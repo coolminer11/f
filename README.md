@@ -163,6 +163,58 @@ Au premier écran, l'application vous propose de créer votre compte.
 Sans clé de messagerie, les envois de documents sont **simulés** : le courriel
 est écrit dans `./courriels-locaux` et l'écran le dit franchement.
 
+## Rester en local
+
+Pour deux personnes qui démarrent, faire tourner l'application sur une seule
+machine est un choix défendable : c'est gratuit, personne d'autre n'y touche, et
+il n'y a rien à administrer. Deux conditions, quand même.
+
+**Une machine fait foi.** Si chacun lance l'application chez soi, vous obtenez
+deux comptabilités différentes qui divergent en silence. Décidez laquelle est la
+vraie et n'en démordez pas.
+
+**Sauvegardez.** Un portable qui meurt emporte l'exercice au complet, sans
+version antérieure à aller rechercher.
+
+```bash
+npm run sauvegarde     # écrit sauvegardes/tapora-<date>.sql
+```
+
+Deux secondes. Faites-le à chaque fin de semaine et **copiez le fichier
+ailleurs** — disque externe, nuage, clé USB. Une sauvegarde rangée à côté de
+l'original ne protège de rien.
+
+```bash
+npm run restaurer -- sauvegardes/tapora-2026-09-10-18-04-56.sql
+```
+
+La restauration vide la base avant de recharger, pour obtenir l'état exact de
+la sauvegarde plutôt qu'un mélange des deux. Le script le dit et demande
+confirmation.
+
+### Travailler à deux, au même endroit
+
+```bash
+npm run partage
+```
+
+L'application devient visible sur votre réseau local. Votre associé ouvre
+l'adresse affichée depuis son portable ou son téléphone, sur le même Wi-Fi, et
+se connecte avec son propre compte.
+
+La liaison est en clair : sans conséquence sur un réseau que vous contrôlez,
+mais n'ouvrez pas ce port sur votre routeur. Pour un accès depuis l'extérieur,
+il faut un hébergeur — voir `DEPLOIEMENT.md`.
+
+### Quand le local ne suffira plus
+
+- Julien a besoin d'entrer des dépenses de chez lui.
+- Vous voulez photographier un reçu avec le téléphone, sur place.
+- Vous branchez le webhook Stripe : il lui faut une adresse publique.
+- Vous en avez assez de penser aux sauvegardes.
+
+Le premier de ces quatre points qui vous agace est le signal.
+
 ## Où ça tourne
 
 Deux choses distinctes, souvent confondues :

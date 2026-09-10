@@ -1,5 +1,5 @@
 import 'server-only'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createHash, randomBytes, scrypt, timingSafeEqual } from 'node:crypto'
 import { promisify } from 'node:util'
@@ -89,6 +89,23 @@ export async function signer(charge: string): Promise<string> {
 // Sessions
 // ---------------------------------------------------------------------------
 
+/**
+ * Le drapeau « Secure » du cookie suit la connexion RÉELLE, pas NODE_ENV.
+ *
+ * Un cookie Secure n'est jamais renvoyé sur une connexion en clair. Le poser
+ * parce que « on est en production » rendait l'application inutilisable dès
+ * qu'on y accédait autrement que par localhost — sur le réseau du bureau, par
+ * exemple : la connexion réussissait, puis chaque écran redemandait le mot de
+ * passe, sans le moindre message.
+ *
+ * Derrière un hébergeur (Render, Vercel), `x-forwarded-proto` vaut toujours
+ * « https » et le cookie est donc bien protégé.
+ */
+async function connexionChiffree(): Promise<boolean> {
+  const entetes = await headers()
+  return entetes.get('x-forwarded-proto')?.split(',')[0].trim() === 'https'
+}
+
 export async function ouvrirSession(utilisateurId: string, agent?: string): Promise<void> {
   const jeton = randomBytes(32).toString('base64url')
   await requete(
@@ -105,7 +122,7 @@ export async function ouvrirSession(utilisateurId: string, agent?: string): Prom
   magasin.set(NOM_COOKIE, `${jeton}.${await signer(jeton)}`, {
     httpOnly: true,
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    secure: await connexionChiffree(),
     path: '/',
     maxAge: DUREE_JOURS * 24 * 60 * 60,
   })

@@ -10,7 +10,10 @@
     "typecheck": "tsc --noEmit",
     "local": "node scripts/local.mjs",
     "db:migrer": "node --env-file-if-exists=.env.local scripts/migrer.mjs",
-    "db:demo": "node --env-file-if-exists=.env.local scripts/demo.mjs"
+    "db:demo": "node --env-file-if-exists=.env.local scripts/demo.mjs",
+    "sauvegarde": "node --env-file-if-exists=.env.local scripts/sauvegarde.mjs",
+    "restaurer": "node --env-file-if-exists=.env.local scripts/restaurer.mjs",
+    "partage": "node scripts/partage.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
