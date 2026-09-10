@@ -137,8 +137,9 @@ Les cartes peuvent être vendues en argent comptant. Le schéma en tient compte 
 
 ## Essayer sur votre machine
 
-Sur un Mac, le plus simple est de suivre **`DEMARRAGE-MAC.md`** et de
-double-cliquer `Demarrer-Tapora.command`. En ligne de commande :
+Sur un Mac neuf, **`DEMARRAGE-MAC.md`** donne les commandes d'installation
+exactes (Homebrew, Node.js, PostgreSQL) ; ensuite tout se lance en
+double-cliquant `Demarrer-Tapora.command`. Si la machine est déjà équipée :
 
 ```bash
 npm install

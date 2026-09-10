@@ -1,31 +1,88 @@
-# Démarrer sur un MacBook
+# Démarrer sur un MacBook — les commandes exactes
 
-## Ce qu'il faut savoir d'abord
+À faire **une seule fois**, sur un Mac neuf, environ 20 minutes dont 15
+d'attente. Ensuite l'application se lance en double-cliquant sur une icône.
 
-**Julien n'a rien à installer.** L'application tourne sur **une seule**
-machine — la vôtre. Julien l'ouvre dans Safari, avec l'adresse que le
-programme affiche, quand vous êtes sur le même Wi-Fi.
+**Julien n'a rien à installer.** L'application tourne sur **une seule** machine
+— la vôtre. Julien l'ouvre dans Safari, avec l'adresse que le programme
+affiche, quand vous êtes sur le même Wi-Fi. C'est voulu : deux copies séparées
+donneraient deux comptabilités qui divergent en silence, et vous ne le verriez
+qu'au moment de faire les taxes.
 
-C'est voulu : deux copies séparées donneraient deux comptabilités qui
-divergent en silence, et vous ne le verriez qu'au moment de faire les taxes.
+---
 
-## Une seule fois : installer
+## Ouvrir le Terminal
 
-### 1. Node.js
+`⌘` + `espace`, taper **Terminal**, `entrée`. Une fenêtre noire ou blanche
+s'ouvre. C'est là que tout se colle.
 
-Aller sur **nodejs.org**, télécharger la version **LTS** pour macOS, ouvrir le
-fichier et suivre l'installation.
+Coller = `⌘` + `V`, puis `entrée`. **Une étape à la fois**, en attendant que
+chacune se termine avant de passer à la suivante.
 
-### 2. PostgreSQL
+---
 
-Aller sur **postgresapp.com**, télécharger, glisser **Postgres.app** dans
-Applications, l'ouvrir, cliquer **Initialize**. Un petit éléphant apparaît dans
-la barre de menus : c'est votre base de données.
+## Étape 1 — Homebrew
 
-### 3. Le projet
+C'est le gestionnaire d'installation de macOS. Il installe aussi, au passage,
+les outils de développement d'Apple (dont `git`), ce qui évite trois
+téléchargements séparés.
 
-Ouvrir **Terminal** (⌘ + espace, taper « Terminal ») et coller ces trois
-lignes, une par une :
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+Il va vous demander deux choses :
+
+- **`Press RETURN to continue`** → appuyez sur `entrée` ;
+- **`Password:`** → votre mot de passe de session Mac. **Rien ne s'affiche
+  pendant que vous tapez**, pas même des points. C'est normal, tapez et faites
+  `entrée`.
+
+Puis il travaille 5 à 15 minutes. Laissez la fenêtre tranquille.
+
+## Étape 2 — Rendre Homebrew utilisable
+
+Sans cette ligne, la commande `brew` n'existe pas dans les fenêtres suivantes.
+Elle marche aussi bien sur les Mac Apple Silicon (M1 à M4) que sur les anciens
+Mac Intel.
+
+```bash
+BREW=/usr/local/bin/brew; [ -x /opt/homebrew/bin/brew ] && BREW=/opt/homebrew/bin/brew
+eval "$($BREW shellenv)"
+grep -q 'brew shellenv' ~/.zprofile 2>/dev/null || echo "eval \"\$($BREW shellenv)\"" >> ~/.zprofile
+```
+
+Vérification — la commande doit répondre un numéro de version :
+
+```bash
+brew --version
+```
+
+## Étape 3 — Node.js et PostgreSQL
+
+Node.js fait tourner l'application, PostgreSQL garde les données.
+
+```bash
+brew install node postgresql@16
+```
+
+Cinq minutes environ. Puis on démarre la base, et on lui dit de se relancer
+toute seule à chaque redémarrage du Mac :
+
+```bash
+brew services start postgresql@16
+```
+
+Vérification — les deux lignes doivent répondre :
+
+```bash
+node --version
+"$(brew --prefix postgresql@16)/bin/pg_isready"
+```
+
+Attendu : `v22.…` (ou plus haut) puis `accepting connections`.
+
+## Étape 4 — Télécharger l'application
 
 ```bash
 cd ~/Documents
@@ -33,20 +90,29 @@ git clone https://github.com/coolminer11/f.git tapora
 cd tapora
 ```
 
-## Ensuite : double-cliquer
+## Étape 5 — Premier démarrage
 
-Ouvrir le dossier `Documents/tapora` dans le Finder et double-cliquer sur
-**`Demarrer-Tapora.command`**.
+```bash
+./Demarrer-Tapora.command
+```
 
-Le premier lancement prend quelques minutes : il installe les composants,
-prépare la base et construit l'application. Les suivants prennent une dizaine
-de secondes.
+Trois à cinq minutes : il installe les composants, crée la base, applique les
+migrations et construit l'application. Le navigateur s'ouvre tout seul sur
+l'écran de création de compte.
 
-Votre navigateur s'ouvre tout seul. Le premier écran vous propose de créer
-votre compte.
+**Les fois suivantes, plus besoin du Terminal** : ouvrez le dossier
+`Documents/tapora` dans le Finder et double-cliquez sur
+**`Demarrer-Tapora.command`**. Une dizaine de secondes.
 
-> **macOS refuse d'ouvrir le fichier ?** Clic droit dessus → **Ouvrir** →
-> **Ouvrir** dans la fenêtre qui apparaît. C'est à faire une seule fois.
+> **macOS refuse d'ouvrir le fichier depuis le Finder ?** Clic droit dessus →
+> **Ouvrir** → **Ouvrir** dans la fenêtre qui apparaît. Une seule fois, pour
+> toutes les suivantes.
+
+Pour l'avoir sous la main : glissez `Demarrer-Tapora.command` dans la barre
+latérale du Finder, ou faites-en un alias sur le Bureau (clic droit → **Créer
+un alias**).
+
+---
 
 ## Faire entrer Julien
 
@@ -56,32 +122,66 @@ votre compte.
 3. Julien la tape dans Safari, sur le **même Wi-Fi**, et se connecte avec son
    compte.
 
-Il voit les mêmes chiffres que vous, à la seconde près — il suffit qu'il
-recharge la page après une de vos saisies.
+Il voit les mêmes chiffres que vous — il recharge la page après une de vos
+saisies.
 
 ## Arrêter
 
-Fermez la fenêtre du Terminal. Julien perd l'accès en même temps : c'est votre
-machine qui fait tourner l'application.
+Fermez la fenêtre du Terminal ouverte par le démarrage. Julien perd l'accès en
+même temps : c'est votre machine qui fait tourner l'application.
 
 ## Chaque vendredi
 
-Dans le Terminal, dans le dossier du projet :
+Dans le Terminal :
 
 ```bash
-npm run sauvegarde
+cd ~/Documents/tapora && npm run sauvegarde
 ```
 
 Puis copiez le fichier créé dans `sauvegardes/` **ailleurs** — iCloud, un
 disque externe, une clé. Une sauvegarde rangée à côté de l'original ne protège
 de rien.
 
+Pour récupérer une sauvegarde (la base est vidée d'abord, le script vous le
+fait confirmer) :
+
+```bash
+npm run restaurer -- sauvegardes/tapora-2026-09-12-18-30-00.sql
+```
+
+## Mettre à jour
+
+```bash
+cd ~/Documents/tapora && git pull
+```
+
+Puis relancez `Demarrer-Tapora.command` : il réapplique les migrations
+manquantes et reconstruit.
+
+---
+
 ## Quand ça coince
 
 | Ce que vous voyez | Ce qu'il faut faire |
 |---|---|
-| `Could not read package.json` | Vous n'êtes pas dans le dossier du projet. `cd ~/Documents/tapora` |
-| `Aucune base de données trouvée` | Postgres.app n'est pas lancé. Ouvrez-le, vérifiez l'éléphant dans la barre de menus. |
-| `Node.js n'est pas installé` | Installez-le depuis nodejs.org, version LTS. |
+| `command not found: brew` | L'étape 2 n'a pas été faite, ou dans une autre fenêtre. Fermez le Terminal, rouvrez-le, refaites l'étape 2. |
+| `Could not read package.json` | Vous n'êtes pas dans le dossier du projet : `cd ~/Documents/tapora` |
+| `command not found: node` | L'étape 3 a échoué. Relancez `brew install node`. |
+| `Aucune base de données trouvée` | PostgreSQL est arrêté : `brew services start postgresql@16` |
+| `xcrun: error: invalid active developer path` | Les outils Apple manquent : `xcode-select --install`, puis reprenez. |
+| `Le port 3000 est déjà utilisé` | L'application tourne déjà dans une autre fenêtre. Fermez-la, ou ouvrez simplement http://localhost:3000 |
+| macOS refuse d'ouvrir `Demarrer-Tapora.command` | Clic droit → **Ouvrir** → **Ouvrir**. |
 | Julien ne voit rien | Même Wi-Fi ? L'adresse commence-t-elle par `192.168` ou `10.` ? |
 | Julien voit la page mais est déconnecté à chaque écran | Vous n'êtes pas à jour : `git pull`, puis redémarrez. |
+
+## Repartir de zéro
+
+Si l'installation part en vrille, ceci efface la base et le dossier — **et
+toute la comptabilité avec** (faites une sauvegarde avant) :
+
+```bash
+brew services stop postgresql@16
+rm -rf ~/Documents/tapora
+```
+
+Puis reprenez à l'étape 3.

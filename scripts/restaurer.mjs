@@ -13,8 +13,14 @@ import { existsSync, readFileSync } from 'node:fs'
 import { createInterface } from 'node:readline/promises'
 import path from 'node:path'
 import pg from 'pg'
+import {
+  CONTENEUR,
+  conteneurDebout,
+  coordonnees,
+  messageOutilsAbsents,
+  trouver,
+} from './outils-postgres.mjs'
 
-const CONTENEUR = 'tapora-postgres'
 const fichier = process.argv[2]
 
 if (!fichier || !existsSync(fichier)) {
@@ -56,29 +62,29 @@ if (reponse.trim() !== 'restaurer') {
   process.exit(0)
 }
 
-function disponible(commande) {
-  return spawnSync(commande, ['--version'], { stdio: 'ignore' }).status === 0
-}
-
 const prealable = 'drop schema if exists public cascade; create schema public;'
 const contenu = prealable + '\n' + readFileSync(fichier, 'utf8')
 
+const outil = trouver('psql')
 let resultat
-if (disponible('psql')) {
-  resultat = spawnSync('psql', ['-v', 'ON_ERROR_STOP=1', '-q', url], {
+
+if (outil) {
+  resultat = spawnSync(outil, ['-v', 'ON_ERROR_STOP=1', '-q', url], {
     input: contenu,
     encoding: 'utf8',
     maxBuffer: 512 * 1024 * 1024,
   })
-} else {
-  const u = new URL(url)
+} else if (conteneurDebout()) {
+  const { utilisateur, base } = coordonnees(url)
   resultat = spawnSync(
     'docker',
     ['exec', '-i', CONTENEUR, 'psql', '-v', 'ON_ERROR_STOP=1', '-q',
-     '-U', decodeURIComponent(u.username) || 'postgres',
-     '-d', u.pathname.replace(/^\//, '') || 'postgres'],
+     '-U', utilisateur, '-d', base],
     { input: contenu, encoding: 'utf8', maxBuffer: 512 * 1024 * 1024 },
   )
+} else {
+  console.error(messageOutilsAbsents('psql'))
+  process.exit(1)
 }
 
 if (resultat.status !== 0) {

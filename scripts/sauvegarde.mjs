@@ -11,15 +11,22 @@
  * On s'appuie sur `pg_dump` plutôt que sur un exporteur maison : c'est l'outil
  * de PostgreSQL, il connaît les séquences, les contraintes et l'ordre des
  * tables mieux que ce que l'on écrirait ici. S'il n'est pas sur le PATH, on le
- * cherche dans le conteneur Docker monté par « npm run local ».
+ * cherche là où les installateurs Mac le rangent, puis dans le conteneur
+ * Docker monté par « npm run local ».
  */
 import { spawnSync } from 'node:child_process'
 import { mkdirSync, statSync, writeFileSync, readdirSync } from 'node:fs'
 import path from 'node:path'
+import {
+  CONTENEUR,
+  conteneurDebout,
+  coordonnees,
+  messageOutilsAbsents,
+  trouver,
+} from './outils-postgres.mjs'
 
 const RACINE = path.resolve(import.meta.dirname, '..')
 const DOSSIER = path.join(RACINE, 'sauvegardes')
-const CONTENEUR = 'tapora-postgres'
 
 const url = process.env.DATABASE_URL
 if (!url) {
@@ -27,34 +34,12 @@ if (!url) {
   process.exit(1)
 }
 
-function coordonnees(chaine) {
-  try {
-    const u = new URL(chaine)
-    return {
-      utilisateur: decodeURIComponent(u.username) || 'postgres',
-      base: u.pathname.replace(/^\//, '') || 'postgres',
-    }
-  } catch {
-    return { utilisateur: 'postgres', base: 'postgres' }
-  }
-}
-
-function disponible(commande) {
-  return spawnSync(commande, ['--version'], { stdio: 'ignore' }).status === 0
-}
-
-function conteneurDebout() {
-  const r = spawnSync('docker', ['inspect', '-f', '{{.State.Running}}', CONTENEUR], {
-    encoding: 'utf8',
-  })
-  return r.status === 0 && r.stdout.trim() === 'true'
-}
-
 const { utilisateur, base } = coordonnees(url)
+const outil = trouver('pg_dump')
 let resultat
 
-if (disponible('pg_dump')) {
-  resultat = spawnSync('pg_dump', ['--no-owner', '--no-privileges', url], {
+if (outil) {
+  resultat = spawnSync(outil, ['--no-owner', '--no-privileges', url], {
     encoding: 'utf8',
     maxBuffer: 512 * 1024 * 1024,
   })
@@ -66,17 +51,7 @@ if (disponible('pg_dump')) {
     { encoding: 'utf8', maxBuffer: 512 * 1024 * 1024 },
   )
 } else {
-  console.error(
-    [
-      'Impossible de trouver pg_dump.',
-      '',
-      'Deux façons de le régler :',
-      '  • installer les outils clients PostgreSQL',
-      '    (macOS : brew install libpq && brew link --force libpq)',
-      '  • ou lancer la base avec Docker : « npm run local » s’en charge,',
-      '    et pg_dump se trouve alors dans le conteneur.',
-    ].join('\n'),
-  )
+  console.error(messageOutilsAbsents('pg_dump'))
   process.exit(1)
 }
 
