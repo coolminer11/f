@@ -66,7 +66,15 @@ fi
 # lancement : on le dit clairement plutôt que de laisser une erreur obscure.
 # On teste avec Node plutôt qu'avec lsof : Node vient d'être vérifié, alors
 # que lsof dépend de la machine.
+# Le port peut être fixé une fois pour toutes dans .env.local (npm run port).
+# Le Finder ne transmet aucune variable d'environnement : sans cette lecture,
+# le double-clic retomberait sur 3000 alors que le reste écoute ailleurs.
+if [ -z "$PORT" ] && [ -f .env.local ]; then
+  PORT=$(sed -n 's/^[[:space:]]*PORT[[:space:]]*=[[:space:]]*\([0-9]*\).*/\1/p' .env.local | tail -1)
+fi
 PORT="${PORT:-3000}"
+export PORT
+
 port_occupe() {
   node -e '
     const net = require("net")

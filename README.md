@@ -164,6 +164,8 @@ Au premier écran, l'application vous propose de créer votre compte.
 | `npm run db:migrer` | Applique seulement les migrations en attente |
 | `npm run db:demo` | Charge un jeu d'essai (refuse si la base contient déjà des écritures) |
 | `npm run dev` | Démarre l'application |
+| `npm run port` | Tire un port libre au hasard et le retient dans `.env.local` |
+| `npm run partage` | Démarre en rendant l'application visible sur le réseau local |
 
 Sans clé de messagerie, les envois de documents sont **simulés** : le courriel
 est écrit dans `./courriels-locaux` et l'écran le dit franchement.

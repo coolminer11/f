@@ -13,7 +13,8 @@
     "db:demo": "node --env-file-if-exists=.env.local scripts/demo.mjs",
     "sauvegarde": "node --env-file-if-exists=.env.local scripts/sauvegarde.mjs",
     "restaurer": "node --env-file-if-exists=.env.local scripts/restaurer.mjs",
-    "partage": "node scripts/partage.mjs"
+    "port": "node scripts/port.mjs",
+    "partage": "node --env-file-if-exists=.env.local scripts/partage.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",

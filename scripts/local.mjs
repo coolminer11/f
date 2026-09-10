@@ -78,20 +78,35 @@ function lireEnv() {
   )
 }
 
+/**
+ * Pose une valeur dans .env.local sans toucher au reste du fichier.
+ *
+ * Ce script tourne à chaque démarrage. S'il réécrivait le fichier au complet,
+ * il effacerait tout ce que vous y avez ajouté à la main — la clé d'envoi de
+ * courriel, le port retenu par « npm run port » — et vous ne le verriez qu'au
+ * moment où un envoi repart en mode simulé.
+ */
+function poser(lignes, cle, valeur) {
+  const i = lignes.findIndex((l) => new RegExp(`^\\s*${cle}\\s*=`).test(l))
+  if (i === -1) return [...lignes, `${cle}=${valeur}`]
+  const copie = [...lignes]
+  copie[i] = `${cle}=${valeur}`
+  return copie
+}
+
 function ecrireEnv(valeurs) {
-  const contenu = [
+  const neuf = [
     '# Écrit par « npm run local ». Modifiable à la main.',
-    `SESSION_SECRET=${valeurs.SESSION_SECRET}`,
-    `DATABASE_URL=${valeurs.DATABASE_URL}`,
-    'DATABASE_SSL=false',
     '',
     '# Envoi de courriel : sans ces deux valeurs, les envois sont simulés et',
     '# écrits dans ./courriels-locaux.',
     '# RESEND_API_KEY=',
     '# COURRIEL_EXPEDITEUR="Tapora S.E.N.C. <facturation@exemple.ca>"',
     '',
-  ].join('\n')
-  writeFileSync(ENV, contenu)
+  ]
+  let lignes = existsSync(ENV) ? readFileSync(ENV, 'utf8').split('\n') : neuf
+  for (const [cle, valeur] of Object.entries(valeurs)) lignes = poser(lignes, cle, valeur)
+  writeFileSync(ENV, lignes.join('\n').replace(/\n+$/, '') + '\n')
 }
 
 function demarrerDocker() {
@@ -184,6 +199,7 @@ await migrer()
 ecrireEnv({
   SESSION_SECRET: env.SESSION_SECRET || randomBytes(32).toString('base64url'),
   DATABASE_URL: url,
+  DATABASE_SSL: process.env.DATABASE_SSL,
 })
 
 console.log(
@@ -193,8 +209,8 @@ console.log(
     '',
     '    npm run dev',
     '',
-    '  Puis ouvrez http://localhost:3000 : le premier écran vous propose de',
-    '  créer votre compte.',
+    `  Puis ouvrez http://localhost:${env.PORT || process.env.PORT || 3000} : le premier écran vous`,
+    '  propose de créer votre compte.',
     '',
   ].join('\n'),
 )

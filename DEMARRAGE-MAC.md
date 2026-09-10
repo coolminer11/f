@@ -112,13 +112,36 @@ Pour l'avoir sous la main : glissez `Demarrer-Tapora.command` dans la barre
 latérale du Finder, ou faites-en un alias sur le Bureau (clic droit → **Créer
 un alias**).
 
+## Changer de port
+
+Par défaut l'application écoute sur le port 3000 — celui que la moitié des
+outils de développement veulent aussi. Pour lui en donner un autre, tiré au
+hasard et libre :
+
+```bash
+cd ~/Documents/tapora && npm run port
+```
+
+Il affiche le port retenu, le note dans `.env.local`, et tous les démarrages
+suivants l'utilisent — double-clic compris. Pour en imposer un précis :
+
+```bash
+npm run port -- 48210
+```
+
+Et pour revenir au réglage d'origine : `npm run port -- 3000`.
+
+Le changement vaut aussi pour Julien : l'adresse à lui donner porte le nouveau
+port, et c'est celle que la fenêtre affiche au démarrage.
+
 ---
 
 ## Faire entrer Julien
 
 1. Dans l'application, aller dans **Comptes** et créer le compte de Julien.
 2. La fenêtre du Terminal affiche une adresse du genre
-   `http://192.168.2.14:3000`. C'est celle-là qu'il lui faut.
+   `http://192.168.2.14:3000`, sous « Application accessible sur ce réseau ».
+   C'est celle-là qu'il lui faut — recopiez-la telle quelle, port compris.
 3. Julien la tape dans Safari, sur le **même Wi-Fi**, et se connecte avec son
    compte.
 
@@ -169,7 +192,7 @@ manquantes et reconstruit.
 | `command not found: node` | L'étape 3 a échoué. Relancez `brew install node`. |
 | `Aucune base de données trouvée` | PostgreSQL est arrêté : `brew services start postgresql@16` |
 | `xcrun: error: invalid active developer path` | Les outils Apple manquent : `xcode-select --install`, puis reprenez. |
-| `Le port 3000 est déjà utilisé` | L'application tourne déjà dans une autre fenêtre. Fermez-la, ou ouvrez simplement http://localhost:3000 |
+| `Le port … est déjà utilisé` | L'application tourne déjà dans une autre fenêtre : fermez-la, ou ouvrez l'adresse affichée. Si un autre programme occupe le port : `npm run port` |
 | macOS refuse d'ouvrir `Demarrer-Tapora.command` | Clic droit → **Ouvrir** → **Ouvrir**. |
 | Julien ne voit rien | Même Wi-Fi ? L'adresse commence-t-elle par `192.168` ou `10.` ? |
 | Julien voit la page mais est déconnecté à chaque écran | Vous n'êtes pas à jour : `git pull`, puis redémarrez. |
