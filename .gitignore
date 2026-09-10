@@ -13,3 +13,4 @@ supabase/.temp
 next-env.d.ts
 /recus-local
 tsconfig.tsbuildinfo
+/courriels-locaux

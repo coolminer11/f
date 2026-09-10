@@ -9,6 +9,7 @@ import {
 } from '@/lib/requetes/resultats'
 import { argent, moisCourant, moisLong, moisPrecedent, moisSuivant, nombre, pourcent } from '@/lib/format'
 import TendanceProfit from '@/components/tendance-profit'
+import { exigerSession } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,6 +25,7 @@ export default async function PageResultats({
 }: {
   searchParams: Promise<{ mois?: string }>
 }) {
+  await exigerSession()
   const { mois: moisDemande } = await searchParams
   const disponibles = await moisDisponibles()
   const mois =

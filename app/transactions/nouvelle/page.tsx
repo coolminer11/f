@@ -10,6 +10,7 @@ import {
 } from '@/lib/requetes/transactions'
 import { televerserRecu } from '@/lib/stockage'
 import FormulaireDepense from '@/components/formulaire-depense'
+import { exigerSession } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,6 +34,7 @@ export default async function PageNouvelleDepense({
 }: {
   searchParams: Promise<{ erreur?: string }>
 }) {
+  await exigerSession()
   const { erreur } = await searchParams
   const categories = (await listerCategories()).filter(
     (c) => c.type_defaut === 'depense' && c.saisie_manuelle,

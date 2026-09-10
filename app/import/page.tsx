@@ -12,6 +12,7 @@ import { listerCategories, PROVINCES } from '@/lib/requetes/transactions'
 import { argent, dateCourte } from '@/lib/format'
 import TeleversementReleve from '@/components/televersement-releve'
 import TableauRapprochement from '@/components/tableau-rapprochement'
+import { exigerSession } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,6 +21,7 @@ export default async function PageImport({
 }: {
   searchParams: Promise<{ import?: string; tout?: string; message?: string; erreur?: string }>
 }) {
+  await exigerSession()
   const p = await searchParams
   const inclureTraitees = p.tout === '1'
 

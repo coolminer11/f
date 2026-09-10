@@ -14,6 +14,8 @@ Gestion des dépenses, des profits et des comptes d'associés pour Tapora S.E.N.
 | 5. Import CSV bancaire et rapprochement | `/import` |
 | 6. Marge unitaire et seuil de rentabilité | `/marge` |
 | Documents de vente (7 types) | `/ventes` |
+| Export comptable | `/export` |
+| Comptes | `/compte` |
 
 ## Facturation
 
@@ -136,12 +138,14 @@ Les cartes peuvent être vendues en argent comptant. Le schéma en tient compte 
 ## Développement local
 
 ```bash
-cp .env.example .env.local   # puis remplir BACKOFFICE_PASSWORD, SESSION_SECRET, DATABASE_URL
+cp .env.example .env.local   # puis remplir SESSION_SECRET et DATABASE_URL
 supabase start               # applique migrations/ puis seed.sql
 supabase db reset            # repart d'une base vierge
 npm install
 npm run dev                  # http://localhost:3000
 ```
+
+Au premier lancement, `/connexion` propose de créer le premier compte.
 
 ## Architecture de l'interface
 
@@ -181,15 +185,43 @@ Deux protections, parce que les deux sources de données réessaient :
   sur chaque ligne (`lignes_import_bancaire`), pour couvrir aussi les relevés
   qui se chevauchent.
 
+## Envoi des documents
+
+Un document se transmet au client par courriel, avec un **lien vers ce document
+seul** : le client l'ouvre, l'imprime ou l'enregistre en PDF sans avoir de
+compte. Le jeton est tiré au hasard sur 24 octets, n'ouvre aucun autre écran, et
+se révoque d'un clic.
+
+Le courriel part par l'API HTTP de Resend — aucune dépendance à installer. Sans
+clé configurée, l'envoi est **simulé** : le message est écrit dans
+`./courriels-locaux` et le journal des envois le dit franchement, en orange.
+
+## Export comptable
+
+Cinq fichiers par période : grand livre, balance de vérification, sommaire des
+taxes par autorité, documents de vente, mouvements des associés. CSV séparé par
+des points-virgules, décimales à la virgule, UTF-8 avec marque d'ordre — Excel
+en français les ouvre d'un double-clic, sans assistant ni accents cassés.
+
+L'écran affiche aussi le sommaire de la période : revenus, coûts, profit,
+valeur du stock et net de taxes par autorité.
+
 ## Sécurité
 
-Pas d'authentification : un mot de passe unique en variable d'environnement
-(`BACKOFFICE_PASSWORD`). En conséquence, le RLS est activé sur les 28 tables
-**sans aucune politique**, et les 16 vues sont en `security_invoker`.
+**Un compte par associé.** Mot de passe haché en scrypt avec un sel par
+utilisateur, sessions en base (fermer une session la révoque vraiment), rôle
+« accès complet » ou « lecture seule ». Au premier démarrage, l'écran de
+connexion propose de créer le premier compte.
 
-**Aucun appel Supabase ne part du navigateur.** Tout passe par des route
-handlers ou des server actions, avec la clé `service_role`. Il n'y a
-volontairement pas de clé `anon` dans ce projet : une requête depuis le
-navigateur ne remonterait que des tableaux vides, sans message d'erreur. Le
-détail est documenté en tête de `lib/supabase/server.ts` et de la migration
-`..._securite.sql`.
+Deux barrières, et les deux comptent :
+
+- le **middleware** vérifie la signature du cookie et écarte un cookie forgé
+  sans toucher la base ;
+- **`exigerSession()`** est appelée en tête de chaque page, de chaque route et
+  de chaque action serveur : c'est elle qui tranche contre la base, car une
+  session fermée ou expirée garde une signature valide.
+
+Le RLS est activé sur toutes les tables **sans aucune politique**, et toutes les
+vues sont en `security_invoker`. **Aucun accès à la base ne part du
+navigateur** : tout passe par des composants serveur, des server actions ou des
+route handlers. Le raisonnement complet est en tête de `lib/db.ts`.

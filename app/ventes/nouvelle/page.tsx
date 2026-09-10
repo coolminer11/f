@@ -15,6 +15,7 @@ import {
 } from '@/lib/requetes/ventes'
 import { MODES_PAIEMENT, PROVINCES } from '@/lib/requetes/transactions'
 import FormulaireDocument from '@/components/formulaire-document'
+import { exigerSession } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -70,6 +71,7 @@ export default async function PageNouveauDocument({
 }: {
   searchParams: Promise<{ type?: string; depuis?: string; erreur?: string }>
 }) {
+  await exigerSession()
   const p = await searchParams
   const [produits, societe, types, regimes, clients] = await Promise.all([
     listerProduits(),

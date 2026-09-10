@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { utilisateurCourant } from '@/lib/auth'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -15,9 +16,12 @@ const LIENS = [
   ['/marge', 'Marge'],
   ['/import', 'Import'],
   ['/associes', 'Associés'],
+  ['/export', 'Export'],
 ] as const
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Le nom affiché vient de la session : la page de connexion n'en a pas.
+  const utilisateur = await utilisateurCourant()
   return (
     <html lang="fr-CA">
       <body className="min-h-screen antialiased">
@@ -37,11 +41,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </Link>
               ))}
             </nav>
-            <form action="/connexion/sortie" method="post" className="ml-auto">
-              <button className="text-xs font-medium text-[var(--color-encre-doux)] hover:underline">
-                Fermer la session
-              </button>
-            </form>
+            {utilisateur && (
+              <div className="ml-auto flex items-center gap-3">
+                <Link
+                  href="/compte"
+                  className="text-xs font-medium text-[var(--color-encre-doux)] hover:underline"
+                >
+                  {utilisateur.nom}
+                  {utilisateur.role === 'lecture' && ' · lecture seule'}
+                </Link>
+                <form action="/connexion/sortie" method="post">
+                  <button className="text-xs font-medium text-[var(--color-encre-doux)] hover:underline">
+                    Fermer la session
+                  </button>
+                </form>
+              </div>
+            )}
           </div>
         </header>
         <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>

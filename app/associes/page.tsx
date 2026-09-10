@@ -19,6 +19,7 @@ import { argent, dateCourte, dateLongue, pourcent } from '@/lib/format'
 import FormulaireMouvement from '@/components/formulaire-mouvement'
 import FormulaireDecision from '@/components/formulaire-decision'
 import FiltresDecisions from '@/components/filtres-decisions'
+import { exigerSession } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -54,6 +55,7 @@ export default async function PageAssocies({
 }: {
   searchParams: Promise<Record<string, string | undefined>>
 }) {
+  await exigerSession()
   const p = await searchParams
   const exercices = await exercicesConnus()
   // Par défaut, l'exercice en cours — pas le plus récent connu : la table

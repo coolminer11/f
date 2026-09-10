@@ -13,7 +13,11 @@ import {
   supprimerPaiement,
 } from '@/lib/requetes/ventes'
 import { MODES_PAIEMENT } from '@/lib/requetes/transactions'
+import { envoyerDocument, listerEnvois, messagerieConfiguree, revoquerLienPublic } from '@/lib/requetes/envois'
+import { requeteUne } from '@/lib/db'
+import { headers } from 'next/headers'
 import { argent, dateLongue, nombre, taux } from '@/lib/format'
+import { exigerSession } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,19 +28,33 @@ const SaisiePaiement = z.object({
   reference: z.string().trim().max(100).optional(),
 })
 
+const SaisieEnvoi = z.object({
+  destinataire: z.string().trim().email('Adresse courriel invalide.'),
+  message: z.string().trim().max(1500).optional(),
+})
+
 export default async function PageDocument({
   params,
   searchParams,
 }: {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ erreur?: string; message?: string }>
+  searchParams: Promise<{ erreur?: string; message?: string; avis?: string }>
 }) {
+  const moi = await exigerSession()
   const { id } = await params
-  const { erreur, message } = await searchParams
+  const { erreur, message, avis } = await searchParams
   const doc = await documentComplet(id)
   if (!doc) notFound()
 
   const estCredit = doc.definition.signe === -1
+  const [envois, lienPublic] = await Promise.all([
+    listerEnvois(doc.id),
+    requeteUne<{ jeton_public: string | null }>(
+      `select jeton_public from ventes where id = $1::uuid`,
+      [doc.id],
+    ),
+  ])
+
   const cibles =
     estCredit && !doc.paiements.length
       ? (await documentsCreditables(doc.client ?? doc.client_nom ?? '')).filter(
@@ -46,6 +64,7 @@ export default async function PageDocument({
 
   async function enregistrerPaiement(donnees: FormData) {
     'use server'
+    await exigerSession()
     const analyse = SaisiePaiement.safeParse(Object.fromEntries(donnees))
     if (!analyse.success) {
       redirect(`/ventes/${id}?erreur=${encodeURIComponent(analyse.error.issues[0].message)}`)
@@ -64,12 +83,14 @@ export default async function PageDocument({
 
   async function retirerPaiement(donnees: FormData) {
     'use server'
+    await exigerSession()
     await supprimerPaiement(String(donnees.get('id')))
     revalidatePath(`/ventes/${id}`)
   }
 
   async function transformer() {
     'use server'
+    await exigerSession()
     let factureId: string
     try {
       factureId = await accepterDevis(id, new Date().toISOString().slice(0, 10))
@@ -83,6 +104,7 @@ export default async function PageDocument({
 
   async function appliquerCredit(donnees: FormData) {
     'use server'
+    await exigerSession()
     try {
       await appliquerNoteCredit(id, String(donnees.get('facture_id')))
     } catch (e) {
@@ -95,15 +117,65 @@ export default async function PageDocument({
 
   async function envoyer() {
     'use server'
+    await exigerSession()
     await marquerEnvoye(id, new Date().toISOString().slice(0, 10))
     revalidatePath(`/ventes/${id}`)
   }
 
   async function annuler() {
     'use server'
+    await exigerSession()
     await annulerDocument(id)
     revalidatePath('/ventes')
     redirect('/ventes')
+  }
+
+  async function expedier(donnees: FormData) {
+    'use server'
+    const utilisateur = await exigerSession()
+    const analyse = SaisieEnvoi.safeParse(Object.fromEntries(donnees))
+    if (!analyse.success) {
+      redirect(`/ventes/${id}?erreur=${encodeURIComponent(analyse.error.issues[0].message)}`)
+    }
+    // L'origine vient de la requête : le lien du courriel doit pointer vers le
+    // domaine réellement utilisé, pas vers une valeur codée en dur.
+    const entetes = await headers()
+    const hote = entetes.get('x-forwarded-host') ?? entetes.get('host') ?? 'localhost:3000'
+    const schema = entetes.get('x-forwarded-proto') ?? (hote.startsWith('localhost') ? 'http' : 'https')
+
+    let resultat: { statut: string; erreur: string | null }
+    try {
+      resultat = await envoyerDocument({
+        venteId: id,
+        destinataire: analyse.data.destinataire,
+        message: analyse.data.message?.length ? analyse.data.message : null,
+        utilisateurId: utilisateur.id,
+        origine: `${schema}://${hote}`,
+      })
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Envoi impossible.'
+      redirect(`/ventes/${id}?erreur=${encodeURIComponent(msg)}`)
+    }
+
+    revalidatePath(`/ventes/${id}`)
+    if (resultat.statut === 'echec') {
+      redirect(`/ventes/${id}?erreur=${encodeURIComponent(resultat.erreur ?? 'Envoi refusé.')}`)
+    }
+    // Un envoi simulé n'est pas un succès : il ne doit pas s'afficher en vert.
+    redirect(
+      resultat.statut === 'simule'
+        ? `/ventes/${id}?avis=${encodeURIComponent(
+            'Aucun service de courriel n’est configuré : le message a été écrit dans ./courriels-locaux, rien n’est parti.',
+          )}`
+        : `/ventes/${id}?message=${encodeURIComponent('Document envoyé.')}`,
+    )
+  }
+
+  async function revoquer() {
+    'use server'
+    await exigerSession()
+    await revoquerLienPublic(id)
+    revalidatePath(`/ventes/${id}`)
   }
 
   const sousTotal = doc.lignes.reduce((s, l) => s + Number(l.montant_ht), 0)
@@ -177,6 +249,11 @@ export default async function PageDocument({
       {message && (
         <p className="carte border-[var(--color-positif)] bg-green-50 px-4 py-3 text-sm font-medium text-[var(--color-positif)]">
           {message}
+        </p>
+      )}
+      {avis && (
+        <p className="carte border-[var(--color-attention)] bg-orange-50 px-4 py-3 text-sm font-medium text-[var(--color-attention)]">
+          {avis}
         </p>
       )}
 
@@ -297,6 +374,78 @@ export default async function PageDocument({
             </div>
             <button className="bouton">Appliquer le crédit</button>
           </form>
+        </section>
+      )}
+
+      {actif && (
+        <section className="carte p-5">
+          <h2 className="text-sm font-bold">Envoyer au client</h2>
+          <p className="mt-0.5 text-xs text-[var(--color-encre-doux)]">
+            Le courriel contient un lien vers ce document seul. Le client peut l’ouvrir,
+            l’imprimer ou l’enregistrer en PDF, sans compte.
+            {!messagerieConfiguree() &&
+              ' Aucun service de courriel n’est configuré : l’envoi sera simulé et écrit sur disque.'}
+          </p>
+
+          <form action={expedier} className="mt-3 space-y-3">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className="etiquette" htmlFor="destinataire">
+                  Destinataire
+                </label>
+                <input
+                  id="destinataire"
+                  name="destinataire"
+                  type="email"
+                  className="champ"
+                  defaultValue={doc.courriel_facturation ?? ''}
+                  required
+                />
+              </div>
+              <div className="flex items-end">
+                <button className="bouton">
+                  {envois.length > 0 ? 'Renvoyer' : 'Envoyer'} {doc.definition.libelle.toLowerCase()}
+                </button>
+              </div>
+            </div>
+            <div>
+              <label className="etiquette" htmlFor="message_envoi">
+                Message <span className="font-normal">(facultatif)</span>
+              </label>
+              <textarea
+                id="message_envoi"
+                name="message"
+                className="champ"
+                rows={2}
+                maxLength={1500}
+                placeholder="Bonjour, voici la facture pour votre commande…"
+              />
+            </div>
+          </form>
+
+          {envois.length > 0 && (
+            <div className="mt-4 border-t border-[var(--color-ligne)] pt-3">
+              <ul className="space-y-1 text-xs text-[var(--color-encre-doux)]">
+                {envois.map((e) => (
+                  <li key={e.id}>
+                    {dateLongue(e.envoye_le.slice(0, 10))} — {e.destinataire}
+                    {e.statut === 'simule' && ' · simulé, rien n’est parti'}
+                    {e.statut === 'echec' && (
+                      <span className="text-[var(--color-negatif)]"> · échec : {e.erreur}</span>
+                    )}
+                    {e.envoye_par_nom && ` · par ${e.envoye_par_nom}`}
+                  </li>
+                ))}
+              </ul>
+              {lienPublic?.jeton_public && (
+                <form action={revoquer} className="mt-2">
+                  <button className="text-xs text-[var(--color-encre-doux)] hover:underline">
+                    Révoquer le lien public
+                  </button>
+                </form>
+              )}
+            </div>
+          )}
         </section>
       )}
 

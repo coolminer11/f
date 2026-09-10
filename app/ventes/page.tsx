@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { listerDocuments, typesDocument } from '@/lib/requetes/ventes'
 import { argent, dateCourte, nombre } from '@/lib/format'
+import { exigerSession } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,6 +18,7 @@ export default async function PageVentes({
 }: {
   searchParams: Promise<Record<string, string | undefined>>
 }) {
+  await exigerSession()
   const p = await searchParams
   const [documents, types] = await Promise.all([
     listerDocuments({ type: p.type, statut_paiement: p.etat, recherche: p.recherche }),

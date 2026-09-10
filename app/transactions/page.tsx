@@ -4,6 +4,7 @@ import { lienRecu } from '@/lib/stockage'
 import { argent, dateCourte, nombre } from '@/lib/format'
 import type { LigneJournal } from '@/lib/requetes/transactions'
 import FiltresJournal from '@/components/filtres-journal'
+import { exigerSession } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,6 +15,7 @@ export default async function PageTransactions({
 }: {
   searchParams: Promise<Record<string, string | undefined>>
 }) {
+  await exigerSession()
   const p = await searchParams
   const filtres = {
     debut: p.debut,

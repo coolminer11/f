@@ -12,6 +12,7 @@ import {
 } from '@/lib/requetes/taxes'
 import { argent, dateCourte, dateLongue, taux } from '@/lib/format'
 import SelecteurPeriode from '@/components/selecteur-periode'
+import { exigerSession } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,6 +21,7 @@ export default async function PageTaxes({
 }: {
   searchParams: Promise<{ periode?: string; autorite?: string; erreur?: string }>
 }) {
+  await exigerSession()
   const p = await searchParams
   const periodes = await periodesDisponibles()
   const periode = periodes.find((x) => x.valeur === p.periode) ?? periodes[0]

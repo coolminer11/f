@@ -14,6 +14,7 @@ import {
 } from '@/lib/requetes/marge'
 import { listerProduits } from '@/lib/requetes/ventes'
 import { argent, nombre, pourcent, taux } from '@/lib/format'
+import { exigerSession } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -42,6 +43,7 @@ export default async function PageMarge({
 }: {
   searchParams: Promise<{ erreur?: string; message?: string }>
 }) {
+  await exigerSession()
   const p = await searchParams
   const [reelles, references, seuil, couts, produits, hypo] = await Promise.all([
     margeReelle(),
