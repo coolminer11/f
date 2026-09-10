@@ -1,0 +1,84 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-encre: #16181d;
+  --color-encre-doux: #5b6472;
+  --color-ligne: #e4e7ec;
+  --color-fond: #f7f8fa;
+  --color-accent: #1d4ed8;
+  --color-accent-doux: #eff4ff;
+  --color-positif: #0f7b52;
+  --color-negatif: #b42318;
+  --color-attention: #b54708;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  background: var(--color-fond);
+  color: var(--color-encre);
+  font-feature-settings: 'tnum' 1;
+}
+
+/* Les montants s'alignent en colonne : chiffres à chasse fixe. */
+.chiffre {
+  font-variant-numeric: tabular-nums;
+}
+
+.carte {
+  background: white;
+  border: 1px solid var(--color-ligne);
+  border-radius: 0.75rem;
+}
+
+.champ {
+  width: 100%;
+  border: 1px solid var(--color-ligne);
+  border-radius: 0.5rem;
+  background: white;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.875rem;
+  color: var(--color-encre);
+}
+
+.champ:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -1px;
+  border-color: var(--color-accent);
+}
+
+.etiquette {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-encre-doux);
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.01em;
+}
+
+.bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: var(--color-accent);
+  color: white;
+  border: 1px solid transparent;
+}
+
+.bouton:hover { filter: brightness(1.08); }
+.bouton:disabled { opacity: 0.55; }
+
+.bouton-secondaire {
+  background: white;
+  color: var(--color-encre);
+  border-color: var(--color-ligne);
+}
+
+.bouton-secondaire:hover { background: var(--color-fond); filter: none; }

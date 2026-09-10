@@ -3,8 +3,16 @@
 Gestion des dépenses, des profits et des comptes d'associés pour Tapora S.E.N.C.
 (société en nom collectif québécoise, 2 associés à parts égales).
 
-**État : schéma de base de données seulement.** L'interface Next.js n'est pas
-encore écrite — elle attend votre accord sur la modélisation ci-dessous.
+**État : schéma de base de données + écrans 1 et 2.**
+
+| Écran | Route | État |
+|---|---|---|
+| 1. Transactions et saisie d'une dépense | `/transactions` | ✅ |
+| 2. État des résultats mensuel | `/resultats` | ✅ |
+| 3. Rapport de remise de taxes | — | à venir |
+| 4. Tableau des associés | — | à venir |
+| 5. Import CSV bancaire | — | à venir |
+| 6. Marge unitaire et seuil de rentabilité | — | à venir |
 
 ## Contenu
 
@@ -87,9 +95,27 @@ Les cartes peuvent être vendues en argent comptant. Le schéma en tient compte 
 ## Développement local
 
 ```bash
-supabase start          # applique migrations/ puis seed.sql
-supabase db reset       # repart d'une base vierge
+cp .env.example .env.local   # puis remplir BACKOFFICE_PASSWORD, SESSION_SECRET, DATABASE_URL
+supabase start               # applique migrations/ puis seed.sql
+supabase db reset            # repart d'une base vierge
+npm install
+npm run dev                  # http://localhost:3000
 ```
+
+## Architecture de l'interface
+
+- **Next.js App Router**, composants serveur par défaut. Les rares composants
+  clients (filtres, formulaire de dépense, graphique) ne touchent jamais la
+  base : ils passent par des server actions ou des route handlers.
+- **`pg` pour les données, `@supabase/supabase-js` pour les reçus.** Toute
+  l'intelligence du modèle vit dans des vues et des fonctions SQL ; les
+  interroger en SQL direct est plus lisible qu'à travers PostgREST et permet
+  d'enchaîner plusieurs écritures dans une transaction. Le raisonnement complet
+  est en tête de `lib/db.ts`.
+- **Aucun calcul monétaire en JavaScript.** Les montants arrivent déjà calculés
+  par PostgreSQL ; le client ne fait que les mettre en forme.
+- Les reçus vivent dans un bucket privé, servis par `/api/recus/...` qui vérifie
+  la session et redirige vers une URL signée à durée limitée.
 
 Le schéma est validé sur PostgreSQL 16 : les 12 migrations et le seed
 s'appliquent sur une base vierge, et un scénario complet passe — ventes au

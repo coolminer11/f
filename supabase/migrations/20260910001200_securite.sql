@@ -26,12 +26,17 @@
 --     politiques : la structure des tables n'aura pas à changer.
 -- ============================================================================
 
+-- NOTE : `enable` sans `force`, volontairement.
+-- `force row level security` soumet AUSSI le propriétaire des tables au RLS.
+-- Comme il n'existe aucune politique, le rôle `postgres` — celui qui applique
+-- les migrations et celui avec lequel le serveur se connecte — se retrouverait
+-- lui-même à ne rien voir. `enable` seul suffit à bloquer anon et
+-- authenticated, qui ne sont ni propriétaires ni porteurs de BYPASSRLS.
 do $$
 declare r record;
 begin
   for r in select tablename from pg_tables where schemaname = 'public' loop
     execute format('alter table public.%I enable row level security', r.tablename);
-    execute format('alter table public.%I force row level security', r.tablename);
   end loop;
 end;
 $$;
