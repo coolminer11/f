@@ -135,17 +135,45 @@ Les cartes peuvent être vendues en argent comptant. Le schéma en tient compte 
 - la marge unitaire est calculée **par canal** : une vente comptant ne supporte
   aucun frais Stripe.
 
-## Développement local
+## Essayer sur votre machine
 
 ```bash
-cp .env.example .env.local   # puis remplir SESSION_SECRET et DATABASE_URL
-supabase start               # applique migrations/ puis seed.sql
-supabase db reset            # repart d'une base vierge
 npm install
-npm run dev                  # http://localhost:3000
+npm run local     # trouve ou démarre une base, applique les migrations
+npm run db:demo   # facultatif : un trimestre de données d'essai
+npm run dev       # http://localhost:3000
 ```
 
-Au premier lancement, `/connexion` propose de créer le premier compte.
+`npm run local` cherche une base de données dans cet ordre : le `DATABASE_URL`
+de votre `.env.local` s'il existe, sinon la CLI Supabase (`supabase start`),
+sinon un conteneur Docker PostgreSQL. Il applique les migrations en attente,
+écrit un `.env.local` avec un `SESSION_SECRET` tiré au hasard, et vous rend la
+main. Le relancer ne rejoue rien : les migrations déjà passées sont notées dans
+`schema_migrations`.
+
+Au premier écran, l'application vous propose de créer votre compte.
+
+| Commande | Ce qu'elle fait |
+|---|---|
+| `npm run local` | Prépare la base et l'environnement |
+| `npm run db:migrer` | Applique seulement les migrations en attente |
+| `npm run db:demo` | Charge un jeu d'essai (refuse si la base contient déjà des écritures) |
+| `npm run dev` | Démarre l'application |
+
+Sans clé de messagerie, les envois de documents sont **simulés** : le courriel
+est écrit dans `./courriels-locaux` et l'écran le dit franchement.
+
+## Où ça tourne
+
+Deux choses distinctes, souvent confondues :
+
+- **Supabase héberge la base de données** (PostgreSQL) et l'entreposage des
+  reçus. C'est là que vivent les données.
+- **L'application est un serveur Next.js.** Elle exécute du code à chaque
+  requête — c'est ce qui permet qu'aucun secret ni aucune requête ne parte du
+  navigateur. Supabase n'héberge pas de serveur Node : il faut donc un
+  hébergeur pour l'application elle-même (Vercel, Railway, Render, un VPS…),
+  ou la faire tourner sur une machine à vous.
 
 ## Architecture de l'interface
 
