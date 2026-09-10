@@ -6,9 +6,13 @@
  *
  * Le script cherche une base de données dans cet ordre :
  *   1. DATABASE_URL déjà présent dans .env.local — on l'utilise tel quel ;
- *   2. la CLI Supabase (`supabase start`) — c'est le plus proche de la
- *      production, avec l'entreposage des reçus ;
- *   3. Docker — un simple conteneur PostgreSQL, plus léger.
+ *   2. un PostgreSQL déjà lancé sur le port 5432 — Postgres.app sur Mac, ou
+ *      une installation Homebrew. C'est le cas le plus courant et le plus
+ *      rapide : rien à télécharger de plus ;
+ *   3. la CLI Supabase (`supabase start`) ;
+ *   4. Docker — un simple conteneur PostgreSQL.
+ *
+ * La base `tapora` est créée si elle n'existe pas.
  *
  * Puis il applique les migrations, écrit .env.local s'il manque, et vous rend
  * la main pour `npm run dev`.
@@ -23,6 +27,38 @@ const RACINE = path.resolve(import.meta.dirname, '..')
 const ENV = path.join(RACINE, '.env.local')
 const CONTENEUR = 'tapora-postgres'
 const URL_DOCKER = 'postgresql://postgres:tapora@127.0.0.1:54329/tapora'
+
+/**
+ * Cherche un PostgreSQL déjà en marche. Postgres.app crée un rôle au nom de
+ * l'utilisateur macOS ; Homebrew fait de même ; une installation classique
+ * garde « postgres ». On essaie les trois.
+ */
+async function postgresLocal() {
+  const pg = (await import('pg')).default
+  const utilisateur = process.env.USER || process.env.USERNAME || 'postgres'
+  const candidats = [
+    `postgresql://${encodeURIComponent(utilisateur)}@127.0.0.1:5432/postgres`,
+    'postgresql://postgres@127.0.0.1:5432/postgres',
+    'postgresql://postgres:postgres@127.0.0.1:5432/postgres',
+  ]
+
+  for (const candidat of candidats) {
+    const client = new pg.Client({ connectionString: candidat, connectionTimeoutMillis: 2500 })
+    try {
+      await client.connect()
+      const { rows } = await client.query('select 1 from pg_database where datname = $1', ['tapora'])
+      if (rows.length === 0) {
+        await client.query('create database tapora')
+        console.log('Base « tapora » créée.')
+      }
+      await client.end()
+      return candidat.replace(/\/postgres$/, '/tapora')
+    } catch {
+      await client.end().catch(() => {})
+    }
+  }
+  return null
+}
 
 function disponible(commande, args = ['--version']) {
   return spawnSync(commande, args, { stdio: 'ignore' }).status === 0
@@ -96,6 +132,8 @@ let url = env.DATABASE_URL || process.env.DATABASE_URL
 
 if (url) {
   console.log('Base de données : celle indiquée par DATABASE_URL.')
+} else if ((url = await postgresLocal())) {
+  console.log('Base de données : le PostgreSQL déjà installé sur cette machine.')
 } else if (disponible('supabase')) {
   console.log('Démarrage de Supabase en local (première fois : quelques minutes)…')
   spawnSync('supabase', ['start'], { stdio: 'inherit', cwd: RACINE })
@@ -111,13 +149,21 @@ if (url) {
 } else {
   console.error(
     [
-      'Aucune base de données trouvée.',
       '',
-      'Trois façons de continuer :',
-      '  • installer Docker Desktop, puis relancer « npm run local » ;',
-      '  • installer la CLI Supabase (brew install supabase/tap/supabase) ;',
-      '  • ou pointer DATABASE_URL vers un PostgreSQL que vous avez déjà,',
-      '    dans un fichier .env.local.',
+      '  Aucune base de données trouvée sur cette machine.',
+      '',
+      '  Le plus simple sur un Mac : Postgres.app',
+      '',
+      '    1. Télécharger sur postgresapp.com',
+      '    2. Glisser Postgres.app dans Applications',
+      '    3. L’ouvrir et cliquer « Initialize »',
+      '    4. Relancer cette commande',
+      '',
+      '  Rien d’autre à configurer : le script trouvera la base tout seul.',
+      '',
+      '  (Autres possibilités : Docker Desktop, la CLI Supabase, ou un',
+      '   DATABASE_URL que vous renseignez vous-même dans .env.local.)',
+      '',
     ].join('\n'),
   )
   process.exit(1)

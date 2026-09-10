@@ -137,6 +137,9 @@ Les cartes peuvent être vendues en argent comptant. Le schéma en tient compte 
 
 ## Essayer sur votre machine
 
+Sur un Mac, le plus simple est de suivre **`DEMARRAGE-MAC.md`** et de
+double-cliquer `Demarrer-Tapora.command`. En ligne de commande :
+
 ```bash
 npm install
 npm run local     # trouve ou démarre une base, applique les migrations
@@ -145,8 +148,9 @@ npm run dev       # http://localhost:3000
 ```
 
 `npm run local` cherche une base de données dans cet ordre : le `DATABASE_URL`
-de votre `.env.local` s'il existe, sinon la CLI Supabase (`supabase start`),
-sinon un conteneur Docker PostgreSQL. Il applique les migrations en attente,
+de votre `.env.local` s'il existe, sinon un PostgreSQL déjà lancé sur le port
+5432 (Postgres.app, Homebrew), sinon la CLI Supabase, sinon un conteneur
+Docker. La base `tapora` est créée si elle n'existe pas. Il applique les migrations en attente,
 écrit un `.env.local` avec un `SESSION_SECRET` tiré au hasard, et vous rend la
 main. Le relancer ne rejoue rien : les migrations déjà passées sont notées dans
 `schema_migrations`.

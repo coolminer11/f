@@ -10,6 +10,11 @@
  *
  * Les fichiers déjà appliqués sont notés dans `schema_migrations` : relancer
  * la commande ne rejoue rien.
+ *
+ * L'application ET son enregistrement se font dans la MÊME transaction. Sinon,
+ * une interruption entre les deux — fenêtre fermée, machine qui s'éteint —
+ * laisserait le schéma en avance sur ce qui est noté, et la relance échouerait
+ * sur un « relation already exists » incompréhensible.
  */
 import { readFile, readdir } from 'node:fs/promises'
 import path from 'node:path'
@@ -56,10 +61,13 @@ export async function migrer({ avecSeed = true, silencieux = false } = {}) {
       const sql = await readFile(path.join(MIGRATIONS, fichier), 'utf8')
       process.stdout.write(`  ${fichier} … `)
       try {
+        await client.query('begin')
         await client.query(sql)
         await client.query('insert into schema_migrations (fichier) values ($1)', [fichier])
+        await client.query('commit')
         console.log('appliquée')
       } catch (e) {
+        await client.query('rollback').catch(() => {})
         console.log('ÉCHEC')
         console.error(`\n${e.message}\n`)
         throw e
