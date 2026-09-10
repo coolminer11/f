@@ -1,16 +1,15 @@
 import Link from 'next/link'
-import { listerDocuments } from '@/lib/requetes/ventes'
+import { listerDocuments, typesDocument } from '@/lib/requetes/ventes'
 import { argent, dateCourte, nombre } from '@/lib/format'
 
 export const dynamic = 'force-dynamic'
-
-const TYPES: Record<string, string> = { facture: 'Facture', devis: 'Devis', recu: 'Reçu' }
 
 const ETATS: Record<string, { libelle: string; classe: string }> = {
   impayee: { libelle: 'Impayée', classe: 'bg-[var(--color-fond)] text-[var(--color-encre-doux)]' },
   partielle: { libelle: 'Partielle', classe: 'bg-orange-50 text-[var(--color-attention)]' },
   payee: { libelle: 'Payée', classe: 'bg-green-50 text-[var(--color-positif)]' },
   remboursee: { libelle: 'Remboursée', classe: 'bg-[var(--color-fond)] text-[var(--color-encre-doux)]' },
+  sans_objet: { libelle: '—', classe: 'text-[var(--color-encre-doux)]' },
 }
 
 export default async function PageVentes({
@@ -19,14 +18,13 @@ export default async function PageVentes({
   searchParams: Promise<Record<string, string | undefined>>
 }) {
   const p = await searchParams
-  const documents = await listerDocuments({
-    type: p.type,
-    statut_paiement: p.etat,
-    recherche: p.recherche,
-  })
+  const [documents, types] = await Promise.all([
+    listerDocuments({ type: p.type, statut_paiement: p.etat, recherche: p.recherche }),
+    typesDocument(),
+  ])
 
   const aRecevoir = documents
-    .filter((d) => d.type_document === 'facture' && d.statut_paiement !== 'payee')
+    .filter((d) => d.attend_paiement && d.statut_paiement !== 'payee')
     .reduce((somme, d) => somme + d.solde, 0)
   const enRetard = documents.filter((d) => d.en_retard)
 
@@ -55,7 +53,9 @@ export default async function PageVentes({
         <Sommaire
           libelle="Documents"
           valeur={nombre(documents.length)}
-          detail={`${documents.filter((d) => d.type_document === 'devis').length} devis`}
+          detail={`${documents.filter((d) => d.type_document === 'devis').length} devis · ${
+            documents.filter((d) => d.type_document === 'note_credit').length
+          } note${documents.filter((d) => d.type_document === 'note_credit').length > 1 ? 's' : ''} de crédit`}
         />
       </div>
 
@@ -78,9 +78,11 @@ export default async function PageVentes({
           </label>
           <select id="type" name="type" className="champ w-auto" defaultValue={p.type ?? ''}>
             <option value="">Tous</option>
-            <option value="facture">Factures</option>
-            <option value="devis">Devis</option>
-            <option value="recu">Reçus</option>
+            {types.map((t) => (
+              <option key={t.code} value={t.code}>
+                {t.libelle_pluriel}
+              </option>
+            ))}
           </select>
         </div>
         <div>
@@ -130,7 +132,7 @@ export default async function PageVentes({
                       {d.numero}
                     </Link>
                     <span className="ml-2 text-xs text-[var(--color-encre-doux)]">
-                      {TYPES[d.type_document]}
+                      {d.type_libelle}
                     </span>
                   </td>
                   <td className="chiffre whitespace-nowrap px-3 py-2 text-[var(--color-encre-doux)]">
@@ -141,20 +143,29 @@ export default async function PageVentes({
                     {argent(d.montant_ttc)}
                   </td>
                   <td className="chiffre whitespace-nowrap px-3 py-2 text-right">
-                    {d.type_document === 'devis' ? '—' : argent(d.solde)}
+                    {d.attend_paiement ? argent(d.solde) : '—'}
                   </td>
                   <td className="px-3 py-2">
-                    {d.type_document === 'devis' ? (
+                    {d.statut === 'annulee' ? (
                       <span className="rounded bg-[var(--color-fond)] px-2 py-0.5 text-xs font-semibold text-[var(--color-encre-doux)]">
-                        {d.devis_facture ? 'Facturé' : d.statut}
+                        Annulé
                       </span>
-                    ) : (
+                    ) : d.attend_paiement ? (
                       <span
                         className={`rounded px-2 py-0.5 text-xs font-semibold ${
                           ETATS[d.statut_paiement]?.classe ?? ''
                         }`}
                       >
                         {ETATS[d.statut_paiement]?.libelle ?? d.statut_paiement}
+                      </span>
+                    ) : (
+                      <span className="rounded bg-[var(--color-fond)] px-2 py-0.5 text-xs font-semibold text-[var(--color-encre-doux)]">
+                        {d.a_un_suivi ? `Suivi ${d.numero_suivi_document}` : d.statut}
+                      </span>
+                    )}
+                    {d.regime_taxe !== 'taxable' && (
+                      <span className="ml-1.5 rounded bg-orange-50 px-1.5 py-0.5 text-[11px] font-semibold text-[var(--color-attention)]">
+                        sans taxe
                       </span>
                     )}
                   </td>

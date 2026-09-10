@@ -13,48 +13,66 @@ Gestion des dépenses, des profits et des comptes d'associés pour Tapora S.E.N.
 | 4. Associés : capital, prélèvements, décisions | `/associes` |
 | 5. Import CSV bancaire et rapprochement | `/import` |
 | 6. Marge unitaire et seuil de rentabilité | `/marge` |
-| Factures, devis et reçus | `/ventes` |
+| Documents de vente (7 types) | `/ventes` |
 
 ## Facturation
 
-Trois types de documents, numérotés séparément et sans trou (`F-2026-00001`,
-`D-2026-00001`, `R-2026-00001`) :
+Sept types de documents, numérotés séparément et sans trou par des compteurs
+annuels. Ce que chacun **fait** est décrit une seule fois, dans la table
+`types_document` : les déclencheurs SQL et l'interface la lisent tous les deux,
+personne ne recopie la règle.
 
-- **Facture** — reconnaît le revenu à l'émission, même impayée. Conditions de
-  paiement, échéance calculée, bon de commande, remise par ligne et remise
-  globale, lignes non taxables, note au client et conditions générales.
-- **Devis** — ne crée ni revenu, ni sortie de stock, ni taxe à remettre. Une
-  fois accepté, il engendre une facture qui garde le lien vers lui.
-- **Reçu de vente** — pour la vente réglée au comptoir.
+| Document | Préfixe | Revenu | Stock | Prix affichés | Paiement attendu |
+|---|---|---|---|---|---|
+| Facture | `F` | oui | sortie | oui | oui |
+| Reçu de vente | `R` | oui | sortie | oui | oui |
+| Facture d'acompte | `A` | oui | non | oui | oui |
+| Note de crédit | `NC` | négatif | retour | oui | non |
+| Devis | `D` | non | non | oui | non |
+| Facture proforma | `P` | non | non | oui | non |
+| Bon de livraison | `BL` | non | non | **non** | non |
 
-Une facture peut recevoir **plusieurs paiements** (`paiements_vente`) : le
-revenu et l'encaissement sont deux moments distincts et le restent. Un paiement
-comptant entre en caisse à ce moment-là, pas à l'émission du document.
+Ajouter un type, c'est ajouter une ligne à ce registre — pas retrouver cinq
+conditions éparpillées dans des déclencheurs.
 
-Le document imprimable (`/ventes/<id>/facture`) sort sur une feuille Lettre via
-la fonction d'impression du navigateur, qui permet aussi d'enregistrer en PDF.
-Il porte les numéros d'inscription TPS et TVQ dès 30 $, comme l'exige Revenu
-Québec pour que le client puisse réclamer ses propres crédits.
+### Régimes de taxe
 
-## Contenu
+Toutes les ventes ne portent pas de taxe. Le régime se choisit sur le document
+et **exige un motif**, qui s'imprime dessus :
 
-```
-supabase/
-  migrations/
-    ..._types_et_extensions.sql   Types énumérés
-    ..._referentiel.sql           Paramètres, référentiel de taxes, exercices, produits
-    ..._ventes.sql                Ventes et lignes de vente (Stripe et comptant)
-    ..._transactions.sql          Journal central et lignes de taxe
-    ..._caisse_et_inventaire.sql  Petite caisse, stock, dénombrement
-    ..._stripe_et_imports.sql     Événements, versements, litiges, import CSV
-    ..._associes.sql              Capital, compte courant, registre des décisions
-    ..._declarations_taxes.sql    Déclarations figées, par autorité fiscale
-    ..._fonctions.sql             Calculs de taxes et déclencheurs
-    ..._rpc_metier.sql            Webhooks, rapport de taxes, clôture d'exercice
-    ..._vues_rapports.sql         Vues alimentant les 5 écrans
-    ..._securite.sql              RLS et entreposage des reçus
-  seed.sql                        Taux de taxes, catégories, associés, produit
-```
+| Régime | Taxes | Motif | Certificat |
+|---|---|---|---|
+| Taxable | selon la province | — | — |
+| Détaxée (0 %) | aucune | obligatoire | facultatif |
+| Exonérée | aucune | obligatoire | obligatoire |
+| Hors du champ | aucune | obligatoire | facultatif |
+
+Ce n'est pas un interrupteur « pas de taxes » : sans motif, la base refuse
+l'écriture. C'est exactement ce qu'une vérification demandera.
+
+### Prix taxes incluses
+
+Pour la vente au comptoir, une case fait basculer les prix des lignes en TTC :
+on saisit 45 $ tout rond, le hors-taxes est déduit du prix payé. Quatre cartes
+à 45 $ donnent 180,00 $ pile — 156,56 $ HT plus 23,44 $ de taxes.
+
+### Le reste
+
+- Une facture peut recevoir **plusieurs paiements** (`paiements_vente`) : le
+  revenu et l'encaissement sont deux moments distincts et le restent. Un
+  paiement comptant entre en caisse à ce moment-là, pas à l'émission.
+- Une **note de crédit** s'applique à la facture qu'elle corrige : le solde dû
+  diminue sans qu'un sou n'ait été encaissé. La ligne porte `note_credit_id`,
+  pour ne jamais confondre un crédit accordé avec de l'argent reçu.
+- Le **fichier client se construit tout seul** : facturer un nom inconnu crée sa
+  fiche, refacturer le même nom la retrouve et la met à jour.
+- **Dupliquer**, créer une **note de crédit** ou un **bon de livraison** passent
+  tous par le même mécanisme : le nouveau document est prérempli depuis
+  l'ancien et reste modifiable avant enregistrement.
+- Le document imprimable sort sur feuille Lettre via la fonction d'impression du
+  navigateur, qui enregistre aussi en PDF. Il porte les numéros d'inscription
+  TPS et TVQ dès 30 $, comme l'exige Revenu Québec, et le bon de livraison
+  réserve un espace de signature à la réception.
 
 ## Règles fiscales inscrites dans le schéma
 

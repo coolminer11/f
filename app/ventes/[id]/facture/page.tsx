@@ -6,27 +6,32 @@ import BoutonImprimer from '@/components/bouton-imprimer'
 
 export const dynamic = 'force-dynamic'
 
-const TITRES: Record<string, string> = {
-  facture: 'FACTURE',
-  devis: 'DEVIS',
-  recu: 'REÇU DE VENTE',
-}
-
-export default async function PageFacture({ params }: { params: Promise<{ id: string }> }) {
+export default async function PageDocumentImprimable({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
   const { id } = await params
   const [doc, societe] = await Promise.all([documentComplet(id), emetteur()])
   if (!doc) notFound()
 
-  const sousTotal = doc.lignes.reduce((s, l) => s + Number(l.montant_ht), 0)
-  const estDevis = doc.type_document === 'devis'
-  // Au Québec, une facture de 30 $ ou plus doit porter les numéros d'inscription :
-  // sans eux, le client ne peut pas réclamer ses propres crédits de taxe.
-  const mentionsObligatoires = doc.montant_ttc >= 30
+  const { definition, regime } = doc
+  const affichePrix = definition.affiche_prix
+  const estCredit = definition.signe === -1
+  const sousTotal = doc.lignes.reduce((s, l) => s + Number(l.montant_ht), 0) * definition.signe
+  const aDesRemises = doc.lignes.some((l) => l.remise_ht > 0)
+
+  // Au Québec, un document de 30 $ ou plus doit porter les numéros
+  // d'inscription : sans eux, le client ne peut pas réclamer ses crédits.
+  const mentionsObligatoires = Math.abs(doc.montant_ttc) >= 30 && affichePrix
 
   return (
     <>
       <div className="mx-auto mb-4 flex max-w-[8.5in] flex-wrap items-center justify-between gap-2 print:hidden">
-        <Link href={`/ventes/${doc.id}`} className="text-sm text-[var(--color-encre-doux)] hover:underline">
+        <Link
+          href={`/ventes/${doc.id}`}
+          className="text-sm text-[var(--color-encre-doux)] hover:underline"
+        >
           ← Retour au document
         </Link>
         <div className="flex items-center gap-2">
@@ -38,7 +43,6 @@ export default async function PageFacture({ params }: { params: Promise<{ id: st
       </div>
 
       <article className="mx-auto max-w-[8.5in] bg-white p-[0.6in] text-[13px] leading-relaxed text-[var(--color-encre)] shadow-sm print:max-w-none print:p-0 print:shadow-none">
-        {/* En-tête */}
         <header className="flex flex-wrap items-start justify-between gap-6 border-b-2 border-[var(--color-encre)] pb-5">
           <div>
             <h1 className="text-xl font-bold tracking-tight">{societe.nom_entreprise}</h1>
@@ -58,38 +62,38 @@ export default async function PageFacture({ params }: { params: Promise<{ id: st
           </div>
 
           <div className="text-right">
-            <div className="text-2xl font-bold tracking-wide">{TITRES[doc.type_document]}</div>
+            <div className="text-2xl font-bold uppercase tracking-wide">{definition.libelle}</div>
             <div className="chiffre mt-1 text-lg font-semibold">{doc.numero}</div>
             <dl className="mt-3 space-y-0.5 text-[var(--color-encre-doux)]">
-              <div className="flex justify-end gap-3">
-                <dt>Date</dt>
-                <dd className="chiffre font-medium text-[var(--color-encre)]">
-                  {dateLongue(doc.date)}
-                </dd>
-              </div>
-              {doc.date_echeance && (
-                <div className="flex justify-end gap-3">
-                  <dt>{estDevis ? 'Valide jusqu’au' : 'Échéance'}</dt>
-                  <dd className="chiffre font-medium text-[var(--color-encre)]">
-                    {dateLongue(doc.date_echeance)}
-                  </dd>
-                </div>
+              <Entete libelle="Date" valeur={dateLongue(doc.date)} />
+              {/* Une échéance n'a de sens que si un paiement est attendu ; une
+                  date de validité, que sur une offre. Une note de crédit n'a ni
+                  l'une ni l'autre. */}
+              {doc.date_echeance &&
+                affichePrix &&
+                (definition.attend_paiement || !definition.comptabilise_revenu) && (
+                  <Entete
+                    libelle={definition.attend_paiement ? 'Échéance' : 'Valide jusqu’au'}
+                    valeur={dateLongue(doc.date_echeance)}
+                  />
+                )}
+              {doc.numero_origine && (
+                <Entete
+                  libelle={estCredit ? 'Facture créditée' : 'Référence'}
+                  valeur={doc.numero_origine}
+                />
               )}
               {doc.bon_de_commande && (
-                <div className="flex justify-end gap-3">
-                  <dt>Bon de commande</dt>
-                  <dd className="font-medium text-[var(--color-encre)]">{doc.bon_de_commande}</dd>
-                </div>
+                <Entete libelle="Bon de commande" valeur={doc.bon_de_commande} />
               )}
             </dl>
           </div>
         </header>
 
-        {/* Destinataire */}
         <section className="mt-5 flex flex-wrap justify-between gap-6">
           <div>
             <h2 className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-encre-doux)]">
-              {estDevis ? 'Destinataire' : 'Facturé à'}
+              {affichePrix ? (estCredit ? 'Crédité à' : 'Facturé à') : 'Livré à'}
             </h2>
             <div className="mt-1 font-semibold">{doc.client ?? doc.client_nom ?? '—'}</div>
             {doc.adresse_facturation && (
@@ -104,6 +108,14 @@ export default async function PageFacture({ params }: { params: Promise<{ id: st
             )}
           </div>
 
+          {(doc.transporteur || doc.numero_suivi) && (
+            <div className="text-[11px] text-[var(--color-encre-doux)]">
+              <h2 className="font-bold uppercase tracking-wider">Expédition</h2>
+              {doc.transporteur && <div className="mt-1">{doc.transporteur}</div>}
+              {doc.numero_suivi && <div className="chiffre">Suivi : {doc.numero_suivi}</div>}
+            </div>
+          )}
+
           {mentionsObligatoires && (societe.numero_tps || societe.numero_tvq) && (
             <div className="text-right text-[11px] text-[var(--color-encre-doux)]">
               <h2 className="font-bold uppercase tracking-wider">Numéros d’inscription</h2>
@@ -116,17 +128,20 @@ export default async function PageFacture({ params }: { params: Promise<{ id: st
           )}
         </section>
 
-        {/* Lignes */}
         <table className="mt-6 w-full">
           <thead>
             <tr className="border-b border-[var(--color-encre)] text-left text-[11px] uppercase tracking-wider text-[var(--color-encre-doux)]">
               <th className="pb-1.5 font-bold">Description</th>
               <th className="pb-1.5 text-right font-bold">Qté</th>
-              <th className="pb-1.5 text-right font-bold">Prix unitaire</th>
-              {doc.lignes.some((l) => l.remise_ht > 0) && (
-                <th className="pb-1.5 text-right font-bold">Remise</th>
+              {affichePrix && (
+                <>
+                  <th className="pb-1.5 text-right font-bold">
+                    Prix unitaire{doc.prix_avec_taxes ? ' (taxes incl.)' : ''}
+                  </th>
+                  {aDesRemises && <th className="pb-1.5 text-right font-bold">Remise</th>}
+                  <th className="pb-1.5 text-right font-bold">Montant</th>
+                </>
               )}
-              <th className="pb-1.5 text-right font-bold">Montant</th>
             </tr>
           </thead>
           <tbody>
@@ -134,58 +149,89 @@ export default async function PageFacture({ params }: { params: Promise<{ id: st
               <tr key={l.id} className="border-b border-[var(--color-ligne)]">
                 <td className="py-2">
                   {l.description}
-                  {!l.taxable && (
+                  {regime.applique_taxes && !l.taxable && (
                     <span className="ml-2 text-[11px] text-[var(--color-encre-doux)]">
                       (non taxable)
                     </span>
                   )}
                 </td>
                 <td className="chiffre py-2 text-right">{nombre(l.quantite)}</td>
-                <td className="chiffre py-2 text-right">{argent(l.prix_unitaire_ht)}</td>
-                {doc.lignes.some((x) => x.remise_ht > 0) && (
-                  <td className="chiffre py-2 text-right">
-                    {l.remise_ht > 0 ? `− ${argent(l.remise_ht)}` : ''}
-                  </td>
+                {affichePrix && (
+                  <>
+                    <td className="chiffre py-2 text-right">{argent(l.prix_unitaire_ht)}</td>
+                    {aDesRemises && (
+                      <td className="chiffre py-2 text-right">
+                        {l.remise_ht > 0 ? `− ${argent(l.remise_ht)}` : ''}
+                      </td>
+                    )}
+                    <td className="chiffre py-2 text-right font-medium">
+                      {argent(Number(l.montant_ht) * definition.signe)}
+                    </td>
+                  </>
                 )}
-                <td className="chiffre py-2 text-right font-medium">{argent(l.montant_ht)}</td>
               </tr>
             ))}
           </tbody>
         </table>
 
-        {/* Totaux */}
-        <div className="mt-4 flex justify-end">
-          <dl className="w-full max-w-xs space-y-1">
-            <LigneTotal libelle="Sous-total" valeur={argent(sousTotal)} />
-            {doc.remise_globale > 0 && (
-              <LigneTotal libelle="Remise" valeur={`− ${argent(doc.remise_globale)}`} />
-            )}
-            <LigneTotal libelle="Total hors taxes" valeur={argent(doc.montant_ht)} />
-            {doc.taxes.map((t) => (
+        {affichePrix && (
+          <div className="mt-4 flex justify-end">
+            <dl className="w-full max-w-xs space-y-1">
               <LigneTotal
-                key={t.code}
-                libelle={`${t.code} ${taux(t.taux)}`}
-                valeur={argent(t.montant)}
+                libelle={doc.prix_avec_taxes ? 'Sous-total (taxes incluses)' : 'Sous-total'}
+                valeur={argent(sousTotal)}
               />
-            ))}
-            <div className="!mt-2 flex items-baseline justify-between border-t-2 border-[var(--color-encre)] pt-2">
-              <dt className="font-bold">{estDevis ? 'Total estimé' : 'Total'}</dt>
-              <dd className="chiffre text-lg font-bold">{argent(doc.montant_ttc)}</dd>
-            </div>
+              {doc.remise_globale > 0 && (
+                <LigneTotal libelle="Remise" valeur={`− ${argent(doc.remise_globale)}`} />
+              )}
+              <LigneTotal libelle="Total hors taxes" valeur={argent(doc.montant_ht)} />
+              {doc.taxes.map((t) => (
+                <LigneTotal
+                  key={t.code}
+                  libelle={`${t.code} ${taux(t.taux)}`}
+                  valeur={argent(t.montant)}
+                />
+              ))}
+              {!regime.applique_taxes && (
+                <LigneTotal libelle={regime.libelle} valeur={argent(0)} />
+              )}
+              <div className="!mt-2 flex items-baseline justify-between border-t-2 border-[var(--color-encre)] pt-2">
+                <dt className="font-bold">
+                  {estCredit ? 'Total du crédit' : definition.attend_paiement ? 'Total' : 'Total estimé'}
+                </dt>
+                <dd className="chiffre text-lg font-bold">{argent(doc.montant_ttc)}</dd>
+              </div>
 
-            {!estDevis && doc.montant_paye !== 0 && (
+              {definition.attend_paiement && doc.montant_paye !== 0 && (
+                <>
+                  <LigneTotal libelle="Paiements reçus" valeur={`− ${argent(doc.montant_paye)}`} />
+                  <div className="!mt-2 flex items-baseline justify-between border-t border-[var(--color-encre)] pt-2">
+                    <dt className="font-bold">Solde dû</dt>
+                    <dd className="chiffre text-lg font-bold">{argent(doc.solde)}</dd>
+                  </div>
+                </>
+              )}
+            </dl>
+          </div>
+        )}
+
+        {!regime.applique_taxes && affichePrix && (
+          <p className="mt-5 border-l-2 border-[var(--color-encre)] pl-3 text-[11px]">
+            <span className="font-bold uppercase tracking-wider">{regime.libelle}</span>
+            <br />
+            {regime.mention_document} {doc.motif_exemption}
+            {doc.numero_certificat_exemption && (
               <>
-                <LigneTotal libelle="Paiements reçus" valeur={`− ${argent(doc.montant_paye)}`} />
-                <div className="!mt-2 flex items-baseline justify-between border-t border-[var(--color-encre)] pt-2">
-                  <dt className="font-bold">Solde dû</dt>
-                  <dd className="chiffre text-lg font-bold">{argent(doc.solde)}</dd>
-                </div>
+                <br />
+                <span className="chiffre">
+                  Certificat d’exemption n° {doc.numero_certificat_exemption}
+                </span>
               </>
             )}
-          </dl>
-        </div>
+          </p>
+        )}
 
-        {!estDevis && doc.paiements.length > 0 && (
+        {definition.attend_paiement && doc.paiements.length > 0 && (
           <section className="mt-5">
             <h2 className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-encre-doux)]">
               Paiements reçus
@@ -194,19 +240,58 @@ export default async function PageFacture({ params }: { params: Promise<{ id: st
               {doc.paiements.map((p) => (
                 <li key={p.id} className="chiffre">
                   {dateLongue(p.date)} — {argent(p.montant)}
-                  {p.reference && ` (${p.reference})`}
+                  {p.note_credit_id
+                    ? ` (note de crédit ${p.reference ?? ''})`
+                    : p.reference
+                      ? ` (${p.reference})`
+                      : ''}
                 </li>
               ))}
             </ul>
           </section>
         )}
 
-        {doc.solde > 0 && !estDevis && (
+        {definition.attend_paiement && doc.solde > 0 && (
           <p className="mt-5 rounded border border-[var(--color-encre)] px-4 py-2 font-semibold">
             Montant à payer : <span className="chiffre">{argent(doc.solde)}</span>
             {doc.conditions_paiement && ` · ${doc.conditions_paiement}`}
             {doc.date_echeance && ` · au plus tard le ${dateLongue(doc.date_echeance)}`}
           </p>
+        )}
+
+        {estCredit && (
+          <p className="mt-5 rounded border border-[var(--color-encre)] px-4 py-2 font-semibold">
+            Crédit de <span className="chiffre">{argent(Math.abs(doc.montant_ttc))}</span>
+            {doc.numero_origine && ` porté au compte, en regard de la facture ${doc.numero_origine}`}.
+          </p>
+        )}
+
+        {!affichePrix && (
+          <>
+            <p className="mt-5 rounded border border-[var(--color-ligne)] px-4 py-2 text-[11px] text-[var(--color-encre-doux)]">
+              Ce bon de livraison ne tient pas lieu de facture. Aucun prix n’y figure.
+            </p>
+            <section className="mt-8 flex gap-10">
+              <div className="flex-1">
+                <div className="border-b border-[var(--color-encre)] pb-8" />
+                <div className="mt-1 text-[11px] uppercase tracking-wider text-[var(--color-encre-doux)]">
+                  Reçu par (nom en lettres moulées)
+                </div>
+              </div>
+              <div className="flex-1">
+                <div className="border-b border-[var(--color-encre)] pb-8" />
+                <div className="mt-1 text-[11px] uppercase tracking-wider text-[var(--color-encre-doux)]">
+                  Signature
+                </div>
+              </div>
+              <div className="w-32">
+                <div className="border-b border-[var(--color-encre)] pb-8" />
+                <div className="mt-1 text-[11px] uppercase tracking-wider text-[var(--color-encre-doux)]">
+                  Date
+                </div>
+              </div>
+            </section>
+          </>
         )}
 
         {doc.notes_facture && (
@@ -218,7 +303,7 @@ export default async function PageFacture({ params }: { params: Promise<{ id: st
           </section>
         )}
 
-        {doc.conditions_generales && (
+        {doc.conditions_generales && affichePrix && (
           <section className="mt-4">
             <h2 className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-encre-doux)]">
               Conditions
@@ -231,7 +316,7 @@ export default async function PageFacture({ params }: { params: Promise<{ id: st
 
         <footer className="mt-8 border-t border-[var(--color-ligne)] pt-3 text-center text-[11px] text-[var(--color-encre-doux)]">
           {societe.pied_facture}
-          {!mentionsObligatoires && (societe.numero_tps || societe.numero_tvq) && (
+          {!mentionsObligatoires && affichePrix && (societe.numero_tps || societe.numero_tvq) && (
             <div className="chiffre mt-1">
               {societe.numero_tps && `TPS / TVH : ${societe.numero_tps}`}
               {societe.numero_tps && societe.numero_tvq && ' · '}
@@ -241,6 +326,15 @@ export default async function PageFacture({ params }: { params: Promise<{ id: st
         </footer>
       </article>
     </>
+  )
+}
+
+function Entete({ libelle, valeur }: { libelle: string; valeur: string }) {
+  return (
+    <div className="flex justify-end gap-3">
+      <dt>{libelle}</dt>
+      <dd className="chiffre font-medium text-[var(--color-encre)]">{valeur}</dd>
+    </div>
   )
 }
 
