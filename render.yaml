@@ -1,0 +1,35 @@
+# Plan de déploiement Render — https://render.com/docs/blueprint-spec
+#
+# Dans Render : New → Blueprint → choisir ce dépôt. Render lit ce fichier,
+# crée le service et demande les trois secrets marqués « sync: false ».
+# SESSION_SECRET est tiré au hasard par Render : vous n'avez pas à y toucher.
+services:
+  - type: web
+    name: tapora-backoffice
+    runtime: node
+    plan: free
+    region: ohio            # le plus proche du Québec chez Render
+    branch: main
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    healthCheckPath: /connexion
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: SESSION_SECRET
+        generateValue: true
+      # Chaîne de connexion Supabase (Transaction pooler).
+      - key: DATABASE_URL
+        sync: false
+      # Entreposage des reçus. Sans ces deux valeurs, les reçus sont écrits sur
+      # le disque du serveur — qui est effacé à chaque redéploiement.
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      # Envoi des documents. Sans ces deux valeurs, les envois sont simulés.
+      - key: RESEND_API_KEY
+        sync: false
+      - key: COURRIEL_EXPEDITEUR
+        sync: false
