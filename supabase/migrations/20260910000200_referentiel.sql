@@ -2,30 +2,29 @@
 -- Tapora S.E.N.C. — 02 · Référentiel (paramètres, taxes, exercices, produits)
 -- ============================================================================
 
--- ---------------------------------------------------------------------------
--- Paramètres de la société : une seule ligne (contrainte id = true).
--- ---------------------------------------------------------------------------
 create table parametres (
   id                        boolean primary key default true check (id),
   nom_entreprise            text    not null default 'Tapora S.E.N.C.',
   neq                       text,
-  numero_tps                text,        -- 123456789 RT0001
-  numero_tvq                text,        -- 1234567890 TQ0001
+  numero_tps                text,        -- couvre aussi la TVH (même inscription ARC)
+  numero_tvq                text,
+  province_etablissement    province_canada not null default 'QC',
   adresse                   text,
   courriel_contact          text,
   devise                    char(3) not null default 'CAD',
 
-  -- Hypothèses Stripe utilisées pour la marge théorique et le contrôle des
-  -- frais reçus par webhook (le montant réel du webhook fait toujours foi).
   frais_stripe_pct          numeric(6,4) not null default 0.0290,
   frais_stripe_fixe         numeric(8,2) not null default 0.30,
   frais_stripe_taxables     boolean not null default true,
+  frais_litige_stripe       numeric(8,2) not null default 15.00,
 
-  -- Nombre de mois utilisés pour lisser les coûts fixes du seuil de rentabilité
-  mois_lissage_couts_fixes  smallint not null default 3 check (mois_lissage_couts_fixes between 1 and 12),
-  -- Écart de prélèvements (en $) au-delà duquel l'écran associés alerte.
+  mois_lissage_couts_fixes  smallint not null default 3
+                            check (mois_lissage_couts_fixes between 1 and 12),
+  -- Fenêtre glissante des indicateurs unitaires : les coûts d'il y a un an ne
+  -- doivent pas polluer la marge d'aujourd'hui.
+  jours_fenetre_marge       smallint not null default 90
+                            check (jours_fenetre_marge between 30 and 730),
   seuil_alerte_prelevement  numeric(12,2) not null default 500.00,
-  -- Fond de caisse théorique conservé pour les ventes comptant.
   fond_de_caisse            numeric(12,2) not null default 0.00,
 
   maj_le                    timestamptz not null default now()
@@ -33,28 +32,49 @@ create table parametres (
 comment on table parametres is 'Configuration unique de la société (ligne singleton).';
 
 -- ---------------------------------------------------------------------------
--- Taux de taxes historisés : les taux changent (TVQ 9,5 % -> 9,975 % en 2013).
--- Une déclaration rouverte sur une vieille période doit retrouver SON taux.
+-- Taxes de vente canadiennes.
+-- Deux colonnes fixes (tps, tvq) ne suffisent pas : une carte expédiée en
+-- Ontario porte 13 % de TVH sur UNE seule ligne, la Colombie-Britannique
+-- porte TPS + TVP. Le modèle est donc générique : un référentiel de taxes,
+-- des règles par province de destination, et des lignes de taxe par écriture.
 -- ---------------------------------------------------------------------------
-create table taux_taxes (
-  id          bigserial primary key,
-  date_debut  date not null,
-  date_fin    date,                       -- borne exclusive, null = en vigueur
-  taux_tps    numeric(7,5) not null check (taux_tps    >= 0 and taux_tps    < 1),
-  taux_tvq    numeric(7,5) not null check (taux_tvq    >= 0 and taux_tvq    < 1),
-  note        text,
-  constraint chk_taux_periode check (date_fin is null or date_fin > date_debut),
-  -- Aucune période ne peut se chevaucher : garantit un taux unique par date.
-  constraint ex_taux_sans_chevauchement exclude using gist (
+create table taxes (
+  code                   text primary key check (code in ('TPS', 'TVQ', 'TVH', 'TVP')),
+  nom                    text not null,
+  -- Récupérable par défaut à l'achat : la TVP (PST/RST) ne l'est PAS, il n'existe
+  -- pas de crédit sur intrants provincial hors Québec.
+  recuperable_pct_defaut numeric(5,4) not null default 1
+                         check (recuperable_pct_defaut between 0 and 1),
+  ordre                  smallint not null default 1
+);
+
+-- Règles par province de destination, historisées.
+-- `autorite` porte le destinataire de la remise : la TVQ se déclare à Revenu
+-- Québec, la TPS et la TVH à l'ARC, la TVP à la province qui la perçoit.
+create table regles_taxes_province (
+  id         bigserial primary key,
+  province   province_canada not null,
+  code_taxe  text not null references taxes (code) on delete restrict,
+  taux       numeric(7,5) not null check (taux >= 0 and taux < 1),
+  autorite   text not null check (autorite in ('ARC', 'RQ', 'BC', 'SK', 'MB')),
+  date_debut date not null,
+  date_fin   date,
+  note       text,
+  constraint chk_regle_periode check (date_fin is null or date_fin > date_debut),
+  -- Un seul taux par (province, taxe) à une date donnée.
+  constraint ex_regles_sans_chevauchement exclude using gist (
+    province  with =,
+    code_taxe with =,
     daterange(date_debut, coalesce(date_fin, 'infinity'::date), '[)') with &&
   )
 );
-comment on table taux_taxes is
-  'TPS/TVQ par période. TVQ calculée sur le HT seul (pas sur HT+TPS) depuis 2013.';
+create index idx_regles_province on regles_taxes_province (province, date_debut desc);
+
+comment on table regles_taxes_province is
+  'Taxe applicable selon la province de DESTINATION du bien expédié (règles sur le lieu de fourniture).';
 
 -- ---------------------------------------------------------------------------
 -- Exercices financiers : 1er janvier au 31 décembre.
--- Un exercice « clos » gèle les écritures (trigger en migration 09).
 -- ---------------------------------------------------------------------------
 create table exercices (
   annee        integer primary key check (annee between 2020 and 2100),
@@ -69,26 +89,25 @@ create table exercices (
 );
 
 -- ---------------------------------------------------------------------------
--- Valeurs par défaut par catégorie : pilote les formulaires (nature suggérée)
--- et les règles fiscales de récupération. Table plutôt que code en dur pour
--- que vous puissiez ajuster sans redéploiement.
+-- Valeurs par défaut par catégorie.
+-- `pct_recuperable` s'applique à TOUTES les taxes de la ligne : la limite de
+-- 50 % sur les repas vaut autant pour la TPS/TVH que pour la TVQ.
 -- ---------------------------------------------------------------------------
 create table categories_defauts (
-  categorie     categorie_transaction primary key,
-  libelle       text not null,
-  type_defaut   type_transaction not null,
-  nature_defaut nature_cout,             -- null pour les catégories de revenu
-  pct_cti       numeric(5,4) not null default 1 check (pct_cti between 0 and 1),
-  pct_rti       numeric(5,4) not null default 1 check (pct_rti between 0 and 1),
-  ordre         smallint not null default 100,
-  actif         boolean not null default true,
+  categorie       categorie_transaction primary key,
+  libelle         text not null,
+  type_defaut     type_transaction not null,
+  nature_defaut   nature_cout,
+  pct_recuperable numeric(5,4) not null default 1 check (pct_recuperable between 0 and 1),
+  -- Catégories produites par le système (COGS, pertes) : masquées à la saisie.
+  saisie_manuelle boolean not null default true,
+  ordre           smallint not null default 100,
+  actif           boolean not null default true,
   constraint chk_nature_selon_type check (
     (type_defaut = 'depense' and nature_defaut is not null)
     or (type_defaut = 'revenu' and nature_defaut is null)
   )
 );
-comment on column categories_defauts.pct_cti is
-  'Part de la TPS payée récupérable en CTI (0,5 pour repas et représentation).';
 
 -- ---------------------------------------------------------------------------
 -- Associés : deux lignes fixes, parts 50/50.
@@ -102,25 +121,21 @@ create table associes (
   ordre     smallint not null default 1,
   cree_le   timestamptz not null default now()
 );
-comment on column associes.part is
-  'Quote-part des profits. La somme des parts des associés actifs doit valoir 1 (trigger).';
 
--- ---------------------------------------------------------------------------
--- Clients (facultatif mais utile pour les ventes comptant B2B).
--- ---------------------------------------------------------------------------
 create table clients (
   id         uuid primary key default gen_random_uuid(),
   nom        text not null,
   entreprise text,
   courriel   text,
   telephone  text,
+  province   province_canada,
   notes      text,
   cree_le    timestamptz not null default now()
 );
 create index idx_clients_nom on clients (lower(nom));
 
 -- ---------------------------------------------------------------------------
--- Produits physiques (cartes NFC, présentoirs, etc.).
+-- Produits physiques.
 -- ---------------------------------------------------------------------------
 create table produits (
   id             uuid primary key default gen_random_uuid(),
@@ -130,18 +145,15 @@ create table produits (
   prix_vente_ht  numeric(12,2) not null default 0 check (prix_vente_ht >= 0),
   taxable        boolean not null default true,
   suivi_stock    boolean not null default true,
-  est_carte      boolean not null default true,   -- compte dans le seuil de rentabilité
+  est_carte      boolean not null default true,
   actif          boolean not null default true,
   cree_le        timestamptz not null default now(),
   maj_le         timestamptz not null default now()
 );
-comment on column produits.est_carte is
-  'Vrai si l''unité vendue est une carte : base du calcul « cartes à vendre par mois ».';
+comment on column produits.suivi_stock is
+  'Vrai : l''achat est porté au stock (actif) et ne charge le résultat qu''à la vente.';
 
--- ---------------------------------------------------------------------------
--- Coûts unitaires historisés, décomposés par composante.
--- produit_id null = coût de référence applicable à tous les produits.
--- ---------------------------------------------------------------------------
+-- Coûts unitaires de référence, historisés par composante.
 create table couts_unitaires (
   id          uuid primary key default gen_random_uuid(),
   produit_id  uuid references produits (id) on delete cascade,
@@ -152,10 +164,7 @@ create table couts_unitaires (
   note        text,
   cree_le     timestamptz not null default now()
 );
--- Un seul coût par (produit, composante, date d'effet).
 create unique index uq_couts_unitaires_produit
   on couts_unitaires (produit_id, composante, date_effet) where produit_id is not null;
 create unique index uq_couts_unitaires_global
   on couts_unitaires (composante, date_effet) where produit_id is null;
-comment on table couts_unitaires is
-  'Coûts HT par carte. Les frais Stripe n''y figurent pas : ils dépendent du canal de vente.';

@@ -1,35 +1,42 @@
 -- ============================================================================
--- Tapora S.E.N.C. — 06 · Stripe et import bancaire
+-- Tapora S.E.N.C. — 06 · Stripe (événements, litiges, versements) et import CSV
 -- ============================================================================
 
 -- ---------------------------------------------------------------------------
--- Journal des événements Stripe : idempotence + rejouabilité.
--- Stripe re-livre un webhook en cas de timeout ; la clé primaire evt_... garantit
--- qu'un même événement ne crée jamais deux écritures.
+-- Journal des événements Stripe.
+--
+-- Stripe réessaie un webhook tant qu'il ne reçoit pas de 2xx : un timeout, un
+-- redéploiement pendant le traitement, et la même vente est comptabilisée deux
+-- fois. Protocole imposé par le schéma : on INSÈRE d'abord dans cette table
+-- (contrainte unique sur stripe_event_id), et on ne traite que si l'insertion
+-- a réussi. Voir la fonction `reserver_evenement_stripe()`.
 -- ---------------------------------------------------------------------------
-create table stripe_evenements (
-  id         text primary key,             -- evt_...
-  type       text not null,                -- charge.succeeded, charge.refunded, payout.paid
-  recu_le    timestamptz not null default now(),
-  traite_le  timestamptz,
-  statut     text not null default 'recu'
-             check (statut in ('recu', 'traite', 'ignore', 'erreur')),
-  erreur     text,
-  payload    jsonb not null
+create table evenements_stripe (
+  id              uuid primary key default gen_random_uuid(),
+  stripe_event_id text not null unique,          -- evt_...
+  type            text not null,                 -- charge.succeeded, charge.dispute.created, ...
+  recu_le         timestamptz not null default now(),
+  traite_le       timestamptz,
+  statut          text not null default 'recu'
+                  check (statut in ('recu', 'traite', 'ignore', 'erreur')),
+  erreur          text,
+  payload         jsonb
 );
-create index idx_stripe_evenements_statut on stripe_evenements (statut, recu_le desc);
+create index idx_evenements_stripe_statut on evenements_stripe (statut, recu_le desc);
+create index idx_evenements_stripe_type on evenements_stripe (type, recu_le desc);
+
+comment on column evenements_stripe.stripe_event_id is
+  'Clé d''idempotence. Une insertion refusée signifie « déjà traité » : ne rien faire de plus.';
 
 -- ---------------------------------------------------------------------------
 -- Versements Stripe (payout.paid).
--- IMPORTANT : un payout n'est NI un revenu NI une dépense. C'est un simple
--- virement Stripe -> banque d'argent déjà comptabilisé au moment de la vente.
--- L'enregistrer comme revenu doublerait le chiffre d'affaires ; c'est pour cela
--- qu'il vit dans sa propre table et non dans `transactions`.
+-- Ni revenu ni dépense : simple virement Stripe -> banque d'argent déjà
+-- comptabilisé à la vente. Sert au rapprochement du relevé bancaire.
 -- ---------------------------------------------------------------------------
 create table versements_stripe (
   id            text primary key,          -- po_...
   date_arrivee  date not null,
-  montant       numeric(12,2) not null,     -- net déposé au compte bancaire
+  montant       numeric(12,2) not null,
   devise        char(3) not null default 'CAD',
   statut        text not null default 'paid',
   rapproche     boolean not null default false,
@@ -38,21 +45,55 @@ create table versements_stripe (
 );
 create index idx_versements_date on versements_stripe (date_arrivee desc);
 
-comment on table versements_stripe is
-  'Virements Stripe -> banque. Sert uniquement au rapprochement du relevé, aucun impact sur le profit.';
+-- ---------------------------------------------------------------------------
+-- Rétrofacturations (contestations de paiement).
+--
+-- Une contestation coûte deux fois : le revenu est repris ET Stripe facture des
+-- frais d'environ 15 $, non remboursés même si la contestation est gagnée dans
+-- certains cas. Sur une carte à 30 $, c'est une perte nette — elle doit être
+-- visible, pas noyée dans les frais Stripe.
+-- ---------------------------------------------------------------------------
+create table litiges (
+  id                 text primary key,      -- dp_...
+  stripe_charge_id   text,
+  vente_id           uuid references ventes (id) on delete set null,
+  date_ouverture     date not null,
+  date_cloture       date,
+  montant_conteste   numeric(12,2) not null check (montant_conteste >= 0),
+  frais              numeric(12,2) not null default 0 check (frais >= 0),
+  motif              text,
+  statut             text not null default 'ouvert'
+                     check (statut in ('ouvert', 'gagne', 'perdu', 'annule')),
+  -- Écritures produites : reprise du revenu, frais, et reprise à la clôture.
+  transaction_reprise_id uuid references transactions (id) on delete set null,
+  transaction_frais_id   uuid references transactions (id) on delete set null,
+  transaction_reversal_id uuid references transactions (id) on delete set null,
+  payload            jsonb,
+  cree_le            timestamptz not null default now(),
+  maj_le             timestamptz not null default now()
+);
+create index idx_litiges_statut on litiges (statut, date_ouverture desc);
+create index idx_litiges_vente on litiges (vente_id);
+
+comment on table litiges is
+  'Rétrofacturations Stripe. Une contestation ouverte reprend le revenu immédiatement ; une contestation gagnée le rétablit.';
 
 -- ---------------------------------------------------------------------------
 -- Import CSV de relevé bancaire.
+-- Deux niveaux de déduplication : l'empreinte du FICHIER empêche de réimporter
+-- le même relevé, l'empreinte de la LIGNE empêche de recréer une écriture déjà
+-- saisie même si elle arrive dans un autre fichier (relevés qui se chevauchent).
 -- ---------------------------------------------------------------------------
 create table imports_bancaires (
-  id           uuid primary key default gen_random_uuid(),
-  nom_fichier  text not null,
-  compte       text,                        -- ex. « Desjardins entreprise »
-  date_import  timestamptz not null default now(),
-  nb_lignes    integer not null default 0,
-  nb_traitees  integer not null default 0,
-  statut       text not null default 'en_cours' check (statut in ('en_cours', 'termine')),
-  note         text
+  id               uuid primary key default gen_random_uuid(),
+  nom_fichier      text not null,
+  empreinte_fichier text not null unique,
+  compte           text,
+  date_import      timestamptz not null default now(),
+  nb_lignes        integer not null default 0,
+  nb_traitees      integer not null default 0,
+  statut           text not null default 'en_cours' check (statut in ('en_cours', 'termine')),
+  note             text
 );
 
 create table lignes_import_bancaire (
@@ -63,17 +104,10 @@ create table lignes_import_bancaire (
   -- Signé selon le relevé : négatif = débit (dépense), positif = crédit.
   montant       numeric(12,2) not null,
   solde         numeric(12,2),
-  -- Empreinte de déduplication : rejouer deux fois le même CSV ne duplique rien.
   empreinte     text not null unique,
   statut        text not null default 'a_categoriser' check (statut in (
-                  'a_categoriser',
-                  'categorisee',        -- a produit une transaction
-                  'depot_caisse',       -- dépôt d'argent comptant déjà comptabilisé
-                  'virement_stripe',    -- versement Stripe déjà comptabilisé
-                  'mouvement_associe',  -- apport / prélèvement, hors résultat
-                  'ignoree',
-                  'doublon'
-                )),
+                  'a_categoriser', 'categorisee', 'depot_caisse', 'virement_stripe',
+                  'mouvement_associe', 'ignoree', 'doublon')),
   transaction_id       uuid references transactions (id) on delete set null,
   versement_stripe_id  text references versements_stripe (id) on delete set null,
   categorie_suggeree   categorie_transaction,
@@ -84,20 +118,15 @@ create index idx_lignes_import_statut on lignes_import_bancaire (statut, date de
 create index idx_lignes_import_import on lignes_import_bancaire (import_id);
 
 comment on column lignes_import_bancaire.statut is
-  'Les statuts depot_caisse / virement_stripe / mouvement_associe existent pour rapprocher une ligne sans créer de double comptabilisation.';
+  'depot_caisse / virement_stripe / mouvement_associe : ligne rapprochée d''argent DÉJÀ comptabilisé, pas un revenu.';
 
--- ---------------------------------------------------------------------------
--- Règles de catégorisation : l'écran de catégorisation apprend de vos choix.
--- ---------------------------------------------------------------------------
 create table regles_categorisation (
   id        uuid primary key default gen_random_uuid(),
-  motif     text not null,                 -- comparé en ILIKE '%motif%'
+  motif     text not null,
   type      type_transaction not null default 'depense',
   categorie categorie_transaction not null,
   nature    nature_cout,
-  pct_cti   numeric(5,4),
-  pct_rti   numeric(5,4),
-  priorite  smallint not null default 100, -- plus petit = appliqué en premier
+  priorite  smallint not null default 100,
   actif     boolean not null default true,
   cree_le   timestamptz not null default now()
 );

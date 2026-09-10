@@ -1,11 +1,10 @@
 -- ============================================================================
 -- Tapora S.E.N.C. — 03 · Ventes (Stripe, comptant, autres canaux)
 -- ============================================================================
--- Pourquoi une table `ventes` distincte de `transactions` ?
---   `transactions` répond « combien d'argent ». `ventes` répond « combien de
---   cartes ». La marge unitaire et le seuil de rentabilité ont besoin de
---   QUANTITÉS, qu'un simple montant ne porte pas. Chaque vente engendre
---   automatiquement UNE ligne de revenu HT dans `transactions`.
+-- `transactions` répond « combien d'argent », `ventes` répond « combien de
+-- cartes ». La marge unitaire et le seuil de rentabilité ont besoin de
+-- quantités. Chaque vente engendre automatiquement une ligne de revenu HT,
+-- ses lignes de taxe, et son coût des marchandises vendues.
 -- ============================================================================
 
 create sequence seq_numero_vente start 1;
@@ -17,28 +16,27 @@ create table ventes (
                           || '-' || lpad(nextval('seq_numero_vente')::text, 5, '0')),
   date           date not null default current_date,
   client_id      uuid references clients (id) on delete set null,
-  client_nom     text,                       -- vente au comptant sans fiche client
+  client_nom     text,
+  -- Province de DESTINATION : c'est elle qui détermine la taxe applicable.
+  province       province_canada not null default 'QC',
   canal          canal_vente not null default 'comptant',
   mode_paiement  mode_paiement not null default 'comptant',
   statut         statut_vente not null default 'payee',
 
-  -- Totaux recalculés par trigger depuis `vente_lignes` (jamais saisis à la main).
+  -- Totaux recalculés par déclencheur depuis `vente_lignes`.
   montant_ht     numeric(12,2) not null default 0,
-  tps            numeric(12,2) not null default 0,
-  tvq            numeric(12,2) not null default 0,
-  montant_ttc    numeric(12,2) generated always as (montant_ht + tps + tvq) stored,
+  total_taxes    numeric(12,2) not null default 0,
+  montant_ttc    numeric(12,2) generated always as (montant_ht + total_taxes) stored,
 
-  -- Encaissement comptant : ce qui a réellement été reçu et rendu.
-  montant_encaisse numeric(12,2),
-  monnaie_rendue   numeric(12,2) not null default 0 check (monnaie_rendue >= 0),
-
-  -- Vrai : les taxes sont imposées par la source (montant Stripe au cent près)
-  -- et ne doivent pas être recalculées depuis les lignes.
+  -- Vrai : le total des taxes est imposé par la source (montant Stripe au cent
+  -- près) et ne doit pas être recalculé depuis les lignes.
   taxes_manuelles boolean not null default false,
-  -- Catégorie de revenu portée par la ligne de `transactions` engendrée.
   categorie_revenu categorie_transaction not null default 'ventes_cartes'
                    check (categorie_revenu in
                      ('ventes_cartes', 'ventes_accessoires', 'ventes_services')),
+
+  montant_encaisse numeric(12,2),
+  monnaie_rendue   numeric(12,2) not null default 0 check (monnaie_rendue >= 0),
 
   stripe_charge_id text unique,
   stripe_payment_intent_id text,
@@ -56,9 +54,7 @@ create table ventes (
 );
 create index idx_ventes_date on ventes (date desc);
 create index idx_ventes_canal on ventes (canal, date desc);
-
-comment on column ventes.montant_encaisse is
-  'Vente comptant : espèces reçues. Sert à contrôler la monnaie rendue et le solde de caisse.';
+create index idx_ventes_province on ventes (province);
 
 create table vente_lignes (
   id              uuid primary key default gen_random_uuid(),
@@ -75,6 +71,3 @@ create table vente_lignes (
 );
 create index idx_vente_lignes_vente on vente_lignes (vente_id);
 create index idx_vente_lignes_produit on vente_lignes (produit_id);
-
-comment on column vente_lignes.quantite is
-  'Négative pour une ligne de retour (remboursement partiel), positive sinon.';
