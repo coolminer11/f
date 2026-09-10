@@ -9,14 +9,19 @@ export const metadata: Metadata = {
 
 const LIENS = [
   ['/transactions', 'Transactions'],
+  ['/ventes', 'Factures'],
   ['/resultats', 'Résultats'],
+  ['/taxes', 'Taxes'],
+  ['/marge', 'Marge'],
+  ['/import', 'Import'],
+  ['/associes', 'Associés'],
 ] as const
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr-CA">
       <body className="min-h-screen antialiased">
-        <header className="border-b border-[var(--color-ligne)] bg-white">
+        <header className="entete-application border-b border-[var(--color-ligne)] bg-white print:hidden">
           <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
             <Link href="/transactions" className="text-sm font-bold tracking-tight">
               Tapora <span className="font-normal text-[var(--color-encre-doux)]">S.E.N.C.</span>

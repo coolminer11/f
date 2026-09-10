@@ -1,0 +1,254 @@
+import { notFound } from 'next/navigation'
+import Link from 'next/link'
+import { documentComplet, emetteur } from '@/lib/requetes/ventes'
+import { argent, dateLongue, nombre, taux } from '@/lib/format'
+import BoutonImprimer from '@/components/bouton-imprimer'
+
+export const dynamic = 'force-dynamic'
+
+const TITRES: Record<string, string> = {
+  facture: 'FACTURE',
+  devis: 'DEVIS',
+  recu: 'REÇU DE VENTE',
+}
+
+export default async function PageFacture({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const [doc, societe] = await Promise.all([documentComplet(id), emetteur()])
+  if (!doc) notFound()
+
+  const sousTotal = doc.lignes.reduce((s, l) => s + Number(l.montant_ht), 0)
+  const estDevis = doc.type_document === 'devis'
+  // Au Québec, une facture de 30 $ ou plus doit porter les numéros d'inscription :
+  // sans eux, le client ne peut pas réclamer ses propres crédits de taxe.
+  const mentionsObligatoires = doc.montant_ttc >= 30
+
+  return (
+    <>
+      <div className="mx-auto mb-4 flex max-w-[8.5in] flex-wrap items-center justify-between gap-2 print:hidden">
+        <Link href={`/ventes/${doc.id}`} className="text-sm text-[var(--color-encre-doux)] hover:underline">
+          ← Retour au document
+        </Link>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-[var(--color-encre-doux)]">
+            « Imprimer » permet aussi d’enregistrer en PDF.
+          </span>
+          <BoutonImprimer />
+        </div>
+      </div>
+
+      <article className="mx-auto max-w-[8.5in] bg-white p-[0.6in] text-[13px] leading-relaxed text-[var(--color-encre)] shadow-sm print:max-w-none print:p-0 print:shadow-none">
+        {/* En-tête */}
+        <header className="flex flex-wrap items-start justify-between gap-6 border-b-2 border-[var(--color-encre)] pb-5">
+          <div>
+            <h1 className="text-xl font-bold tracking-tight">{societe.nom_entreprise}</h1>
+            <address className="mt-1 not-italic text-[var(--color-encre-doux)]">
+              {societe.adresse && <div>{societe.adresse}</div>}
+              {(societe.ville || societe.code_postal) && (
+                <div>
+                  {societe.ville}
+                  {societe.ville && societe.code_postal ? ' ' : ''}
+                  {societe.code_postal}
+                </div>
+              )}
+              {societe.telephone && <div>{societe.telephone}</div>}
+              {societe.courriel_contact && <div>{societe.courriel_contact}</div>}
+              {societe.site_web && <div>{societe.site_web}</div>}
+            </address>
+          </div>
+
+          <div className="text-right">
+            <div className="text-2xl font-bold tracking-wide">{TITRES[doc.type_document]}</div>
+            <div className="chiffre mt-1 text-lg font-semibold">{doc.numero}</div>
+            <dl className="mt-3 space-y-0.5 text-[var(--color-encre-doux)]">
+              <div className="flex justify-end gap-3">
+                <dt>Date</dt>
+                <dd className="chiffre font-medium text-[var(--color-encre)]">
+                  {dateLongue(doc.date)}
+                </dd>
+              </div>
+              {doc.date_echeance && (
+                <div className="flex justify-end gap-3">
+                  <dt>{estDevis ? 'Valide jusqu’au' : 'Échéance'}</dt>
+                  <dd className="chiffre font-medium text-[var(--color-encre)]">
+                    {dateLongue(doc.date_echeance)}
+                  </dd>
+                </div>
+              )}
+              {doc.bon_de_commande && (
+                <div className="flex justify-end gap-3">
+                  <dt>Bon de commande</dt>
+                  <dd className="font-medium text-[var(--color-encre)]">{doc.bon_de_commande}</dd>
+                </div>
+              )}
+            </dl>
+          </div>
+        </header>
+
+        {/* Destinataire */}
+        <section className="mt-5 flex flex-wrap justify-between gap-6">
+          <div>
+            <h2 className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-encre-doux)]">
+              {estDevis ? 'Destinataire' : 'Facturé à'}
+            </h2>
+            <div className="mt-1 font-semibold">{doc.client ?? doc.client_nom ?? '—'}</div>
+            {doc.adresse_facturation && (
+              <address className="not-italic text-[var(--color-encre-doux)]">
+                {doc.adresse_facturation.split('\n').map((l, i) => (
+                  <div key={i}>{l}</div>
+                ))}
+              </address>
+            )}
+            {doc.courriel_facturation && (
+              <div className="text-[var(--color-encre-doux)]">{doc.courriel_facturation}</div>
+            )}
+          </div>
+
+          {mentionsObligatoires && (societe.numero_tps || societe.numero_tvq) && (
+            <div className="text-right text-[11px] text-[var(--color-encre-doux)]">
+              <h2 className="font-bold uppercase tracking-wider">Numéros d’inscription</h2>
+              {societe.numero_tps && (
+                <div className="chiffre mt-1">TPS / TVH : {societe.numero_tps}</div>
+              )}
+              {societe.numero_tvq && <div className="chiffre">TVQ : {societe.numero_tvq}</div>}
+              {societe.neq && <div className="chiffre">NEQ : {societe.neq}</div>}
+            </div>
+          )}
+        </section>
+
+        {/* Lignes */}
+        <table className="mt-6 w-full">
+          <thead>
+            <tr className="border-b border-[var(--color-encre)] text-left text-[11px] uppercase tracking-wider text-[var(--color-encre-doux)]">
+              <th className="pb-1.5 font-bold">Description</th>
+              <th className="pb-1.5 text-right font-bold">Qté</th>
+              <th className="pb-1.5 text-right font-bold">Prix unitaire</th>
+              {doc.lignes.some((l) => l.remise_ht > 0) && (
+                <th className="pb-1.5 text-right font-bold">Remise</th>
+              )}
+              <th className="pb-1.5 text-right font-bold">Montant</th>
+            </tr>
+          </thead>
+          <tbody>
+            {doc.lignes.map((l) => (
+              <tr key={l.id} className="border-b border-[var(--color-ligne)]">
+                <td className="py-2">
+                  {l.description}
+                  {!l.taxable && (
+                    <span className="ml-2 text-[11px] text-[var(--color-encre-doux)]">
+                      (non taxable)
+                    </span>
+                  )}
+                </td>
+                <td className="chiffre py-2 text-right">{nombre(l.quantite)}</td>
+                <td className="chiffre py-2 text-right">{argent(l.prix_unitaire_ht)}</td>
+                {doc.lignes.some((x) => x.remise_ht > 0) && (
+                  <td className="chiffre py-2 text-right">
+                    {l.remise_ht > 0 ? `− ${argent(l.remise_ht)}` : ''}
+                  </td>
+                )}
+                <td className="chiffre py-2 text-right font-medium">{argent(l.montant_ht)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {/* Totaux */}
+        <div className="mt-4 flex justify-end">
+          <dl className="w-full max-w-xs space-y-1">
+            <LigneTotal libelle="Sous-total" valeur={argent(sousTotal)} />
+            {doc.remise_globale > 0 && (
+              <LigneTotal libelle="Remise" valeur={`− ${argent(doc.remise_globale)}`} />
+            )}
+            <LigneTotal libelle="Total hors taxes" valeur={argent(doc.montant_ht)} />
+            {doc.taxes.map((t) => (
+              <LigneTotal
+                key={t.code}
+                libelle={`${t.code} ${taux(t.taux)}`}
+                valeur={argent(t.montant)}
+              />
+            ))}
+            <div className="!mt-2 flex items-baseline justify-between border-t-2 border-[var(--color-encre)] pt-2">
+              <dt className="font-bold">{estDevis ? 'Total estimé' : 'Total'}</dt>
+              <dd className="chiffre text-lg font-bold">{argent(doc.montant_ttc)}</dd>
+            </div>
+
+            {!estDevis && doc.montant_paye !== 0 && (
+              <>
+                <LigneTotal libelle="Paiements reçus" valeur={`− ${argent(doc.montant_paye)}`} />
+                <div className="!mt-2 flex items-baseline justify-between border-t border-[var(--color-encre)] pt-2">
+                  <dt className="font-bold">Solde dû</dt>
+                  <dd className="chiffre text-lg font-bold">{argent(doc.solde)}</dd>
+                </div>
+              </>
+            )}
+          </dl>
+        </div>
+
+        {!estDevis && doc.paiements.length > 0 && (
+          <section className="mt-5">
+            <h2 className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-encre-doux)]">
+              Paiements reçus
+            </h2>
+            <ul className="mt-1 space-y-0.5 text-[var(--color-encre-doux)]">
+              {doc.paiements.map((p) => (
+                <li key={p.id} className="chiffre">
+                  {dateLongue(p.date)} — {argent(p.montant)}
+                  {p.reference && ` (${p.reference})`}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {doc.solde > 0 && !estDevis && (
+          <p className="mt-5 rounded border border-[var(--color-encre)] px-4 py-2 font-semibold">
+            Montant à payer : <span className="chiffre">{argent(doc.solde)}</span>
+            {doc.conditions_paiement && ` · ${doc.conditions_paiement}`}
+            {doc.date_echeance && ` · au plus tard le ${dateLongue(doc.date_echeance)}`}
+          </p>
+        )}
+
+        {doc.notes_facture && (
+          <section className="mt-5">
+            <h2 className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-encre-doux)]">
+              Note
+            </h2>
+            <p className="mt-1 whitespace-pre-line">{doc.notes_facture}</p>
+          </section>
+        )}
+
+        {doc.conditions_generales && (
+          <section className="mt-4">
+            <h2 className="text-[11px] font-bold uppercase tracking-wider text-[var(--color-encre-doux)]">
+              Conditions
+            </h2>
+            <p className="mt-1 whitespace-pre-line text-[11px] text-[var(--color-encre-doux)]">
+              {doc.conditions_generales}
+            </p>
+          </section>
+        )}
+
+        <footer className="mt-8 border-t border-[var(--color-ligne)] pt-3 text-center text-[11px] text-[var(--color-encre-doux)]">
+          {societe.pied_facture}
+          {!mentionsObligatoires && (societe.numero_tps || societe.numero_tvq) && (
+            <div className="chiffre mt-1">
+              {societe.numero_tps && `TPS / TVH : ${societe.numero_tps}`}
+              {societe.numero_tps && societe.numero_tvq && ' · '}
+              {societe.numero_tvq && `TVQ : ${societe.numero_tvq}`}
+            </div>
+          )}
+        </footer>
+      </article>
+    </>
+  )
+}
+
+function LigneTotal({ libelle, valeur }: { libelle: string; valeur: string }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4">
+      <dt className="text-[var(--color-encre-doux)]">{libelle}</dt>
+      <dd className="chiffre">{valeur}</dd>
+    </div>
+  )
+}

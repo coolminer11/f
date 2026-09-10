@@ -3,16 +3,38 @@
 Gestion des dépenses, des profits et des comptes d'associés pour Tapora S.E.N.C.
 (société en nom collectif québécoise, 2 associés à parts égales).
 
-**État : schéma de base de données + écrans 1 et 2.**
+**État : complet.**
 
-| Écran | Route | État |
-|---|---|---|
-| 1. Transactions et saisie d'une dépense | `/transactions` | ✅ |
-| 2. État des résultats mensuel | `/resultats` | ✅ |
-| 3. Rapport de remise de taxes | — | à venir |
-| 4. Tableau des associés | — | à venir |
-| 5. Import CSV bancaire | — | à venir |
-| 6. Marge unitaire et seuil de rentabilité | — | à venir |
+| Écran | Route |
+|---|---|
+| 1. Transactions et saisie d'une dépense | `/transactions` |
+| 2. État des résultats mensuel | `/resultats` |
+| 3. Remise de taxes, ventilée par juridiction | `/taxes` |
+| 4. Associés : capital, prélèvements, décisions | `/associes` |
+| 5. Import CSV bancaire et rapprochement | `/import` |
+| 6. Marge unitaire et seuil de rentabilité | `/marge` |
+| Factures, devis et reçus | `/ventes` |
+
+## Facturation
+
+Trois types de documents, numérotés séparément et sans trou (`F-2026-00001`,
+`D-2026-00001`, `R-2026-00001`) :
+
+- **Facture** — reconnaît le revenu à l'émission, même impayée. Conditions de
+  paiement, échéance calculée, bon de commande, remise par ligne et remise
+  globale, lignes non taxables, note au client et conditions générales.
+- **Devis** — ne crée ni revenu, ni sortie de stock, ni taxe à remettre. Une
+  fois accepté, il engendre une facture qui garde le lien vers lui.
+- **Reçu de vente** — pour la vente réglée au comptoir.
+
+Une facture peut recevoir **plusieurs paiements** (`paiements_vente`) : le
+revenu et l'encaissement sont deux moments distincts et le restent. Un paiement
+comptant entre en caisse à ce moment-là, pas à l'émission du document.
+
+Le document imprimable (`/ventes/<id>/facture`) sort sur une feuille Lettre via
+la fonction d'impression du navigateur, qui permet aussi d'enregistrer en PDF.
+Il porte les numéros d'inscription TPS et TVQ dès 30 $, comme l'exige Revenu
+Québec pour que le client puisse réclamer ses propres crédits.
 
 ## Contenu
 
@@ -76,6 +98,7 @@ les taux.
 | 5. Saisie d'une dépense + reçu | `transactions`, bucket privé `recus` |
 | Associés | `v_capital_associes`, `v_prelevements_exercice` |
 | Registre des décisions | `v_decisions` |
+| Documents de vente | `v_documents_vente`, `paiements_vente` |
 | Dénombrement d'inventaire | `denombrements`, `preparer_denombrement()`, `appliquer_denombrement()` |
 | Rétrofacturations | `v_litiges` |
 
@@ -116,6 +139,10 @@ npm run dev                  # http://localhost:3000
   par PostgreSQL ; le client ne fait que les mettre en forme.
 - Les reçus vivent dans un bucket privé, servis par `/api/recus/...` qui vérifie
   la session et redirige vers une URL signée à durée limitée.
+- **Le relevé bancaire est analysé dans le navigateur** (`lib/csv.ts`) : rien
+  n'est envoyé tant que la correspondance des colonnes n'est pas confirmée. Les
+  montants d'un relevé sont traités comme **taxes incluses** — c'est ce qui a
+  réellement quitté le compte.
 
 Le schéma est validé sur PostgreSQL 16 : les 12 migrations et le seed
 s'appliquent sur une base vierge, et un scénario complet passe — ventes au

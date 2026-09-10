@@ -59,6 +59,12 @@ types.setTypeParser(types.builtins.NUMERIC, (valeur) => Number(valeur))
 types.setTypeParser(types.builtins.INT8, (valeur) => Number(valeur))
 // Les dates restent des chaînes AAAA-MM-JJ : pas de décalage de fuseau.
 types.setTypeParser(types.builtins.DATE, (valeur) => valeur)
+// Les horodatages aussi : par défaut `pg` les convertit en objets Date, ce qui
+// oblige chaque appelant à se souvenir du type et casse au premier `.slice()`.
+// Une chaîne ISO partout est plus simple à manipuler et à sérialiser.
+const versIso = (valeur: string) => new Date(valeur).toISOString()
+types.setTypeParser(types.builtins.TIMESTAMPTZ, versIso)
+types.setTypeParser(types.builtins.TIMESTAMP, versIso)
 
 let pool: Pool | null = null
 
