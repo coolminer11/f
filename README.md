@@ -170,6 +170,29 @@ Au premier écran, l'application vous propose de créer votre compte.
 Sans clé de messagerie, les envois de documents sont **simulés** : le courriel
 est écrit dans `./courriels-locaux` et l'écran le dit franchement.
 
+## Temps réel
+
+Les écrans se mettent à jour tout seuls : un battement toutes les douze
+secondes (`/api/pouls`) suivi d'un `router.refresh()`, qui redemande au serveur
+exactement ce que les composants affichent. Une saisie de l'un apparaît chez
+l'autre sans que personne ne recharge.
+
+Le choix d'un sondage plutôt que d'une liaison permanente est délibéré : les
+écrans sont des composants serveur, et tout le calcul comptable vit dans
+PostgreSQL. Une connexion WebSocket obligerait à refaire ces calculs côté
+navigateur pour un gain nul à deux utilisateurs — et à les maintenir en double.
+
+Trois précautions dans `components/rafraichissement-auto.tsx` :
+
+- onglet en arrière-plan : pas de sondage, rattrapage au retour ;
+- champ en cours de saisie : le tour est sauté, l'écran ne bouge pas sous les
+  doigts de celui qui tape un montant ;
+- serveur injoignable ou session expirée : l'en-tête le dit (« Hors ligne »,
+  « Session expirée ») au lieu de laisser des chiffres périmés passer pour des
+  chiffres à jour. C'est pourquoi le middleware répond **401** sur `/api/…` au
+  lieu de rediriger : un `fetch` qui suit une redirection reçoit la page de
+  connexion avec un code 200 et conclut que tout va bien.
+
 ## Rester en local
 
 Pour deux personnes qui démarrent, faire tourner l'application sur une seule

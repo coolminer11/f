@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import RafraichissementAuto from '@/components/rafraichissement-auto'
 import { utilisateurCourant } from '@/lib/auth'
 import './globals.css'
 
@@ -43,6 +44,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </nav>
             {utilisateur && (
               <div className="ml-auto flex items-center gap-3">
+                <RafraichissementAuto />
                 <Link
                   href="/compte"
                   className="text-xs font-medium text-[var(--color-encre-doux)] hover:underline"

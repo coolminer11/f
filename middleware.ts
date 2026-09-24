@@ -19,6 +19,14 @@ export async function middleware(requete: NextRequest) {
   const brut = requete.cookies.get(NOM_COOKIE)?.value
   if (brut && (await signatureValide(brut))) return NextResponse.next()
 
+  // Un appel fetch qui suit une redirection vers la page de connexion reçoit
+  // du HTML avec un code 200 : le navigateur conclut que tout va bien et
+  // continue d'afficher des chiffres périmés. Les routes d'API répondent donc
+  // franchement 401, que l'écran sait interpréter.
+  if (chemin.startsWith('/api/')) {
+    return NextResponse.json({ erreur: 'Non autorisé' }, { status: 401 })
+  }
+
   const destination = requete.nextUrl.clone()
   destination.pathname = '/connexion'
   destination.search = chemin === '/' ? '' : `?suite=${encodeURIComponent(chemin)}`

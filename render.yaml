@@ -9,7 +9,7 @@ services:
     runtime: node
     plan: free
     region: ohio            # le plus proche du Québec chez Render
-    branch: main
+    branch: claude/tapora-expenses-profits-lsclxr
     buildCommand: npm ci && npm run build
     startCommand: npm run start
     healthCheckPath: /connexion

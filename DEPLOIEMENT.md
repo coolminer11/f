@@ -77,6 +77,12 @@ tourner le serveur Next.js.
 
 ### Option A — Render (gratuit, usage commercial permis)
 
+> **N'acceptez pas la base de données que Render propose au passage.** Son
+> PostgreSQL gratuit **expire 30 jours après sa création**, puis il est
+> supprimé après un délai de grâce. Une comptabilité qui s'efface au bout d'un
+> mois n'est pas une comptabilité. La base reste chez Supabase, qui ne met en
+> pause qu'après une semaine d'inactivité — sans rien perdre.
+
 1. Créer un compte sur **render.com**, connecter le dépôt GitHub.
 2. **New → Blueprint**, choisir ce dépôt. Render lit `render.yaml` et propose
    le service `tapora-backoffice`.
@@ -94,6 +100,12 @@ quinze minutes sans visite, et la première visite suivante attend environ une
 minute que le serveur se réveille. Pour un outil interne consulté quelques fois
 par jour, c'est vivable mais agaçant. Le forfait payant le plus bas supprime
 l'endormissement.
+
+Tant qu'un onglet reste ouvert, le rafraîchissement automatique interroge le
+serveur toutes les douze secondes : il ne s'endort donc pas pendant que vous
+travaillez. Ne laissez pas pour autant un onglet ouvert jour et nuit — le
+forfait gratuit compte 750 heures de service par mois, et un service éveillé
+en permanence les consomme toutes.
 
 ### Option B — Vercel (le plus simple, mais lisez ceci)
 
@@ -149,8 +161,17 @@ Le forfait gratuit de Supabase ne garde pas d'historique de sauvegardes long.
 Une exportation régulière vaut mieux que rien :
 
 ```bash
-DATABASE_URL="<votre chaîne>" npx pg-dump-quelconque   # ou pg_dump si installé
+cd ~/Documents/tapora
+DATABASE_URL="<votre chaîne Supabase>" npm run sauvegarde
 ```
+
+Le fichier atterrit dans `sauvegardes/`, sur votre machine — c'est-à-dire
+ailleurs que chez l'hébergeur, ce qui est tout l'intérêt.
+
+> Si `pg_dump` refuse en parlant de version (« server version mismatch »),
+> c'est que Supabase tourne sur un PostgreSQL plus récent que le vôtre :
+> `brew install postgresql@17` suffit, le script trouve tout seul le plus
+> récent des deux.
 
 Plus simple et suffisant au début : l'écran **Export** produit les cinq
 fichiers comptables de la période. Faites-le à chaque fin de mois et rangez-les
