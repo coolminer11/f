@@ -1,7 +1,10 @@
 # Plan de déploiement Render — https://render.com/docs/blueprint-spec
 #
-# Dans Render : New → Blueprint → choisir ce dépôt. Render lit ce fichier,
-# crée le service et demande les trois secrets marqués « sync: false ».
+# Lien direct vers le bon écran, dépôt et branche déjà remplis :
+# https://dashboard.render.com/blueprint/new?repo=https://github.com/coolminer11/f/tree/claude/tapora-expenses-profits-lsclxr
+#
+# Render lit ce fichier, crée le service et demande les valeurs marquées
+# « sync: false ». Seule DATABASE_URL est indispensable au démarrage.
 # SESSION_SECRET est tiré au hasard par Render : vous n'avez pas à y toucher.
 services:
   - type: web
@@ -11,7 +14,11 @@ services:
     region: ohio            # le plus proche du Québec chez Render
     branch: claude/tapora-expenses-profits-lsclxr
     buildCommand: npm ci && npm run build
-    startCommand: npm run start
+    # Les migrations en attente s'appliquent au démarrage, avant que le
+    # serveur n'accepte une visite. C'est idempotent — schema_migrations note
+    # ce qui est déjà passé — et ça retire une étape manuelle dont l'oubli
+    # donnerait des écrans vides sans message d'erreur.
+    startCommand: npm run db:migrer && npm run start
     healthCheckPath: /connexion
     autoDeploy: true
     envVars:

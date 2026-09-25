@@ -50,6 +50,11 @@ le monde est alors déconnecté, rien d'autre).
 
 ### Appliquer le schéma
 
+**Chez Render, il n'y a rien à faire** : les migrations s'appliquent au
+démarrage du service. Cette section ne sert que pour appliquer le schéma à la
+main — une base montée avant le premier déploiement, ou un hébergeur qui ne
+lance pas `npm run db:migrer`.
+
 Depuis votre machine, dans le dossier du projet :
 
 ```bash
@@ -84,12 +89,18 @@ tourner le serveur Next.js.
 > pause qu'après une semaine d'inactivité — sans rien perdre.
 
 1. Créer un compte sur **render.com**, connecter le dépôt GitHub.
-2. **New → Blueprint**, choisir ce dépôt. Render lit `render.yaml` et propose
-   le service `tapora-backoffice`.
+2. Ouvrir ce lien, qui va droit au bon écran avec le dépôt et la branche déjà
+   remplis :
+
+   <https://dashboard.render.com/blueprint/new?repo=https://github.com/coolminer11/f/tree/claude/tapora-expenses-profits-lsclxr>
+
+   Render lit `render.yaml` et propose le service `tapora-backoffice`.
 3. Render demande les valeurs marquées « sync: false ». Coller :
    - `DATABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `NEXT_PUBLIC_SUPABASE_URL` et `SUPABASE_SERVICE_ROLE_KEY` : pour les
+     photos de reçus. Vous pouvez les laisser vides au début — les reçus sont
+     alors écrits sur le disque du serveur, qui est effacé à chaque
+     redéploiement. Le reste de la comptabilité n'en dépend pas.
    - `RESEND_API_KEY` et `COURRIEL_EXPEDITEUR` : laisser vides pour l'instant.
 
    `SESSION_SECRET` est tiré au hasard par Render, ne le touchez pas.

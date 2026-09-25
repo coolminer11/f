@@ -33,13 +33,39 @@ function chaineConnexion() {
   return url
 }
 
+/**
+ * Se connecte en laissant à la base le temps de se réveiller.
+ *
+ * Un projet Supabase gratuit se met en pause après une semaine sans activité
+ * et met quelques secondes à revenir ; un hébergeur qui démarre le serveur au
+ * même instant tomberait sinon sur un refus de connexion et abandonnerait.
+ */
+async function connecter(configuration, dire, essais = 5) {
+  for (let essai = 1; ; essai++) {
+    // Un client pg ne se reconnecte pas : après un échec il est mort, et le
+    // réutiliser masquerait la vraie cause derrière « cannot reuse a client ».
+    const client = new pg.Client(configuration)
+    try {
+      await client.connect()
+      return client
+    } catch (e) {
+      await client.end().catch(() => {})
+      if (essai >= essais) throw e
+      dire(`Base injoignable (${e.code || e.message}) — nouvel essai dans 3 s…`)
+      await new Promise((r) => setTimeout(r, 3000))
+    }
+  }
+}
+
 export async function migrer({ avecSeed = true, silencieux = false } = {}) {
   const dire = (...a) => !silencieux && console.log(...a)
-  const client = new pg.Client({
-    connectionString: chaineConnexion(),
-    ssl: process.env.DATABASE_SSL === 'false' ? undefined : { rejectUnauthorized: false },
-  })
-  await client.connect()
+  const client = await connecter(
+    {
+      connectionString: chaineConnexion(),
+      ssl: process.env.DATABASE_SSL === 'false' ? undefined : { rejectUnauthorized: false },
+    },
+    dire,
+  )
 
   try {
     await client.query(`
@@ -86,5 +112,13 @@ export async function migrer({ avecSeed = true, silencieux = false } = {}) {
 }
 
 if (import.meta.filename === process.argv[1]) {
-  migrer({ avecSeed: !process.argv.includes('--sans-seed') }).catch(() => process.exit(1))
+  migrer({ avecSeed: !process.argv.includes('--sans-seed') }).catch((e) => {
+    // Sans ce message, un échec de connexion — base en pause, mot de passe
+    // changé, SSL refusé — ne laisse qu'un code de sortie 1. Au démarrage
+    // d'un hébergeur, cela donne un déploiement qui échoue sans un mot
+    // d'explication, et rien dans les journaux pour savoir quoi corriger.
+    console.error(`\nLes migrations ont échoué : ${e.message}`)
+    if (e.code) console.error(`Code PostgreSQL : ${e.code}`)
+    process.exit(1)
+  })
 }
