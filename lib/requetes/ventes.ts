@@ -580,3 +580,19 @@ export const MOTIFS_EXEMPTION = [
   'Fourniture à un acheteur autochtone, livrée sur réserve',
   'Vente à un autre inscrit, hors du champ des taxes de vente',
 ] as const
+
+/**
+ * Efface un document et tout ce qu'il a produit.
+ *
+ * Le numéro doit être retapé : c'est la seule confirmation qui oblige à
+ * regarder ce qu'on efface. La base refuse par ailleurs d'effacer un document
+ * dont un autre dépend, et garde une trace de ce qui est parti.
+ */
+export async function supprimerDocument(
+  id: string,
+  numeroConfirme: string,
+  motif: string | null,
+  par: string | null,
+): Promise<void> {
+  await requete('select supprimer_vente($1::uuid, $2, $3, $4)', [id, numeroConfirme, motif, par])
+}

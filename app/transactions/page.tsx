@@ -4,6 +4,10 @@ import { lienRecu } from '@/lib/stockage'
 import { argent, dateCourte, nombre } from '@/lib/format'
 import type { LigneJournal } from '@/lib/requetes/transactions'
 import FiltresJournal from '@/components/filtres-journal'
+import BoutonSupprimer from '@/components/bouton-supprimer'
+import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
+import { supprimerTransaction } from '@/lib/requetes/transactions'
 import { exigerSession } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
@@ -15,8 +19,20 @@ export default async function PageTransactions({
 }: {
   searchParams: Promise<Record<string, string | undefined>>
 }) {
-  await exigerSession()
+  const moi = await exigerSession()
   const p = await searchParams
+
+  async function supprimer(donnees: FormData) {
+    'use server'
+    const utilisateur = await exigerSession()
+    try {
+      await supprimerTransaction(String(donnees.get('id')), null, utilisateur.courriel)
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Suppression impossible.'
+      redirect(`/transactions?erreur=${encodeURIComponent(msg)}`)
+    }
+    revalidatePath('/transactions')
+  }
   const filtres = {
     debut: p.debut,
     fin: p.fin,
@@ -45,6 +61,11 @@ export default async function PageTransactions({
 
   return (
     <div className="space-y-5">
+      {p.erreur && (
+        <p className="carte border-[var(--color-negatif)] bg-red-50 px-4 py-3 text-sm font-medium text-[var(--color-negatif)]">
+          {p.erreur}
+        </p>
+      )}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-lg font-bold tracking-tight">Transactions</h1>
@@ -79,12 +100,13 @@ export default async function PageTransactions({
                 <th className="px-3 py-2 text-right font-semibold">TTC</th>
                 <th className="px-3 py-2 font-semibold">Source</th>
                 <th className="px-3 py-2 font-semibold">Reçu</th>
+                <th className="px-3 py-2 font-semibold" />
               </tr>
             </thead>
             <tbody>
               {lignes.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-3 py-10 text-center text-[var(--color-encre-doux)]">
+                  <td colSpan={9} className="px-3 py-10 text-center text-[var(--color-encre-doux)]">
                     Aucune transaction pour ces critères.
                   </td>
                 </tr>
@@ -148,6 +170,25 @@ export default async function PageTransactions({
                       </a>
                     ) : (
                       <span className="text-xs text-[var(--color-encre-doux)] opacity-60">—</span>
+                    )}
+                  </td>
+                  <td className="px-3 py-2 text-right">
+                    {/* Une écriture née d'un document se supprime avec le
+                        document : la facture resterait sinon sans son revenu. */}
+                    {l.vente_id ? (
+                      <Link
+                        href={`/ventes/${l.vente_id}`}
+                        className="text-xs text-[var(--color-encre-doux)] hover:underline"
+                      >
+                        Document
+                      </Link>
+                    ) : (
+                      moi.role !== 'lecture' && (
+                        <form action={supprimer}>
+                          <input type="hidden" name="id" value={l.id} />
+                          <BoutonSupprimer quoi={l.description} />
+                        </form>
+                      )
                     )}
                   </td>
                 </tr>

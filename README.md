@@ -170,6 +170,45 @@ Au premier écran, l'application vous propose de créer votre compte.
 Sans clé de messagerie, les envois de documents sont **simulés** : le courriel
 est écrit dans `./courriels-locaux` et l'écran le dit franchement.
 
+## Documents en PDF
+
+`/ventes/<id>/pdf` renvoie un vrai fichier, en pièce jointe : le navigateur le
+télécharge au lieu de l'afficher. La page publique du client a le même bouton.
+
+Le PDF est **dessiné** (pdfkit) plutôt qu'imprimé depuis le HTML. Un navigateur
+sans tête donnerait un rendu identique à l'écran, mais coûterait 300 Mo de
+Chromium et autant de mémoire vive — le forfait gratuit de l'hébergeur en offre
+512 en tout. Les montants n'y passent pas par `Intl` : le français y insère des
+espaces fines insécables (U+202F) que l'encodage WinAnsi des polices standard
+ne connaît pas, et le client verrait des caractères de remplacement à la place
+de son prix.
+
+## Supprimer
+
+`supprimer_vente` et `supprimer_transaction` effacent pour de bon — le
+document, son revenu, son coût des marchandises, ses taxes, son stock, ses
+paiements — et déposent la ligne complète dans `suppressions` avec l'auteur et
+le motif.
+
+C'est un écart assumé : en comptabilité on annule, on n'efface pas, et
+« Annuler » reste le geste normal. Mais une facture d'essai n'a rien à faire
+dans un registre qu'on présentera un jour à Revenu Québec. Trois garde-fous :
+le numéro doit être retapé, un document dont un autre dépend est refusé (note
+de crédit, crédit appliqué, litige Stripe), et un exercice clos l'est aussi —
+le déclencheur `t_exercice` couvre déjà la suppression. Le numéro effacé n'est
+jamais réattribué.
+
+## Aide en vidéo
+
+`/aide` tient les vidéos d'explication : un lien (YouTube, Loom, Vimeo, Drive —
+converti en adresse d'intégration, puisque personne ne colle jamais la bonne)
+ou un fichier dans le seau privé `tutoriels`.
+
+Le fichier ne transite pas par l'application : le serveur signe une adresse de
+dépôt, et le navigateur téléverse directement chez Supabase. Cent mégaoctets en
+mémoire tueraient l'instance gratuite, et la barre de progression vient de XHR
+— `fetch` ne sait toujours pas rendre compte de l'avancement d'un envoi.
+
 ## Savoir ce qui est branché
 
 `/etat` répond à « est-ce que tout est bien connecté ? » sans avoir à ouvrir

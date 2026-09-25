@@ -29,7 +29,12 @@ export default async function PageDocumentPublic({
         <span className="text-sm text-[var(--color-encre-doux)]">
           {doc.definition.libelle} {doc.numero} · {societe.nom_entreprise}
         </span>
-        <BoutonImprimer />
+        <div className="flex items-center gap-2">
+          <a href={`/documents/${jeton}/pdf`} className="bouton bouton-secondaire">
+            Télécharger le PDF
+          </a>
+          <BoutonImprimer />
+        </div>
       </div>
       <DocumentImprimable doc={doc} societe={societe} />
     </>

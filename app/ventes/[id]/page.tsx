@@ -10,6 +10,7 @@ import {
   documentComplet,
   documentsCreditables,
   marquerEnvoye,
+  supprimerDocument,
   supprimerPaiement,
 } from '@/lib/requetes/ventes'
 import { MODES_PAIEMENT } from '@/lib/requetes/transactions'
@@ -115,6 +116,24 @@ export default async function PageDocument({
     redirect(`/ventes/${id}?message=${encodeURIComponent('Crédit appliqué à la facture.')}`)
   }
 
+  async function supprimer(donnees: FormData) {
+    'use server'
+    const moi = await exigerSession()
+    try {
+      await supprimerDocument(
+        id,
+        String(donnees.get('numero') ?? ''),
+        String(donnees.get('motif') ?? '') || null,
+        moi.courriel,
+      )
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Suppression impossible.'
+      redirect(`/ventes/${id}?erreur=${encodeURIComponent(msg)}`)
+    }
+    revalidatePath('/ventes')
+    redirect(`/ventes?message=${encodeURIComponent('Document supprimé.')}`)
+  }
+
   async function envoyer() {
     'use server'
     await exigerSession()
@@ -201,6 +220,9 @@ export default async function PageDocument({
           <Link href={`/ventes/${doc.id}/facture`} className="bouton" target="_blank">
             Ouvrir le document
           </Link>
+          <a href={`/ventes/${doc.id}/pdf`} className="bouton bouton-secondaire">
+            Télécharger le PDF
+          </a>
           {actif && !doc.date_envoi && (
             <form action={envoyer}>
               <button className="bouton bouton-secondaire">Marquer envoyé</button>
@@ -546,6 +568,45 @@ export default async function PageDocument({
           </p>
         </section>
       )}
+
+      <details className="carte border-[var(--color-negatif)] p-4">
+        <summary className="cursor-pointer text-sm font-semibold text-[var(--color-negatif)]">
+          Supprimer ce document
+        </summary>
+        <p className="mt-2 text-sm text-[var(--color-encre-doux)]">
+          En comptabilité on annule, on n’efface pas — « Annuler » garde la trace et le numéro.
+          La suppression existe pour ce qui n’aurait jamais dû être là : un essai, un doublon.
+          Elle emporte le revenu, le coût des marchandises, les taxes, le mouvement de stock et
+          les paiements. Le numéro n’est pas réutilisé, et la suppression est consignée.
+        </p>
+        <form action={supprimer} className="mt-3 flex flex-wrap items-end gap-3">
+          <div>
+            <label className="etiquette" htmlFor="numero_confirme">
+              Retapez {doc.numero} pour confirmer
+            </label>
+            <input
+              id="numero_confirme"
+              name="numero"
+              className="champ w-48"
+              autoComplete="off"
+              required
+            />
+          </div>
+          <div>
+            <label className="etiquette" htmlFor="motif_suppression">
+              Motif (facultatif)
+            </label>
+            <input
+              id="motif_suppression"
+              name="motif"
+              className="champ w-64"
+              maxLength={200}
+              placeholder="doublon, facture d’essai…"
+            />
+          </div>
+          <button className="bouton bouton-danger">Supprimer définitivement</button>
+        </form>
+      </details>
     </div>
   )
 }

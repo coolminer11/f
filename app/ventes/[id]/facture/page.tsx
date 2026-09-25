@@ -27,9 +27,9 @@ export default async function PageDocumentImprimable({
           ← Retour au document
         </Link>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-[var(--color-encre-doux)]">
-            « Imprimer » permet aussi d’enregistrer en PDF.
-          </span>
+          <a href={`/ventes/${doc.id}/pdf`} className="bouton bouton-secondaire">
+            Télécharger le PDF
+          </a>
           <BoutonImprimer />
         </div>
       </div>

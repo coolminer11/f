@@ -21,6 +21,7 @@ export type LigneJournal = {
   province: string
   est_stock: boolean
   est_remboursement: boolean
+  vente_id: string | null
   piece_jointe_url: string | null
   note: string | null
   taxes: LigneTaxe[] | null
@@ -187,3 +188,12 @@ export const MODES_PAIEMENT = [
   ['stripe', 'Stripe'],
   ['autre', 'Autre'],
 ] as const
+
+/** Efface une écriture saisie à la main, et le mouvement de stock qu'elle portait. */
+export async function supprimerTransaction(
+  id: string,
+  motif: string | null,
+  par: string | null,
+): Promise<void> {
+  await requete('select supprimer_transaction($1::uuid, $2, $3)', [id, motif, par])
+}

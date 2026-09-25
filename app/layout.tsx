@@ -18,6 +18,7 @@ const LIENS = [
   ['/import', 'Import'],
   ['/associes', 'Associés'],
   ['/export', 'Export'],
+  ['/aide', 'Aide'],
 ] as const
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

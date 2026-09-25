@@ -83,6 +83,13 @@ body {
 
 .bouton-secondaire:hover { background: var(--color-fond); filter: none; }
 
+/* Le seul bouton rouge de l'application : ce qui ne se défait pas. */
+.bouton-danger {
+  background: var(--color-negatif);
+  color: white;
+  border-color: transparent;
+}
+
 /* ---------------------------------------------------------------------------
    Impression : seul le document sort sur le papier. La navigation, les boutons
    et les fonds gris disparaissent, et la feuille reprend ses marges normales.
