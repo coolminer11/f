@@ -46,6 +46,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <div className="ml-auto flex items-center gap-3">
                 <RafraichissementAuto />
                 <Link
+                  href="/etat"
+                  className="text-xs font-medium text-[var(--color-encre-doux)] hover:underline"
+                >
+                  État
+                </Link>
+                <Link
                   href="/compte"
                   className="text-xs font-medium text-[var(--color-encre-doux)] hover:underline"
                 >

@@ -170,6 +170,15 @@ Au premier écran, l'application vous propose de créer votre compte.
 Sans clé de messagerie, les envois de documents sont **simulés** : le courriel
 est écrit dans `./courriels-locaux` et l'écran le dit franchement.
 
+## Savoir ce qui est branché
+
+`/etat` répond à « est-ce que tout est bien connecté ? » sans avoir à ouvrir
+trois tableaux de bord. Chaque ligne fait le vrai geste plutôt que de
+constater qu'une variable existe : elle interroge la base, demande le seau
+« recus » à Supabase, lit la table `parametres`. Une clé peut exister et être
+fausse — et le repli sur disque est silencieux par construction, donc
+invisible jusqu'au redéploiement qui efface les reçus.
+
 ## Temps réel
 
 Les écrans se mettent à jour tout seuls : un battement toutes les douze
