@@ -269,6 +269,17 @@ export async function basculerActif(id: string, actif: boolean): Promise<void> {
   if (!actif) await requete(`delete from sessions where utilisateur_id = $1::uuid`, [id])
 }
 
+/**
+ * Efface un compte pour de bon.
+ *
+ * Ses sessions partent en cascade. Ce qu'il a saisi RESTE : les écritures
+ * appartiennent à la société, pas à la personne qui les a tapées — seule la
+ * mention « saisi par » redevient vide (clés en « set null »).
+ */
+export async function supprimerUtilisateur(id: string): Promise<void> {
+  await requete(`delete from utilisateurs where id = $1::uuid`, [id])
+}
+
 export async function fermerToutesSessions(id: string): Promise<void> {
   await requete(`delete from sessions where utilisateur_id = $1::uuid`, [id])
 }

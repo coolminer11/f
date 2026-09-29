@@ -9,8 +9,10 @@ import {
   fermerToutesSessions,
   listerUtilisateurs,
   motDePasseCorrespond,
+  supprimerUtilisateur,
   verifierForceMotDePasse,
 } from '@/lib/auth'
+import BoutonSupprimer from '@/components/bouton-supprimer'
 import { listerAssocies } from '@/lib/requetes/associes'
 import { requeteUne } from '@/lib/db'
 import { dateLongue } from '@/lib/format'
@@ -113,6 +115,21 @@ export default async function PageCompte({
     revalidatePath('/compte')
   }
 
+  async function supprimerCompte(donnees: FormData) {
+    'use server'
+    const utilisateur = await exigerSession()
+    if (utilisateur.role !== 'associe') redirect('/compte')
+    const cible = String(donnees.get('id'))
+    // Se supprimer soi-même, c'est pouvoir se retrouver sans aucun compte
+    // capable d'entrer : la base redeviendrait « premier démarrage ».
+    if (cible === utilisateur.id) {
+      redirect(`/compte?erreur=${encodeURIComponent('Vous ne pouvez pas supprimer votre propre compte.')}`)
+    }
+    await supprimerUtilisateur(cible)
+    revalidatePath('/compte')
+    redirect(`/compte?message=${encodeURIComponent('Compte supprimé. Ses saisies restent dans la comptabilité.')}`)
+  }
+
   async function deconnecterPartout(donnees: FormData) {
     'use server'
     const utilisateur = await exigerSession()
@@ -196,6 +213,13 @@ export default async function PageCompte({
                         <button className="text-[var(--color-encre-doux)] hover:underline">
                           {c.actif ? 'Désactiver' : 'Réactiver'}
                         </button>
+                      </form>
+                      <form action={supprimerCompte}>
+                        <input type="hidden" name="id" value={c.id} />
+                        <BoutonSupprimer
+                          quoi={`le compte de ${c.nom}`}
+                          avertissement="Ses sessions sont fermées tout de suite. Ce qu’il a saisi reste dans la comptabilité."
+                        />
                       </form>
                     </div>
                   )}
