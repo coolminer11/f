@@ -97,6 +97,8 @@ export async function documentEnPdf(
     societe.telephone,
     societe.courriel_contact,
     societe.site_web,
+    // Le NEQ identifie l'entreprise : il figure sur tous les documents.
+    societe.neq ? `NEQ : ${societe.neq}` : null,
   ]) {
     if (ligne) pdf.text(ligne, MARGE, pdf.y, { width: 300 })
   }
@@ -154,7 +156,6 @@ export async function documentEnPdf(
     normal(9, GRIS)
     if (societe.numero_tps) pdf.text(`TPS / TVH : ${societe.numero_tps}`, droite.x, pdf.y + 2, droite)
     if (societe.numero_tvq) pdf.text(`TVQ : ${societe.numero_tvq}`, droite.x, pdf.y, droite)
-    if (societe.neq) pdf.text(`NEQ : ${societe.neq}`, droite.x, pdf.y, droite)
   }
 
   y = Math.max(basClient, pdf.y) + 22

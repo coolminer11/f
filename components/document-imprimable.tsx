@@ -40,6 +40,9 @@ export default function DocumentImprimable({
             {societe.telephone && <div>{societe.telephone}</div>}
             {societe.courriel_contact && <div>{societe.courriel_contact}</div>}
             {societe.site_web && <div>{societe.site_web}</div>}
+            {/* Le NEQ identifie l'entreprise, pas une taxe : il figure sur
+                tous les documents, bon de livraison et petit reçu compris. */}
+            {societe.neq && <div className="chiffre">NEQ : {societe.neq}</div>}
           </address>
         </div>
 
@@ -105,7 +108,6 @@ export default function DocumentImprimable({
               <div className="chiffre mt-1">TPS / TVH : {societe.numero_tps}</div>
             )}
             {societe.numero_tvq && <div className="chiffre">TVQ : {societe.numero_tvq}</div>}
-            {societe.neq && <div className="chiffre">NEQ : {societe.neq}</div>}
           </div>
         )}
       </section>
