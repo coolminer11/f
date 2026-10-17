@@ -5,6 +5,8 @@ export type EtatDirect = {
   taps_60s: number
   taps_5min: number
   taps_15min: number
+  /** Parmi les taps des 15 dernières minutes, ceux servis par Cloudflare. */
+  cloudflare_15min: number
   p50_ms: number | null
   p95_ms: number | null
   max_ms: number | null
@@ -23,6 +25,7 @@ export async function etatDirect(): Promise<EtatDirect> {
       `select count(*) filter (where tape_le >= now() - interval '60 seconds')::int as taps_60s,
               count(*) filter (where tape_le >= now() - interval '5 minutes')::int  as taps_5min,
               count(*)::int                                                         as taps_15min,
+              count(*) filter (where via = 'cloudflare')::int                       as cloudflare_15min,
               round(percentile_cont(0.5)  within group (order by duree_ms))::int    as p50_ms,
               round(percentile_cont(0.95) within group (order by duree_ms))::int    as p95_ms,
               max(duree_ms)                                                         as max_ms,
@@ -45,6 +48,7 @@ export async function etatDirect(): Promise<EtatDirect> {
     taps_60s: chiffres?.taps_60s ?? 0,
     taps_5min: chiffres?.taps_5min ?? 0,
     taps_15min: chiffres?.taps_15min ?? 0,
+    cloudflare_15min: chiffres?.cloudflare_15min ?? 0,
     p50_ms: chiffres?.p50_ms ?? null,
     p95_ms: chiffres?.p95_ms ?? null,
     max_ms: chiffres?.max_ms ?? null,

@@ -15,3 +15,5 @@ next-env.d.ts
 tsconfig.tsbuildinfo
 /courriels-locaux
 /sauvegardes
+.wrangler/
+worker/.dev.vars

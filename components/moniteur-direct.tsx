@@ -7,6 +7,7 @@ type Etat = {
   taps_60s: number
   taps_5min: number
   taps_15min: number
+  cloudflare_15min: number
   p50_ms: number | null
   p95_ms: number | null
   max_ms: number | null
@@ -154,6 +155,15 @@ export default function MoniteurDirect() {
           <div className="mt-1 text-xs text-[var(--color-encre-doux)]">
             {etat ? `${fmt.format(etat.taps_5min)} sur 5 min · ${fmt.format(etat.taps_15min)} sur 15 min` : ''}
           </div>
+          {etat && etat.taps_15min > 0 && (
+            <div className="mt-1 text-xs text-[var(--color-encre-doux)]">
+              {etat.cloudflare_15min === etat.taps_15min
+                ? 'tous servis par Cloudflare'
+                : etat.cloudflare_15min === 0
+                  ? 'tous servis par Render'
+                  : `${Math.round((100 * etat.cloudflare_15min) / etat.taps_15min)} % servis par Cloudflare, le reste par Render`}
+            </div>
+          )}
         </div>
         <Bloc
           titre="Temps de redirection"
@@ -162,7 +172,7 @@ export default function MoniteurDirect() {
             etat?.p95_ms != null ? `95 % sous ${fmt.format(etat.p95_ms)} ms` : 'aucun tap depuis 15 min',
             etat?.max_ms != null ? `pire : ${fmt.format(etat.max_ms)} ms` : '',
           ]}
-          note="côté serveur, médiane sur 15 min"
+          note="médiane sur 15 min, avant la réponse"
         />
         <Bloc
           titre="Base de données"

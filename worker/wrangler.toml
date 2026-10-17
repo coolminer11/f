@@ -1,0 +1,25 @@
+# Worker des cartes NFC — voir src/index.ts et DEPLOIEMENT.md, section 6.
+#
+#   cd worker && npm install
+#   npx wrangler login
+#   npx wrangler deploy
+#   npx wrangler secret put SUPABASE_URL
+#   npx wrangler secret put SUPABASE_CLE
+#
+# Les deux secrets se tapent dans le Terminal, jamais dans ce fichier.
+name = "tapora-cartes"
+main = "src/index.ts"
+compatibility_date = "2025-09-01"
+
+# Pas d'adresse …workers.dev : le Worker ne répond que sur le domaine.
+workers_dev = false
+
+# Une ROUTE, pas un « custom domain » : le CNAME go → Render reste en place.
+# Tout ce qui n'est pas /t/… continue vers Render, et si le quota gratuit est
+# dépassé (route réglée en « fail open »), Render reprend les taps lui-même.
+routes = [
+  { pattern = "go.taporacards.com/*", zone_name = "taporacards.com" },
+]
+
+[observability]
+enabled = true

@@ -197,7 +197,14 @@ d'affluence, jours de la semaine, part puce/QR, iPhone/Android, classement
 des cartes avec mini-courbe sur 14 jours. Les statistiques par jour et par
 heure sont calculées à l'heure du Québec.
 
-**Tenir la charge.** La redirection ne lit pas la base à chaque tap : la
+**Sur Cloudflare.** En production, `/t/CODE` est servi par le Worker du
+dossier `worker/`, pas par Render : plus rapide, jamais endormi, gratuit
+jusqu'à 100 000 requêtes par jour. `app/t/[code]/route.ts` reste le filet de
+sécurité — le Worker lui renvoie la requête s'il ne peut pas répondre. Les
+deux appliquent les mêmes règles et doivent rester alignés. Mise en place :
+DEPLOIEMENT.md, section 6.
+
+**Tenir la charge (côté Render).** La redirection ne lit pas la base à chaque tap : la
 carte est gardée 30 s en mémoire (`lib/cache-cartes.ts`), et une
 modification l'efface aussitôt. Les taps ne s'écrivent pas un à un mais par
 paquets, une requête par seconde au plus (`lib/file-taps.ts`). Un tap peut

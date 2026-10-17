@@ -265,14 +265,74 @@ Render (environ 7 $ US par mois) ne s'endort jamais.
 4. Lire le verdict du script et celui de l'écran, puis **supprimer la carte de
    test** (ses taps partent avec elle).
 
-### Le jour où ça ne suffit plus
+### Ce que Render gratuit encaisse
 
-Dans l'ordre, sans jamais reprogrammer une carte :
+Mesuré : environ 30 taps par seconde. Au-delà, les taps attendent leur tour
+(3 à 4 s en rafale). C'est la raison de la section suivante.
 
-1. Render payant (Starter) : plus d'endormissement, plus de processeur.
-2. Render Standard ou plusieurs instances : même code, un réglage.
-3. Sortir la seule redirection `/t/*` sur Cloudflare Workers : on change la
-   cible du `CNAME go`, les puces ne voient rien.
+## 6. Les cartes sur Cloudflare Workers — gratuit, sans sommeil
+
+Le dossier `worker/` contient un Worker Cloudflare qui sert les adresses
+`/t/CODE` directement, depuis la ville du client. Il ne s'endort jamais,
+encaisse des milliers de taps par seconde, et le plan gratuit couvre
+100 000 requêtes par jour. Tout le reste de `go.taporacards.com` continue
+vers Render.
+
+Il parle à Supabase avec la **clé publique** (« publishable »), qui ne peut
+appeler que deux fonctions : lire la destination d'une carte active, compter
+un tap. Aucune table, aucune vente, aucun client (migration
+`20261018000100_cartes_worker.sql`).
+
+Les replis, pour qu'une carte ne casse jamais :
+
+| Situation | Ce qui se passe |
+|---|---|
+| Worker déployé sans ses secrets | tout passe à Render, comme avant |
+| Supabase ne répond pas | dernière destination connue (cache 30 jours), sinon Render |
+| Quota gratuit dépassé | route en « fail open » : Cloudflare envoie à Render |
+
+Une destination modifiée dans l'app s'applique sur les cartes en 15 s au plus.
+
+### Mise en place (une fois, depuis le Mac)
+
+Attendre que Render ait déployé la dernière version : la migration qui crée
+les deux fonctions s'applique à son démarrage.
+
+1. **Supabase** → le projet → **Project Settings → API Keys** : copier la
+   **Publishable key** (`sb_publishable_…`). L'URL du projet est celle de
+   `NEXT_PUBLIC_SUPABASE_URL` chez Render (`https://xxxx.supabase.co`).
+2. **Terminal** :
+   ```
+   cd ~/Documents/tapora && git pull
+   cd worker && npm install
+   npx wrangler login
+   npx wrangler deploy
+   npx wrangler secret put SUPABASE_URL
+   npx wrangler secret put SUPABASE_CLE
+   ```
+   `wrangler login` ouvre le navigateur : **Allow**. Chaque `secret put`
+   demande la valeur : la coller, Entrée. Elle part chez Cloudflare, nulle
+   part ailleurs.
+3. **Cloudflare** → `taporacards.com` → **SSL/TLS → Overview** → mode
+   **Full (strict)**. (En « Flexible », Render et Cloudflare se renverraient
+   la page à l'infini.)
+4. **Cloudflare → DNS → Records** → la ligne `go` → **Edit** → **Proxy
+   status : Proxied** (nuage orange) → **Save**. Sans le nuage orange, le
+   Worker n'est jamais appelé.
+5. **Cloudflare → Workers & Pages** → `tapora-cartes` → **Settings →
+   Domains & Routes** → la route `go.taporacards.com/*` → **Request limit
+   failure mode : Fail open**.
+6. Vérifier : taper une carte, puis **Cartes → En direct** doit afficher
+   « tous servis par Cloudflare ».
+
+`npm run journal` (dans `worker/`) affiche les requêtes en direct, pour
+déboguer. Revenir en arrière : remettre le nuage gris — tout repasse par
+Render, rien d'autre à toucher.
+
+### Le jour où même ça ne suffit plus
+
+Au-delà de 100 000 requêtes par jour : Workers Paid, 5 $ US par mois pour
+10 millions. Rien à changer dans le code.
 
 ## Sauvegardes
 
