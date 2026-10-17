@@ -64,6 +64,17 @@ export async function documentParJeton(jeton: string): Promise<VenteComplete | n
  * factures, et Gmail le classe en indésirables. La date et le montant dans
  * la phrase disent au filtre — et au client — qu'il s'agit d'un vrai achat.
  */
+/**
+ * L'adresse à laquelle le client peut écrire : celle de la société si elle
+ * est renseignée, sinon celle qui envoie — un client ne doit jamais lire
+ * « écrivez-nous à » suivi de rien.
+ */
+function adresseContact(courrielContact: string | null): string {
+  if (courrielContact?.trim()) return courrielContact.trim()
+  const expediteur = process.env.COURRIEL_EXPEDITEUR ?? process.env.GMAIL_EXPEDITEUR ?? ''
+  return expediteur.match(/<([^>]+)>/)?.[1] ?? expediteur.trim()
+}
+
 function corpsCourriel(
   doc: VenteComplete,
   societe: Awaited<ReturnType<typeof emetteur>>,
@@ -75,6 +86,7 @@ function corpsCourriel(
       .replaceAll('{numero}', doc.numero)
       .replaceAll('{client}', doc.client ?? doc.client_nom ?? '')
       .replaceAll('{entreprise}', societe.nom_entreprise)
+      .replaceAll('{contact}', adresseContact(societe.courriel_contact))
       .replaceAll('{date}', dateLongue(doc.date))
       .replaceAll('{total}', argent(doc.montant_ttc))
       // {details} s'adapte au document : un bon de livraison n'a pas de montant.
