@@ -26,6 +26,10 @@ services:
         value: "22"
       - key: SESSION_SECRET
         generateValue: true
+      # Adresse écrite sur les puces NFC — https://go.taporacards.com.
+      # PERMANENTE : une puce ne se reprogramme pas chez le client.
+      - key: URL_CARTES
+        sync: false
       # Chaîne de connexion Supabase (Transaction pooler).
       - key: DATABASE_URL
         sync: false

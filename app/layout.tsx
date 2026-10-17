@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 const LIENS = [
   ['/transactions', 'Transactions'],
   ['/ventes', 'Factures'],
+  ['/cartes', 'Cartes'],
   ['/resultats', 'Résultats'],
   ['/taxes', 'Taxes'],
   ['/marge', 'Marge'],
@@ -32,12 +33,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <Link href="/transactions" className="text-sm font-bold tracking-tight">
               Tapora <span className="font-normal text-[var(--color-encre-doux)]">S.E.N.C.</span>
             </Link>
-            <nav className="flex gap-1">
+            <nav className="-mx-1 flex max-w-full gap-1 overflow-x-auto">
               {LIENS.map(([href, libelle]) => (
                 <Link
                   key={href}
                   href={href}
-                  className="rounded-md px-3 py-1.5 text-sm font-medium text-[var(--color-encre-doux)] hover:bg-[var(--color-fond)] hover:text-[var(--color-encre)]"
+                  className="shrink-0 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium text-[var(--color-encre-doux)] hover:bg-[var(--color-fond)] hover:text-[var(--color-encre)]"
                 >
                   {libelle}
                 </Link>

@@ -220,6 +220,42 @@ envois sont **simulés**, écrits sur disque, et l'écran le dit en orange.
 
 ---
 
+## 5. Les cartes NFC — avant de programmer la première puce
+
+La puce contient `https://go.taporacards.com/t/K7M2QX`, pas le lien Google du
+client : l'application redirige et compte. Cette adresse est **permanente** —
+une carte posée chez un client ne se reprogramme pas. Elle doit donc être sur
+le domaine de la société, jamais sur celui de l'hébergeur (`…onrender.com`),
+pour que l'hébergeur puisse changer un jour sans casser une seule carte.
+
+1. **Render** → le service → **Settings → Custom Domains → Add** →
+   `go.taporacards.com`. Render affiche une cible (`tapora-backoffice.onrender.com`).
+2. **Cloudflare** → `taporacards.com` → **DNS → Add record** :
+   type `CNAME`, nom `go`, cible `tapora-backoffice.onrender.com`,
+   **proxy désactivé (nuage gris)** — Render émet lui-même le certificat.
+3. Attendre que Render affiche le domaine **Verified** et le certificat émis.
+4. **Render → Environment** : `URL_CARTES` = `https://go.taporacards.com`
+   → **Save, rebuild, and deploy**.
+
+Tant que `URL_CARTES` manque, l'écran Cartes le dit en orange : ne programmez
+aucune puce avant.
+
+### Le réveil du serveur
+
+Le forfait gratuit endort le serveur après quinze minutes sans visite ; le
+réveil prend près d'une minute. Pour le back-office, c'est agaçant. Pour une
+carte tapée au comptoir, c'est rédhibitoire : le client range son téléphone
+avant que la page ne s'ouvre.
+
+Solution gratuite : **cron-job.org** → créer une tâche qui appelle
+`https://go.taporacards.com/api/eveil` **toutes les 10 minutes**. Ce point
+répond « ok » sans toucher à la base. Le serveur reste éveillé en permanence,
+ce qui consomme environ 744 des 750 heures gratuites du mois — assez pour ce
+service, à condition de ne pas en ajouter un deuxième sur le forfait gratuit.
+
+Solution sûre, quand les cartes rapportent : le forfait payant le plus bas de
+Render (environ 7 $ US par mois) ne s'endort jamais.
+
 ## Sauvegardes
 
 Le forfait gratuit de Supabase ne garde pas d'historique de sauvegardes long.

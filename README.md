@@ -170,6 +170,33 @@ Au premier écran, l'application vous propose de créer votre compte.
 Sans clé de messagerie, les envois de documents sont **simulés** : le courriel
 est écrit dans `./courriels-locaux` et l'écran le dit franchement.
 
+## Cartes NFC : redirection et compteur
+
+La puce d'une carte ne contient pas le lien du client mais
+`https://go.taporacards.com/t/K7M2QX` ; `/t/[code]` redirige vers la
+destination de la carte et compte le passage. La destination se change d'un
+clic, sans toucher à la carte. Le code QR imprimé porte `?q`, ce qui sépare
+les scans des taps.
+
+- **La redirection passe avant le compteur** : un échec d'écriture perd un
+  tap, jamais un client.
+- **Seuls les humains comptent** : les aperçus de liens (iMessage, WhatsApp,
+  Slack…) et les robots sont redirigés sans être comptés ; un même téléphone
+  qui recharge dans la minute compte une fois (témoin de 60 s, sans
+  identifiant).
+- **Rien qui désigne une personne** (Loi 25) : ni IP, ni témoin durable, ni
+  position — l'heure, le canal (puce ou QR) et le type d'appareil.
+- **Un code ne sert qu'une fois** : `codes_cartes_emis` garde tous les codes
+  jamais attribués. Une carte supprimée ne libère pas son code ; une carte
+  oubliée dans un tiroir ne mènera jamais chez quelqu'un d'autre.
+- **L'adresse de base vient de `URL_CARTES` et de rien d'autre** : une puce
+  écrite avec l'adresse de l'hébergeur casserait au premier déménagement.
+
+`/cartes` : taps de la période et évolution, taps par jour, heures
+d'affluence, jours de la semaine, part puce/QR, iPhone/Android, classement
+des cartes avec mini-courbe sur 14 jours. Les statistiques par jour et par
+heure sont calculées à l'heure du Québec.
+
 ## Documents en PDF
 
 `/ventes/<id>/pdf` renvoie un vrai fichier, en pièce jointe : le navigateur le

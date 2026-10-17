@@ -10,6 +10,13 @@
   --color-positif: #0f7b52;
   --color-negatif: #b42318;
   --color-attention: #b54708;
+
+  /* Graphiques : deux teintes de série validées (daltonisme, contraste) sur
+     fond blanc, et une grille à un cran du fond. */
+  --color-serie-1: #2a78d6;
+  --color-serie-2: #eb6834;
+  --color-serie-attenuee: #9aa3b2;
+  --color-grille: #eceef2;
 }
 
 html {
