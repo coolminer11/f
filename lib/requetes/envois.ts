@@ -4,6 +4,7 @@ import { requete, requeteUne } from '@/lib/db'
 import { documentComplet, emetteur, type VenteComplete } from '@/lib/requetes/ventes'
 import { echapper, envoyerCourriel, messagerieConfiguree } from '@/lib/courriel'
 import { documentEnPdf, nomFichierPdf } from '@/lib/pdf'
+import { argent, dateLongue } from '@/lib/format'
 
 export type Envoi = {
   id: string
@@ -57,9 +58,11 @@ export async function documentParJeton(jeton: string): Promise<VenteComplete | n
 /**
  * Le courriel, dans la voix des associés.
  *
- * Volontairement sobre : quelques lignes et le PDF en pièce jointe, comme un
- * message écrit à la main. Le détail des montants est dans le PDF ; le
- * répéter dans le corps doublerait l'endroit où une erreur peut se glisser.
+ * Quelques lignes et le PDF en pièce jointe, comme un message écrit à la main
+ * — mais concrètes. « Voici votre reçu » sans date ni montant, avec un PDF
+ * joint et un expéditeur neuf, c'est trait pour trait le gabarit des fausses
+ * factures, et Gmail le classe en indésirables. La date et le montant dans
+ * la phrase disent au filtre — et au client — qu'il s'agit d'un vrai achat.
  */
 function corpsCourriel(
   doc: VenteComplete,
@@ -72,6 +75,15 @@ function corpsCourriel(
       .replaceAll('{numero}', doc.numero)
       .replaceAll('{client}', doc.client ?? doc.client_nom ?? '')
       .replaceAll('{entreprise}', societe.nom_entreprise)
+      .replaceAll('{date}', dateLongue(doc.date))
+      .replaceAll('{total}', argent(doc.montant_ttc))
+      // {details} s'adapte au document : un bon de livraison n'a pas de montant.
+      .replaceAll(
+        '{details}',
+        doc.definition.affiche_prix
+          ? ` du ${dateLongue(doc.date)}, d’un montant de ${argent(Math.abs(doc.montant_ttc))}`
+          : ` du ${dateLongue(doc.date)}`,
+      )
 
   const texte = remplacer(message ?? societe.modele_courriel).trim()
 
