@@ -1,6 +1,7 @@
 import 'server-only'
 import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
+import { masquer, secret } from '@/lib/secrets'
 
 /**
  * Envoi de courriel — par Gmail, par Resend, ou simulé.
@@ -37,13 +38,13 @@ export type Transport = 'gmail' | 'resend' | null
 
 export function transport(): Transport {
   if (
-    process.env.GMAIL_CLIENT_ID &&
-    process.env.GMAIL_CLIENT_SECRET &&
-    process.env.GMAIL_REFRESH_TOKEN
+    secret('GMAIL_CLIENT_ID') &&
+    secret('GMAIL_CLIENT_SECRET') &&
+    secret('GMAIL_REFRESH_TOKEN')
   ) {
     return 'gmail'
   }
-  if (process.env.RESEND_API_KEY && process.env.COURRIEL_EXPEDITEUR) return 'resend'
+  if (secret('RESEND_API_KEY') && process.env.COURRIEL_EXPEDITEUR) return 'resend'
   return null
 }
 
@@ -65,7 +66,7 @@ export async function envoyerCourriel(entree: Courriel): Promise<ResultatEnvoi> 
     return {
       statut: 'echec',
       reference: null,
-      erreur: e instanceof Error ? e.message : 'Envoi impossible.',
+      erreur: e instanceof Error ? masquer(e.message) : 'Envoi impossible.',
     }
   }
 }
@@ -87,9 +88,9 @@ async function accesGmail(): Promise<string> {
     method: 'POST',
     headers: { 'content-type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
-      client_id: process.env.GMAIL_CLIENT_ID as string,
-      client_secret: process.env.GMAIL_CLIENT_SECRET as string,
-      refresh_token: process.env.GMAIL_REFRESH_TOKEN as string,
+      client_id: secret('GMAIL_CLIENT_ID') as string,
+      client_secret: secret('GMAIL_CLIENT_SECRET') as string,
+      refresh_token: secret('GMAIL_REFRESH_TOKEN') as string,
       grant_type: 'refresh_token',
     }),
   })
@@ -213,7 +214,7 @@ async function parResend(entree: Courriel): Promise<ResultatEnvoi> {
   const reponse = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+      Authorization: `Bearer ${secret('RESEND_API_KEY')}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({

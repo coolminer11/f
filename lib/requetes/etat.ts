@@ -1,5 +1,5 @@
 import 'server-only'
-import { createClient } from '@supabase/supabase-js'
+import { clientSupabase, masquer } from '@/lib/secrets'
 import { requeteUne } from '@/lib/db'
 import { transport } from '@/lib/courriel'
 import { stockageDistant } from '@/lib/stockage'
@@ -38,7 +38,7 @@ async function controlerBase(): Promise<Controle> {
     return {
       nom: 'Base de données',
       verdict: 'panne',
-      detail: e instanceof Error ? e.message : 'Connexion impossible.',
+      detail: e instanceof Error ? masquer(e.message) : 'Connexion impossible.',
       remede: 'Vérifiez DATABASE_URL chez l’hébergeur, et que le projet Supabase n’est pas en pause.',
     }
   }
@@ -56,17 +56,13 @@ async function controlerStockage(): Promise<Controle> {
     }
   }
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-      process.env.SUPABASE_SERVICE_ROLE_KEY as string,
-      { auth: { persistSession: false, autoRefreshToken: false } },
-    )
+    const supabase = clientSupabase()
     const { data, error } = await supabase.storage.getBucket('recus')
     if (error) {
       return {
         nom: 'Photos de reçus',
         verdict: 'panne',
-        detail: `Supabase répond : ${error.message}`,
+        detail: `Supabase répond : ${masquer(error.message)}`,
         remede:
           'Clé refusée, ou seau absent. Vérifiez la clé « secret » / « service_role », et qu’un seau nommé exactement « recus » existe dans Storage.',
       }
@@ -85,7 +81,7 @@ async function controlerStockage(): Promise<Controle> {
     return {
       nom: 'Photos de reçus',
       verdict: 'panne',
-      detail: e instanceof Error ? e.message : 'Supabase injoignable.',
+      detail: e instanceof Error ? masquer(e.message) : 'Supabase injoignable.',
     }
   }
 }

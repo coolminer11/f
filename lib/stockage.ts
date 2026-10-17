@@ -1,5 +1,5 @@
 import 'server-only'
-import { createClient } from '@supabase/supabase-js'
+import { clientSupabase, masquer, supabaseConfigure } from '@/lib/secrets'
 import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
@@ -16,16 +16,10 @@ const DUREE_URL_SIGNEE = 60 * 10 // 10 minutes
  * l'application sans dépendre du réseau.
  */
 export function stockageDistant(): boolean {
-  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY)
+  return supabaseConfigure()
 }
 
-function client() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-    process.env.SUPABASE_SERVICE_ROLE_KEY as string,
-    { auth: { persistSession: false, autoRefreshToken: false } },
-  )
-}
+const client = clientSupabase
 
 function cheminLocal(chemin: string): string {
   // Empêche toute remontée hors du dossier de dépôt.
@@ -43,7 +37,7 @@ export async function televerserRecu(fichier: File): Promise<string> {
     const { error } = await client()
       .storage.from(BUCKET)
       .upload(chemin, contenu, { contentType: fichier.type, upsert: false })
-    if (error) throw new Error(`Téléversement du reçu impossible : ${error.message}`)
+    if (error) throw new Error(`Téléversement du reçu impossible : ${masquer(error.message)}`)
     return chemin
   }
 

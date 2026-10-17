@@ -1,5 +1,5 @@
 import 'server-only'
-import { createClient } from '@supabase/supabase-js'
+import { clientSupabase, masquer } from '@/lib/secrets'
 import { requete, requeteUne } from '@/lib/db'
 import { stockageDistant } from '@/lib/stockage'
 
@@ -24,13 +24,7 @@ export type TutorielAffiche = Tutoriel & {
   fichier: string | null
 }
 
-function client() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-    process.env.SUPABASE_SERVICE_ROLE_KEY as string,
-    { auth: { persistSession: false, autoRefreshToken: false } },
-  )
-}
+const client = clientSupabase
 
 /**
  * Transforme l'adresse d'une vidéo en adresse d'intégration.
@@ -104,7 +98,7 @@ export async function urlDeTeleversement(
   const extension = (nomFichier.split('.').pop() ?? 'mp4').toLowerCase().slice(0, 5)
   const chemin = `${new Date().getFullYear()}/${crypto.randomUUID()}.${extension}`
   const { data, error } = await client().storage.from(SEAU).createSignedUploadUrl(chemin)
-  if (error || !data) throw new Error(error?.message ?? 'Adresse de dépôt refusée.')
+  if (error || !data) throw new Error(masquer(error?.message ?? 'Adresse de dépôt refusée.'))
   return { url: data.signedUrl, chemin, jeton: data.token }
 }
 
