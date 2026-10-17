@@ -128,7 +128,11 @@ async function accesGmail(): Promise<string> {
 }
 
 async function parGmail(entree: Courriel): Promise<ResultatEnvoi> {
-  const brut = construireMime(entree, process.env.GMAIL_EXPEDITEUR ?? null)
+  // Pas d'adresse de réponse : elle pointerait vers le domaine de la société
+  // sous un expéditeur @gmail.com, et un « Reply-To » d'un autre domaine que
+  // l'expéditeur est l'un des signaux que les filtres associent à
+  // l'hameçonnage. Les réponses reviennent de toute façon dans ce Gmail.
+  const brut = construireMime({ ...entree, repondreA: null }, process.env.GMAIL_EXPEDITEUR ?? null)
   const reponse = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
     method: 'POST',
     headers: {
