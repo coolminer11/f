@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
 const NOM_COOKIE = 'tapora_session'
-const PUBLIC = ['/connexion', '/documents']
+const PUBLIC = ['/connexion', '/documents', '/confidentialite']
 
 /**
  * Première barrière. Elle vérifie la SIGNATURE du cookie, ce qui écarte un
