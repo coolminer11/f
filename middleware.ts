@@ -60,6 +60,9 @@ async function signatureValide(brut: string): Promise<boolean> {
   return difference === 0
 }
 
+// Les taps (/t/…) et le réveil ne passent pas du tout par ici : publics de
+// toute façon, ils économisent ainsi l'aller-retour du middleware — environ
+// 10 % du temps processeur d'un tap, mesuré.
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|icon.svg).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|icon.svg|t/|api/eveil).*)'],
 }
