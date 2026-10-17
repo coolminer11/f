@@ -1,7 +1,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
-import { exigerSession } from '@/lib/auth'
+import { exigerEcriture, exigerSession } from '@/lib/auth'
 import { stockageDistant } from '@/lib/stockage'
 import {
   ajouterTutoriel,
@@ -38,7 +38,7 @@ export default async function PageAide({
 
   async function enregistrer(donnees: FormData) {
     'use server'
-    const utilisateur = await exigerSession()
+    const utilisateur = await exigerEcriture()
     const analyse = Saisie.safeParse(Object.fromEntries(donnees))
     if (!analyse.success) {
       redirect(`/aide?erreur=${encodeURIComponent(analyse.error.issues[0].message)}`)
@@ -57,14 +57,14 @@ export default async function PageAide({
 
   async function retirer(donnees: FormData) {
     'use server'
-    await exigerSession()
+    await exigerEcriture()
     await supprimerTutoriel(String(donnees.get('id')))
     revalidatePath('/aide')
   }
 
   async function deplacer(donnees: FormData) {
     'use server'
-    await exigerSession()
+    await exigerEcriture()
     await deplacerTutoriel(String(donnees.get('id')), Number(donnees.get('sens')) as -1 | 1)
     revalidatePath('/aide')
   }

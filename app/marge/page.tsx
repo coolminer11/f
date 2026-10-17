@@ -14,7 +14,7 @@ import {
 } from '@/lib/requetes/marge'
 import { listerProduits } from '@/lib/requetes/ventes'
 import { argent, nombre, pourcent, taux } from '@/lib/format'
-import { exigerSession } from '@/lib/auth'
+import { exigerEcriture, exigerSession } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -58,6 +58,7 @@ export default async function PageMarge({
 
   async function enregistrerCouts(donnees: FormData) {
     'use server'
+    await exigerEcriture()
     const analyse = SaisieCouts.safeParse(Object.fromEntries(donnees))
     if (!analyse.success) {
       redirect(`/marge?erreur=${encodeURIComponent(analyse.error.issues[0].message)}`)
@@ -81,6 +82,7 @@ export default async function PageMarge({
 
   async function enregistrerHypotheses(donnees: FormData) {
     'use server'
+    await exigerEcriture()
     const analyse = SaisieHypotheses.safeParse(Object.fromEntries(donnees))
     if (!analyse.success) {
       redirect(`/marge?erreur=${encodeURIComponent(analyse.error.issues[0].message)}`)

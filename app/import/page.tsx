@@ -12,7 +12,7 @@ import { listerCategories, PROVINCES } from '@/lib/requetes/transactions'
 import { argent, dateCourte } from '@/lib/format'
 import TeleversementReleve from '@/components/televersement-releve'
 import TableauRapprochement from '@/components/tableau-rapprochement'
-import { exigerSession } from '@/lib/auth'
+import { exigerEcriture, exigerSession } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,6 +33,7 @@ export default async function PageImport({
 
   async function appliquer(donnees: FormData) {
     'use server'
+    await exigerEcriture()
     const brut = String(donnees.get('decisions') ?? '[]')
     let decisions: DecisionLigne[]
     try {
@@ -63,12 +64,14 @@ export default async function PageImport({
 
   async function reouvrir(donnees: FormData) {
     'use server'
+    await exigerEcriture()
     await annulerClassement(String(donnees.get('id')))
     revalidatePath('/import')
   }
 
   async function retirerImport(donnees: FormData) {
     'use server'
+    await exigerEcriture()
     await supprimerImport(String(donnees.get('id')))
     revalidatePath('/import')
     redirect('/import')

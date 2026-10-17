@@ -12,7 +12,7 @@ import {
 } from '@/lib/requetes/taxes'
 import { argent, dateCourte, dateLongue, taux } from '@/lib/format'
 import SelecteurPeriode from '@/components/selecteur-periode'
-import { exigerSession } from '@/lib/auth'
+import { exigerEcriture, exigerSession } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -42,6 +42,7 @@ export default async function PageTaxes({
 
   async function produire(donnees: FormData) {
     'use server'
+    await exigerEcriture()
     const autorite = String(donnees.get('autorite'))
     const debut = String(donnees.get('debut'))
     const fin = String(donnees.get('fin'))
@@ -62,6 +63,7 @@ export default async function PageTaxes({
 
   async function changerStatut(donnees: FormData) {
     'use server'
+    await exigerEcriture()
     await marquerDeclaration(
       String(donnees.get('id')),
       donnees.get('statut') as 'brouillon' | 'transmise' | 'payee',
@@ -72,6 +74,7 @@ export default async function PageTaxes({
 
   async function supprimer(donnees: FormData) {
     'use server'
+    await exigerEcriture()
     await supprimerDeclaration(String(donnees.get('id')))
     revalidatePath('/taxes')
   }

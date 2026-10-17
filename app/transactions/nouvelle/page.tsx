@@ -10,7 +10,7 @@ import {
 } from '@/lib/requetes/transactions'
 import { televerserRecu } from '@/lib/stockage'
 import FormulaireDepense from '@/components/formulaire-depense'
-import { exigerSession } from '@/lib/auth'
+import { exigerEcriture, exigerSession } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -42,6 +42,7 @@ export default async function PageNouvelleDepense({
 
   async function enregistrer(donnees: FormData) {
     'use server'
+    await exigerEcriture()
 
     const analyse = Saisie.safeParse(Object.fromEntries(donnees))
     if (!analyse.success) {

@@ -19,7 +19,7 @@ import { argent, dateCourte, dateLongue, pourcent } from '@/lib/format'
 import FormulaireMouvement from '@/components/formulaire-mouvement'
 import FormulaireDecision from '@/components/formulaire-decision'
 import FiltresDecisions from '@/components/filtres-decisions'
-import { exigerSession } from '@/lib/auth'
+import { exigerEcriture, exigerSession } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -85,6 +85,7 @@ export default async function PageAssocies({
 
   async function enregistrerMouvement(donnees: FormData) {
     'use server'
+    await exigerEcriture()
     const analyse = SaisieMouvement.safeParse(Object.fromEntries(donnees))
     if (!analyse.success) {
       redirect(`${retour}&erreur=${encodeURIComponent(analyse.error.issues[0].message)}`)
@@ -109,12 +110,14 @@ export default async function PageAssocies({
 
   async function retirerMouvement(donnees: FormData) {
     'use server'
+    await exigerEcriture()
     await supprimerMouvement(String(donnees.get('id')))
     revalidatePath('/associes')
   }
 
   async function enregistrerDecision(donnees: FormData) {
     'use server'
+    await exigerEcriture()
     const analyse = SaisieDecision.safeParse(Object.fromEntries(donnees))
     if (!analyse.success) {
       redirect(`${retour}&erreur=${encodeURIComponent(analyse.error.issues[0].message)}`)
@@ -134,6 +137,7 @@ export default async function PageAssocies({
 
   async function approuver(donnees: FormData) {
     'use server'
+    await exigerEcriture()
     await basculerApprobation(
       String(donnees.get('decision_id')),
       String(donnees.get('associe_id')),

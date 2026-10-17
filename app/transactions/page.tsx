@@ -8,7 +8,7 @@ import BoutonSupprimer from '@/components/bouton-supprimer'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { supprimerTransaction } from '@/lib/requetes/transactions'
-import { exigerSession } from '@/lib/auth'
+import { exigerEcriture, exigerSession } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,7 +24,7 @@ export default async function PageTransactions({
 
   async function supprimer(donnees: FormData) {
     'use server'
-    const utilisateur = await exigerSession()
+    const utilisateur = await exigerEcriture()
     try {
       await supprimerTransaction(String(donnees.get('id')), null, utilisateur.courriel)
     } catch (e) {
