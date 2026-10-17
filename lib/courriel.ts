@@ -36,7 +36,15 @@ type Courriel = {
 
 export type Transport = 'gmail' | 'resend' | null
 
+/**
+ * Resend passe devant Gmail quand les deux sont configurés : il n'est
+ * branché que si la société a son propre domaine, authentifié — et un
+ * domaine authentifié arrive en boîte de réception là où une adresse Gmail
+ * neuve finit en indésirables. Les variables GMAIL_… peuvent rester en place :
+ * elles servent de repli si l'on retire la clé Resend.
+ */
 export function transport(): Transport {
+  if (secret('RESEND_API_KEY') && process.env.COURRIEL_EXPEDITEUR) return 'resend'
   if (
     secret('GMAIL_CLIENT_ID') &&
     secret('GMAIL_CLIENT_SECRET') &&
@@ -44,7 +52,6 @@ export function transport(): Transport {
   ) {
     return 'gmail'
   }
-  if (secret('RESEND_API_KEY') && process.env.COURRIEL_EXPEDITEUR) return 'resend'
   return null
 }
 

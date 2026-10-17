@@ -212,7 +212,8 @@ ce qui a échoué.
 **Avec votre propre nom de domaine**, Resend reste possible à la place de
 Gmail : renseignez `RESEND_API_KEY` et `COURRIEL_EXPEDITEUR`
 (`Tapora S.E.N.C. <facturation@votredomaine.ca>`) après avoir vérifié le
-domaine chez Resend. Si les deux sont configurés, Gmail l'emporte.
+domaine chez Resend. Si les deux sont configurés, Resend l'emporte : un
+domaine authentifié évite les indésirables mieux qu'une adresse Gmail neuve.
 
 Tant qu'aucun des deux n'est configuré, l'application ne casse pas : les
 envois sont **simulés**, écrits sur disque, et l'écran le dit en orange.
