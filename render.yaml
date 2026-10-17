@@ -35,7 +35,17 @@ services:
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
-      # Envoi des documents. Sans ces deux valeurs, les envois sont simulés.
+      # Envoi des documents par Gmail (npm run gmail:autoriser les fournit).
+      # L'API Gmail passe par HTTPS : le SMTP est bloqué sur le forfait gratuit.
+      - key: GMAIL_CLIENT_ID
+        sync: false
+      - key: GMAIL_CLIENT_SECRET
+        sync: false
+      - key: GMAIL_REFRESH_TOKEN
+        sync: false
+      - key: GMAIL_EXPEDITEUR
+        sync: false
+      # Ou par Resend, pour qui a son propre nom de domaine.
       - key: RESEND_API_KEY
         sync: false
       - key: COURRIEL_EXPEDITEUR

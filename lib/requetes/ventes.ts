@@ -259,13 +259,14 @@ export type Emetteur = {
   pied_facture: string | null
   conditions_generales_defaut: string | null
   delai_paiement_jours: number
+  modele_courriel: string
 }
 
 export async function emetteur(): Promise<Emetteur> {
   const p = await requeteUne<Emetteur>(
     `select nom_entreprise, neq, numero_tps, numero_tvq, adresse, ville, code_postal,
             telephone, site_web, courriel_contact, pied_facture,
-            conditions_generales_defaut, delai_paiement_jours
+            conditions_generales_defaut, delai_paiement_jours, modele_courriel
        from parametres where id`,
   )
   if (!p) throw new Error('Les paramètres de la société ne sont pas initialisés.')

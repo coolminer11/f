@@ -1,7 +1,7 @@
 import 'server-only'
 import { createClient } from '@supabase/supabase-js'
 import { requeteUne } from '@/lib/db'
-import { messagerieConfiguree } from '@/lib/courriel'
+import { transport } from '@/lib/courriel'
 import { stockageDistant } from '@/lib/stockage'
 
 /**
@@ -91,18 +91,28 @@ async function controlerStockage(): Promise<Controle> {
 }
 
 function controlerCourriel(): Controle {
-  return messagerieConfiguree()
-    ? {
+  switch (transport()) {
+    case 'gmail':
+      return {
         nom: 'Envoi des documents',
         verdict: 'ok',
-        detail: `Resend configuré · expéditeur ${process.env.COURRIEL_EXPEDITEUR}`,
+        detail: `Gmail · ${process.env.GMAIL_EXPEDITEUR ?? 'compte autorisé'} · le PDF part en pièce jointe`,
       }
-    : {
+    case 'resend':
+      return {
+        nom: 'Envoi des documents',
+        verdict: 'ok',
+        detail: `Resend · expéditeur ${process.env.COURRIEL_EXPEDITEUR}`,
+      }
+    default:
+      return {
         nom: 'Envoi des documents',
         verdict: 'attention',
         detail: 'Les envois sont SIMULÉS : rien ne part, le message est écrit sur disque.',
-        remede: 'Renseignez RESEND_API_KEY et COURRIEL_EXPEDITEUR chez l’hébergeur.',
+        remede:
+          'Lancez « npm run gmail:autoriser » sur votre Mac et collez les quatre valeurs GMAIL_… chez l’hébergeur.',
       }
+  }
 }
 
 async function controlerParametres(): Promise<Controle> {

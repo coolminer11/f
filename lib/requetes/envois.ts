@@ -3,7 +3,7 @@ import { randomBytes } from 'node:crypto'
 import { requete, requeteUne } from '@/lib/db'
 import { documentComplet, emetteur, type VenteComplete } from '@/lib/requetes/ventes'
 import { echapper, envoyerCourriel, messagerieConfiguree } from '@/lib/courriel'
-import { argent, dateLongue, taux } from '@/lib/format'
+import { documentEnPdf, nomFichierPdf } from '@/lib/pdf'
 
 export type Envoi = {
   id: string
@@ -54,105 +54,35 @@ export async function documentParJeton(jeton: string): Promise<VenteComplete | n
   return ligne ? documentComplet(ligne.id) : null
 }
 
+/**
+ * Le courriel, dans la voix des associés.
+ *
+ * Volontairement sobre : quelques lignes et le PDF en pièce jointe, comme un
+ * message écrit à la main. Le détail des montants est dans le PDF ; le
+ * répéter dans le corps doublerait l'endroit où une erreur peut se glisser.
+ */
 function corpsCourriel(
   doc: VenteComplete,
   societe: Awaited<ReturnType<typeof emetteur>>,
-  lien: string,
   message: string | null,
 ): { html: string; texte: string } {
-  const ligneStyle = 'padding:6px 0;border-bottom:1px solid #e4e7ec;font-size:14px;color:#16181d'
-  const doux = 'color:#5b6472'
+  const remplacer = (modele: string) =>
+    modele
+      .replaceAll('{document}', doc.definition.libelle.toLowerCase())
+      .replaceAll('{numero}', doc.numero)
+      .replaceAll('{client}', doc.client ?? doc.client_nom ?? '')
+      .replaceAll('{entreprise}', societe.nom_entreprise)
 
-  const lignes = doc.lignes
-    .map(
-      (l) => `<tr>
-        <td style="${ligneStyle}">${echapper(l.description)}</td>
-        <td style="${ligneStyle};text-align:right">${l.quantite}</td>
-        ${
-          doc.definition.affiche_prix
-            ? `<td style="${ligneStyle};text-align:right">${argent(Number(l.montant_ht) * doc.definition.signe)}</td>`
-            : ''
-        }
-      </tr>`,
-    )
+  const texte = remplacer(message ?? societe.modele_courriel).trim()
+
+  // Un paragraphe par bloc séparé d'une ligne vide, des sauts de ligne
+  // simples à l'intérieur — c'est ainsi que le texte a été tapé.
+  const paragraphes = texte
+    .split(/\n\s*\n/)
+    .map((bloc) => `<p style="margin:0 0 14px">${echapper(bloc).replace(/\n/g, '<br>')}</p>`)
     .join('')
 
-  const taxes = doc.taxes
-    .map(
-      (t) => `<tr>
-        <td style="${ligneStyle};border:0;${doux}">${t.code} ${taux(t.taux)}</td>
-        <td style="${ligneStyle};border:0;text-align:right">${argent(t.montant)}</td>
-      </tr>`,
-    )
-    .join('')
-
-  const aPayer =
-    doc.definition.attend_paiement && doc.solde > 0
-      ? `<p style="margin:20px 0;padding:12px 16px;border:1px solid #16181d;border-radius:6px;font-size:15px;font-weight:600">
-           Montant à payer : ${argent(doc.solde)}
-           ${doc.date_echeance ? ` — au plus tard le ${dateLongue(doc.date_echeance)}` : ''}
-         </p>`
-      : ''
-
-  // HTML volontairement simple : tables et styles en ligne, parce que les
-  // clients de messagerie ne comprennent ni les variables CSS ni la grille.
-  const html = `<!doctype html><html lang="fr"><body style="margin:0;padding:24px;background:#f7f8fa;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
-  <div style="max-width:560px;margin:0 auto;background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:28px">
-    <p style="margin:0;font-size:13px;${doux}">${echapper(societe.nom_entreprise)}</p>
-    <h1 style="margin:6px 0 0;font-size:20px;color:#16181d">${doc.definition.libelle} ${doc.numero}</h1>
-    <p style="margin:4px 0 0;font-size:14px;${doux}">${dateLongue(doc.date)}</p>
-
-    ${message ? `<p style="margin:20px 0;font-size:14px;line-height:1.6;color:#16181d;white-space:pre-line">${echapper(message)}</p>` : ''}
-
-    <table style="width:100%;border-collapse:collapse;margin-top:20px">
-      <tr>
-        <th style="text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;${doux};padding-bottom:6px">Description</th>
-        <th style="text-align:right;font-size:11px;text-transform:uppercase;letter-spacing:.04em;${doux};padding-bottom:6px">Qté</th>
-        ${doc.definition.affiche_prix ? `<th style="text-align:right;font-size:11px;text-transform:uppercase;letter-spacing:.04em;${doux};padding-bottom:6px">Montant</th>` : ''}
-      </tr>
-      ${lignes}
-    </table>
-
-    ${
-      doc.definition.affiche_prix
-        ? `<table style="width:100%;border-collapse:collapse;margin-top:16px">
-             <tr><td style="${ligneStyle};border:0;${doux}">Total hors taxes</td>
-                 <td style="${ligneStyle};border:0;text-align:right">${argent(doc.montant_ht)}</td></tr>
-             ${taxes}
-             <tr><td style="padding:8px 0 0;font-size:16px;font-weight:700;border-top:2px solid #16181d">Total</td>
-                 <td style="padding:8px 0 0;font-size:16px;font-weight:700;text-align:right;border-top:2px solid #16181d">${argent(doc.montant_ttc)}</td></tr>
-           </table>`
-        : ''
-    }
-
-    ${aPayer}
-
-    <p style="margin:24px 0 0">
-      <a href="${lien}" style="display:inline-block;background:#1d4ed8;color:#fff;text-decoration:none;padding:11px 20px;border-radius:8px;font-size:14px;font-weight:600">
-        Voir le document
-      </a>
-    </p>
-    <p style="margin:12px 0 0;font-size:12px;${doux}">
-      Le lien ouvre ${doc.definition.libelle.toLowerCase()} ${doc.numero} et permet de l’imprimer ou de l’enregistrer en PDF.
-    </p>
-
-    <p style="margin:24px 0 0;padding-top:16px;border-top:1px solid #e4e7ec;font-size:12px;${doux}">
-      ${echapper(societe.nom_entreprise)}${societe.telephone ? ` · ${echapper(societe.telephone)}` : ''}${societe.courriel_contact ? ` · ${echapper(societe.courriel_contact)}` : ''}
-    </p>
-  </div>
-</body></html>`
-
-  const texte = [
-    `${doc.definition.libelle} ${doc.numero} — ${societe.nom_entreprise}`,
-    dateLongue(doc.date),
-    message ?? '',
-    doc.definition.affiche_prix ? `Total : ${argent(doc.montant_ttc)}` : '',
-    doc.definition.attend_paiement && doc.solde > 0 ? `Montant à payer : ${argent(doc.solde)}` : '',
-    '',
-    `Voir le document : ${lien}`,
-  ]
-    .filter(Boolean)
-    .join('\n')
+  const html = `<!doctype html><html lang="fr"><body style="margin:0;padding:16px;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.5;color:#16181d">${paragraphes}</body></html>`
 
   return { html, texte }
 }
@@ -161,16 +91,16 @@ export async function envoyerDocument(entree: {
   venteId: string
   destinataire: string
   message: string | null
-  utilisateurId: string
-  origine: string
+  utilisateurId: string | null
 }): Promise<{ statut: string; erreur: string | null }> {
   const [doc, societe] = await Promise.all([documentComplet(entree.venteId), emetteur()])
   if (!doc) throw new Error('Document introuvable.')
 
-  const jeton = await jetonPublic(entree.venteId)
-  const lien = `${entree.origine.replace(/\/$/, '')}/documents/${jeton}`
+  // Le lien public reste créé : l'écran du document le propose à copier,
+  // pour qui préfère l'envoyer par texto.
+  await jetonPublic(entree.venteId)
   const objet = `${doc.definition.libelle} ${doc.numero} — ${societe.nom_entreprise}`
-  const { html, texte } = corpsCourriel(doc, societe, lien, entree.message)
+  const { html, texte } = corpsCourriel(doc, societe, entree.message)
 
   const resultat = await envoyerCourriel({
     destinataire: entree.destinataire,
@@ -178,6 +108,11 @@ export async function envoyerDocument(entree: {
     html,
     texte,
     repondreA: societe.courriel_contact,
+    pieceJointe: {
+      nom: nomFichierPdf(doc),
+      contenu: await documentEnPdf(doc, societe),
+      type: 'application/pdf',
+    },
   })
 
   await requete(

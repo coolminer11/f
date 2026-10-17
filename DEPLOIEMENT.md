@@ -149,20 +149,73 @@ ajoutant `SESSION_SECRET` (32 caractères au hasard — `openssl rand -base64 32
 
 ---
 
-## 4. Le courriel, plus tard
+## 4. Le courriel — envoyer depuis le Gmail de la société
 
-1. Créer un compte sur **resend.com**.
-2. **Domains → Add Domain**, entrer votre domaine, puis ajouter chez votre
-   registraire les enregistrements DNS que Resend affiche (DKIM, SPF).
-   La vérification prend de quelques minutes à quelques heures.
-3. **API Keys → Create**, copier la clé.
-4. Dans l'hébergeur, renseigner :
-   - `RESEND_API_KEY`
-   - `COURRIEL_EXPEDITEUR` = `Tapora S.E.N.C. <facturation@votredomaine.ca>`
-5. Redéployer.
+Les documents partent depuis l'adresse Gmail de la société, avec le PDF en
+pièce jointe, et apparaissent dans ses « Messages envoyés ». Le texte du
+courriel est dans `parametres.modele_courriel` (Supabase → Table Editor) ;
+les repères `{document}`, `{numero}`, `{client}` et `{entreprise}` sont
+remplacés à l'envoi.
 
-Tant que ces deux valeurs sont vides, l'application ne casse pas : les envois
-sont **simulés**, écrits sur disque, et l'écran le dit en orange.
+**Pourquoi pas une connexion Gmail « normale » (SMTP) :** le forfait gratuit
+de Render bloque les ports 25, 465 et 587. Une configuration SMTP marcherait
+sur votre Mac et échouerait en silence une fois en ligne. L'API Gmail passe
+par HTTPS, comme une page web : elle n'est pas bloquée.
+
+À faire une fois, connecté au compte Gmail de la société :
+
+1. **console.cloud.google.com** → en haut, sélecteur de projet → **Nouveau
+   projet** → nom `Tapora` → **Créer**.
+2. Menu → **API et services → Bibliothèque** → chercher **Gmail API** →
+   **Activer**.
+3. Menu → **Google Auth Platform** (anciennement « Écran de consentement
+   OAuth ») → **Commencer** :
+   - Nom de l'application : `Tapora back-office`
+   - Adresse d'assistance : l'adresse Gmail de la société
+   - Audience : **Externe**
+   - Coordonnées : la même adresse → accepter → **Créer**
+4. **Audience → Publier l'application → Confirmer.**
+   **N'oubliez pas cette étape.** Une application restée « En test » voit son
+   autorisation révoquée par Google au bout de **sept jours**, et les envois
+   s'arrêtent sans prévenir.
+5. **Clients → Créer un client** → type **Application de bureau** → nom
+   `Tapora` → **Créer**. Gardez l'**ID client** et le **code secret** affichés.
+6. Sur votre Mac :
+
+   ```bash
+   cd ~/Documents/tapora && git pull && npm install
+   npm run gmail:autoriser -- <ID_CLIENT> <CODE_SECRET>
+   ```
+
+   Le navigateur s'ouvre. Choisissez le compte Gmail de la société. Google
+   affichera « Google n'a pas validé cette application » : c'est normal pour
+   une application privée → **Paramètres avancés → Accéder à Tapora back-office
+   (non sécurisé)** → cochez **Envoyer des e-mails en votre nom** → **Continuer**.
+7. Le Terminal affiche quatre valeurs `GMAIL_…`. Render → votre service →
+   **Environment → Add variable**, une par une → **Save, rebuild, and deploy**.
+8. Vérifiez sur `/etat` : la ligne **Envoi des documents** passe au vert.
+   Puis envoyez-vous un reçu de test.
+
+La seule permission demandée est « envoyer » : l'application ne peut ni lire
+la boîte, ni effacer, ni voir les contacts.
+
+> **Changer le mot de passe Gmail révoque l'autorisation.** L'écran du
+> document le dira à l'envoi suivant ; refaites l'étape 6 et remplacez
+> `GMAIL_REFRESH_TOKEN` chez Render.
+
+**L'envoi automatique.** Sur un nouveau document, la case « Envoyer le PDF à
+ce courriel dès l'enregistrement » est cochée d'office pour les reçus, les
+factures et les notes de crédit, dès qu'un courriel client est saisi. Un envoi
+raté ne défait jamais la vente : le document est enregistré, et l'écran dit
+ce qui a échoué.
+
+**Avec votre propre nom de domaine**, Resend reste possible à la place de
+Gmail : renseignez `RESEND_API_KEY` et `COURRIEL_EXPEDITEUR`
+(`Tapora S.E.N.C. <facturation@votredomaine.ca>`) après avoir vérifié le
+domaine chez Resend. Si les deux sont configurés, Gmail l'emporte.
+
+Tant qu'aucun des deux n'est configuré, l'application ne casse pas : les
+envois sont **simulés**, écrits sur disque, et l'écran le dit en orange.
 
 ---
 

@@ -16,9 +16,8 @@ import {
 import { MODES_PAIEMENT } from '@/lib/requetes/transactions'
 import { envoyerDocument, listerEnvois, messagerieConfiguree, revoquerLienPublic } from '@/lib/requetes/envois'
 import { requeteUne } from '@/lib/db'
-import { headers } from 'next/headers'
 import { argent, dateLongue, nombre, taux } from '@/lib/format'
-import { exigerSession } from '@/lib/auth'
+import { exigerEcriture, exigerSession } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -65,7 +64,7 @@ export default async function PageDocument({
 
   async function enregistrerPaiement(donnees: FormData) {
     'use server'
-    await exigerSession()
+    await exigerEcriture()
     const analyse = SaisiePaiement.safeParse(Object.fromEntries(donnees))
     if (!analyse.success) {
       redirect(`/ventes/${id}?erreur=${encodeURIComponent(analyse.error.issues[0].message)}`)
@@ -84,14 +83,14 @@ export default async function PageDocument({
 
   async function retirerPaiement(donnees: FormData) {
     'use server'
-    await exigerSession()
+    await exigerEcriture()
     await supprimerPaiement(String(donnees.get('id')))
     revalidatePath(`/ventes/${id}`)
   }
 
   async function transformer() {
     'use server'
-    await exigerSession()
+    await exigerEcriture()
     let factureId: string
     try {
       factureId = await accepterDevis(id, new Date().toISOString().slice(0, 10))
@@ -105,7 +104,7 @@ export default async function PageDocument({
 
   async function appliquerCredit(donnees: FormData) {
     'use server'
-    await exigerSession()
+    await exigerEcriture()
     try {
       await appliquerNoteCredit(id, String(donnees.get('facture_id')))
     } catch (e) {
@@ -118,7 +117,7 @@ export default async function PageDocument({
 
   async function supprimer(donnees: FormData) {
     'use server'
-    const moi = await exigerSession()
+    const moi = await exigerEcriture()
     try {
       await supprimerDocument(
         id,
@@ -136,14 +135,14 @@ export default async function PageDocument({
 
   async function envoyer() {
     'use server'
-    await exigerSession()
+    await exigerEcriture()
     await marquerEnvoye(id, new Date().toISOString().slice(0, 10))
     revalidatePath(`/ventes/${id}`)
   }
 
   async function annuler() {
     'use server'
-    await exigerSession()
+    await exigerEcriture()
     await annulerDocument(id)
     revalidatePath('/ventes')
     redirect('/ventes')
@@ -151,17 +150,11 @@ export default async function PageDocument({
 
   async function expedier(donnees: FormData) {
     'use server'
-    const utilisateur = await exigerSession()
+    const utilisateur = await exigerEcriture()
     const analyse = SaisieEnvoi.safeParse(Object.fromEntries(donnees))
     if (!analyse.success) {
       redirect(`/ventes/${id}?erreur=${encodeURIComponent(analyse.error.issues[0].message)}`)
     }
-    // L'origine vient de la requête : le lien du courriel doit pointer vers le
-    // domaine réellement utilisé, pas vers une valeur codée en dur.
-    const entetes = await headers()
-    const hote = entetes.get('x-forwarded-host') ?? entetes.get('host') ?? 'localhost:3000'
-    const schema = entetes.get('x-forwarded-proto') ?? (hote.startsWith('localhost') ? 'http' : 'https')
-
     let resultat: { statut: string; erreur: string | null }
     try {
       resultat = await envoyerDocument({
@@ -169,7 +162,6 @@ export default async function PageDocument({
         destinataire: analyse.data.destinataire,
         message: analyse.data.message?.length ? analyse.data.message : null,
         utilisateurId: utilisateur.id,
-        origine: `${schema}://${hote}`,
       })
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Envoi impossible.'
@@ -192,7 +184,7 @@ export default async function PageDocument({
 
   async function revoquer() {
     'use server'
-    await exigerSession()
+    await exigerEcriture()
     await revoquerLienPublic(id)
     revalidatePath(`/ventes/${id}`)
   }
@@ -403,8 +395,8 @@ export default async function PageDocument({
         <section className="carte p-5">
           <h2 className="text-sm font-bold">Envoyer au client</h2>
           <p className="mt-0.5 text-xs text-[var(--color-encre-doux)]">
-            Le courriel contient un lien vers ce document seul. Le client peut l’ouvrir,
-            l’imprimer ou l’enregistrer en PDF, sans compte.
+            Le PDF part en pièce jointe, avec votre texte habituel (Supabase → parametres →
+            modele_courriel).
             {!messagerieConfiguree() &&
               ' Aucun service de courriel n’est configuré : l’envoi sera simulé et écrit sur disque.'}
           </p>
@@ -432,7 +424,7 @@ export default async function PageDocument({
             </div>
             <div>
               <label className="etiquette" htmlFor="message_envoi">
-                Message <span className="font-normal">(facultatif)</span>
+                Message <span className="font-normal">(facultatif — remplace le texte habituel)</span>
               </label>
               <textarea
                 id="message_envoi"
@@ -440,7 +432,7 @@ export default async function PageDocument({
                 className="champ"
                 rows={2}
                 maxLength={1500}
-                placeholder="Bonjour, voici la facture pour votre commande…"
+                placeholder="Laissez vide pour envoyer le texte habituel."
               />
             </div>
           </form>

@@ -15,7 +15,8 @@ import {
 } from '@/lib/requetes/ventes'
 import { MODES_PAIEMENT, PROVINCES } from '@/lib/requetes/transactions'
 import FormulaireDocument from '@/components/formulaire-document'
-import { exigerSession } from '@/lib/auth'
+import { envoyerDocument } from '@/lib/requetes/envois'
+import { exigerEcriture, exigerSession } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -64,6 +65,7 @@ const Saisie = z.object({
   paiement_immediat: nombreFacultatif,
   document_origine_id: z.string().uuid().optional().or(z.literal('')),
   lignes: z.string(),
+  envoyer_au_client: z.string().optional(),
 })
 
 export default async function PageNouveauDocument({
@@ -86,6 +88,7 @@ export default async function PageNouveauDocument({
 
   async function enregistrer(donnees: FormData) {
     'use server'
+    const utilisateur = await exigerEcriture()
     const analyse = Saisie.safeParse(Object.fromEntries(donnees))
     const retour = `/ventes/nouvelle?type=${encodeURIComponent(String(donnees.get('type_document') ?? 'facture'))}${
       p.depuis ? `&depuis=${p.depuis}` : ''
@@ -151,6 +154,30 @@ export default async function PageNouveauDocument({
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Création impossible.'
       redirect(`${retour}&erreur=${encodeURIComponent(message)}`)
+    }
+
+    // Envoi au client dans la foulée. Un envoi raté ne défait pas la vente :
+    // le document existe, il se renvoie d'un clic depuis sa page.
+    const courriel = v.courriel_facturation?.trim()
+    if (v.envoyer_au_client === '1' && courriel) {
+      let resultat: { statut: string; erreur: string | null }
+      try {
+        resultat = await envoyerDocument({
+          venteId: cree.id,
+          destinataire: courriel,
+          message: null,
+          utilisateurId: utilisateur.id,
+        })
+      } catch (e) {
+        resultat = { statut: 'echec', erreur: e instanceof Error ? e.message : 'Envoi impossible.' }
+      }
+      const avis =
+        resultat.statut === 'envoye'
+          ? `message=${encodeURIComponent(`${cree.numero} enregistré et envoyé à ${courriel}.`)}`
+          : resultat.statut === 'simule'
+            ? `avis=${encodeURIComponent(`${cree.numero} enregistré. Envoi SIMULÉ : aucun service de courriel n’est branché, rien n’est parti.`)}`
+            : `erreur=${encodeURIComponent(`${cree.numero} est enregistré, mais l’envoi a échoué : ${resultat.erreur ?? 'raison inconnue'}. Renvoyez-le depuis cette page.`)}`
+      redirect(`/ventes/${cree.id}?${avis}`)
     }
 
     redirect(`/ventes/${cree.id}`)

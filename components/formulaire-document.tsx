@@ -290,6 +290,17 @@ export default function FormulaireDocument({
               defaultValue={prefill?.courrielFacturation ?? clientConnu?.courriel ?? ''}
               maxLength={200}
             />
+            {/* La clé remet la case à son défaut quand le type change : on
+                envoie d'office un reçu ou une facture, pas un bon de livraison. */}
+            <label key={type} className="mt-1.5 flex items-center gap-2 text-xs text-[var(--color-encre-doux)]">
+              <input
+                type="checkbox"
+                name="envoyer_au_client"
+                value="1"
+                defaultChecked={['recu', 'facture', 'facture_acompte', 'note_credit'].includes(type)}
+              />
+              Envoyer le PDF à ce courriel dès l’enregistrement
+            </label>
           </div>
         </div>
 
