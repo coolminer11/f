@@ -1,4 +1,6 @@
-import { enregistrerTap, resoudre } from '@/lib/requetes/cartes'
+import { resoudre } from '@/lib/requetes/cartes'
+import { noterTap } from '@/lib/file-taps'
+import { carteEnCache } from '@/lib/cache-cartes'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -9,8 +11,10 @@ export const dynamic = 'force-dynamic'
  * C'est le seul écran que voit le client du client, debout au comptoir, le
  * téléphone à la main. Trois règles en découlent :
  *
- *   1. Rediriger d'abord. Si le compteur échoue, le tap se perd ; la
- *      redirection, jamais.
+ *   1. Rediriger d'abord. Le tap est compté APRÈS la réponse : le
+ *      téléphone n'attend que la lecture de la destination — souvent servie
+ *      de mémoire, sans toucher la base. Si le compteur échoue, le tap se
+ *      perd ; la redirection, jamais.
  *   2. Ne compter que les vrais humains. Les aperçus de liens (iMessage,
  *      WhatsApp, Slack…) et les robots visitent l'adresse sans que personne
  *      n'ait tapé : ils sont redirigés mais pas comptés. Un même téléphone
@@ -34,13 +38,14 @@ function appareil(agent: string): 'ios' | 'android' | 'autre' {
 const CODE = /^[A-HJ-NP-Z2-9]{6}$/
 
 export async function GET(requete: Request, { params }: { params: Promise<{ code: string }> }) {
+  const debut = performance.now()
   const { code: brut } = await params
   const code = brut.toUpperCase()
   if (!CODE.test(code)) return pageInactive()
 
   let carte: { id: string; destination: string } | null = null
   try {
-    carte = await resoudre(code)
+    carte = await carteEnCache(code, () => resoudre(code))
   } catch {
     return pageIndisponible()
   }
@@ -52,11 +57,9 @@ export async function GET(requete: Request, { params }: { params: Promise<{ code
   const canal = new URL(requete.url).searchParams.has('q') ? 'qr' : 'nfc'
 
   if (!ROBOTS.test(agent) && !dejaCompte) {
-    try {
-      await enregistrerTap(carte.id, canal, appareil(agent))
-    } catch {
-      // Le compteur ne bloque jamais la redirection.
-    }
+    // Le tap part dans la file d'écriture (lib/file-taps.ts) : la réponse
+    // n'attend pas la base, et les taps s'écrivent par paquets.
+    noterTap({ carteId: carte.id, canal, appareil: appareil(agent), dureeMs: performance.now() - debut })
   }
 
   return new Response(null, {

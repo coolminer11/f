@@ -197,6 +197,19 @@ d'affluence, jours de la semaine, part puce/QR, iPhone/Android, classement
 des cartes avec mini-courbe sur 14 jours. Les statistiques par jour et par
 heure sont calculées à l'heure du Québec.
 
+**Tenir la charge.** La redirection ne lit pas la base à chaque tap : la
+carte est gardée 30 s en mémoire (`lib/cache-cartes.ts`), et une
+modification l'efface aussitôt. Les taps ne s'écrivent pas un à un mais par
+paquets, une requête par seconde au plus (`lib/file-taps.ts`). Un tap peut
+donc se perdre si le serveur redémarre dans la seconde qui suit ; c'est le
+prix d'un serveur qui ne s'étouffe pas en pleine rafale.
+
+`/cartes/direct` montre, rafraîchi toutes les 3 s : taps de la dernière
+minute, temps de réponse côté serveur, mémoire, file d'écriture, connexions
+à la base, et un verdict (« ça suit », « ça force », « ça ne suit plus »).
+`npm run stress -- https://go.taporacards.com CODE 500 50` envoie 500 taps,
+50 à la fois, sur une carte de test — à regarder pendant ce temps.
+
 ## Documents en PDF
 
 `/ventes/<id>/pdf` renvoie un vrai fichier, en pièce jointe : le navigateur le

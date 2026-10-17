@@ -15,6 +15,7 @@
     "restaurer": "node --env-file-if-exists=.env.local scripts/restaurer.mjs",
     "port": "node scripts/port.mjs",
     "gmail:autoriser": "node scripts/gmail-autoriser.mjs",
+    "stress": "node scripts/stress.mjs",
     "partage": "node --env-file-if-exists=.env.local scripts/partage.mjs"
   },
   "dependencies": {

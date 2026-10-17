@@ -256,6 +256,24 @@ service, à condition de ne pas en ajouter un deuxième sur le forfait gratuit.
 Solution sûre, quand les cartes rapportent : le forfait payant le plus bas de
 Render (environ 7 $ US par mois) ne s'endort jamais.
 
+### Vérifier que le serveur tient
+
+1. Créer une carte « Test de charge » (n'importe quelle destination) et noter
+   son code.
+2. Ouvrir **Cartes → En direct**.
+3. Depuis le Mac : `npm run stress -- https://go.taporacards.com CODE 500 50`.
+4. Lire le verdict du script et celui de l'écran, puis **supprimer la carte de
+   test** (ses taps partent avec elle).
+
+### Le jour où ça ne suffit plus
+
+Dans l'ordre, sans jamais reprogrammer une carte :
+
+1. Render payant (Starter) : plus d'endormissement, plus de processeur.
+2. Render Standard ou plusieurs instances : même code, un réglage.
+3. Sortir la seule redirection `/t/*` sur Cloudflare Workers : on change la
+   cible du `CNAME go`, les puces ne voient rien.
+
 ## Sauvegardes
 
 Le forfait gratuit de Supabase ne garde pas d'historique de sauvegardes long.

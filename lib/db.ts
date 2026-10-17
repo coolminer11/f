@@ -66,21 +66,42 @@ const versIso = (valeur: string) => new Date(valeur).toISOString()
 types.setTypeParser(types.builtins.TIMESTAMPTZ, versIso)
 types.setTypeParser(types.builtins.TIMESTAMP, versIso)
 
-let pool: Pool | null = null
+// Le pool vit sur globalThis : Next peut charger ce module dans plusieurs
+// paquets du même processus, et deux pools doubleraient les connexions tout
+// en rendant faux le moniteur qui en lit l'état.
+const globale = globalThis as typeof globalThis & { __poolTapora?: Pool }
+
+/** Connexions simultanées à la base. Le pooler de Supabase en accepte bien plus côté client. */
+const TAILLE_POOL = 10
 
 function obtenirPool(): Pool {
   if (!process.env.DATABASE_URL) {
     throw new Error('DATABASE_URL est requis. Voir .env.example.')
   }
-  if (!pool) {
-    pool = new Pool({
+  if (!globale.__poolTapora) {
+    globale.__poolTapora = new Pool({
       connectionString: process.env.DATABASE_URL,
-      max: 5,
+      max: TAILLE_POOL,
       idleTimeoutMillis: 30_000,
       ssl: process.env.DATABASE_SSL === 'false' ? undefined : { rejectUnauthorized: false },
     })
   }
-  return pool
+  return globale.__poolTapora
+}
+
+/**
+ * État du pool, pour le moniteur en direct. « en attente » au-dessus de zéro
+ * veut dire que des requêtes font la queue pour une connexion : la base, ou
+ * le serveur, ne suit plus.
+ */
+export function etatPool(): { taille: number; ouvertes: number; libres: number; enAttente: number } {
+  const p = globale.__poolTapora
+  return {
+    taille: TAILLE_POOL,
+    ouvertes: p?.totalCount ?? 0,
+    libres: p?.idleCount ?? 0,
+    enAttente: p?.waitingCount ?? 0,
+  }
 }
 
 /** Exécute une requête paramétrée et renvoie les lignes typées. */

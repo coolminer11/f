@@ -1,5 +1,6 @@
 import 'server-only'
 import { requete, requeteUne } from '@/lib/db'
+import { oublierCarte } from '@/lib/cache-cartes'
 
 /** Fuseau de la société : un tap à 23 h 30 à Lévis appartient à sa journée. */
 const FUSEAU = 'America/Toronto'
@@ -55,21 +56,31 @@ export async function modifierCarte(
   id: string,
   entree: { libelle: string; clientId: string | null; destination: string; note: string | null },
 ): Promise<void> {
-  await requete(
+  const ligne = await requeteUne<{ code: string }>(
     `update cartes_nfc set libelle = $2, client_id = $3::uuid, destination = $4, note = $5
-      where id = $1::uuid`,
+      where id = $1::uuid returning code`,
     [id, entree.libelle, entree.clientId, entree.destination, entree.note],
   )
+  // La nouvelle destination doit servir dès le tap suivant, pas dans 30 s.
+  if (ligne) oublierCarte(ligne.code)
 }
 
 export async function basculerCarte(id: string, actif: boolean): Promise<void> {
-  await requete('update cartes_nfc set actif = $2 where id = $1::uuid', [id, actif])
+  const ligne = await requeteUne<{ code: string }>(
+    'update cartes_nfc set actif = $2 where id = $1::uuid returning code',
+    [id, actif],
+  )
+  if (ligne) oublierCarte(ligne.code)
 }
 
 export async function supprimerCarte(id: string): Promise<void> {
   // Le code reste dans codes_cartes_emis : il ne sera jamais réattribué, et
   // une carte oubliée dans un tiroir ne mènera jamais chez quelqu'un d'autre.
-  await requete('delete from cartes_nfc where id = $1::uuid', [id])
+  const ligne = await requeteUne<{ code: string }>(
+    'delete from cartes_nfc where id = $1::uuid returning code',
+    [id],
+  )
+  if (ligne) oublierCarte(ligne.code)
 }
 
 // ---------------------------------------------------------------------------
@@ -81,18 +92,6 @@ export async function resoudre(code: string): Promise<{ id: string; destination:
     'select id, destination from cartes_nfc where code = $1 and actif',
     [code],
   )
-}
-
-export async function enregistrerTap(
-  carteId: string,
-  canal: 'nfc' | 'qr',
-  appareil: 'ios' | 'android' | 'autre',
-): Promise<void> {
-  await requete('insert into taps (carte_id, canal, appareil) values ($1::uuid, $2, $3)', [
-    carteId,
-    canal,
-    appareil,
-  ])
 }
 
 // ---------------------------------------------------------------------------

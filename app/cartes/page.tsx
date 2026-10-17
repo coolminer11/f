@@ -36,9 +36,15 @@ export default async function PageCartes({ searchParams }: { searchParams: Promi
             Chaque carte redirige vers la page de son client — et chaque tap est compté.
           </p>
         </div>
-        <Link href="/cartes/nouvelle" className="bouton">
-          Nouvelle carte
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/cartes/direct" className="bouton bouton-secondaire">
+            <span className="mr-1.5 inline-block size-2 rounded-full bg-[#0ca30c] align-middle" aria-hidden />
+            En direct
+          </Link>
+          <Link href="/cartes/nouvelle" className="bouton">
+            Nouvelle carte
+          </Link>
+        </div>
       </div>
 
       {!baseCartesConfiguree() && (
