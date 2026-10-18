@@ -3,6 +3,7 @@
 import { useActionState, useState } from 'react'
 import { commanderCartes, type EtatCommande } from '@/app/stats/[jeton]/actions'
 import { textes, type Langue } from '@/lib/langue'
+import CarteArcEnCiel from '@/components/client/carte-arc-en-ciel'
 
 const CHOIX = [1, 3, 5, 10]
 
@@ -33,6 +34,7 @@ export default function CommanderCartes({ jeton, langue }: { jeton: string; lang
       ) : (
         <form action={envoyer} className="relative grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-start">
           <div>
+            <CarteArcEnCiel className="mb-3 size-16 -translate-x-1.5" />
             <h2 className="titre-client !text-2xl sm:!text-3xl">{T.commanderTitre}</h2>
             <p className="mt-2 max-w-sm text-[#6b5d50]">{T.commanderSous}</p>
           </div>

@@ -253,3 +253,10 @@ details .reponse { overflow: hidden; }
   .article .indice-tableau { display: block; }
   .article .indice-tableau + .tableau { margin-top: 0.5em; }
 }
+
+/* Le sceau du pied de page tourne d'un tour au survol. */
+.sceau-pied { transition: transform 1.2s cubic-bezier(.2, .8, .2, 1); }
+.sceau-pied:hover { transform: rotate(360deg); }
+@media (prefers-reduced-motion: reduce) {
+  .sceau-pied:hover { transform: none; }
+}

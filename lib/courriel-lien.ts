@@ -29,7 +29,7 @@ export async function courrielLien(e: { commerce: string; lien: string; message:
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:540px;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
 <tr><td style="padding:0 4px 16px">
   <table role="presentation" cellpadding="0" cellspacing="0"><tr>
-    <td style="width:34px;height:34px"><img src="https://taporacards.com/apple-touch-icon.png" width="34" height="34" alt="" style="display:block;border-radius:10px"></td>
+    <td style="width:34px;height:34px"><img src="https://taporacards.com/apple-touch-icon.png" width="34" height="34" alt="" style="display:block;border-radius:50%"></td>
     <td style="padding-left:10px;font-family:Georgia,serif;font-size:20px;font-weight:600;color:#2a211a">Tapora</td>
   </tr></table>
 </td></tr>

@@ -44,37 +44,37 @@ function texteAjuste(ctx: CanvasRenderingContext2D, texte: string, police: (tail
   return t
 }
 
+/** Le sceau soleil sans texte (mêmes tracés que components/client/logo.tsx). */
 function logo(ctx: CanvasRenderingContext2D, x: number, y: number, taille: number) {
-  const k = taille / 64
+  const k = taille / 100
   ctx.save()
   ctx.translate(x, y)
   ctx.scale(k, k)
   ctx.fillStyle = BRIQUE
   ctx.beginPath()
-  ctx.roundRect(0, 0, 64, 64, 18)
+  ctx.arc(50, 50, 49, 0, Math.PI * 2)
   ctx.fill()
-  ctx.strokeStyle = '#fffaf2'
-  ctx.lineWidth = 5
+  ctx.translate(50, 50)
+  ctx.scale(0.92, 0.92)
+  ctx.translate(-50, -54)
+  ctx.lineWidth = 6
   ctx.lineCap = 'round'
-  // Les trois ondes du logo (mêmes arcs que le SVG : extrémités et rayon).
-  for (const [x, haut, r, a] of [
-    [25, 22, 14, 1],
-    [33, 15, 23, 1],
-    [41, 9, 31, 0.55],
+  for (const [r, couleur] of [
+    [19.5, '#f2d3c4'],
+    [28.5, '#e4a53a'],
+    [37.5, '#fffaf2'],
   ] as const) {
-    const demi = 32 - haut
-    const decalage = Math.sqrt(r * r - demi * demi)
-    const angle = Math.atan2(demi, decalage)
-    ctx.globalAlpha = a
+    ctx.strokeStyle = couleur
     ctx.beginPath()
-    ctx.arc(x - decalage, 32, r, -angle, angle)
+    ctx.arc(50, 64, r, Math.PI, 0)
     ctx.stroke()
   }
-  ctx.globalAlpha = 1
-  ctx.fillStyle = '#fffaf2'
-  ctx.beginPath()
-  ctx.arc(17.5, 32, 4.2, 0, Math.PI * 2)
-  ctx.fill()
+  const etoile = new Path2D('M50 51.9L52.48 58.08 59.13 58.53 54.02 62.81 55.64 69.27 50 65.72 44.36 69.27 45.98 62.81 40.87 58.53 47.52 58.08Z')
+  ctx.fillStyle = ctx.strokeStyle = '#fffaf2'
+  ctx.lineWidth = 3
+  ctx.lineJoin = 'round'
+  ctx.fill(etoile)
+  ctx.stroke(etoile)
   ctx.restore()
 }
 

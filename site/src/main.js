@@ -296,16 +296,11 @@
       scrollTrigger: { trigger: '#lignes-comparaison', start: 'top 85%', once: true },
     })
 
-    // ---- Bloc final : les ondes s'étendent.
-    gsap.from('#ondes-cta path', {
-      scale: 0.6,
-      opacity: 0,
-      transformOrigin: '0% 50%',
-      duration: 1.2,
-      ease: 'power3.out',
-      stagger: 0.15,
-      scrollTrigger: { trigger: '#commander', start: 'top 80%', once: true },
-    })
+    // ---- Bloc final : la carte arc-en-ciel se pose, puis ses ondes s'étendent.
+    gsap
+      .timeline({ scrollTrigger: { trigger: '#commander', start: 'top 80%', once: true } })
+      .from('#ondes-cta .carte-cta', { y: 40, rotation: -12, opacity: 0, svgOrigin: '40 62', duration: 1, ease: 'back.out(1.6)' })
+      .from('#ondes-cta .arc-cta', { scale: 0.3, opacity: 0, svgOrigin: '55 39', duration: 0.8, ease: 'power3.out', stagger: 0.14 }, '-=0.45')
 
     // ---- Le bandeau suit le défilement : il accélère, et repart à l'envers
     // quand on remonte.

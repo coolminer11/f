@@ -23,7 +23,7 @@ import contenu_fr  # noqa: E402
 
 SITE = 'https://taporacards.com'
 DATE = '2026-10-18'
-ORG = {'@type': 'Organization', '@id': f'{SITE}/#organisation', 'name': 'Tapora Cards', 'url': f'{SITE}/'}
+ORG = {'@type': 'Organization', '@id': f'{SITE}/#organisation', 'name': 'Tapora Cards', 'url': f'{SITE}/', 'logo': f'{SITE}/logo.png'}
 
 TX = {
     'fr': dict(
@@ -132,7 +132,7 @@ def page(l, titre, desc, canon, alt_fr, alt_en, jsonld, corps):
   <footer class="border-t border-ligne">
     <div class="mx-auto flex max-w-6xl flex-col gap-5 px-5 py-10 text-sm text-encre-doux sm:flex-row sm:items-center sm:justify-between">
       <div class="flex items-center gap-2.5">
-        <img src="/favicon.svg" alt="" width="22" height="22" class="size-[22px]">
+        <img src="/marque/sceau-{l}.svg" alt="" width="56" height="56" class="sceau-pied size-14">
         <span><strong class="font-semibold text-encre">Tapora S.E.N.C.</strong> · NEQ 3382462367 · {t['pied']}</span>
       </div>
       <nav class="flex flex-wrap gap-6" aria-label="{t['pied_aria']}">
