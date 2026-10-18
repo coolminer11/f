@@ -1,0 +1,141 @@
+@import 'tailwindcss';
+@source './*.html';
+@source './main.js';
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fraunces';
+  src: url('/fonts/fraunces-normal.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fraunces';
+  src: url('/fonts/fraunces-italic.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Une palette de café de quartier : papier, encre chaude, terre cuite, sapin, miel. */
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: 'Fraunces', ui-serif, Georgia, serif;
+  --color-papier: #f7f1e7;
+  --color-creme: #fffaf2;
+  --color-sable: #ede3d3;
+  --color-ligne: #e2d6c3;
+  --color-encre: #2a211a;
+  --color-encre-doux: #6b5d50;
+  --color-brique: #c2552f;
+  --color-brique-fonce: #9e4122;
+  --color-sapin: #2f5c47;
+  --color-miel: #e4a53a;
+  --color-rose: #f2d3c4;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--color-papier);
+  color-scheme: light;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-papier);
+  color: var(--color-encre);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--color-rose); }
+
+.titre {
+  font-family: var(--font-serif);
+  font-variation-settings: 'SOFT' 100;
+  letter-spacing: -0.02em;
+}
+
+/* Grain de papier, très léger */
+.papier { position: relative; }
+.papier::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .55  0 0 0 0 .45  0 0 0 0 .35  0 0 0 .18 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Trait dessiné à la main sous un mot */
+.souligne { position: relative; white-space: nowrap; }
+.souligne svg {
+  position: absolute;
+  left: -2%;
+  bottom: -0.18em;
+  width: 104%;
+  height: 0.42em;
+  overflow: visible;
+}
+
+/* Carte physique : papier épais, coins arrondis, ombre douce */
+.carte-papier {
+  background: var(--color-creme);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.8) inset,
+    0 2px 4px rgb(60 40 20 / 0.06),
+    0 18px 40px -18px rgb(60 40 20 / 0.35);
+}
+
+.carte-nfc {
+  background:
+    radial-gradient(120% 120% at 100% 0%, rgb(255 255 255 / 0.18), transparent 50%),
+    var(--color-brique);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.25) inset,
+    0 30px 50px -22px rgb(110 40 15 / 0.55),
+    0 4px 10px rgb(60 30 10 / 0.12);
+}
+
+/* Petite vague du tap, qui respire */
+@keyframes respire {
+  0% { transform: scale(0.7); opacity: 0.7; }
+  100% { transform: scale(2); opacity: 0; }
+}
+.onde { animation: respire 2.8s ease-out infinite; }
+.onde:nth-child(2) { animation-delay: 1.4s; }
+
+/* Bandeau des métiers */
+@keyframes defile { to { transform: translateX(-50%); } }
+.defile { animation: defile 45s linear infinite; }
+.bandeau:hover .defile { animation-play-state: paused; }
+
+/* Gommette « Fait au Québec » qui tourne doucement */
+@keyframes tourne { to { transform: rotate(360deg); } }
+.gommette-texte { animation: tourne 28s linear infinite; transform-origin: center; }
+
+/* Cartes de contenu qui se soulèvent un peu au survol */
+.soulevable { transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s; }
+.soulevable:hover { transform: translateY(-4px) rotate(var(--penche, 0deg)); }
+
+details > summary { list-style: none; cursor: pointer; }
+details > summary::-webkit-details-marker { display: none; }
+details[open] .plus { transform: rotate(45deg); }
+
+.case { aspect-ratio: 1.5; border-radius: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .onde, .defile, .gommette-texte { animation: none; }
+  .soulevable:hover { transform: none; }
+}
+
+:focus-visible { outline: 2px solid var(--color-brique); outline-offset: 3px; border-radius: 6px; }

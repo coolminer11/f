@@ -17,3 +17,4 @@ tsconfig.tsbuildinfo
 /sauvegardes
 .wrangler/
 worker/.dev.vars
+site/dist/

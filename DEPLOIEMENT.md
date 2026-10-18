@@ -372,6 +372,33 @@ arrivent seuls, avec le réveil de cron-job.org.
   dossier. Il part le 1er du mois à partir de 9 h, par le réveil de
   cron-job.org — qui doit donc rester actif. Jamais deux fois le même mois.
 
+## 9. Le site taporacards.com (Cloudflare Pages)
+
+Le dossier `site/` est un site statique : HTML, Tailwind compilé, GSAP pour
+les animations, polices hébergées sur place. Aucun script tiers, aucun
+traceur — la politique de sécurité (`site/public/_headers`) n'autorise que
+le domaine lui-même. Gratuit, sans limite de visites.
+
+**Mettre en ligne (et à chaque modification)**, depuis le Mac :
+```
+cd ~/Documents/tapora && git pull
+cd site && npm install
+npm run deployer
+```
+La première fois, wrangler demande de créer le projet `taporacards` : Entrée.
+
+**Brancher le domaine (une seule fois)** :
+1. Cloudflare → **Workers & Pages** → `taporacards` → **Custom domains** →
+   **Set up a custom domain** → `taporacards.com` → Activate.
+   Si Cloudflare signale un enregistrement existant pour `taporacards.com`
+   (A ou CNAME `@`), supprimez-le d'abord dans DNS — pas les MX ni les TXT
+   (ce sont les courriels).
+2. Même chose pour `www.taporacards.com`.
+3. **Rules → Redirect Rules → Create rule → modèle « Redirect from WWW to
+   root »** → Deploy : une seule adresse pour Google.
+
+Aperçu local avant d'envoyer : `npm run apercu` → http://localhost:4321.
+
 ## Sauvegardes
 
 Le forfait gratuit de Supabase ne garde pas d'historique de sauvegardes long.
