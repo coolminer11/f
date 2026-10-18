@@ -1,6 +1,6 @@
 # Tapora Cards
 
-> Tapora Cards (Tapora S.E.N.C., entreprise québécoise, NEQ 3382462367) fabrique au Québec des cartes NFC avec code QR qui ouvrent la page « Écrire un avis » de la fiche Google d'un commerce en un tap, sans application. Chaque carte est suivie : nombre de taps en direct, heures de pointe (jour × heure), puce ou QR, iPhone ou Android, et avis Google gagnés. Service en français.
+> Tapora Cards (Tapora S.E.N.C., entreprise québécoise, NEQ 3382462367) fabrique au Québec des cartes NFC avec code QR qui ouvrent la page « Écrire un avis » de la fiche Google d'un commerce en un tap, sans application. Chaque carte est suivie : nombre de taps en direct, heures de pointe (jour × heure), puce ou QR, iPhone ou Android, et avis Google gagnés. Service en français et en anglais (English-speaking customers welcome).
 
 ## Ce qui distingue Tapora
 
@@ -25,4 +25,6 @@ Restaurants, cafés, salons de coiffure et d'esthétique, cliniques, garages, bo
 ## Pages
 
 - [Accueil](https://taporacards.com/) : fonctionnement, statistiques, avantages, FAQ.
+- [English](https://taporacards.com/en/) : NFC Google review cards made in Québec — how it works, live stats, FAQ.
 - [Confidentialité](https://taporacards.com/confidentialite) : données conservées lors d'un tap (Loi 25).
+- [Privacy](https://taporacards.com/en/privacy) : what is kept when a card is tapped (Law 25).

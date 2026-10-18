@@ -399,6 +399,10 @@ La première fois, wrangler demande de créer le projet `taporacards` : Entrée.
 
 Aperçu local avant d'envoyer : `npm run apercu` → http://localhost:4321.
 
+Deux langues : le français à `/`, l'anglais à `/en/` (`site/src/en/`). Une
+modification de texte se fait dans les deux fichiers ; les balises
+`hreflang` et le plan du site disent à Google quelle page montrer à qui.
+
 ## Sauvegardes
 
 Le forfait gratuit de Supabase ne garde pas d'historique de sauvegardes long.

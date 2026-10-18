@@ -23,6 +23,7 @@ await mkdir(path.join(DIST, 'fonts'), { recursive: true })
 await cp(path.join(ICI, 'public'), DIST, { recursive: true })
 await cp(path.join(ICI, 'node_modules/gsap/dist/gsap.min.js'), path.join(DIST, 'js/gsap.min.js'))
 await cp(path.join(ICI, 'node_modules/gsap/dist/ScrollTrigger.min.js'), path.join(DIST, 'js/ScrollTrigger.min.js'))
+await cp(path.join(ICI, 'node_modules/lenis/dist/lenis.min.js'), path.join(DIST, 'js/lenis.min.js'))
 await cp(
   path.join(ICI, 'node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2'),
   path.join(DIST, 'fonts/inter.woff2'),
@@ -34,6 +35,7 @@ for (const style of ['normal', 'italic']) {
   )
 }
 await cp(path.join(SRC, 'main.js'), path.join(DIST, 'js/main.js'))
+await cp(path.join(SRC, 'pret.js'), path.join(DIST, 'js/pret.js'))
 
 execFileSync(
   path.join(ICI, 'node_modules/.bin/tailwindcss'),
@@ -47,12 +49,19 @@ const empreinte = async (f) => createHash('sha256').update(await readFile(path.j
 const versions = {
   '/styles.css': `/styles.css?v=${await empreinte('styles.css')}`,
   '/js/main.js': `/js/main.js?v=${await empreinte('js/main.js')}`,
+  '/js/pret.js': `/js/pret.js?v=${await empreinte('js/pret.js')}`,
 }
 
-for (const f of await readdir(SRC)) {
-  if (!f.endsWith('.html')) continue
-  let html = await readFile(path.join(SRC, f), 'utf8')
-  for (const [de, vers] of Object.entries(versions)) html = html.replaceAll(`"${de}"`, `"${vers}"`)
-  await writeFile(path.join(DIST, f), html)
+// Les pages : src/*.html à la racine, src/en/*.html sous /en/.
+for (const dossier of ['', 'en']) {
+  const source = path.join(SRC, dossier)
+  await mkdir(path.join(DIST, dossier), { recursive: true })
+  for (const f of await readdir(source)) {
+    if (!f.endsWith('.html') || (f.startsWith('_') && !process.env.AVEC_OG)) continue
+    let html = await readFile(path.join(source, f), 'utf8')
+    for (const [de, vers] of Object.entries(versions)) html = html.replaceAll(`"${de}"`, `"${vers}"`)
+    // /en/index.html est servi à /en/ ; les autres pages sans .html (Cloudflare Pages).
+    await writeFile(path.join(DIST, dossier, f), html)
+  }
 }
 console.log('Site construit dans', DIST)

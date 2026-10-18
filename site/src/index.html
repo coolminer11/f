@@ -7,6 +7,7 @@
   <meta name="description" content="Cartes NFC et QR pour récolter des avis Google en un tap. Fabriquées au Québec, modifiables à vie, avec statistiques en direct : taps, heures de pointe et avis gagnés.">
   <link rel="canonical" href="https://taporacards.com/">
   <link rel="alternate" hreflang="fr-CA" href="https://taporacards.com/">
+  <link rel="alternate" hreflang="en-CA" href="https://taporacards.com/en/">
   <link rel="alternate" hreflang="x-default" href="https://taporacards.com/">
   <meta name="theme-color" content="#f7f1e7">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -14,6 +15,7 @@
   <link rel="preload" href="/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/fraunces-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
+  <script src="/js/pret.js"></script>
 
   <meta property="og:type" content="website">
   <meta property="og:locale" content="fr_CA">
@@ -76,21 +78,25 @@
   </script>
 </head>
 <body class="papier overflow-x-hidden">
+  <div id="progression" class="fixed inset-x-0 top-0 z-50 h-[3px] origin-left scale-x-0 bg-brique" aria-hidden="true"></div>
   <a href="#contenu" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-encre focus:px-4 focus:py-2 focus:text-creme">Aller au contenu</a>
 
   <!-- Navigation -->
-  <header id="entete" class="fixed inset-x-0 top-0 z-40 transition-all duration-300">
+  <header id="entete" class="fixed inset-x-0 top-0 z-40 transition-[background-color,box-shadow,backdrop-filter] duration-300">
     <nav class="mx-auto flex max-w-6xl items-center justify-between px-5 py-4" aria-label="Principale">
       <a href="/" class="flex items-center gap-2.5" aria-label="Tapora Cards, accueil">
         <img src="/favicon.svg" alt="" width="30" height="30" class="size-[30px]">
         <span class="titre text-xl font-semibold">Tapora</span>
       </a>
       <div class="hidden items-center gap-8 text-[15px] text-encre-doux md:flex">
-        <a href="#fonctionnement" class="transition hover:text-encre">Comment ça marche</a>
-        <a href="#statistiques" class="transition hover:text-encre">Les stats</a>
-        <a href="#faq" class="transition hover:text-encre">Questions</a>
+        <a href="#fonctionnement" class="lien-nav transition hover:text-encre">Comment ça marche</a>
+        <a href="#statistiques" class="lien-nav transition hover:text-encre">Les stats</a>
+        <a href="#faq" class="lien-nav transition hover:text-encre">Questions</a>
       </div>
-      <a href="#commander" class="rounded-full bg-encre px-5 py-2.5 text-sm font-medium text-creme transition hover:bg-brique">Commander</a>
+      <div class="flex items-center gap-4">
+        <a href="/en/" hreflang="en" lang="en" class="lien-nav text-sm font-medium text-encre-doux transition hover:text-encre" title="English version">EN</a>
+        <a href="#commander" class="rounded-full bg-encre px-5 py-2.5 text-sm font-medium text-creme transition hover:bg-brique">Commander</a>
+      </div>
     </nav>
   </header>
 
@@ -99,9 +105,14 @@
     <section class="relative overflow-hidden pt-32 pb-24 sm:pt-40">
       <div class="mx-auto grid max-w-6xl items-center gap-14 px-5 lg:grid-cols-[1.05fr_1fr]">
         <div>
-          <p class="inline-flex items-center gap-2 rounded-full bg-sable px-3.5 py-1.5 text-[13px] font-medium text-encre-doux" data-apparait>
-            <span class="text-brique">♥</span> Pour les commerces d’ici
-          </p>
+          <div class="flex flex-wrap items-center gap-2" data-apparait>
+            <p class="inline-flex items-center gap-2 rounded-full bg-sable px-3.5 py-1.5 text-[13px] font-medium text-encre-doux">
+              <span class="text-brique">♥</span> Pour les commerces d’ici
+            </p>
+            <a href="/en/" hreflang="en" lang="en" class="bouton-fleche group inline-flex items-center gap-1.5 rounded-full border border-ligne px-3.5 py-1.5 text-[13px] font-medium text-encre-doux transition hover:border-sapin hover:text-sapin">
+              Speaking English? No problem, we can help you <span class="fleche" aria-hidden="true">→</span>
+            </a>
+          </div>
           <h1 class="titre mt-6 text-[2.9rem] leading-[1.04] font-medium sm:text-6xl lg:text-[3.85rem]">
             <span class="titre-ligne block">Vos clients vous aiment.</span>
             <span class="titre-ligne block">Aidez-les à le
@@ -112,7 +123,7 @@
             et la page d’avis Google s’ouvre. Vous, vous voyez chaque tap — et chaque nouvel avis.
           </p>
           <div class="mt-9 flex flex-wrap items-center gap-4" data-apparait>
-            <a href="#commander" class="rounded-full bg-brique px-7 py-4 text-[15px] font-semibold text-creme shadow-[0_10px_24px_-10px_rgb(158_65_34_/_0.7)] transition hover:-translate-y-0.5 hover:bg-brique-fonce">Commander mes cartes</a>
+            <a href="#commander" class="bouton-fleche group inline-flex items-center gap-2 rounded-full bg-brique px-7 py-4 text-[15px] font-semibold text-creme shadow-[0_10px_24px_-10px_rgb(158_65_34_/_0.7)] transition hover:-translate-y-0.5 hover:bg-brique-fonce">Commander mes cartes <span class="fleche" aria-hidden="true">→</span></a>
             <a href="#fonctionnement" class="group inline-flex items-center gap-2 px-2 py-4 text-[15px] font-medium underline decoration-ligne decoration-2 underline-offset-[6px] transition hover:decoration-brique">
               Voir comment ça marche
             </a>
@@ -127,23 +138,23 @@
         <!-- Le comptoir -->
         <div id="scene" class="relative mx-auto h-[30rem] w-full max-w-[30rem]" aria-hidden="true">
           <!-- plan de travail -->
-          <div class="absolute inset-x-0 bottom-6 top-10 rounded-[2.5rem] bg-sable"></div>
+          <div id="plan" class="absolute inset-x-0 bottom-6 top-10 rounded-[2.5rem] bg-sable"></div>
           <div class="absolute inset-x-6 bottom-6 h-24 rounded-b-[2.5rem] bg-gradient-to-t from-[#e2d3bd] to-transparent"></div>
 
           <!-- gommette qui tourne -->
-          <div class="absolute -top-2 right-2 z-20 size-28 sm:right-4">
+          <div id="gommette" class="absolute -top-2 right-2 z-20 size-28 sm:right-4">
             <svg viewBox="0 0 120 120" class="size-full">
               <circle cx="60" cy="60" r="58" fill="#2f5c47"/>
               <g class="gommette-texte">
                 <defs><path id="cercle" d="M60 60 m-44 0 a44 44 0 1 1 88 0 a44 44 0 1 1 -88 0"/></defs>
-                <text fill="#fffaf2" font-size="11.5" font-weight="600" letter-spacing="3.4" font-family="Inter, sans-serif"><textPath href="#cercle">FAIT AU QUÉBEC · FAIT AU QUÉBEC ·</textPath></text>
+                <text fill="#fffaf2" font-size="11.5" font-weight="600" font-family="Inter, sans-serif"><textPath href="#cercle" textLength="274" lengthAdjust="spacing">FAIT AU QUÉBEC · FAIT AU QUÉBEC ·</textPath></text>
               </g>
               <text x="60" y="71" text-anchor="middle" fill="#fffaf2" font-size="30" font-family="Fraunces, serif">⚜</text>
             </svg>
           </div>
 
           <!-- tasse -->
-          <div class="absolute left-6 top-20 sm:left-8">
+          <div id="tasse" class="absolute left-6 top-20 sm:left-8">
             <div class="relative size-24 rounded-full bg-creme shadow-[0_10px_25px_-12px_rgb(60_40_20_/_0.5)]">
               <div class="absolute inset-3 rounded-full bg-[#7a4a2c]"></div>
               <div class="absolute inset-[22px] rounded-full bg-[#9a6440]"></div>
@@ -187,7 +198,7 @@
           </div>
 
           <!-- note manuscrite -->
-          <div class="pointer-events-none absolute bottom-0 right-2 z-20 flex items-end gap-1 sm:right-0">
+          <div id="note-main" class="pointer-events-none absolute bottom-0 right-2 z-20 flex items-end gap-1 sm:right-0">
             <svg viewBox="0 0 70 50" class="mb-6 w-14 text-encre-doux" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path class="trait" d="M64 44 C 48 44, 30 36, 20 14"/><path d="M14 22 L20 13 L27 20"/></svg>
             <p class="titre -rotate-3 text-lg italic text-encre-doux">un tap, c’est tout.</p>
           </div>
@@ -213,21 +224,21 @@
 
     <!-- ============================== FONCTIONNEMENT ============================== -->
     <section id="fonctionnement" class="mx-auto max-w-6xl scroll-mt-20 px-5 py-28">
-      <div class="max-w-2xl" data-apparait>
-        <h2 class="titre text-4xl font-medium leading-tight sm:text-5xl">Entre « merci, c’était bon ! » et un avis cinq étoiles, il y a trois secondes.</h2>
+      <div class="max-w-2xl">
+        <h2 data-mots class="titre text-4xl font-medium leading-tight sm:text-5xl">Entre « merci, c’était bon ! » et un avis cinq étoiles, il y a trois secondes.</h2>
       </div>
       <ol class="mt-16 grid gap-6 md:grid-cols-3">
-        <li class="soulevable carte-papier rounded-3xl p-7 md:-rotate-1 [--penche:-1deg]" data-apparait>
+        <li class="etape soulevable carte-papier rounded-3xl p-7 md:-rotate-1 [--penche:-1deg]">
           <span class="titre text-5xl text-brique">1</span>
           <h3 class="mt-4 text-xl font-semibold">On pose la carte</h3>
           <p class="mt-2 leading-relaxed text-encre-doux">Au comptoir, sur les tables, près de la caisse. Chaque carte a sa puce NFC, son code QR, et son propre compteur.</p>
         </li>
-        <li class="soulevable carte-papier rounded-3xl p-7 md:translate-y-6 md:rotate-1 [--penche:1deg]" data-apparait>
+        <li class="etape soulevable carte-papier rounded-3xl p-7 md:translate-y-6 md:rotate-1 [--penche:1deg]">
           <span class="titre text-5xl text-sapin">2</span>
           <h3 class="mt-4 text-xl font-semibold">Votre client l’effleure</h3>
           <p class="mt-2 leading-relaxed text-encre-doux">La fenêtre « Écrire un avis » de votre fiche Google s’ouvre sur son téléphone. Rien à télécharger, rien à chercher.</p>
         </li>
-        <li class="soulevable carte-papier rounded-3xl p-7 md:-rotate-1 [--penche:-1deg]" data-apparait>
+        <li class="etape soulevable carte-papier rounded-3xl p-7 md:-rotate-1 [--penche:-1deg]">
           <span class="titre text-5xl text-miel">3</span>
           <h3 class="mt-4 text-xl font-semibold">Vous voyez tout</h3>
           <p class="mt-2 leading-relaxed text-encre-doux">Chaque tap s’affiche dans vos statistiques, les nouveaux avis aussi. Et le 1<sup>er</sup> du mois, un petit rapport arrive dans vos courriels.</p>
@@ -238,21 +249,21 @@
     <!-- ============================== STATISTIQUES ============================== -->
     <section id="statistiques" class="scroll-mt-20 bg-sable/70 py-28">
       <div class="mx-auto max-w-6xl px-5">
-        <div class="grid items-end gap-8 lg:grid-cols-[1fr_auto]" data-apparait>
-          <h2 class="titre max-w-2xl text-4xl font-medium leading-tight sm:text-5xl">
+        <div class="grid items-end gap-8 lg:grid-cols-[1fr_auto]">
+          <h2 data-mots class="titre max-w-2xl text-4xl font-medium leading-tight sm:text-5xl">
             La seule carte qui vous montre <span class="souligne italic text-brique">ce qu’elle rapporte<svg viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path class="trait" d="M3 12 C 50 5, 110 4, 150 10 S 185 13, 197 8" fill="none" stroke="#e4a53a" stroke-width="4" stroke-linecap="round"/></svg></span>.
           </h2>
-          <p class="max-w-sm leading-relaxed text-encre-doux">La plupart des cartes s’arrêtent au tap. Les nôtres comptent chaque passage, montrent vos meilleurs moments, et mettent les avis gagnés juste à côté.</p>
+          <p class="max-w-sm leading-relaxed text-encre-doux" data-apparait>La plupart des cartes s’arrêtent au tap. Les nôtres comptent chaque passage, montrent vos meilleurs moments, et mettent les avis gagnés juste à côté.</p>
         </div>
 
         <!-- Carnet de statistiques (exemple) -->
-        <figure class="carte-papier relative mt-14 rounded-[2rem] p-5 sm:p-8" data-apparait>
+        <figure id="carnet" class="carte-papier relative mt-14 rounded-[2rem] p-5 sm:p-8">
           <div class="flex flex-wrap items-center justify-between gap-3 border-b border-dashed border-ligne pb-4">
             <p class="titre text-xl font-medium">Café du Coin <span class="text-base text-encre-doux">· 3 cartes</span></p>
             <span class="titre rotate-2 rounded-md bg-miel/25 px-2.5 py-1 text-sm italic text-[#8a5a10]">exemple, chiffres inventés</span>
           </div>
 
-          <div class="mt-6 grid grid-cols-2 gap-5 lg:grid-cols-4">
+          <div id="tuiles" class="mt-6 grid grid-cols-2 gap-5 lg:grid-cols-4">
             <div>
               <p class="text-sm text-encre-doux">Taps ce mois-ci</p>
               <p class="titre mt-1 text-4xl font-medium sm:text-5xl"><span class="compteur" data-valeur="1448">1 448</span></p>
@@ -312,7 +323,7 @@
 
     <!-- ============================== POURQUOI ============================== -->
     <section id="avantages" class="mx-auto max-w-6xl scroll-mt-20 px-5 py-28">
-      <h2 class="titre max-w-2xl text-4xl font-medium leading-tight sm:text-5xl" data-apparait>Faite ici, pensée pour durer.</h2>
+      <h2 data-mots class="titre max-w-2xl text-4xl font-medium leading-tight sm:text-5xl">Faite ici, pensée pour durer.</h2>
       <div class="mt-14 grid gap-x-12 gap-y-12 md:grid-cols-2">
         <div class="flex gap-5" data-apparait>
           <svg viewBox="0 0 48 48" class="size-12 shrink-0 text-brique" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M38 18a15 15 0 0 0-27-4M10 30a15 15 0 0 0 27 4"/><path d="M11 7v7h7M37 41v-7h-7"/></svg>
@@ -339,7 +350,7 @@
           <thead class="border-b border-ligne">
             <tr><th scope="col" class="px-5 py-4"></th><th scope="col" class="px-5 py-4 font-medium text-encre-doux">Carte NFC ordinaire</th><th scope="col" class="titre px-5 py-4 text-lg font-semibold text-brique">Tapora</th></tr>
           </thead>
-          <tbody class="divide-y divide-dashed divide-ligne">
+          <tbody id="lignes-comparaison" class="divide-y divide-dashed divide-ligne">
             <tr><th scope="row" class="px-5 py-3.5 font-medium">Ouvre la page d’avis Google</th><td class="px-5 py-3.5 text-encre-doux">Oui</td><td class="px-5 py-3.5 font-medium text-sapin">Oui</td></tr>
             <tr><th scope="row" class="px-5 py-3.5 font-medium">Destination modifiable sans la reprogrammer</th><td class="px-5 py-3.5 text-encre-doux">Rarement</td><td class="px-5 py-3.5 font-medium text-sapin">Toujours</td></tr>
             <tr><th scope="row" class="px-5 py-3.5 font-medium">Nombre de taps, carte par carte</th><td class="px-5 py-3.5 text-encre-doux">—</td><td class="px-5 py-3.5 font-medium text-sapin">En direct</td></tr>
@@ -354,31 +365,31 @@
 
     <!-- ============================== FAQ ============================== -->
     <section id="faq" class="mx-auto max-w-3xl scroll-mt-20 px-5 pb-28">
-      <h2 class="titre text-center text-4xl font-medium sm:text-5xl" data-apparait>Vos questions</h2>
+      <h2 data-mots class="titre text-center text-4xl font-medium sm:text-5xl">Vos questions</h2>
       <div class="mt-12 divide-y divide-dashed divide-ligne border-y border-dashed border-ligne">
         <details class="group py-5" data-apparait>
           <summary class="flex items-center justify-between gap-6 text-lg font-medium">Comment fonctionne une carte NFC pour avis Google ?<span class="plus titre text-3xl text-brique transition">+</span></summary>
-          <p class="mt-3 leading-relaxed text-encre-doux">Le client approche son téléphone de la carte : la page « Écrire un avis » de votre fiche Google s’ouvre aussitôt, sans application à installer. Un code QR imprimé sur la carte sert pour les téléphones dont le NFC est éteint.</p>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Le client approche son téléphone de la carte : la page « Écrire un avis » de votre fiche Google s’ouvre aussitôt, sans application à installer. Un code QR imprimé sur la carte sert pour les téléphones dont le NFC est éteint.</p></div>
         </details>
         <details class="group py-5" data-apparait>
           <summary class="flex items-center justify-between gap-6 text-lg font-medium">Est-ce que ça marche avec iPhone et Android ?<span class="plus titre text-3xl text-brique transition">+</span></summary>
-          <p class="mt-3 leading-relaxed text-encre-doux">Oui. Tous les iPhone depuis le XR et la grande majorité des Android lisent le NFC sans application. Le code QR couvre les autres.</p>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Oui. Tous les iPhone depuis le XR et la grande majorité des Android lisent le NFC sans application. Le code QR couvre les autres.</p></div>
         </details>
         <details class="group py-5" data-apparait>
           <summary class="flex items-center justify-between gap-6 text-lg font-medium">Peut-on changer la page où mène la carte ?<span class="plus titre text-3xl text-brique transition">+</span></summary>
-          <p class="mt-3 leading-relaxed text-encre-doux">Oui, à vie et sans toucher à la carte : la puce mène à une adresse Tapora, et c’est nous qui redirigeons. Avis Google aujourd’hui, menu ou Instagram demain.</p>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Oui, à vie et sans toucher à la carte : la puce mène à une adresse Tapora, et c’est nous qui redirigeons. Avis Google aujourd’hui, menu ou Instagram demain.</p></div>
         </details>
         <details class="group py-5" data-apparait>
           <summary class="flex items-center justify-between gap-6 text-lg font-medium">Quelles statistiques voit-on ?<span class="plus titre text-3xl text-brique transition">+</span></summary>
-          <p class="mt-3 leading-relaxed text-encre-doux">Chaque tap, en direct : par jour, par heure, par jour de la semaine, puce ou QR, iPhone ou Android — et le nombre d’avis Google gagnés à côté. Chaque commerce a sa page privée et reçoit un rapport le 1er du mois.</p>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Chaque tap, en direct : par jour, par heure, par jour de la semaine, puce ou QR, iPhone ou Android — et le nombre d’avis Google gagnés à côté. Chaque commerce a sa page privée et reçoit un rapport le 1er du mois.</p></div>
         </details>
         <details class="group py-5" data-apparait>
           <summary class="flex items-center justify-between gap-6 text-lg font-medium">Collectez-vous des données sur mes clients ?<span class="plus titre text-3xl text-brique transition">+</span></summary>
-          <p class="mt-3 leading-relaxed text-encre-doux">Non. Conformément à la Loi 25, nous ne gardons ni adresse IP, ni témoin durable, ni position : seulement l’heure du tap, le canal (puce ou QR) et le type de téléphone.</p>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Non. Conformément à la Loi 25, nous ne gardons ni adresse IP, ni témoin durable, ni position : seulement l’heure du tap, le canal (puce ou QR) et le type de téléphone.</p></div>
         </details>
         <details class="group py-5" data-apparait>
           <summary class="flex items-center justify-between gap-6 text-lg font-medium">Où sont fabriquées les cartes Tapora ?<span class="plus titre text-3xl text-brique transition">+</span></summary>
-          <p class="mt-3 leading-relaxed text-encre-doux">Au Québec. Tapora S.E.N.C. est une entreprise québécoise (NEQ 3382462367) ; le service et le soutien sont en français.</p>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Au Québec. Tapora S.E.N.C. est une entreprise québécoise (NEQ 3382462367) ; le service et le soutien sont en français.</p></div>
         </details>
       </div>
     </section>
@@ -386,9 +397,9 @@
     <!-- ============================== COMMANDER ============================== -->
     <section id="commander" class="mx-auto max-w-6xl scroll-mt-20 px-5 pb-24">
       <div class="relative overflow-hidden rounded-[2.5rem] bg-sapin px-6 py-16 text-creme sm:px-16 sm:py-20" data-apparait>
-        <svg viewBox="0 0 400 400" class="pointer-events-none absolute -right-24 -top-24 size-96 text-creme/[0.07]" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="22" stroke-linecap="round"><path d="M150 120a110 110 0 0 1 0 160"/><path d="M210 80a170 170 0 0 1 0 240"/><path d="M270 40a230 230 0 0 1 0 320"/></g></svg>
+        <svg id="ondes-cta" viewBox="0 0 400 400" class="pointer-events-none absolute -right-24 -top-24 size-96 text-creme/[0.07]" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="22" stroke-linecap="round"><path d="M150 120a110 110 0 0 1 0 160"/><path d="M210 80a170 170 0 0 1 0 240"/><path d="M270 40a230 230 0 0 1 0 320"/></g></svg>
         <div class="relative max-w-2xl">
-          <h2 class="titre text-4xl font-medium leading-tight sm:text-6xl">On jase&nbsp;?</h2>
+          <h2 data-mots class="titre text-4xl font-medium leading-tight sm:text-6xl">On jase&nbsp;?</h2>
           <p class="mt-5 text-lg leading-relaxed text-creme/80">Dites-nous le nom de votre commerce et combien de cartes il vous faut. On vous répond avec un prix et une maquette — en français, et vite.</p>
           <div class="mt-9 flex flex-wrap gap-3">
             <a href="mailto:contact@taporacards.com?subject=Commande%20de%20cartes%20Tapora&amp;body=Bonjour%2C%0A%0ANom%20du%20commerce%20%3A%20%0AVille%20%3A%20%0ANombre%20de%20cartes%20%3A%20%0A%0AMerci%20!" class="rounded-full bg-creme px-7 py-4 text-[15px] font-semibold text-sapin transition hover:-translate-y-0.5 hover:bg-white">Écrire pour commander</a>
@@ -407,6 +418,7 @@
       </div>
       <nav class="flex flex-wrap gap-6" aria-label="Pied de page">
         <a href="/confidentialite" class="hover:text-encre">Confidentialité</a>
+        <a href="/en/" hreflang="en" lang="en" class="hover:text-encre">English</a>
         <a href="mailto:contact@taporacards.com" class="hover:text-encre">Contact</a>
         <span>© <span id="annee">2026</span> Tapora</span>
       </nav>
@@ -415,6 +427,7 @@
 
   <script src="/js/gsap.min.js" defer></script>
   <script src="/js/ScrollTrigger.min.js" defer></script>
+  <script src="/js/lenis.min.js" defer></script>
   <script src="/js/main.js" defer></script>
 </body>
 </html>

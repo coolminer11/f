@@ -1,12 +1,15 @@
-// Animations du site. Sans ce script (ou sans GSAP), tout est déjà visible et
-// lisible ; il ajoute seulement du mouvement — doux. Et rien du tout si le
-// visiteur a demandé de réduire les animations.
+// Animations du site.
+//
+// Trois règles : sans ce script, tout est visible et lisible ; si le visiteur
+// a demandé de réduire les animations, il n'y en a aucune ; et chaque
+// mouvement sert à guider l'œil — jamais à en mettre plein la vue.
 ;(() => {
   const annee = document.getElementById('annee')
   if (annee) annee.textContent = String(new Date().getFullYear())
 
   const reduit = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   const fmt = new Intl.NumberFormat('fr-CA')
+  const ENTETE = 72
 
   // ---------------------------------------------------------------- entête
   const entete = document.getElementById('entete')
@@ -54,25 +57,146 @@
     }
   }
 
+  // FAQ : sans animation, le comportement natif de <details> suffit.
+  const faq = [...document.querySelectorAll('#faq details')]
+
   // ------------------------------------------------------------------ GSAP
+  const montrer = () => document.documentElement.classList.remove('attente')
   const demarrer = () => {
-    const { gsap, ScrollTrigger } = window
-    if (!gsap || !ScrollTrigger || reduit) return
+    const { gsap, ScrollTrigger, Lenis } = window
+    if (!gsap || !ScrollTrigger || reduit) return montrer()
     gsap.registerPlugin(ScrollTrigger)
 
-    // Titre : deux lignes qui se posent, puis le trait jaune se dessine.
-    gsap.from('.titre-ligne', { y: 26, opacity: 0, duration: 1.1, ease: 'power3.out', stagger: 0.14, delay: 0.1 })
-    gsap.utils.toArray('.souligne .trait').forEach((trait, i) => {
-      const l = trait.getTotalLength()
-      gsap.fromTo(
-        trait,
-        { strokeDasharray: l, strokeDashoffset: l },
-        { strokeDashoffset: 0, duration: 0.9, ease: 'power2.inOut', delay: i === 0 ? 0.9 : 0, scrollTrigger: i === 0 ? undefined : { trigger: trait, start: 'top 85%', once: true } },
-      )
+    // ---- Défilement fluide, synchronisé avec les animations.
+    let lenis = null
+    if (Lenis) {
+      lenis = new Lenis({ lerp: 0.09, smoothWheel: true })
+      lenis.on('scroll', ScrollTrigger.update)
+      gsap.ticker.add((t) => lenis.raf(t * 1000))
+      gsap.ticker.lagSmoothing(0)
+    }
+    // Les liens d'ancre glissent jusqu'à la section, sous l'entête.
+    document.querySelectorAll('a[href^="#"]').forEach((a) => {
+      a.addEventListener('click', (e) => {
+        const id = a.getAttribute('href')
+        const cible = id && id.length > 1 ? document.querySelector(id) : null
+        if (!cible) return
+        e.preventDefault()
+        // Lenis tient déjà compte du scroll-margin des sections (80 px) : on n'en
+        // garde qu'un peu, l'entête se range de toute façon en descendant.
+        if (lenis) lenis.scrollTo(cible, { offset: ENTETE - 56, duration: 1.4, easing: (x) => 1 - Math.pow(1 - x, 4) })
+        else cible.scrollIntoView({ behavior: 'smooth' })
+        history.replaceState(null, '', id)
+      })
     })
 
-    // Apparitions au défilement, par lots. Cachées par le script, pas par la
-    // feuille de style : sans script, rien ne reste invisible.
+    // ---- Barre de progression, en haut.
+    gsap.to('#progression', { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: 0.3 } })
+
+    // ---- L'entête se range quand on descend, revient quand on remonte.
+    const cacher = gsap.to(entete, { yPercent: -110, duration: 0.45, ease: 'power3.inOut', paused: true })
+    ScrollTrigger.create({
+      start: 'top top',
+      end: 'max',
+      onUpdate: (st) => (st.direction === 1 && st.scroll() > 260 ? cacher.play() : cacher.reverse()),
+    })
+
+    // ---- Le menu suit la section où l'on se trouve.
+    document.querySelectorAll('.lien-nav[href^="#"]').forEach((lien) => {
+      const section = document.querySelector(lien.getAttribute('href'))
+      if (!section) return
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top 45%',
+        end: 'bottom 45%',
+        onToggle: (st) => lien.classList.toggle('actif', st.isActive),
+      })
+    })
+
+    // ---- Arrivée : l'entête, le titre, puis le comptoir se dresse objet par objet.
+    const arrivee = gsap.timeline({ defaults: { ease: 'power3.out' } })
+    arrivee
+      .from(entete, { y: -24, opacity: 0, duration: 0.8 })
+      .from('.titre-ligne', { y: 34, opacity: 0, duration: 1.1, stagger: 0.13 }, 0.1)
+      .from('#plan', { scale: 0.92, opacity: 0, duration: 1.1, ease: 'expo.out' }, 0.25)
+      .from('#tasse', { x: -50, rotation: -25, opacity: 0, duration: 1 }, 0.5)
+      .from('#carte', { y: 70, rotation: -14, opacity: 0, duration: 1.1, ease: 'back.out(1.5)' }, 0.6)
+      .from('#telephone', { x: 70, y: 30, rotation: 18, opacity: 0, duration: 1.1, ease: 'back.out(1.3)' }, 0.75)
+      .from('#gommette', { scale: 0, rotation: -120, duration: 1, ease: 'back.out(2)' }, 1)
+      .from('#note-main', { opacity: 0, y: 10, duration: 0.8 }, 1.3)
+
+    // Tout ce qui précède a posé ses états de départ : on peut lever le voile.
+    montrer()
+
+    // Le trait jaune sous les mots soulignés se dessine.
+    gsap.utils.toArray('.souligne .trait').forEach((trait, i) => {
+      const l = trait.getTotalLength()
+      gsap.set(trait, { strokeDasharray: l, strokeDashoffset: l })
+      const dessin = { strokeDashoffset: 0, duration: 0.9, ease: 'power2.inOut' }
+      if (i === 0) arrivee.to(trait, dessin, 0.95)
+      else gsap.to(trait, { ...dessin, delay: 0.5, scrollTrigger: { trigger: trait, start: 'top 85%', once: true } })
+    })
+    const fleche = document.querySelector('#note-main .trait')
+    if (fleche) {
+      const l = fleche.getTotalLength()
+      arrivee.fromTo(fleche, { strokeDasharray: l, strokeDashoffset: l }, { strokeDashoffset: 0, duration: 0.7, ease: 'power2.out' }, 1.4)
+    }
+
+    // ---- Profondeur : en quittant le héros, chaque objet glisse à sa vitesse.
+    const parallaxe = { trigger: '#scene', start: 'top 20%', end: 'bottom top', scrub: 0.6 }
+    gsap.to('#tasse', { y: -40, rotation: 8, ease: 'none', scrollTrigger: parallaxe })
+    gsap.to('#gommette', { y: -110, rotation: 60, ease: 'none', scrollTrigger: parallaxe })
+    gsap.to('#plan', { y: 30, ease: 'none', scrollTrigger: parallaxe })
+
+    // ---- Titres de section : mot à mot, derrière un masque.
+    document.querySelectorAll('[data-mots]').forEach((titre) => {
+      const mots = []
+      const decouper = (noeud) => {
+        for (const enfant of [...noeud.childNodes]) {
+          if (enfant.nodeType === Node.TEXT_NODE) {
+            const frag = document.createDocumentFragment()
+            for (const m of enfant.textContent.split(/(\s+)/)) {
+              if (!m) continue
+              if (/^\s+$/.test(m)) {
+                frag.appendChild(document.createTextNode(m))
+                continue
+              }
+              const masque = document.createElement('span')
+              masque.className = 'masque-mot'
+              const mot = document.createElement('span')
+              mot.className = 'mot'
+              mot.textContent = m
+              masque.appendChild(mot)
+              frag.appendChild(masque)
+              mots.push(mot)
+            }
+            enfant.replaceWith(frag)
+          } else if (enfant.nodeType === Node.ELEMENT_NODE && enfant.classList.contains('souligne')) {
+            // Un passage souligné reste d'un seul tenant : son trait le suit.
+            const masque = document.createElement('span')
+            masque.className = 'masque-mot'
+            enfant.replaceWith(masque)
+            masque.appendChild(enfant)
+            enfant.classList.add('mot')
+            mots.push(enfant)
+          } else if (enfant.nodeType === Node.ELEMENT_NODE) {
+            decouper(enfant)
+          }
+        }
+      }
+      decouper(titre)
+      gsap.from(mots, {
+        yPercent: 115,
+        rotation: 4,
+        duration: 1,
+        ease: 'power4.out',
+        stagger: 0.045,
+        scrollTrigger: { trigger: titre, start: 'top 85%', once: true },
+      })
+    })
+
+    // ---- Apparitions au défilement, par lots. Cachées par le script, pas
+    // par la feuille de style : sans script, rien ne reste invisible.
     gsap.set('[data-apparait]', { opacity: 0, y: 22 })
     ScrollTrigger.batch('[data-apparait]', {
       start: 'top 90%',
@@ -80,18 +204,39 @@
       onEnter: (lot) => gsap.to(lot, { opacity: 1, y: 0, duration: 0.9, ease: 'power2.out', stagger: 0.09, overwrite: true }),
     })
 
-    // Le carnet : barres qui poussent, cases qui se colorent, courbe tracée.
-    if (barres) {
-      gsap.from('.barre', { scaleY: 0, duration: 1, ease: 'power3.out', stagger: 0.02, scrollTrigger: { trigger: barres, start: 'top 85%', once: true } })
-    }
-    if (chaleur) {
-      gsap.from('#chaleur .case', { opacity: 0, duration: 0.6, ease: 'power1.out', stagger: { each: 0.003 }, scrollTrigger: { trigger: chaleur, start: 'top 90%', once: true } })
-    }
+    // ---- Les trois étapes se posent comme des fiches lancées sur la table.
+    gsap.from('.etape', {
+      y: 80,
+      rotation: (i) => [-7, 5, -5][i] ?? 0,
+      opacity: 0,
+      duration: 1.1,
+      ease: 'power3.out',
+      stagger: 0.12,
+      scrollTrigger: { trigger: '.etape', start: 'top 88%', once: true },
+    })
+
+    // ---- Le carnet de statistiques s'ouvre, puis se remplit.
+    const carnet = gsap.timeline({ scrollTrigger: { trigger: '#carnet', start: 'top 80%', once: true } })
+    carnet
+      .from('#carnet', { y: 60, scale: 0.97, opacity: 0, duration: 1, ease: 'power3.out' })
+      .from('#tuiles > div', { y: 18, opacity: 0, duration: 0.7, stagger: 0.08, ease: 'power2.out' }, '-=0.5')
+    if (barres) carnet.from('.barre', { scaleY: 0, duration: 0.9, ease: 'power3.out', stagger: 0.018 }, '-=0.3')
     const ligne = document.getElementById('ligne-avis')
     if (ligne) {
       const l = ligne.getTotalLength()
-      gsap.fromTo(ligne, { strokeDasharray: l, strokeDashoffset: l }, { strokeDashoffset: 0, duration: 1.8, ease: 'power2.inOut', scrollTrigger: { trigger: ligne, start: 'top 85%', once: true } })
-      gsap.from('#aire-avis', { opacity: 0, duration: 1.2, delay: 0.8, scrollTrigger: { trigger: ligne, start: 'top 85%', once: true } })
+      carnet
+        .fromTo(ligne, { strokeDasharray: l, strokeDashoffset: l }, { strokeDashoffset: 0, duration: 1.4, ease: 'power2.inOut' }, '<0.2')
+        .from('#aire-avis', { opacity: 0, duration: 0.9 }, '-=0.6')
+    }
+    if (chaleur) {
+      gsap.from('#chaleur .case', {
+        opacity: 0,
+        scale: 0.3,
+        duration: 0.5,
+        ease: 'back.out(1.8)',
+        stagger: { grid: [7, 24], from: 'start', amount: 1.1 },
+        scrollTrigger: { trigger: chaleur, start: 'top 88%', once: true },
+      })
     }
     document.querySelectorAll('.compteur').forEach((el) => {
       const cible = Number(el.dataset.valeur)
@@ -105,7 +250,63 @@
       })
     })
 
-    // Le comptoir : le téléphone s'approche de la carte, la page d'avis
+    // ---- Tableau de comparaison : ligne par ligne.
+    gsap.from('#lignes-comparaison tr', {
+      x: -16,
+      opacity: 0,
+      duration: 0.6,
+      ease: 'power2.out',
+      stagger: 0.06,
+      scrollTrigger: { trigger: '#lignes-comparaison', start: 'top 85%', once: true },
+    })
+
+    // ---- Bloc final : les ondes s'étendent.
+    gsap.from('#ondes-cta path', {
+      scale: 0.6,
+      opacity: 0,
+      transformOrigin: '0% 50%',
+      duration: 1.2,
+      ease: 'power3.out',
+      stagger: 0.15,
+      scrollTrigger: { trigger: '#commander', start: 'top 80%', once: true },
+    })
+
+    // ---- Le bandeau suit le défilement : il accélère, et repart à l'envers
+    // quand on remonte.
+    const ruban = document.querySelector('.bandeau ul')
+    if (ruban) {
+      ruban.classList.remove('defile')
+      const boucle = gsap.to(ruban, { xPercent: -50, duration: 45, ease: 'none', repeat: -1 })
+      ScrollTrigger.create({
+        start: 0,
+        end: 'max',
+        onUpdate: (st) => {
+          const sens = st.direction
+          const elan = Math.min(5, 1 + Math.abs(st.getVelocity()) / 400)
+          gsap.timeline({ overwrite: true })
+            .to(boucle, { timeScale: sens * elan, duration: 0.25 })
+            .to(boucle, { timeScale: sens, duration: 1.2, ease: 'power2.out' }, '+=0.2')
+        },
+      })
+    }
+
+    // ---- FAQ : la réponse se déplie et se replie en douceur.
+    faq.forEach((d) => {
+      const resume = d.querySelector('summary')
+      const reponse = d.querySelector('.reponse')
+      if (!resume || !reponse) return
+      resume.addEventListener('click', (e) => {
+        e.preventDefault()
+        if (d.open) {
+          gsap.to(reponse, { height: 0, opacity: 0, duration: 0.45, ease: 'power3.inOut', onComplete: () => (d.open = false) })
+        } else {
+          d.open = true
+          gsap.fromTo(reponse, { height: 0, opacity: 0 }, { height: 'auto', opacity: 1, duration: 0.55, ease: 'power3.out', clearProps: 'height' })
+        }
+      })
+    })
+
+    // ---- Le comptoir : le téléphone s'approche de la carte, la page d'avis
     // s'ouvre, cinq étoiles, un petit mot, et le tap est compté. En boucle.
     const carte = document.getElementById('carte')
     const telephone = document.getElementById('telephone')
@@ -114,16 +315,16 @@
       const texte = document.getElementById('texte-avis')
       const phrase = 'Super accueil et le meilleur latte du quartier !'
       const ecrit = { n: 0 }
-      gsap.to(carte, { y: -6, duration: 2.4, ease: 'sine.inOut', yoyo: true, repeat: -1 })
-      const tl = gsap.timeline({ repeat: -1, repeatDelay: 1.4, delay: 1.4 })
-      tl.to(telephone, { x: -70, y: 70, rotate: -4, duration: 1.1, ease: 'power2.inOut' })
+      gsap.to(carte, { y: -6, duration: 2.4, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 1.7 })
+      const tl = gsap.timeline({ repeat: -1, repeatDelay: 1.4, delay: 2.6 })
+      tl.to(telephone, { x: -70, y: 70, rotation: -10, duration: 1.1, ease: 'power2.inOut' })
         .to('#ecran-attente', { opacity: 0, duration: 0.2 }, '-=0.15')
         .to('#ecran-avis', { opacity: 1, duration: 0.3 }, '<')
-        .to(telephone, { x: 0, y: 0, rotate: 6, duration: 1.1, ease: 'power2.inOut' }, '+=0.2')
+        .to(telephone, { x: 0, y: 0, rotation: 0, duration: 1.1, ease: 'power2.inOut' }, '+=0.2')
         .to(etoiles, { color: '#e4a53a', scale: 1.2, duration: 0.18, stagger: 0.13, yoyo: true, repeat: 1 }, '<')
         .set(etoiles, { color: '#e4a53a' })
         .to(ecrit, { n: phrase.length, duration: 1.5, ease: 'none', onUpdate: () => texte && (texte.textContent = phrase.slice(0, Math.round(ecrit.n))) })
-        .fromTo('#notif', { opacity: 0, y: 12, rotate: -2 }, { opacity: 1, y: 0, rotate: -2, duration: 0.6, ease: 'back.out(1.6)' }, '-=0.6')
+        .fromTo('#notif', { opacity: 0, y: 12, rotation: -2 }, { opacity: 1, y: 0, rotation: -2, duration: 0.6, ease: 'back.out(1.6)' }, '-=0.6')
         .to({}, { duration: 1.8 })
         .to(['#ecran-avis', '#notif'], { opacity: 0, duration: 0.45 })
         .to('#ecran-attente', { opacity: 1, duration: 0.3 }, '<')
@@ -133,8 +334,12 @@
           ecrit.n = 0
         })
     }
+
+    // Les polices peuvent arriver après : on recalcule les positions.
+    document.fonts?.ready.then(() => ScrollTrigger.refresh())
   }
 
-  if (document.readyState === 'complete') demarrer()
-  else window.addEventListener('load', demarrer)
+  // Les scripts sont chargés en « defer », dans l'ordre : GSAP, ScrollTrigger
+  // et Lenis sont déjà là. Inutile d'attendre les images.
+  demarrer()
 })()

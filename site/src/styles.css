@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @source './*.html';
+@source './en/*.html';
 @source './main.js';
 
 @font-face {
@@ -139,3 +140,55 @@ details[open] .plus { transform: rotate(45deg); }
 }
 
 :focus-visible { outline: 2px solid var(--color-brique); outline-offset: 3px; border-radius: 6px; }
+
+/* ------------------------------------------------------------------ */
+/* Défilement fluide (Lenis)                                            */
+html.lenis, html.lenis body { height: auto; }
+html.lenis { scroll-behavior: auto; }
+.lenis.lenis-stopped { overflow: clip; }
+.lenis [data-lenis-prevent] { overscroll-behavior: contain; }
+
+/* Transitions entre les pages du site (navigateurs récents ; ailleurs, rien ne change). */
+@view-transition { navigation: auto; }
+::view-transition-old(root) { animation: 0.28s ease-in both page-sort; }
+::view-transition-new(root) { animation: 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both page-entre; }
+@keyframes page-sort { to { opacity: 0; transform: translateY(-8px); } }
+@keyframes page-entre { from { opacity: 0; transform: translateY(12px); } }
+
+/* Liens du menu : un trait qui se dessine de gauche à droite. */
+.lien-nav { position: relative; }
+.lien-nav::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--color-brique);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.45s cubic-bezier(0.65, 0, 0.35, 1);
+}
+.lien-nav:hover::after, .lien-nav.actif::after { transform: scaleX(1); transform-origin: left; }
+.lien-nav.actif { color: var(--color-encre); }
+
+/* Flèche des boutons */
+.fleche { display: inline-block; transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.bouton-fleche:hover .fleche { transform: translateX(4px); }
+
+/* Titres mot à mot : chaque mot monte derrière un masque. */
+.masque-mot { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.12em; margin-bottom: -0.12em; }
+.mot { display: inline-block; will-change: transform; }
+
+/* FAQ : la réponse se déplie (la hauteur est animée par le script). */
+details .reponse { overflow: hidden; }
+.plus { transition: transform 0.4s cubic-bezier(0.65, 0, 0.35, 1); }
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+  .lien-nav::after, .fleche { transition: none; }
+}
+
+/* En attendant le script d'animation (voir js/pret.js). */
+.attente #entete, .attente .titre-ligne, .attente #scene, .attente [data-apparait], .attente [data-mots], .attente .etape, .attente #carnet { visibility: hidden; }
