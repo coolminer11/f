@@ -1,6 +1,8 @@
 import { resoudre } from '@/lib/requetes/cartes'
 import { noterTap } from '@/lib/file-taps'
 import { carteEnCache } from '@/lib/cache-cartes'
+import { notifierTap } from '@/lib/push'
+import { urlStats } from '@/lib/lien-stats'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -60,6 +62,10 @@ export async function GET(requete: Request, { params }: { params: Promise<{ code
     // Le tap part dans la file d'écriture (lib/file-taps.ts) : la réponse
     // n'attend pas la base, et les taps s'écrivent par paquets.
     noterTap({ carteId: carte.id, canal, appareil: appareil(agent), dureeMs: performance.now() - debut })
+    // Le « Ding ! » des abonnés, une fois le tap écrit (la file vide toutes les ~2 s).
+    setTimeout(() => {
+      notifierTap(code, (id, v) => new URL(urlStats(id, v, 'https://go.taporacards.com')).pathname, false).catch(() => {})
+    }, 3000)
   }
 
   return new Response(null, {

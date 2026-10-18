@@ -21,6 +21,7 @@ export default async function StatsTaps({
   totaux,
   avecCumul = true,
   langue = 'fr',
+  sansQr = false,
 }: {
   portee: Portee
   jours: number
@@ -28,6 +29,8 @@ export default async function StatsTaps({
   avecCumul?: boolean
   /** La page client peut s'afficher en anglais ; le back-office reste en français. */
   langue?: Langue
+  /** Cartes 100 % NFC : pas de section « puce ou QR ». */
+  sansQr?: boolean
 }) {
   const T = textes(langue)
   const J = JOURS[langue]
@@ -124,7 +127,8 @@ export default async function StatsTaps({
         </section>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className={`grid grid-cols-1 gap-4 ${sansQr ? '' : 'lg:grid-cols-2'}`}>
+        {!sansQr && (
         <section className="carte p-5">
           <h2 className="text-sm font-semibold">{T.puceQr}</h2>
           <p className="mt-0.5 text-xs text-[var(--color-encre-doux)]">{T.puceQrSous}</p>
@@ -139,6 +143,7 @@ export default async function StatsTaps({
             />
           </div>
         </section>
+        )}
 
         <section className="carte p-5">
           <h2 className="text-sm font-semibold">{T.telephones}</h2>

@@ -186,6 +186,10 @@ export default async function FicheDossier({
         </div>
         <div className="flex flex-wrap gap-2">
           <a href={lien} target="_blank" rel="noreferrer" className="bouton bouton-secondaire">Vue du client ↗</a>
+          <a href={`${lien}/comptoir`} target="_blank" rel="noreferrer" className="bouton bouton-secondaire">Mode comptoir ↗</a>
+          <a href={`${lien}/annee`} target="_blank" rel="noreferrer" className="bouton bouton-secondaire" title="Ouvert au client en décembre et en janvier ; ici, un aperçu.">
+            Votre année ↗
+          </a>
           {peutEcrire && <Link href={`/cartes/nouvelle?dossier=${d.id}`} className="bouton">Nouvelle carte</Link>}
         </div>
       </div>
@@ -382,7 +386,7 @@ export default async function FicheDossier({
           <form action={enregistrer} className="mt-3 space-y-4">
             <ChampsDossier
               clients={clients}
-              valeurs={{ nom: d.nom, client_id: d.client_id, courriel_rapport: d.courriel_rapport, rapport_mensuel: d.rapport_mensuel, note: d.note, langue: d.langue, objectif_avis: d.objectif_avis }}
+              valeurs={{ nom: d.nom, client_id: d.client_id, courriel_rapport: d.courriel_rapport, rapport_mensuel: d.rapport_mensuel, note: d.note, langue: d.langue, objectif_avis: d.objectif_avis, avis_pose: d.avis_pose, avis_mois_avant: d.avis_mois_avant }}
             />
             <button className="bouton">Enregistrer</button>
           </form>

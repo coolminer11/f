@@ -1,36 +1,41 @@
 import type { Metadata, Viewport } from 'next'
-import localFont from 'next/font/local'
 import { notFound, redirect } from 'next/navigation'
 import { cache } from 'react'
 import { dossierDuJeton } from '@/lib/lien-stats'
 import { dossier as lireDossier } from '@/lib/requetes/dossiers'
-import { listerCartes, tapsParCarte, totaux } from '@/lib/requetes/cartes'
+import { listerCartes, tapsJourHeure, totaux } from '@/lib/requetes/cartes'
 import { cleAvis } from '@/lib/avis-manuels'
-import { requete } from '@/lib/db'
+import { requete, requeteUne } from '@/lib/db'
 import { rythmeAvis, resumeAvis } from '@/lib/avis-google'
 import { direct, exploits } from '@/lib/requetes/exploits'
+import { cartesProfil, course, pointDeDepart, profil } from '@/lib/requetes/profil'
 import { depuisL, langueValide, locale, textes } from '@/lib/langue'
+import { maintenantQuebec } from '@/lib/quebec'
+import { prochainesNotes } from '@/lib/note-google'
+import { surprisesPossibles } from '@/lib/surprises'
+import { conseils } from '@/lib/conseils'
+import { ETAPES_LANCEMENT } from '@/lib/lancement'
 import DirectAujourdhui from '@/components/client/direct-aujourdhui'
 import Paliers from '@/components/client/paliers'
 import CommanderCartes from '@/components/client/commander-cartes'
 import AjouterEcran from '@/components/client/ajouter-ecran'
+import PremiersPas, { type EtapePas } from '@/components/client/premiers-pas'
+import ListeLancement from '@/components/client/liste-lancement'
+import SurpriseDuJour from '@/components/client/surprise-du-jour'
+import Conseils from '@/components/client/conseils'
+import ProchaineEtoile from '@/components/client/prochaine-etoile'
+import AvantApres from '@/components/client/avant-apres'
+import Course from '@/components/client/course'
+import NotificationsDing from '@/components/client/notifications-ding'
+import PartagePalier from '@/components/client/partage-palier'
+import Logo from '@/components/client/logo'
 import StatsTaps from '@/components/stats-taps'
 import SectionAvis from '@/components/section-avis'
 import AnimationsClient from '@/components/animations-client'
 import { PERIODES, joursDepuis } from '@/components/selecteur-jours'
+import { fraunces, inter } from '@/app/stats/polices'
 
 export const dynamic = 'force-dynamic'
-
-// Les polices du site taporacards.com, servies par l'application elle-même.
-const fraunces = localFont({
-  src: [
-    { path: '../../polices/fraunces.woff2', style: 'normal', weight: '100 900' },
-    { path: '../../polices/fraunces-italique.woff2', style: 'italic', weight: '100 900' },
-  ],
-  variable: '--police-fraunces',
-  display: 'swap',
-})
-const inter = localFont({ src: '../../polices/inter.woff2', weight: '100 900', variable: '--police-inter', display: 'swap' })
 
 /**
  * Les statistiques d'un commerce, vues par le commerce lui-même — aux
@@ -82,33 +87,108 @@ export default async function StatsClient({ params, searchParams }: Props) {
   if (!d) notFound()
   const jours = joursDepuis(sp.p)
   const langue = langueValide(sp.l) ?? d.langue
+  const fr = langue === 'fr'
   const T = textes(langue)
+  const X = PLUS[langue]
   const nombre = new Intl.NumberFormat(locale(langue))
   // La langue choisie suit le visiteur de lien en lien ; sinon, celle du dossier.
   const suffixeL = sp.l ? `&l=${langue}` : ''
+  const ql = sp.l ? `?l=${langue}` : ''
+  const ici = maintenantQuebec()
+  const cleManuelle = cleAvis({ type: 'dossier', id: d.id })
 
-  const [cartes, t, parCarte, places, maintenant, records] = await Promise.all([
+  const [cartes, t, places, maintenant, records, portrait, parCarte, lignesCourse, depart, grille, abonnes] = await Promise.all([
     listerCartes(d.id),
     totaux({ dossier: d.id }, jours),
-    tapsParCarte(jours),
     requete<{ place_id: string }>(
       `select distinct place_id from cartes_nfc where dossier_id = $1::uuid and place_id is not null and actif`,
       [d.id],
     ),
     direct(d.id),
     exploits(d.id),
+    profil(d.id),
+    cartesProfil(d.id),
+    course(d.id),
+    pointDeDepart(d.id, cleManuelle),
+    tapsJourHeure({ dossier: d.id }, 3650),
+    requeteUne<{ n: number }>(`select count(*)::int as n from abonnements_push where dossier_id = $1::uuid`, [d.id]),
   ])
-  const avisIds = [...places.map((p) => p.place_id), cleAvis({ type: 'dossier', id: d.id })]
-  const [avis, avisParJour] = await Promise.all([resumeAvis(avisIds, jours), rythmeAvis(avisIds)])
+  const avisIds = [...places.map((p) => p.place_id), cleManuelle]
+  const [avis, avis14, avisParJour] = await Promise.all([resumeAvis(avisIds, jours), resumeAvis(avisIds, 14), rythmeAvis(avisIds)])
   const actives = cartes.filter((c) => c.actif)
-  const classement = actives
-    .map((c) => ({ libelle: c.libelle, periode: parCarte[c.id]?.courant ?? 0, total: c.taps_total }))
-    .sort((a, b) => b.periode - a.periode || b.total - a.total)
-  const max = Math.max(1, ...classement.map((c) => c.periode))
   const chemin = `/stats/${jeton}`
   const ecart = t.precedent > 0 ? Math.round(((t.courant - t.precedent) / t.precedent) * 100) : null
   const moyenne = Math.round((t.courant / jours) * 10) / 10
   const partQr = t.courant ? Math.round((t.qr / t.courant) * 100) : 0
+  // Cartes 100 % NFC : on ne parle de QR que s'il en a déjà servi.
+  const avecQr = portrait.qr > 0
+
+  // ---- Avis : note d'une fiche unique, gains, point de départ.
+  const noteUnique = avis.fiches === 1 ? avis.note : null
+  const etoile = avis.nb_actuel !== null && noteUnique !== null ? { nb: avis.nb_actuel, note: noteUnique } : null
+  const prochaine = etoile ? prochainesNotes(etoile.nb, etoile.note, 1)[0] ?? null : null
+  const gagnesDepuisPose = depart.avis_pose !== null && avis.nb_actuel !== null ? avis.nb_actuel - depart.avis_pose : null
+  const avisGagnes14j = avis14.nb_actuel !== null && avis14.nb_debut !== null ? avis14.nb_actuel - avis14.nb_debut : null
+
+  // ---- Premiers pas : de petites victoires dès les premiers jours.
+  const etapes: EtapePas[] = [
+    { cle: 'premier', libelle: X.pas.premier, fait: portrait.total >= 1 },
+    { cle: 'dix', libelle: X.pas.dix, fait: portrait.total >= 10 },
+    { cle: 'jour5', libelle: X.pas.jour5, fait: portrait.meilleur_jour_taps >= 5 },
+    { cle: 'serie3', libelle: X.pas.serie3, fait: portrait.plus_longue_serie >= 3 },
+    { cle: 'cinquante', libelle: X.pas.cinquante, fait: portrait.total >= 50 },
+    ...(depart.avis_pose !== null && avis.nb_actuel !== null ? [{ cle: 'avis', libelle: X.pas.avis, fait: avis.nb_actuel > depart.avis_pose }] : []),
+    { cle: 'cent', libelle: X.pas.cent, fait: portrait.total >= 100 },
+  ]
+  const montrerPas = etapes.some((e) => !e.fait)
+
+  // ---- Liste de lancement : les 60 premiers jours, jusqu'à ce qu'elle soit finie.
+  const auto = [...(portrait.total > 0 ? ['tester'] : []), ...((abonnes?.n ?? 0) > 0 ? ['notifs'] : [])]
+  const faitesLancement = new Set([...d.lancement, ...auto])
+  const joursDepuisPose = depart.pose ? Math.floor((Date.now() - new Date(depart.pose + 'T12:00:00Z').getTime()) / 86_400_000) : 0
+  const montrerLancement = joursDepuisPose <= 60 && ETAPES_LANCEMENT.some((e) => !faitesLancement.has(e))
+
+  // ---- Surprise du jour et conseils.
+  const caseForte = grille.reduce<(typeof grille)[number] | null>((a, b) => (!a || b.taps > a.taps ? b : a), null)
+  const surprises = surprisesPossibles(
+    {
+      profil: portrait,
+      cartes: parCarte,
+      caseForte,
+      avisGagnesDepuisPose: gagnesDepuisPose,
+      note: noteUnique,
+      avisParSemaine: avisParJour ? avisParJour * 7 : null,
+      jourIso: ici.jourIso,
+      aujourdhui: ici.jour,
+    },
+    langue,
+    d.id,
+  )
+  const numeroJour = Math.floor(new Date(ici.jour + 'T00:00:00Z').getTime() / 86_400_000)
+  const rangSurprise = surprises.length ? numeroJour % surprises.length : 0
+  const listeConseils = conseils(
+    {
+      profil: portrait,
+      cartes: parCarte,
+      aujourdhui: maintenant.aujourdhui,
+      serie: records.serie,
+      heureLocale: ici.heure,
+      avisGagnes14j,
+      taps14j: portrait.sept_jours + portrait.sept_precedents,
+      prochaineNote: prochaine ? { cible: prochaine.cible, estimation: prochaine.estimation } : null,
+      jourAnnee: numeroJour,
+    },
+    langue,
+  )
+
+  // ---- Bonjour : selon l'heure qu'il est au Québec.
+  const h = ici.heure
+  const [salut, emoji] = h >= 5 && h < 12 ? [X.matin, '☀️'] : h >= 12 && h < 18 ? [X.apresMidi, '🌤️'] : h >= 18 && h < 22 ? [X.soir, '🌆'] : [X.soir, '🌙']
+  const phraseDuJour = maintenant.aujourdhui > 0 ? X.dejaAujourdhui(maintenant.aujourdhui) : h < 12 ? X.belleJournee : X.continuer
+
+  // ---- « Votre année Tapora » : en décembre (l'année en cours) et en janvier (la précédente).
+  const anneeBilan = ici.mois === 12 ? ici.annee : ici.mois === 1 ? ici.annee - 1 : null
+  const joursAvantLundi = 8 - ici.jourIso
 
   async function desabonner(donnees: FormData) {
     'use server'
@@ -121,7 +201,7 @@ export default async function StatsClient({ params, searchParams }: Props) {
   }
 
   return (
-    <div className={`${fraunces.variable} ${inter.variable} theme-client`} lang={langue === 'en' ? 'en-CA' : 'fr-CA'}>
+    <div className={`${fraunces.variable} ${inter.variable} theme-client`} lang={fr ? 'fr-CA' : 'en-CA'}>
       <script dangerouslySetInnerHTML={{ __html: ANTI_ECLAIR }} />
       <AnimationsClient langue={langue}>
         <div className="mx-auto max-w-5xl space-y-6 pb-10">
@@ -129,57 +209,60 @@ export default async function StatsClient({ params, searchParams }: Props) {
           <header className="pt-4">
             <div className="flex flex-wrap items-center justify-between gap-3" data-intro>
               <a href="https://taporacards.com" className="flex items-center gap-2.5" aria-label="Tapora Cards">
-                <svg viewBox="0 0 64 64" className="size-8" aria-hidden>
-                  <rect width="64" height="64" rx="18" fill="#c2552f" />
-                  <g fill="none" stroke="#fffaf2" strokeWidth="5" strokeLinecap="round">
-                    <path d="M25 22a14 14 0 0 1 0 20" />
-                    <path d="M33 15a23 23 0 0 1 0 34" />
-                    <path d="M41 9a31 31 0 0 1 0 46" opacity=".55" />
-                  </g>
-                  <circle cx="17.5" cy="32" r="4.2" fill="#fffaf2" />
-                </svg>
+                <Logo />
                 <span className="titre-client text-xl font-semibold">Tapora</span>
               </a>
               <div className="flex items-center gap-2">
-              <nav className="flex rounded-full bg-[#ede3d3] p-1 text-sm" aria-label={langue === 'en' ? 'Period' : 'Période'}>
-                {PERIODES.map((p) => (
-                  <a
-                    key={p}
-                    href={`${chemin}?p=${p}${suffixeL}`}
-                    aria-current={p === jours ? 'page' : undefined}
-                    className={`rounded-full px-4 py-1.5 font-medium transition ${
-                      p === jours ? 'bg-[#2a211a] text-[#fffaf2]' : 'text-[#6b5d50] hover:text-[#2a211a]'
-                    }`}
-                  >
-                    {T.periode(p)}
-                  </a>
-                ))}
-              </nav>
-              <a
-                href={`${chemin}?p=${jours}&l=${langue === 'en' ? 'fr' : 'en'}`}
-                hrefLang={langue === 'en' ? 'fr' : 'en'}
-                className="rounded-full bg-[#ede3d3] px-3.5 py-2.5 text-xs font-semibold uppercase tracking-wider text-[#6b5d50] transition hover:text-[#2a211a]"
-                aria-label={T.langueAutre}
-              >
-                {langue === 'en' ? 'FR' : 'EN'}
-              </a>
+                <nav className="flex rounded-full bg-[#ede3d3] p-1 text-sm" aria-label={fr ? 'Période' : 'Period'}>
+                  {PERIODES.map((p) => (
+                    <a
+                      key={p}
+                      href={`${chemin}?p=${p}${suffixeL}`}
+                      aria-current={p === jours ? 'page' : undefined}
+                      className={`rounded-full px-4 py-1.5 font-medium transition ${
+                        p === jours ? 'bg-[#2a211a] text-[#fffaf2]' : 'text-[#6b5d50] hover:text-[#2a211a]'
+                      }`}
+                    >
+                      {T.periode(p)}
+                    </a>
+                  ))}
+                </nav>
+                <a
+                  href={`${chemin}?p=${jours}&l=${fr ? 'en' : 'fr'}`}
+                  hrefLang={fr ? 'en' : 'fr'}
+                  className="rounded-full bg-[#ede3d3] px-3.5 py-2.5 text-xs font-semibold uppercase tracking-wider text-[#6b5d50] transition hover:text-[#2a211a]"
+                  aria-label={T.langueAutre}
+                >
+                  {fr ? 'EN' : 'FR'}
+                </a>
               </div>
             </div>
-            <p className="mt-12 text-sm font-medium text-[#6b5d50]" data-intro>
-              <span className="text-[#c2552f]">♥</span> {T.etiquette}
+            <p className="mt-12 text-base font-medium text-[#6b5d50]" data-intro>
+              <span className="salut-emoji mr-1.5 inline-block" aria-hidden>
+                {emoji}
+              </span>
+              {salut} — {X.bienvenue}
             </p>
             <h1 className="titre-client mt-3 text-5xl font-medium leading-[1.05] sm:text-6xl" data-mots>
               {d.nom}
             </h1>
             <p className="mt-4 max-w-xl text-lg text-[#6b5d50]" data-intro>
-              {T.sousTitre(actives.length)}
+              {phraseDuJour} {T.sousTitre(actives.length)}
             </p>
           </header>
 
-          {sp.desabonne && (
-            <p className="rounded-2xl bg-[#e3efe7] px-5 py-4 text-sm font-medium text-[#2f6b4f]">
-              {T.desabonne}
-            </p>
+          {sp.desabonne && <p className="rounded-2xl bg-[#e3efe7] px-5 py-4 text-sm font-medium text-[#2f6b4f]">{T.desabonne}</p>}
+
+          {anneeBilan && portrait.total > 0 && (
+            <a href={`${chemin}/annee${ql}`} className="banniere-annee group flex items-center justify-between gap-4 rounded-[1.5rem] p-5 text-[#fffaf2] sm:p-6" data-tuile>
+              <span>
+                <span className="block text-xs font-semibold uppercase tracking-[0.2em] text-[#f6c9a8]">✨ {X.anneePrete}</span>
+                <span className="titre-client mt-1 block text-2xl font-medium sm:text-3xl">{X.votreAnnee(anneeBilan)}</span>
+              </span>
+              <span className="grid size-12 shrink-0 place-items-center rounded-full bg-[#fffaf2] text-xl text-[#2a211a] transition group-hover:translate-x-1" aria-hidden>
+                →
+              </span>
+            </a>
           )}
 
           {/* ---- Aujourd'hui, en direct */}
@@ -190,6 +273,19 @@ export default async function StatsClient({ params, searchParams }: Props) {
             record={{ taps: records.record_taps, jour: records.record_jour }}
             serie={{ jours: records.serie, inclutAujourdhui: records.serie_inclut_aujourdhui }}
           />
+
+          {montrerLancement && (
+            <ListeLancement jeton={jeton} langue={langue} etapes={ETAPES_LANCEMENT} cochees={d.lancement} auto={auto} />
+          )}
+          {montrerPas && <PremiersPas etapes={etapes} langue={langue} />}
+
+          {/* ---- La surprise du jour et les conseils */}
+          <div className={`grid grid-cols-1 gap-6 ${surprises.length && listeConseils.length ? 'lg:grid-cols-2' : ''}`}>
+            {surprises.length > 0 && (
+              <SurpriseDuJour surprise={surprises[rangSurprise]} jour={ici.jour} langue={langue} rang={rangSurprise + 1} total={surprises.length} />
+            )}
+            <Conseils liste={listeConseils} langue={langue} />
+          </div>
 
           {/* ---- Les chiffres de la période */}
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -211,13 +307,24 @@ export default async function StatsClient({ params, searchParams }: Props) {
                 {T.dernierTap} {depuisL(t.dernier_tap, langue)}
               </p>
             </div>
-            <div className="carte p-5 sm:p-6" data-tuile>
-              <p className="text-sm text-[#6b5d50]">{T.parQr}</p>
-              <p className="titre-client mt-1 text-4xl font-medium">
-                <span data-compteur={partQr}>{partQr}</span>{langue === 'en' ? '%' : ' %'}
-              </p>
-              <p className="mt-2 text-sm text-[#6b5d50]">{T.resteNfc}</p>
-            </div>
+            {avecQr ? (
+              <div className="carte p-5 sm:p-6" data-tuile>
+                <p className="text-sm text-[#6b5d50]">{T.parQr}</p>
+                <p className="titre-client mt-1 text-4xl font-medium">
+                  <span data-compteur={partQr}>{partQr}</span>
+                  {fr ? ' %' : '%'}
+                </p>
+                <p className="mt-2 text-sm text-[#6b5d50]">{T.resteNfc}</p>
+              </div>
+            ) : (
+              <div className="carte p-5 sm:p-6" data-tuile>
+                <p className="text-sm text-[#6b5d50]">{X.depuisPose}</p>
+                <p className="titre-client mt-1 text-4xl font-medium">
+                  <span data-compteur={records.total}>{nombre.format(records.total)}</span>
+                </p>
+                <p className="mt-2 text-sm text-[#6b5d50]">{X.tapsAuTotal}</p>
+              </div>
+            )}
           </div>
 
           {/* ---- Paliers : la jauge vers le prochain, et la collection */}
@@ -225,38 +332,51 @@ export default async function StatsClient({ params, searchParams }: Props) {
             dossierId={d.id}
             langue={langue}
             nbAvis={avis.nb_actuel}
-            note={avis.fiches === 1 ? avis.note : null}
+            note={noteUnique}
             objectif={d.objectif_avis}
             avisParJour={avisParJour}
             totalTaps={records.total}
           />
 
+          {(etoile || (depart.pose && depart.avis_pose !== null && avis.nb_actuel !== null)) && (
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 [&>*:only-child]:lg:col-span-2">
+              {etoile && <ProchaineEtoile nb={etoile.nb} note={etoile.note} langue={langue} />}
+              {depart.pose && depart.avis_pose !== null && avis.nb_actuel !== null && (
+                <AvantApres langue={langue} pose={depart.pose} avisPose={depart.avis_pose} avisMaintenant={avis.nb_actuel} avisMoisAvant={depart.avis_mois_avant} />
+              )}
+            </div>
+          )}
+
           <div data-bloc>
             <SectionAvis placeIds={avisIds} jours={jours} tapsPeriode={t.courant} pourClient langue={langue} />
           </div>
 
-          {classement.length > 1 && (
-            <section className="carte p-6">
-              <h2>{T.vosCartes}</h2>
-              <p className="mt-0.5 text-xs text-[#6b5d50]">{T.vosCartesSous(jours)}</p>
-              <ul className="mt-5 space-y-3">
-                {classement.map((c, i) => (
-                  <li key={i} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 text-sm sm:grid-cols-[12rem_minmax(0,1fr)_auto]">
-                    <span className="truncate font-medium">{c.libelle}</span>
-                    <span className="hidden h-2.5 overflow-hidden rounded-full bg-[#ece2d2] sm:block" aria-hidden>
-                      <span data-jauge className="block h-full rounded-full bg-[#c2552f]" style={{ width: `${(c.periode / max) * 100}%` }} />
-                    </span>
-                    <span className="text-right tabular-nums">
-                      <strong>{nombre.format(c.periode)}</strong>
-                      <span className="text-xs text-[#6b5d50]"> · {nombre.format(c.total)} {T.auTotal}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
+          <Course lignes={lignesCourse} langue={langue} joursAvantLundi={joursAvantLundi} />
 
-          <StatsTaps portee={{ dossier: d.id }} jours={jours} totaux={t} langue={langue} />
+          <StatsTaps portee={{ dossier: d.id }} jours={jours} totaux={t} langue={langue} sansQr={!avecQr} />
+
+          {/* ---- Le Ding et le mode comptoir */}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <NotificationsDing jeton={jeton} langue={langue} />
+            <section className="carte comptoir-promo relative overflow-hidden p-6 text-[#fffaf2] sm:p-7">
+              <div className="flex items-start gap-4">
+                <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-white/10 text-3xl" aria-hidden>
+                  📺
+                </span>
+                <div>
+                  <h2 className="!text-[#fffaf2]">{X.comptoirTitre}</h2>
+                  <p className="mt-1 text-sm leading-relaxed text-[#fffaf2]/75">{X.comptoirSous}</p>
+                </div>
+              </div>
+              <a
+                href={`${chemin}/comptoir${ql}`}
+                className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#fffaf2] px-6 py-3 text-sm font-semibold text-[#2a211a] transition hover:-translate-y-0.5 hover:bg-[#f6c9a8]"
+              >
+                {X.comptoirOuvrir} <span aria-hidden>→</span>
+              </a>
+              <p className="mt-3 text-xs text-[#fffaf2]/60">{X.comptoirAstuce}</p>
+            </section>
+          </div>
 
           <CommanderCartes jeton={jeton} langue={langue} />
 
@@ -277,9 +397,65 @@ export default async function StatsClient({ params, searchParams }: Props) {
           </footer>
         </div>
       </AnimationsClient>
-      {/* Calque des fenêtres flottantes (bravo, écran d'accueil) : hors des blocs animés. */}
+      {/* Calque des fenêtres flottantes (bravo, partage, écran d'accueil) : hors des blocs animés. */}
       <div id="calque-client" />
+      <PartagePalier nom={d.nom} langue={langue} />
       <AjouterEcran langue={langue} />
     </div>
   )
+}
+
+const PLUS = {
+  fr: {
+    matin: 'Bon matin',
+    apresMidi: 'Bon après-midi',
+    soir: 'Bonsoir',
+    bienvenue: 'bienvenue !',
+    dejaAujourdhui: (n: number) => `Votre carte a déjà travaillé aujourd’hui : ${n} tap${n > 1 ? 's' : ''}.`,
+    belleJournee: 'Une belle journée vous attend.',
+    continuer: 'On continue sur cette lancée ?',
+    depuisPose: 'Depuis la pose',
+    tapsAuTotal: 'taps au total',
+    anneePrete: 'C’est prêt',
+    votreAnnee: (a: number) => `Votre année Tapora ${a}`,
+    comptoirTitre: 'Le mode comptoir',
+    comptoirSous: 'Un écran à la caisse qui fête chaque tap avec l’équipe : un « ding », des confettis, l’objectif du jour qui se remplit.',
+    comptoirOuvrir: 'Ouvrir le mode comptoir',
+    comptoirAstuce: 'Parfait sur une tablette, même une vieille.',
+    pas: {
+      premier: 'Premier tap',
+      dix: '10 taps',
+      jour5: 'Une journée à 5 taps',
+      serie3: '3 jours de suite',
+      cinquante: '50 taps',
+      avis: 'Premier avis grâce à Tapora',
+      cent: '100 taps',
+    },
+  },
+  en: {
+    matin: 'Good morning',
+    apresMidi: 'Good afternoon',
+    soir: 'Good evening',
+    bienvenue: 'welcome back!',
+    dejaAujourdhui: (n: number) => `Your card is already at work today: ${n} tap${n > 1 ? 's' : ''}.`,
+    belleJournee: 'A great day is waiting.',
+    continuer: 'Shall we keep the momentum going?',
+    depuisPose: 'Since installation',
+    tapsAuTotal: 'taps in total',
+    anneePrete: 'It’s ready',
+    votreAnnee: (a: number) => `Your ${a} Tapora year`,
+    comptoirTitre: 'Counter mode',
+    comptoirSous: 'A screen at the register that celebrates every tap with the team: a “ding”, confetti, and today’s goal filling up.',
+    comptoirOuvrir: 'Open counter mode',
+    comptoirAstuce: 'Perfect on a tablet, even an old one.',
+    pas: {
+      premier: 'First tap',
+      dix: '10 taps',
+      jour5: 'A 5-tap day',
+      serie3: '3 days in a row',
+      cinquante: '50 taps',
+      avis: 'First review thanks to Tapora',
+      cent: '100 taps',
+    },
+  },
 }

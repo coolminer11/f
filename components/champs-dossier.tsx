@@ -20,6 +20,17 @@ export const SaisieDossier = z.object({
     .regex(/^\d{0,7}$/, 'Objectif d’avis : un nombre entier.')
     .refine((v) => v === '' || (Number(v) >= 1 && Number(v) <= 1_000_000), 'Objectif d’avis : entre 1 et 1 000 000.')
     .optional(),
+  avis_pose: z
+    .string()
+    .trim()
+    .regex(/^\d{0,7}$/, 'Avis à la pose : un nombre entier.')
+    .optional(),
+  avis_mois_avant: z
+    .string()
+    .trim()
+    .transform((v) => v.replace(',', '.'))
+    .refine((v) => v === '' || (/^\d{1,5}(\.\d{1,2})?$/.test(v) && Number(v) <= 100000), 'Avis par mois avant Tapora : un nombre (ex. 2 ou 1,5).')
+    .optional(),
 })
 
 export function valeursDossier(v: z.infer<typeof SaisieDossier>) {
@@ -31,6 +42,8 @@ export function valeursDossier(v: z.infer<typeof SaisieDossier>) {
     note: v.note || null,
     langue: v.langue ?? 'fr',
     objectifAvis: v.objectif_avis ? Number(v.objectif_avis) : null,
+    avisPose: v.avis_pose ? Number(v.avis_pose) : null,
+    avisMoisAvant: v.avis_mois_avant ? Number(v.avis_mois_avant) : null,
   }
 }
 
@@ -48,6 +61,8 @@ export default function ChampsDossier({
     note: string | null
     langue: 'fr' | 'en'
     objectif_avis: number | null
+    avis_pose: number | null
+    avis_mois_avant: number | null
   }
   /** Faux : seulement le nom et le client (création rapide). */
   complet?: boolean
@@ -110,6 +125,35 @@ export default function ChampsDossier({
               />
             </div>
           </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="etiquette" htmlFor="avis_pose">Avis Google le jour de la pose (facultatif)</label>
+              <input
+                id="avis_pose"
+                name="avis_pose"
+                inputMode="numeric"
+                className="champ"
+                maxLength={7}
+                defaultValue={valeurs?.avis_pose ?? ''}
+                placeholder="Vide = le premier relevé"
+              />
+            </div>
+            <div>
+              <label className="etiquette" htmlFor="avis_mois_avant">Avis par mois avant Tapora (facultatif)</label>
+              <input
+                id="avis_mois_avant"
+                name="avis_mois_avant"
+                inputMode="decimal"
+                className="champ"
+                maxLength={9}
+                defaultValue={valeurs?.avis_mois_avant ?? ''}
+                placeholder="Ex. 2 — pour l’« avant / après »"
+              />
+            </div>
+          </div>
+          <p className="-mt-2 text-xs text-[var(--color-encre-doux)]">
+            Pour le rythme d’avant : sur Google Maps, triez les avis par « Plus récents » et comptez ceux des 3 derniers mois avant la pose, divisé par 3.
+          </p>
           <div>
             <label className="etiquette" htmlFor="note">Note interne (facultatif)</label>
             <input id="note" name="note" className="champ" maxLength={500} defaultValue={valeurs?.note ?? ''} />

@@ -7,6 +7,8 @@ import { requeteUne } from '@/lib/db'
 import { emetteur } from '@/lib/requetes/ventes'
 import { echapper, envoyerCourriel } from '@/lib/courriel'
 import { langueValide, textes } from '@/lib/langue'
+import { clesVapid, endpointValide, essai } from '@/lib/push'
+import { ETAPES_LANCEMENT } from '@/lib/lancement'
 
 export type EtatCommande = { ok: boolean; erreur: string | null }
 
@@ -68,3 +70,58 @@ export async function commanderCartes(_: EtatCommande, donnees: FormData): Promi
   return { ok: true, erreur: null }
 }
 
+
+// ---------------------------------------------------------------------------
+// Liste de lancement
+// ---------------------------------------------------------------------------
+/** Coche ou décoche une étape. Le jeton est revérifié ; seules les clés connues passent. */
+export async function cocherLancement(jeton: string, cle: string, coche: boolean): Promise<boolean> {
+  if (!(ETAPES_LANCEMENT as readonly string[]).includes(cle)) return false
+  const id = await dossierDuJeton(jeton)
+  if (!id) return false
+  await requeteUne(
+    coche
+      ? `update dossiers_cartes set lancement = array(select distinct unnest(lancement || array[$2::text])) where id = $1::uuid returning 1`
+      : `update dossiers_cartes set lancement = array_remove(lancement, $2::text) where id = $1::uuid returning 1`,
+    [id, cle],
+  )
+  return true
+}
+
+// ---------------------------------------------------------------------------
+// Notifications « Ding ! »
+// ---------------------------------------------------------------------------
+const Abonnement = z.object({
+  endpoint: z.string().url().max(1000),
+  keys: z.object({ p256dh: z.string().min(10).max(200), auth: z.string().min(8).max(100) }),
+})
+
+export async function abonnerPush(jeton: string, brut: unknown, langue: string): Promise<boolean> {
+  const id = await dossierDuJeton(jeton)
+  const a = Abonnement.safeParse(brut)
+  if (!id || !a.success || !endpointValide(a.data.endpoint)) return false
+  await requeteUne(
+    `insert into abonnements_push (dossier_id, endpoint, p256dh, auth, langue) values ($1::uuid, $2, $3, $4, $5)
+     on conflict (endpoint) do update set dossier_id = excluded.dossier_id, p256dh = excluded.p256dh, auth = excluded.auth, langue = excluded.langue
+     returning 1`,
+    [id, a.data.endpoint, a.data.keys.p256dh, a.data.keys.auth, langueValide(langue) ?? 'fr'],
+  )
+  return true
+}
+
+export async function desabonnerPush(jeton: string, endpoint: string): Promise<boolean> {
+  const id = await dossierDuJeton(jeton)
+  if (!id) return false
+  await requeteUne(`delete from abonnements_push where dossier_id = $1::uuid and endpoint = $2 returning 1`, [id, String(endpoint).slice(0, 1000)])
+  return true
+}
+
+export async function essaiPush(jeton: string, endpoint: string): Promise<boolean> {
+  const id = await dossierDuJeton(jeton)
+  if (!id) return false
+  return essai(id, String(endpoint).slice(0, 1000), `/stats/${jeton}`)
+}
+
+export async function clePubliquePush(): Promise<string> {
+  return (await clesVapid()).publique
+}

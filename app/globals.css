@@ -172,6 +172,10 @@ body:has(.theme-client) {
   --color-seq-6: #7e3a1d;
   font-family: var(--police-inter), ui-sans-serif, system-ui, sans-serif;
   color: var(--color-encre);
+  /* Le back-office force les chiffres à chasse fixe partout ; avec Inter,
+     cela élargit aussi le trait d'union (« Montrez - la »). Ici, seuls les
+     chiffres alignés (classe tabular-nums) le gardent. */
+  font-feature-settings: normal;
 }
 .theme-client .titre-client {
   font-family: var(--police-fraunces), ui-serif, Georgia, serif;
@@ -331,3 +335,194 @@ body:has(.theme-client) {
   .theme-client .coche-merci { animation: none; }
   .theme-client .gain-direct { display: none; }
 }
+
+/* ---- Page client : premiers pas, lancement, surprise, partage, comptoir -- */
+.theme-client .pas-rond {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.theme-client .pas-fait {
+  background: radial-gradient(circle at 30% 25%, #e0794f, #c2552f 60%, #a9481f);
+  color: #fffaf2;
+  box-shadow: 0 6px 14px -6px rgb(169 72 31 / 0.7), 0 0 0 4px #fffaf2;
+}
+.theme-client .pas-prochain {
+  background: #fffaf2;
+  color: #c2552f;
+  border: 2px dashed #c2552f;
+  box-shadow: 0 0 0 4px #fffaf2;
+  animation: respire 2.4s ease-in-out infinite;
+}
+.theme-client .pas-avenir {
+  background: #f3ebdf;
+  color: #b5a693;
+  box-shadow: 0 0 0 4px #fffaf2;
+}
+
+.theme-client .case-lancement {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 1.4rem;
+  height: 1.4rem;
+  margin-top: 0.05rem;
+  border-radius: 0.45rem;
+  border: 2px solid #d9cbb6;
+  color: transparent;
+  transition: all 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.4);
+}
+.theme-client .case-cochee {
+  background: #2f6b4f;
+  border-color: #2f6b4f;
+  color: #fff;
+  transform: scale(1.08);
+}
+.theme-client .case-cochee svg path { stroke-dasharray: 20; stroke-dashoffset: 0; animation: trace-coche 0.35s ease-out; }
+@keyframes trace-coche { from { stroke-dashoffset: 20; } }
+
+.theme-client .boite-cadeau svg { animation: boite-attend 2.8s ease-in-out infinite; transform-origin: 50% 90%; }
+.theme-client .boite-cadeau:hover svg { animation-duration: 0.9s; }
+@keyframes boite-attend {
+  0%, 70%, 100% { transform: rotate(0) translateY(0); }
+  76% { transform: rotate(-6deg) translateY(-4px); }
+  82% { transform: rotate(5deg) translateY(-6px); }
+  88% { transform: rotate(-3deg) translateY(-2px); }
+  94% { transform: rotate(2deg); }
+}
+.theme-client .boite-couvercle { transform-box: fill-box; transform-origin: 50% 100%; transition: transform 0.5s cubic-bezier(0.3, 1.6, 0.5, 1), opacity 0.5s; }
+.theme-client .boite-ouvre svg { animation: none; }
+.theme-client .boite-ouvre .boite-couvercle { transform: translateY(-46px) rotate(-24deg); opacity: 0; }
+.theme-client .surprise-revele { animation: revele 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+@keyframes revele {
+  from { opacity: 0; transform: translateY(16px) scale(0.94); filter: blur(6px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+
+.theme-client .salut-emoji { animation: salut 2.4s ease-in-out 0.8s 1 both; transform-origin: 70% 80%; }
+@keyframes salut {
+  0%, 100% { transform: rotate(0); }
+  15% { transform: rotate(14deg); }
+  30% { transform: rotate(-8deg); }
+  45% { transform: rotate(10deg); }
+  60% { transform: rotate(-4deg); }
+}
+
+.theme-client .banniere-annee {
+  background: linear-gradient(120deg, #2a211a, #7e3a1d 45%, #c2552f 70%, #2a211a);
+  background-size: 250% 100%;
+  animation: degrade-annee 9s ease-in-out infinite alternate;
+  box-shadow: 0 18px 40px -22px rgb(60 40 20 / 0.6);
+}
+@keyframes degrade-annee { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
+
+.theme-client .comptoir-promo {
+  background: radial-gradient(120% 140% at 100% 0%, #7e3a1d 0%, #2a211a 55%);
+}
+.theme-client .comptoir-promo::after {
+  content: '';
+  position: absolute;
+  right: -3rem;
+  bottom: -3rem;
+  width: 10rem;
+  height: 10rem;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgb(237 161 0 / 0.35), transparent 70%);
+  animation: lueur 4s ease-in-out infinite alternate;
+}
+@keyframes lueur { from { transform: scale(0.9); opacity: 0.6; } to { transform: scale(1.15); opacity: 1; } }
+
+.theme-client .medaille-bouton { position: relative; display: block; border-radius: 9999px; transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.4); }
+.theme-client .medaille-bouton:hover { transform: translateY(-3px) scale(1.06); }
+.theme-client .medaille-bouton:focus-visible { outline: 3px solid #2a211a; outline-offset: 3px; }
+
+.theme-client .fenetre-partage { animation: fondu 0.25s ease-out; }
+@keyframes fondu { from { opacity: 0; } }
+.theme-client .reflet-partage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.55) 50%, transparent 65%);
+  transform: translateX(-120%);
+  animation: reflet 1.6s ease-in-out 0.8s 2;
+  pointer-events: none;
+}
+@keyframes reflet { to { transform: translateX(120%); } }
+
+.theme-client .cloche-active { animation: cloche 3.5s ease-in-out infinite; transform-origin: 50% 15%; }
+@keyframes cloche {
+  0%, 80%, 100% { transform: rotate(0); }
+  84% { transform: rotate(14deg); }
+  88% { transform: rotate(-12deg); }
+  92% { transform: rotate(8deg); }
+  96% { transform: rotate(-4deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-client .pas-prochain,
+  .theme-client .boite-cadeau svg,
+  .theme-client .surprise-revele,
+  .theme-client .salut-emoji,
+  .theme-client .banniere-annee,
+  .theme-client .comptoir-promo::after,
+  .theme-client .fenetre-partage,
+  .theme-client .reflet-partage::after,
+  .theme-client .cloche-active,
+  .theme-client .case-cochee svg path { animation: none; }
+}
+
+/* ---- Mode comptoir ------------------------------------------------------ */
+body:has(.comptoir) { background: #2a211a; }
+.theme-client .comptoir { background: radial-gradient(130% 120% at 50% 0%, #4a2a1a 0%, #2a211a 60%, #1e1813 100%); }
+.theme-client .comptoir-halo {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  opacity: 0.55;
+  pointer-events: none;
+}
+.theme-client .comptoir-halo-1 { width: 55vmax; height: 55vmax; left: -15vmax; top: -20vmax; background: #c2552f; animation: derive-1 22s ease-in-out infinite alternate; }
+.theme-client .comptoir-halo-2 { width: 45vmax; height: 45vmax; right: -15vmax; bottom: -20vmax; background: #008a7e; opacity: 0.35; animation: derive-2 26s ease-in-out infinite alternate; }
+@keyframes derive-1 { to { transform: translate(18vmax, 12vmax) scale(1.15); } }
+@keyframes derive-2 { to { transform: translate(-16vmax, -10vmax) scale(1.2); } }
+.theme-client .bulle-comptoir { animation: bulle-monte 2.2s cubic-bezier(0.2, 0.8, 0.3, 1) forwards; text-align: center; }
+@keyframes bulle-monte {
+  0% { transform: translate(-50%, 20px) scale(0.6); opacity: 0; }
+  15% { transform: translate(-50%, -40px) scale(1.05); opacity: 1; }
+  75% { transform: translate(-50%, -80px) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -120px) scale(0.95); opacity: 0; }
+}
+.theme-client .fete-comptoir { animation: fete 6s ease both; }
+.theme-client .fete-comptoir > div { animation: fete-pop 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.5) both; }
+@keyframes fete { 0% { opacity: 0; } 8%, 85% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes fete-pop { from { transform: scale(0.4) rotate(-6deg); opacity: 0; } }
+.theme-client .phrase-comptoir { animation: revele 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.1) both; }
+.theme-client .demarrer-comptoir > span > span:first-child { animation: respire 2.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .theme-client .comptoir-halo, .theme-client .bulle-comptoir, .theme-client .fete-comptoir > div,
+  .theme-client .phrase-comptoir, .theme-client .demarrer-comptoir > span > span:first-child { animation: none; }
+}
+
+/* ---- Votre année Tapora ------------------------------------------------- */
+body:has(.annee) { background: #2a211a; overflow: hidden; }
+.theme-client .annee-grain {
+  background:
+    radial-gradient(60% 50% at 85% 10%, rgb(255 255 255 / 0.10), transparent 70%),
+    radial-gradient(50% 40% at 10% 95%, rgb(0 0 0 / 0.12), transparent 70%);
+}
+.theme-client .annee-fin { background: radial-gradient(120% 100% at 50% 0%, #e0794f 0%, #c2552f 45%, #7e3a1d 100%); }
+.theme-client .annee-indice { animation: indice 1.8s ease-in-out infinite; }
+@keyframes indice { 0%, 100% { transform: translateX(0); opacity: 0.6; } 50% { transform: translateX(8px); opacity: 1; } }
+.theme-client .medaille-annee {
+  background: radial-gradient(circle at 30% 25%, #e0794f, #c2552f 60%, #a9481f);
+  color: #fffaf2;
+  box-shadow: 0 10px 24px -8px rgb(0 0 0 / 0.5), inset 0 1px 0 rgb(255 255 255 / 0.35);
+}
+@media (prefers-reduced-motion: reduce) { .theme-client .annee-indice { animation: none; } }

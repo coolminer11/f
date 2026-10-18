@@ -91,7 +91,15 @@ export default {
           p_canal: canal,
           p_appareil: appareil(agent),
           p_duree_ms: Date.now() - debut,
-        }).catch(() => {}),
+        })
+          // Le tap est écrit : on prévient le serveur, qui envoie le « Ding ! »
+          // aux téléphones abonnés du commerce (lib/push.ts). Sans abonné, il
+          // s'arrête en une requête. Une sous-requête vers notre propre
+          // domaine va droit au serveur d'origine, sans repasser ici.
+          .then(() =>
+            fetch(`${url.origin}/api/push/tap?code=${code}`, { method: 'POST', signal: AbortSignal.timeout(10_000) }),
+          )
+          .catch(() => {}),
       )
     }
 

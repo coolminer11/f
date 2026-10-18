@@ -1,6 +1,7 @@
 import { PALIERS_AVIS, PALIERS_TAPS, clePalier, situer } from '@/lib/paliers'
 import { locale, textes, type Langue } from '@/lib/langue'
 import Celebration from '@/components/client/celebration'
+import { BoutonMedaille } from '@/components/client/partage-palier'
 
 const RAYON = 52
 const CIRCONFERENCE = 2 * Math.PI * RAYON
@@ -29,6 +30,7 @@ export default function Paliers({
 }) {
   const T = textes(langue)
   const fmt = new Intl.NumberFormat(locale(langue))
+  const partager = langue === 'fr' ? 'Touchez une médaille gagnée pour la partager.' : 'Tap a medal you’ve earned to share it.'
   const court = new Intl.NumberFormat(locale(langue), { notation: 'compact', maximumFractionDigits: 1 })
 
   const avis = nbAvis !== null ? situer(nbAvis, PALIERS_AVIS) : null
@@ -117,10 +119,10 @@ export default function Paliers({
       </div>
 
       <div className="mt-7 grid gap-6 border-t border-dashed border-[#e2d6c3] pt-6 lg:grid-cols-2">
-        {avis && <Rangee titre={T.paliersAvis} paliers={PALIERS_AVIS} s={avis} court={court} T={T} />}
-        <Rangee titre={T.trophees} paliers={PALIERS_TAPS} s={taps} court={court} T={T} />
+        {avis && <Rangee type="avis" titre={T.paliersAvis} paliers={PALIERS_AVIS} s={avis} court={court} T={T} partager={partager} />}
+        <Rangee type="taps" titre={T.trophees} paliers={PALIERS_TAPS} s={taps} court={court} T={T} partager={partager} />
       </div>
-      <p className="mt-4 text-xs text-[#6b5d50]">{T.paliersSous}</p>
+      <p className="mt-4 text-xs text-[#6b5d50]">{T.paliersSous} {partager}</p>
 
       <Celebration dossierId={dossierId} franchis={franchis} langue={langue} />
     </section>
@@ -128,12 +130,16 @@ export default function Paliers({
 }
 
 function Rangee({
+  type,
   titre,
   paliers,
   s,
   court,
   T,
+  partager,
 }: {
+  type: 'avis' | 'taps'
+  partager: string
   titre: string
   paliers: number[]
   s: ReturnType<typeof situer>
@@ -151,12 +157,16 @@ function Rangee({
         {montres.map((p) => {
           const etat = p <= (s.atteints[i - 1] ?? 0) ? 'atteint' : p === s.prochain ? 'prochain' : 'avenir'
           return (
-            <li key={p} className={`medaille medaille-${etat}`} title={etat === 'atteint' ? T.atteint : T.aVenir}>
-              <span className="medaille-rond">{court.format(p)}</span>
-              {etat === 'atteint' && (
-                <span className="medaille-coche" aria-label={T.atteint}>
-                  ✓
-                </span>
+            <li key={p} className={`medaille medaille-${etat}`} title={etat === 'atteint' ? undefined : T.aVenir}>
+              {etat === 'atteint' ? (
+                <BoutonMedaille medaille={{ type, valeur: p }} libelle={`${court.format(p)} — ${T.atteint} · ${partager}`}>
+                  <span className="medaille-rond">{court.format(p)}</span>
+                  <span className="medaille-coche" aria-hidden>
+                    ✓
+                  </span>
+                </BoutonMedaille>
+              ) : (
+                <span className="medaille-rond">{court.format(p)}</span>
               )}
             </li>
           )

@@ -361,6 +361,30 @@ L'intégration automatique (API Places de Google) reste dans le code
 - **Rapport mensuel** : cocher « Envoyer le rapport mensuel » dans le
   dossier. Il part le 1er du mois à partir de 9 h, par le réveil de
   cron-job.org — qui doit donc rester actif. Jamais deux fois le même mois.
+- **Page client, ce qui fait revenir le commerce** :
+  - bonjour selon l'heure (« Bon matin », « Bon après-midi », « Bonsoir ») ;
+  - liste de lancement à cocher (les 60 premiers jours) et « premiers pas »
+    (premier tap, 10 taps, 3 jours de suite…) jusqu'à ce qu'ils soient franchis ;
+  - la surprise du jour : un fait vrai tiré de ses chiffres, différent chaque
+    jour (plus de 80 avant de se répéter) ;
+  - conseils de la semaine tirés de ses chiffres ;
+  - « Votre prochaine étoile » : combien d'avis 5 ★ pour la note suivante,
+    calcul exact vérifié par `node --experimental-strip-types scripts/verifier-note-google.mjs` ;
+  - « Avant / après Tapora » : remplir dans le dossier « Avis le jour de la
+    pose » (sinon : le premier relevé) et « Avis par mois avant Tapora » ;
+  - la course des cartes (dès 2 cartes), remise à zéro chaque lundi ;
+  - partage d'une médaille en image (publication ou story), signée
+    taporacards.com ;
+  - « Votre année Tapora » : bannière sur la page en décembre et en janvier ;
+    aperçu à tout moment par le bouton « Votre année ↗ » du dossier ;
+  - mode comptoir : `…/stats/<lien>/comptoir`, pour une tablette à la caisse
+    (ding, confettis, objectif du jour) ;
+  - « Ding ! » : notification sur le téléphone du commerce à chaque tap (au
+    plus une par minute, regroupées). Sur iPhone, il faut d'abord ajouter la
+    page à l'écran d'accueil (exigence d'Apple). Les clés se créent toutes
+    seules ; rien à configurer sur Render. **Le Worker doit être redéployé
+    une fois** pour que les taps passés par Cloudflare déclenchent le Ding :
+    `cd worker && npx wrangler deploy`.
 - **Page client, ce qu'elle contient** :
   - « Aujourd'hui » en direct (mis à jour toutes les 15 s), série de jours
     d'affilée et record ;

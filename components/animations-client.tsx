@@ -87,6 +87,14 @@ export default function AnimationsClient({ children, langue = 'fr' }: { children
           tl.from(c, { strokeDashoffset: Number(c.dataset.anneau), duration: 1.6, ease: 'power3.inOut' }, '-=0.6'),
         )
         bloc.querySelectorAll<HTMLElement>('[data-compteur]').forEach((n) => compter(n, tl, '<'))
+        const jaugesV = bloc.querySelectorAll('[data-jauge-v]')
+        if (jaugesV.length) tl.from(jaugesV, { scaleY: 0, transformOrigin: '50% 0%', duration: 1.1, ease: 'power3.out' }, '-=0.5')
+        const etapes = bloc.querySelectorAll('[data-etape]')
+        if (etapes.length) tl.from(etapes, { y: 14, opacity: 0, duration: 0.5, ease: 'power3.out', stagger: 0.07 }, '-=0.6')
+        bloc.querySelectorAll<SVGPathElement>('[data-fleche]').forEach((f) => {
+          const l = f.getTotalLength()
+          tl.fromTo(f, { strokeDasharray: l, strokeDashoffset: l }, { strokeDashoffset: 0, duration: 0.8, ease: 'power2.out' }, '-=0.4')
+        })
         const medailles = bloc.querySelectorAll('.medaille')
         if (medailles.length) tl.from(medailles, { scale: 0.3, opacity: 0, duration: 0.55, ease: 'back.out(2.2)', stagger: 0.05 }, '-=1')
       })
