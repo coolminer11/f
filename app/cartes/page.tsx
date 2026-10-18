@@ -8,6 +8,7 @@ import { Evolution, Tuile, depuis, nombreFr } from '@/components/tuiles-cartes'
 import TableauCartes from '@/components/tableau-cartes'
 import SuiviAvis from '@/components/suivi-avis'
 import { suiviAvis } from '@/lib/avis-manuels'
+import { demandesCartes } from '@/lib/requetes/dossiers'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,12 +16,13 @@ export default async function PageCartes({ searchParams }: { searchParams: Promi
   const moi = await exigerSession()
   const sp = await searchParams
   const jours = joursDepuis(sp.p)
-  const [cartes, t, parCarte, courbes, suivis] = await Promise.all([
+  const [cartes, t, parCarte, courbes, suivis, demandes] = await Promise.all([
     listerCartes(),
     totaux({}, jours),
     tapsParCarte(jours),
     tendances(14),
     suiviAvis(),
+    demandesCartes(),
   ])
 
   const actives = cartes.filter((c) => c.actif)
@@ -68,6 +70,17 @@ export default async function PageCartes({ searchParams }: { searchParams: Promi
         <p className="carte border-[var(--color-positif)] bg-green-50 px-4 py-3 text-sm font-medium text-[var(--color-positif)]">{sp.message}</p>
       )}
 
+      {demandes.length > 0 && (
+        <div className="carte flex flex-wrap items-center justify-between gap-3 border-[var(--color-accent)] px-4 py-3">
+          <p className="text-sm">
+            <strong>🛒 {demandes.length} demande{demandes.length > 1 ? 's' : ''} de cartes</strong>{' '}
+            <span className="text-[var(--color-encre-doux)]">
+              — {demandes.map((q) => `${q.dossier_nom} (${q.quantite})`).join(', ')}
+            </span>
+          </p>
+          <Link href={`/cartes/dossiers/${demandes[0].dossier_id}#demandes`} className="bouton bouton-secondaire text-xs">Voir</Link>
+        </div>
+      )}
       {moi.role !== 'lecture' && <SuiviAvis suivis={suivis} retour="/cartes" />}
 
       <SelecteurJours chemin="/cartes" jours={jours} />

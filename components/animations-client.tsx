@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
+import { locale, type Langue } from '@/lib/langue'
 
 /**
  * Les animations de la page client — les mêmes gestes que taporacards.com :
@@ -14,7 +15,7 @@ import Lenis from 'lenis'
  * et immobile. Les états de départ sont posés avant de retirer le voile
  * (classe « attente ») : rien ne clignote.
  */
-export default function AnimationsClient({ children }: { children: React.ReactNode }) {
+export default function AnimationsClient({ children, langue = 'fr' }: { children: React.ReactNode; langue?: Langue }) {
   const racine = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -28,7 +29,14 @@ export default function AnimationsClient({ children }: { children: React.ReactNo
     const tic = (t: number) => lenis.raf(t * 1000)
     gsap.ticker.add(tic)
     gsap.ticker.lagSmoothing(0)
-    const fmt = new Intl.NumberFormat('fr-CA', { maximumFractionDigits: 1 })
+    const fmt = new Intl.NumberFormat(locale(langue), { maximumFractionDigits: 1 })
+    const BLOCS = 'section.carte, [data-bloc]'
+    const compter = (n: HTMLElement, tl: gsap.core.Timeline, position: number | string) => {
+      const cible = Number(n.dataset.compteur)
+      if (!Number.isFinite(cible)) return
+      const etat = { v: 0 }
+      tl.to(etat, { v: cible, duration: 1.8, ease: 'power2.out', onUpdate: () => (n.textContent = (n.dataset.prefixe ?? '') + fmt.format(Math.round(etat.v * 10) / 10)) }, position)
+    }
 
     const ctx = gsap.context(() => {
       // ---- Le haut de page : petite étiquette, puis le nom mot à mot.
@@ -56,15 +64,13 @@ export default function AnimationsClient({ children }: { children: React.ReactNo
 
       // ---- Les tuiles chiffrées : elles montent, et leurs chiffres comptent.
       intro.from('[data-tuile]', { y: 26, opacity: 0, duration: 0.9, stagger: 0.08 }, 0.35)
+      // Les compteurs des sections plus bas comptent quand on les atteint.
       el.querySelectorAll<HTMLElement>('[data-compteur]').forEach((n) => {
-        const cible = Number(n.dataset.compteur)
-        if (!Number.isFinite(cible)) return
-        const etat = { v: 0 }
-        intro.to(etat, { v: cible, duration: 1.8, ease: 'power2.out', onUpdate: () => (n.textContent = (n.dataset.prefixe ?? '') + fmt.format(Math.round(etat.v * 10) / 10)) }, 0.45)
+        if (!n.closest(BLOCS)) compter(n, intro, 0.45)
       })
 
       // ---- Chaque section se pose quand on l'atteint, puis ses graphiques s'animent.
-      el.querySelectorAll<HTMLElement>('section.carte, [data-bloc]').forEach((bloc) => {
+      el.querySelectorAll<HTMLElement>(BLOCS).forEach((bloc) => {
         const tl = gsap.timeline({ scrollTrigger: { trigger: bloc, start: 'top 88%', once: true } })
         tl.from(bloc, { y: 40, opacity: 0, duration: 0.9, ease: 'power3.out' })
         const barres = bloc.querySelectorAll('.barre-graphique')
@@ -76,6 +82,13 @@ export default function AnimationsClient({ children }: { children: React.ReactNo
         )
         const segments = bloc.querySelectorAll('.segment-repartition, [data-jauge]')
         if (segments.length) tl.from(segments, { scaleX: 0, transformOrigin: '0% 50%', duration: 0.9, ease: 'power3.out', stagger: 0.08 }, '-=0.5')
+        // Paliers : l'anneau se remplit, le chiffre compte, les médailles tombent une à une.
+        bloc.querySelectorAll<SVGCircleElement>('[data-anneau]').forEach((c) =>
+          tl.from(c, { strokeDashoffset: Number(c.dataset.anneau), duration: 1.6, ease: 'power3.inOut' }, '-=0.6'),
+        )
+        bloc.querySelectorAll<HTMLElement>('[data-compteur]').forEach((n) => compter(n, tl, '<'))
+        const medailles = bloc.querySelectorAll('.medaille')
+        if (medailles.length) tl.from(medailles, { scale: 0.3, opacity: 0, duration: 0.55, ease: 'back.out(2.2)', stagger: 0.05 }, '-=1')
       })
     }, el)
 
@@ -86,7 +99,7 @@ export default function AnimationsClient({ children }: { children: React.ReactNo
       gsap.ticker.remove(tic)
       lenis.destroy()
     }
-  }, [])
+  }, [langue])
 
   return <div ref={racine}>{children}</div>
 }

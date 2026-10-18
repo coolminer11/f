@@ -208,6 +208,30 @@ export async function resumeAvis(placeIds: string[], jours: number): Promise<Res
   return ligne ?? { fiches: 0, nb_actuel: null, note: null, nb_debut: null, dernier_releve: null }
 }
 
+/**
+ * Avis gagnés par jour, en moyenne, sur les 90 derniers jours (somme des
+ * fiches). Sert à estimer quand le prochain palier sera atteint. Null tant
+ * qu'il n'y a pas au moins une semaine de relevés : une estimation sur deux
+ * jours ne vaut rien.
+ */
+export async function rythmeAvis(placeIds: string[]): Promise<number | null> {
+  const ids = [...new Set(placeIds.filter((p) => PLACE_ID.test(p)))]
+  if (!ids.length) return null
+  const l = await requeteUne<{ par_jour: number | null }>(
+    `with bornes as (
+       select place_id,
+              (array_agg(nb_avis order by jour))[1] as nb0, min(jour) as j0,
+              (array_agg(nb_avis order by jour desc))[1] as nb1, max(jour) as j1
+         from avis_google
+        where place_id = any($1) and jour >= (now() at time zone 'America/Toronto')::date - 90
+        group by place_id
+     )
+     select sum((nb1 - nb0)::float8 / (j1 - j0)) filter (where j1 - j0 >= 7) as par_jour from bornes`,
+    [ids],
+  )
+  return l?.par_jour && l.par_jour > 0 ? l.par_jour : null
+}
+
 /** Nombre d'avis jour par jour sur la période (somme des fiches, dernier relevé reporté). */
 export async function serieAvis(placeIds: string[], jours: number): Promise<{ jour: string; nb: number | null }[]> {
   const ids = [...new Set(placeIds.filter((p) => PLACE_ID.test(p)))]

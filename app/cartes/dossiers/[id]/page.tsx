@@ -10,6 +10,8 @@ import {
   rattacherCartes,
   renouvelerLien,
   supprimerDossier,
+  demandesCartes,
+  traiterDemande,
 } from '@/lib/requetes/dossiers'
 import { creerCartesEnLot, listerCartes, tapsParCarte, tendances, totaux } from '@/lib/requetes/cartes'
 import { listerClients } from '@/lib/requetes/ventes'
@@ -65,7 +67,7 @@ export default async function FicheDossier({
   const d = await lireDossier(id)
   if (!d) notFound()
 
-  const [cartes, sansDossier, t, parCarte, courbes, clients, base, historique, moisDernier, suivi] = await Promise.all([
+  const [cartes, sansDossier, t, parCarte, courbes, clients, base, historique, moisDernier, suivi, demandes] = await Promise.all([
     listerCartes(d.id),
     listerCartes().then((toutes) => toutes.filter((c) => !c.dossier_id)),
     totaux({ dossier: d.id }, jours),
@@ -76,6 +78,7 @@ export default async function FicheDossier({
     historiqueRapports(d.id),
     moisPrecedent(),
     suiviPour({ type: 'dossier', id: d.id }),
+    demandesCartes(id),
   ])
   const peutEcrire = moi.role !== 'lecture'
   const actives = cartes.filter((c) => c.actif)
@@ -94,6 +97,14 @@ export default async function FicheDossier({
     await modifierDossier(id, valeursDossier(analyse.data))
     revalidatePath(ici)
     redirect(`${ici}?message=${encodeURIComponent('Dossier enregistré.')}`)
+  }
+
+  async function traiter(donnees: FormData) {
+    'use server'
+    await exigerEcriture()
+    await traiterDemande(String(donnees.get('demande') ?? ''))
+    revalidatePath(ici)
+    redirect(`${ici}#demandes`)
   }
 
   async function creerLot(donnees: FormData) {
@@ -181,6 +192,36 @@ export default async function FicheDossier({
 
       {sp.erreur && <p className="carte border-[var(--color-negatif)] bg-red-50 px-4 py-3 text-sm font-medium text-[var(--color-negatif)]">{sp.erreur}</p>}
       {sp.message && <p className="carte border-[var(--color-positif)] bg-green-50 px-4 py-3 text-sm font-medium text-[var(--color-positif)]">{sp.message}</p>}
+
+      {demandes.length > 0 && (
+        <section id="demandes" className="carte scroll-mt-4 p-5">
+          <h2 className="text-sm font-semibold">Demandes de cartes du client</h2>
+          <p className="mt-0.5 text-xs text-[var(--color-encre-doux)]">Envoyées depuis le bouton « Commander plus de cartes » de sa page.</p>
+          <ul className="mt-3 divide-y divide-[var(--color-ligne)]">
+            {demandes.map((q) => (
+              <li key={q.id} className="flex flex-wrap items-center justify-between gap-3 py-2.5 text-sm">
+                <div className="min-w-0">
+                  <span className={q.traitee_le ? 'text-[var(--color-encre-doux)]' : 'font-semibold'}>
+                    {q.quantite} carte{q.quantite > 1 ? 's' : ''}
+                  </span>
+                  <span className="text-[var(--color-encre-doux)]"> · {depuis(q.cree_le)}</span>
+                  {q.message && <p className="mt-0.5 text-[var(--color-encre-doux)]">« {q.message} »</p>}
+                </div>
+                {q.traitee_le ? (
+                  <span className="text-xs text-[var(--color-positif)]">✓ traitée {depuis(q.traitee_le)}</span>
+                ) : peutEcrire ? (
+                  <form action={traiter}>
+                    <input type="hidden" name="demande" value={q.id} />
+                    <button className="bouton bouton-secondaire text-xs">Marquer comme traitée</button>
+                  </form>
+                ) : (
+                  <span className="text-xs font-medium text-[var(--color-attention)]">à traiter</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <SelecteurJours chemin={ici} jours={jours} />
 
@@ -341,7 +382,7 @@ export default async function FicheDossier({
           <form action={enregistrer} className="mt-3 space-y-4">
             <ChampsDossier
               clients={clients}
-              valeurs={{ nom: d.nom, client_id: d.client_id, courriel_rapport: d.courriel_rapport, rapport_mensuel: d.rapport_mensuel, note: d.note }}
+              valeurs={{ nom: d.nom, client_id: d.client_id, courriel_rapport: d.courriel_rapport, rapport_mensuel: d.rapport_mensuel, note: d.note, langue: d.langue, objectif_avis: d.objectif_avis }}
             />
             <button className="bouton">Enregistrer</button>
           </form>

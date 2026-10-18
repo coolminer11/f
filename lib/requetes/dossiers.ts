@@ -13,6 +13,8 @@ export type Dossier = {
   lien_actif: boolean
   version_lien: number
   note: string | null
+  langue: 'fr' | 'en'
+  objectif_avis: number | null
   cree_le: string
   nb_cartes: number
   nb_actives: number
@@ -25,7 +27,7 @@ export type DossierListe = Dossier & {
 }
 
 const COLONNES = `d.id, d.nom, d.client_id, cl.nom as client_nom, d.courriel_rapport,
-  d.rapport_mensuel, d.lien_actif, d.version_lien, d.note, d.cree_le,
+  d.rapport_mensuel, d.lien_actif, d.version_lien, d.note, d.langue, d.objectif_avis, d.cree_le,
   (select count(*)::int from cartes_nfc c where c.dossier_id = d.id) as nb_cartes,
   (select count(*)::int from cartes_nfc c where c.dossier_id = d.id and c.actif) as nb_actives`
 
@@ -69,13 +71,15 @@ export type SaisieDossierValidee = {
   courrielRapport: string | null
   rapportMensuel: boolean
   note: string | null
+  langue: 'fr' | 'en'
+  objectifAvis: number | null
 }
 
 export async function creerDossier(e: SaisieDossierValidee): Promise<string> {
   const ligne = await requeteUne<{ id: string }>(
-    `insert into dossiers_cartes (nom, client_id, courriel_rapport, rapport_mensuel, note)
-     values ($1, $2::uuid, $3, $4, $5) returning id`,
-    [e.nom, e.clientId, e.courrielRapport, e.rapportMensuel, e.note],
+    `insert into dossiers_cartes (nom, client_id, courriel_rapport, rapport_mensuel, note, langue, objectif_avis)
+     values ($1, $2::uuid, $3, $4, $5, $6, $7) returning id`,
+    [e.nom, e.clientId, e.courrielRapport, e.rapportMensuel, e.note, e.langue, e.objectifAvis],
   )
   return ligne!.id
 }
@@ -83,9 +87,10 @@ export async function creerDossier(e: SaisieDossierValidee): Promise<string> {
 export async function modifierDossier(id: string, e: SaisieDossierValidee): Promise<void> {
   await requete(
     `update dossiers_cartes
-        set nom = $2, client_id = $3::uuid, courriel_rapport = $4, rapport_mensuel = $5, note = $6
+        set nom = $2, client_id = $3::uuid, courriel_rapport = $4, rapport_mensuel = $5, note = $6,
+            langue = $7, objectif_avis = $8
       where id = $1::uuid`,
-    [id, e.nom, e.clientId, e.courrielRapport, e.rapportMensuel, e.note],
+    [id, e.nom, e.clientId, e.courrielRapport, e.rapportMensuel, e.note, e.langue, e.objectifAvis],
   )
   // Le client de facturation des cartes suit celui du dossier.
   await requete(`update cartes_nfc set client_id = $2::uuid where dossier_id = $1::uuid`, [id, e.clientId])
@@ -118,4 +123,32 @@ export async function rattacherCartes(dossierId: string, carteIds: string[]): Pr
       where id = any($2::uuid[])`,
     [dossierId, ids],
   )
+}
+
+export type DemandeCartes = {
+  id: string
+  dossier_id: string
+  dossier_nom: string
+  quantite: number
+  message: string | null
+  cree_le: string
+  traitee_le: string | null
+}
+
+/** Les demandes « Commander plus de cartes » d'un dossier, ou toutes celles à traiter. */
+export async function demandesCartes(dossierId?: string): Promise<DemandeCartes[]> {
+  if (dossierId && !UUID.test(dossierId)) return []
+  return requete<DemandeCartes>(
+    `select q.id, q.dossier_id, d.nom as dossier_nom, q.quantite, q.message, q.cree_le, q.traitee_le
+       from demandes_cartes q join dossiers_cartes d on d.id = q.dossier_id
+      where ${dossierId ? 'q.dossier_id = $1::uuid' : 'q.traitee_le is null'}
+      order by q.traitee_le is not null, q.cree_le desc
+      limit 20`,
+    dossierId ? [dossierId] : [],
+  )
+}
+
+export async function traiterDemande(id: string): Promise<void> {
+  if (!UUID.test(id)) return
+  await requete(`update demandes_cartes set traitee_le = now() where id = $1::uuid and traitee_le is null`, [id])
 }

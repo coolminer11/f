@@ -9,24 +9,7 @@ import {
   type Totaux,
 } from '@/lib/requetes/cartes'
 
-const nombre = (n: number) => new Intl.NumberFormat('fr-CA').format(n)
-
-function dateCourte(iso: string): string {
-  const [a, m, j] = iso.split('-').map(Number)
-  return new Date(Date.UTC(a, m - 1, j)).toLocaleDateString('fr-CA', { day: 'numeric', month: 'short', timeZone: 'UTC' })
-}
-
-const JOURS = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche']
-
-function dateLongue(iso: string): string {
-  const [a, m, j] = iso.split('-').map(Number)
-  return new Date(Date.UTC(a, m - 1, j)).toLocaleDateString('fr-CA', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    timeZone: 'UTC',
-  })
-}
+import { JOURS, dateCourte, dateLongue, heure, locale, plage, textes, type Langue } from '@/lib/langue'
 
 /**
  * Les graphiques communs au tableau de bord et à la fiche d'une carte. La
@@ -37,12 +20,18 @@ export default async function StatsTaps({
   jours,
   totaux,
   avecCumul = true,
+  langue = 'fr',
 }: {
   portee: Portee
   jours: number
   totaux: Totaux
   avecCumul?: boolean
+  /** La page client peut s'afficher en anglais ; le back-office reste en français. */
+  langue?: Langue
 }) {
+  const T = textes(langue)
+  const J = JOURS[langue]
+  const nombre = (n: number) => new Intl.NumberFormat(locale(langue)).format(n)
   const [parJour, parHeure, parJourSemaine, grille, cumul] = await Promise.all([
     tapsParJour(portee, jours),
     tapsParHeure(portee, jours),
@@ -54,17 +43,17 @@ export default async function StatsTaps({
 
   const barresJour: Barre[] = parJour.map((p) => ({
     etiquette: String(Number(p.jour.slice(8, 10))),
-    detail: dateLongue(p.jour),
+    detail: dateLongue(p.jour, langue),
     valeur: p.taps,
   }))
   const barresHeure: Barre[] = parHeure.map((h) => ({
-    etiquette: `${h.cle} h`,
-    detail: `de ${h.cle} h à ${(h.cle + 1) % 24} h`,
+    etiquette: heure(h.cle, langue),
+    detail: plage(h.cle, langue),
     valeur: h.taps,
   }))
   const barresSemaine: Barre[] = parJourSemaine.map((d) => ({
-    etiquette: JOURS[d.cle - 1].slice(0, 3) + '.',
-    detail: JOURS[d.cle - 1],
+    etiquette: J[d.cle - 1].slice(0, 3) + (langue === 'fr' ? '.' : ''),
+    detail: J[d.cle - 1],
     valeur: d.taps,
   }))
 
@@ -74,59 +63,62 @@ export default async function StatsTaps({
   return (
     <div className="space-y-4">
       <section className="carte p-5">
-        <h2 className="text-sm font-semibold">Taps par jour</h2>
-        <p className="mt-0.5 text-xs text-[var(--color-encre-doux)]">{jours} derniers jours, heure du Québec</p>
+        <h2 className="text-sm font-semibold">{T.tapsParJour}</h2>
+        <p className="mt-0.5 text-xs text-[var(--color-encre-doux)]">{T.tapsParJourSous(jours)}</p>
         <div className="mt-4">
           <GraphiqueColonnes
             barres={barresJour}
             pasEtiquettes={jours > 31 ? 15 : jours > 7 ? 5 : 1}
-            resume={`Taps par jour sur ${jours} jours, ${totaux.courant} au total.`}
+            resume={T.tapsParJourResume(jours, totaux.courant)}
+            langue={langue}
           />
         </div>
       </section>
 
       <section className="carte p-5">
-        <h2 className="text-sm font-semibold">Quand les clients tapent</h2>
+        <h2 className="text-sm font-semibold">{T.quand}</h2>
         <p className="mt-0.5 text-xs text-[var(--color-encre-doux)]">
           {totaux.courant > 0 && caseForte.taps > 0
-            ? `Moment le plus fort : le ${JOURS[caseForte.jour - 1]} entre ${caseForte.heure} h et ${(caseForte.heure + 1) % 24} h`
-            : 'Jour × heure, sur la période — pas encore assez de taps pour dégager une tendance'}
+            ? T.momentFort(J[caseForte.jour - 1], plage(caseForte.heure, langue))
+            : T.pasAssezGrille}
         </p>
         <div className="mt-4">
-          <CarteChaleur cases={grille} resume={`Taps par jour de la semaine et par heure, sur ${jours} jours.`} />
+          <CarteChaleur cases={grille} resume={T.grilleResume(jours)} langue={langue} />
         </div>
       </section>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <section className="carte p-5">
-          <h2 className="text-sm font-semibold">Heures d’affluence</h2>
+          <h2 className="text-sm font-semibold">{T.affluence}</h2>
           <p className="mt-0.5 text-xs text-[var(--color-encre-doux)]">
             {totaux.courant > 0 && heureForte.taps > 0
-              ? `Pointe entre ${heureForte.cle} h et ${(heureForte.cle + 1) % 24} h`
-              : 'Pas encore assez de taps pour dégager une tendance'}
+              ? T.pointe(plage(heureForte.cle, langue))
+              : T.pasAssez}
           </p>
           <div className="mt-4">
             <GraphiqueColonnes
               barres={barresHeure}
               pasEtiquettes={4}
               hauteur={120}
-              resume="Répartition des taps selon l’heure de la journée."
+              resume={T.heureResume}
+              langue={langue}
             />
           </div>
         </section>
 
         <section className="carte p-5">
-          <h2 className="text-sm font-semibold">Jours de la semaine</h2>
+          <h2 className="text-sm font-semibold">{T.joursSemaine}</h2>
           <p className="mt-0.5 text-xs text-[var(--color-encre-doux)]">
             {totaux.courant > 0 && jourFort.taps > 0
-              ? `Le ${JOURS[jourFort.cle - 1]} est le jour le plus actif`
-              : 'Pas encore assez de taps pour dégager une tendance'}
+              ? T.jourFort(J[jourFort.cle - 1])
+              : T.pasAssez}
           </p>
           <div className="mt-4">
             <GraphiqueColonnes
               barres={barresSemaine}
               hauteur={120}
-              resume="Répartition des taps selon le jour de la semaine."
+              resume={T.semaineResume}
+              langue={langue}
             />
           </div>
         </section>
@@ -134,31 +126,31 @@ export default async function StatsTaps({
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <section className="carte p-5">
-          <h2 className="text-sm font-semibold">Puce ou code QR</h2>
-          <p className="mt-0.5 text-xs text-[var(--color-encre-doux)]">
-            Le QR rattrape les téléphones dont le NFC est éteint ou absent.
-          </p>
+          <h2 className="text-sm font-semibold">{T.puceQr}</h2>
+          <p className="mt-0.5 text-xs text-[var(--color-encre-doux)]">{T.puceQrSous}</p>
           <div className="mt-4">
             <BarreRepartition
-              resume={`${totaux.nfc} taps par la puce, ${totaux.qr} par le code QR.`}
+              resume={T.puceQrResume(totaux.nfc, totaux.qr)}
+              langue={langue}
               segments={[
-                { nom: 'Puce NFC', valeur: totaux.nfc, serie: 1 },
-                { nom: 'Code QR', valeur: totaux.qr, serie: 2 },
+                { nom: T.puce, valeur: totaux.nfc, serie: 1 },
+                { nom: T.qr, valeur: totaux.qr, serie: 2 },
               ]}
             />
           </div>
         </section>
 
         <section className="carte p-5">
-          <h2 className="text-sm font-semibold">Téléphones</h2>
-          <p className="mt-0.5 text-xs text-[var(--color-encre-doux)]">Type d’appareil, sans rien qui identifie la personne.</p>
+          <h2 className="text-sm font-semibold">{T.telephones}</h2>
+          <p className="mt-0.5 text-xs text-[var(--color-encre-doux)]">{T.telephonesSous}</p>
           <div className="mt-4">
             <BarreRepartition
-              resume={`${totaux.ios} iPhone, ${totaux.android} Android, ${totaux.autre} autres.`}
+              resume={T.telephonesResume(totaux.ios, totaux.android, totaux.autre)}
+              langue={langue}
               segments={[
                 { nom: 'iPhone', valeur: totaux.ios, serie: 1 },
                 { nom: 'Android', valeur: totaux.android, serie: 2 },
-                { nom: 'Autre', valeur: totaux.autre, serie: 'attenuee' },
+                { nom: T.autre, valeur: totaux.autre, serie: 'attenuee' },
               ]}
             />
           </div>
@@ -167,16 +159,18 @@ export default async function StatsTaps({
 
       {avecCumul && cumul.length > 1 && (
         <section className="carte p-5">
-          <h2 className="text-sm font-semibold">Taps cumulés depuis la pose</h2>
+          <h2 className="text-sm font-semibold">{T.cumul}</h2>
           <p className="mt-0.5 text-xs text-[var(--color-encre-doux)]">
-            {nombre(cumul[cumul.length - 1].cumul)} taps depuis le {dateLongue(cumul[0].jour)}
+            {T.cumulSous(nombre(cumul[cumul.length - 1].cumul), dateLongue(cumul[0].jour, langue))}
           </p>
           <div className="mt-4">
             <GraphiqueLignes
-              series={[{ nom: 'Taps cumulés', slot: 1, valeurs: cumul.map((c) => c.cumul) }]}
-              etiquettes={cumul.map((c) => dateCourte(c.jour))}
-              details={cumul.map((c) => dateLongue(c.jour))}
-              resume={`Taps cumulés depuis la pose : ${cumul[cumul.length - 1].cumul} au total.`}
+              series={[{ nom: T.cumulSerie, slot: 1, valeurs: cumul.map((c) => c.cumul) }]}
+              etiquettes={cumul.map((c) => dateCourte(c.jour, langue))}
+              details={cumul.map((c) => dateLongue(c.jour, langue))}
+              resume={T.cumulResume(cumul[cumul.length - 1].cumul)}
+              unite={T.taps}
+              langue={langue}
             />
           </div>
         </section>

@@ -13,6 +13,13 @@ export const SaisieDossier = z.object({
     .or(z.literal('')),
   rapport_mensuel: z.literal('on').optional(),
   note: z.string().trim().max(500).optional(),
+  langue: z.enum(['fr', 'en']).optional(),
+  objectif_avis: z
+    .string()
+    .trim()
+    .regex(/^\d{0,7}$/, 'Objectif d’avis : un nombre entier.')
+    .refine((v) => v === '' || (Number(v) >= 1 && Number(v) <= 1_000_000), 'Objectif d’avis : entre 1 et 1 000 000.')
+    .optional(),
 })
 
 export function valeursDossier(v: z.infer<typeof SaisieDossier>) {
@@ -22,6 +29,8 @@ export function valeursDossier(v: z.infer<typeof SaisieDossier>) {
     courrielRapport: v.courriel_rapport || null,
     rapportMensuel: v.rapport_mensuel === 'on',
     note: v.note || null,
+    langue: v.langue ?? 'fr',
+    objectifAvis: v.objectif_avis ? Number(v.objectif_avis) : null,
   }
 }
 
@@ -31,7 +40,15 @@ export default function ChampsDossier({
   complet = true,
 }: {
   clients: Client[]
-  valeurs?: { nom: string; client_id: string | null; courriel_rapport: string | null; rapport_mensuel: boolean; note: string | null }
+  valeurs?: {
+    nom: string
+    client_id: string | null
+    courriel_rapport: string | null
+    rapport_mensuel: boolean
+    note: string | null
+    langue: 'fr' | 'en'
+    objectif_avis: number | null
+  }
   /** Faux : seulement le nom et le client (création rapide). */
   complet?: boolean
 }) {
@@ -71,6 +88,27 @@ export default function ChampsDossier({
               <input type="checkbox" name="rapport_mensuel" defaultChecked={valeurs?.rapport_mensuel} className="size-4 accent-[var(--color-accent)]" />
               Envoyer le rapport mensuel le 1er de chaque mois
             </label>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="etiquette" htmlFor="langue">Langue de la page client</label>
+              <select id="langue" name="langue" className="champ" defaultValue={valeurs?.langue ?? 'fr'}>
+                <option value="fr">Français</option>
+                <option value="en">English</option>
+              </select>
+            </div>
+            <div>
+              <label className="etiquette" htmlFor="objectif_avis">Objectif d’avis Google (facultatif)</label>
+              <input
+                id="objectif_avis"
+                name="objectif_avis"
+                inputMode="numeric"
+                className="champ"
+                maxLength={7}
+                defaultValue={valeurs?.objectif_avis ?? ''}
+                placeholder="Vide = prochain palier (100, 250, 300…)"
+              />
+            </div>
           </div>
           <div>
             <label className="etiquette" htmlFor="note">Note interne (facultatif)</label>

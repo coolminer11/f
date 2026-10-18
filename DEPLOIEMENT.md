@@ -361,6 +361,17 @@ L'intégration automatique (API Places de Google) reste dans le code
 - **Rapport mensuel** : cocher « Envoyer le rapport mensuel » dans le
   dossier. Il part le 1er du mois à partir de 9 h, par le réveil de
   cron-job.org — qui doit donc rester actif. Jamais deux fois le même mois.
+- **Page client, ce qu'elle contient** :
+  - « Aujourd'hui » en direct (mis à jour toutes les 15 s), série de jours
+    d'affilée et record ;
+  - paliers d'avis et de taps, fêtés une fois avec des confettis ; l'objectif
+    d'avis se fixe dans « Modifier le dossier » (vide = prochain palier) ;
+  - français ou anglais : la langue par défaut se choisit dans le dossier,
+    et le client bascule avec le bouton FR/EN ;
+  - « Ajouter à l'écran d'accueil » : la page s'installe comme une app ;
+  - « Commander plus de cartes » : la demande apparaît dans le dossier et
+    dans /cartes, et un courriel part à l'adresse de contact de la société
+    (Paramètres). Au plus 3 demandes par commerce et par 24 h.
 
 ## 9. Le site taporacards.com (Cloudflare Pages)
 

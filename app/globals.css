@@ -205,3 +205,129 @@ body:has(.theme-client) {
   font-weight: 500;
   font-size: 1.9rem;
 }
+
+/* ---- Page client : le direct, les paliers, les fenêtres flottantes ------- */
+.theme-client .point-direct {
+  position: relative;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 9999px;
+  background: #2f9e6a;
+}
+.theme-client .point-direct::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: #2f9e6a;
+  animation: pouls-direct 1.8s cubic-bezier(0.2, 0.7, 0.3, 1) infinite;
+}
+.theme-client .point-direct-pause { background: #b5a693; }
+.theme-client .point-direct-pause::after { display: none; }
+@keyframes pouls-direct {
+  from { transform: scale(1); opacity: 0.55; }
+  to { transform: scale(3.2); opacity: 0; }
+}
+.theme-client .gain-direct {
+  position: absolute;
+  left: calc(100% + 0.35rem);
+  top: 0;
+  padding: 0.15rem 0.6rem;
+  border-radius: 9999px;
+  background: #2f6b4f;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  pointer-events: none;
+  animation: gain-envol 1.8s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+}
+@keyframes gain-envol {
+  0% { transform: translateY(12px) scale(0.6); opacity: 0; }
+  18% { transform: translateY(-6px) scale(1.08); opacity: 1; }
+  70% { transform: translateY(-26px) scale(1); opacity: 1; }
+  100% { transform: translateY(-44px) scale(0.95); opacity: 0; }
+}
+.theme-client .badge-record {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 9999px;
+  background: #fbe9c6;
+  color: #7a4a0c;
+  padding: 0.25rem 0.75rem;
+  animation: apparition-pop 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.4);
+}
+@keyframes apparition-pop {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.theme-client .medaille { position: relative; list-style: none; }
+.theme-client .medaille-rond {
+  display: grid;
+  place-items: center;
+  min-width: 3.25rem;
+  height: 3.25rem;
+  padding: 0 0.6rem;
+  border-radius: 9999px;
+  font-family: var(--police-fraunces), ui-serif, Georgia, serif;
+  font-variation-settings: 'SOFT' 100;
+  font-weight: 600;
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
+.theme-client .medaille-atteint .medaille-rond {
+  background: radial-gradient(circle at 30% 25%, #e0794f, #c2552f 60%, #a9481f);
+  color: #fffaf2;
+  box-shadow: 0 6px 14px -6px rgb(169 72 31 / 0.7), inset 0 1px 0 rgb(255 255 255 / 0.35);
+}
+.theme-client .medaille-prochain .medaille-rond {
+  background: #fffaf2;
+  color: #c2552f;
+  border: 2px dashed #c2552f;
+  animation: respire 2.4s ease-in-out infinite;
+}
+.theme-client .medaille-avenir .medaille-rond {
+  background: #f3ebdf;
+  color: #b5a693;
+}
+.theme-client .medaille-coche {
+  position: absolute;
+  right: -0.15rem;
+  bottom: -0.15rem;
+  display: grid;
+  place-items: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 9999px;
+  background: #2f6b4f;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  box-shadow: 0 0 0 2px #fffaf2;
+}
+@keyframes respire {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.07); }
+}
+
+.theme-client .toast-bravo,
+.theme-client .toast-install {
+  animation: monte-toast 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.15) both;
+}
+@keyframes monte-toast {
+  from { transform: translateY(120%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.theme-client .coche-merci { animation: apparition-pop 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.6); }
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-client .point-direct::after,
+  .theme-client .medaille-prochain .medaille-rond,
+  .theme-client .gain-direct,
+  .theme-client .badge-record,
+  .theme-client .toast-bravo,
+  .theme-client .toast-install,
+  .theme-client .coche-merci { animation: none; }
+  .theme-client .gain-direct { display: none; }
+}

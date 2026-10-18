@@ -1,15 +1,7 @@
 import { GraphiqueLignes } from '@/components/graphiques'
-import { Tuile, depuis, nombreFr } from '@/components/tuiles-cartes'
+import { Tuile } from '@/components/tuiles-cartes'
+import { dateCourte, dateLongue, depuisL, locale, textes, type Langue } from '@/lib/langue'
 import { resumeAvis, serieAvis } from '@/lib/avis-google'
-
-function dateCourte(iso: string): string {
-  const [a, m, j] = iso.split('-').map(Number)
-  return new Date(Date.UTC(a, m - 1, j)).toLocaleDateString('fr-CA', { day: 'numeric', month: 'short', timeZone: 'UTC' })
-}
-function dateLongue(iso: string): string {
-  const [a, m, j] = iso.split('-').map(Number)
-  return new Date(Date.UTC(a, m - 1, j)).toLocaleDateString('fr-CA', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' })
-}
 
 /**
  * Les avis Google à côté des taps : la preuve que la carte rapporte.
@@ -23,13 +15,17 @@ export default async function SectionAvis({
   jours,
   tapsPeriode,
   pourClient = false,
+  langue = 'fr',
 }: {
   placeIds: string[]
   jours: number
   tapsPeriode: number
   /** Sur la page du client : pas de consignes de configuration. */
   pourClient?: boolean
+  langue?: Langue
 }) {
+  const T = textes(langue)
+  const nombreFr = new Intl.NumberFormat(locale(langue))
   if (!placeIds.length) {
     if (pourClient) return null
     return (
@@ -63,41 +59,40 @@ export default async function SectionAvis({
     <section className="space-y-4">
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Tuile
-          libelle={`Avis gagnés, ${jours} derniers jours`}
+          libelle={T.avisGagnes(jours)}
           valeur={`${gagnes > 0 ? '+' : ''}${nombreFr.format(gagnes)}`}
-          sous={<span className="text-xs text-[var(--color-encre-doux)]">sur la fiche Google</span>}
+          sous={<span className="text-xs text-[var(--color-encre-doux)]">{T.surFiche}</span>}
         />
         <Tuile
-          libelle="Avis au total"
+          libelle={T.avisTotal}
           valeur={nombreFr.format(r.nb_actuel)}
-          sous={<span className="text-xs text-[var(--color-encre-doux)]">{r.fiches > 1 ? `${r.fiches} fiches` : 'aujourd’hui'}</span>}
+          sous={<span className="text-xs text-[var(--color-encre-doux)]">{r.fiches > 1 ? T.fiches(r.fiches) : T.aujourdhui.toLowerCase()}</span>}
         />
         <Tuile
-          libelle="Note Google"
-          valeur={r.note !== null ? `${r.note.toLocaleString('fr-CA', { minimumFractionDigits: 1 })} / 5` : '—'}
-          sous={<span className="text-xs text-[var(--color-encre-doux)]">{r.fiches > 1 ? 'voir chaque carte' : '★ moyenne de la fiche'}</span>}
+          libelle={T.noteGoogle}
+          valeur={r.note !== null ? `${r.note.toLocaleString(locale(langue), { minimumFractionDigits: 1 })} / 5` : '—'}
+          sous={<span className="text-xs text-[var(--color-encre-doux)]">{r.fiches > 1 ? T.voirCartes : T.moyenneFiche}</span>}
         />
         <Tuile
-          libelle="Avis pour 100 taps"
-          valeur={parCent !== null ? parCent.toLocaleString('fr-CA', { maximumFractionDigits: 1 }) : '—'}
-          sous={<span className="text-xs text-[var(--color-encre-doux)]">sur la période</span>}
+          libelle={T.avisPour100}
+          valeur={parCent !== null ? parCent.toLocaleString(locale(langue), { maximumFractionDigits: 1 }) : '—'}
+          sous={<span className="text-xs text-[var(--color-encre-doux)]">{T.surPeriode}</span>}
         />
       </div>
       {points.length > 1 && (
         <div className="carte p-5">
-          <h2 className="text-sm font-semibold">Nombre d’avis Google</h2>
-          <p className="mt-0.5 text-xs text-[var(--color-encre-doux)]">
-            {jours} derniers jours · dernier relevé {depuis(r.dernier_releve)}
-          </p>
+          <h2 className="text-sm font-semibold">{T.nbAvis}</h2>
+          <p className="mt-0.5 text-xs text-[var(--color-encre-doux)]">{T.nbAvisSous(jours, depuisL(r.dernier_releve, langue))}</p>
           <div className="mt-4">
             <GraphiqueLignes
-              series={[{ nom: 'Avis', slot: 1, valeurs: points.map((p) => p.nb) }]}
-              etiquettes={points.map((p) => dateCourte(p.jour))}
-              details={points.map((p) => dateLongue(p.jour))}
-              unite="avis"
+              series={[{ nom: T.unAvis, slot: 1, valeurs: points.map((p) => p.nb) }]}
+              etiquettes={points.map((p) => dateCourte(p.jour, langue))}
+              details={points.map((p) => dateLongue(p.jour, langue))}
+              unite={T.unAvis}
+              langue={langue}
               depuisZero={false}
               hauteur={150}
-              resume={`Nombre d’avis Google sur ${jours} jours : de ${points[0].nb} à ${points[points.length - 1].nb}.`}
+              resume={T.nbAvisResume(jours, points[0].nb, points[points.length - 1].nb)}
             />
           </div>
         </div>

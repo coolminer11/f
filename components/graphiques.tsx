@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { JOURS, JOURS_COURTS, plage, textes, type Langue } from '@/lib/langue'
 
 /**
  * Graphiques des cartes NFC.
@@ -12,7 +13,7 @@ import { useState } from 'react'
  * elle ne cache jamais rien.
  */
 
-const fmt = new Intl.NumberFormat('fr-CA')
+const FMT: Record<Langue, Intl.NumberFormat> = { fr: new Intl.NumberFormat('fr-CA'), en: new Intl.NumberFormat('en-CA') }
 
 /** Plafond « rond » de l'échelle : 1, 2 ou 5 × 10ⁿ. */
 function plafond(max: number): number {
@@ -32,8 +33,10 @@ export function GraphiqueColonnes({
   pasEtiquettes = 1,
   hauteur = 160,
   resume,
+  langue = 'fr',
 }: {
   barres: Barre[]
+  langue?: Langue
   unite?: string
   /** Une étiquette d'axe toutes les N barres (la dernière est toujours montrée). */
   pasEtiquettes?: number
@@ -42,6 +45,8 @@ export function GraphiqueColonnes({
   resume: string
 }) {
   const [actif, setActif] = useState<number | null>(null)
+  const fmt = FMT[langue]
+  const t = textes(langue)
   const max = Math.max(0, ...barres.map((b) => b.valeur))
   const haut = plafond(max)
   const graduations = [haut, haut / 2, 0]
@@ -109,7 +114,7 @@ export function GraphiqueColonnes({
               className="absolute inset-x-0 top-0 grid place-items-center text-sm text-[var(--color-encre-doux)]"
               style={{ height: hauteur }}
             >
-              Aucun tap sur la période
+              {t.aucunTap}
             </div>
           )}
 
@@ -125,7 +130,7 @@ export function GraphiqueColonnes({
 
       <details className="mt-2">
         <summary className="cursor-pointer text-xs text-[var(--color-encre-doux)] hover:underline">
-          Voir les données
+          {t.voirDonnees}
         </summary>
         <table className="mt-1 w-full max-w-sm text-xs">
           <tbody>
@@ -154,8 +159,9 @@ const COULEUR: Record<Segment['serie'], string> = {
  * Une barre à 100 % en deux ou trois segments, avec sa légende chiffrée.
  * Préférée au camembert : les parts se comparent sur une même longueur.
  */
-export function BarreRepartition({ segments, resume }: { segments: Segment[]; resume: string }) {
+export function BarreRepartition({ segments, resume, langue = 'fr' }: { segments: Segment[]; resume: string; langue?: Langue }) {
   const [actif, setActif] = useState<number | null>(null)
+  const fmt = FMT[langue]
   const total = segments.reduce((s, x) => s + x.valeur, 0)
   const visibles = segments.filter((s) => s.valeur > 0)
   const pct = (v: number) => (total ? Math.round((v / total) * 100) : 0)
@@ -212,8 +218,6 @@ export function BarreRepartition({ segments, resume }: { segments: Segment[]; re
 // Carte de chaleur jour × heure
 // ---------------------------------------------------------------------------
 
-const JOURS_COURTS = ['lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.', 'dim.']
-const JOURS_LONGS = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche']
 const NIVEAUX = 6
 
 /**
@@ -225,11 +229,17 @@ const NIVEAUX = 6
 export function CarteChaleur({
   cases,
   resume,
+  langue = 'fr',
 }: {
   cases: { jour: number; heure: number; taps: number }[]
   resume: string
+  langue?: Langue
 }) {
   const [actif, setActif] = useState<{ jour: number; heure: number } | null>(null)
+  const fmt = FMT[langue]
+  const t = textes(langue)
+  const JOURS_COURTS_L = JOURS_COURTS[langue]
+  const JOURS_LONGS = JOURS[langue]
   const grille: number[][] = Array.from({ length: 7 }, () => Array(24).fill(0))
   for (const c of cases) grille[c.jour - 1][c.heure] = c.taps
   const max = Math.max(0, ...cases.map((c) => c.taps))
@@ -243,13 +253,13 @@ export function CarteChaleur({
           {grille.map((ligne, j) => (
             <div key={j} className="contents">
               <div className="pr-1 text-right text-[11px] leading-[18px] text-[var(--color-encre-doux)]">
-                {JOURS_COURTS[j]}
+                {JOURS_COURTS_L[j]}
               </div>
               {ligne.map((v, h) => (
                 <div
                   key={h}
                   tabIndex={0}
-                  aria-label={`${JOURS_LONGS[j]}, de ${h} h à ${(h + 1) % 24} h : ${fmt.format(v)} taps`}
+                  aria-label={`${JOURS_LONGS[j]}, ${plage(h, langue)} : ${fmt.format(v)} ${t.taps}`}
                   onPointerEnter={() => setActif({ jour: j, heure: h })}
                   onPointerLeave={() => setActif(null)}
                   onFocus={() => setActif({ jour: j, heure: h })}
@@ -278,25 +288,25 @@ export function CarteChaleur({
               top: actif.jour * 20 - 4,
             }}
           >
-            <div className="text-sm font-semibold text-white">{fmt.format(valeurActive)} taps</div>
+            <div className="text-sm font-semibold text-white">{fmt.format(valeurActive)} {t.taps}</div>
             <div className="text-[11px] text-white/70">
-              {JOURS_LONGS[actif.jour]}, {actif.heure} h à {(actif.heure + 1) % 24} h
+              {JOURS_LONGS[actif.jour]}, {plage(actif.heure, langue)}
             </div>
           </div>
         )}
       </div>
 
       <div className="mt-3 flex items-center gap-1.5 text-[11px] text-[var(--color-encre-doux)]">
-        <span>Moins</span>
+        <span>{t.moins}</span>
         {Array.from({ length: NIVEAUX + 1 }, (_, i) => (
           <span key={i} className="inline-block size-3 rounded-[2px]" style={{ background: `var(--color-seq-${i})` }} aria-hidden />
         ))}
-        <span>Plus</span>
-        {max > 0 && <span className="ml-2">· case la plus foncée : {fmt.format(max)} taps</span>}
+        <span>{t.plus}</span>
+        {max > 0 && <span className="ml-2">· {t.caseForte(fmt.format(max))}</span>}
       </div>
 
       <details className="mt-2">
-        <summary className="cursor-pointer text-xs text-[var(--color-encre-doux)] hover:underline">Voir les données</summary>
+        <summary className="cursor-pointer text-xs text-[var(--color-encre-doux)] hover:underline">{t.voirDonnees}</summary>
         <div className="mt-1 overflow-x-auto">
           <table className="text-[11px]">
             <thead>
@@ -310,7 +320,7 @@ export function CarteChaleur({
             <tbody>
               {grille.map((ligne, j) => (
                 <tr key={j}>
-                  <th className="pr-2 text-left font-medium text-[var(--color-encre-doux)]">{JOURS_COURTS[j]}</th>
+                  <th className="pr-2 text-left font-medium text-[var(--color-encre-doux)]">{JOURS_COURTS_L[j]}</th>
                   {ligne.map((v, h) => (
                     <td key={h} className="chiffre px-1 text-right">{v || '·'}</td>
                   ))}
@@ -351,6 +361,7 @@ export function GraphiqueLignes({
   resume,
   pasEtiquettes,
   depuisZero = true,
+  langue = 'fr',
 }: {
   series: Serie[]
   /** Étiquette courte de chaque point, pour l'axe. */
@@ -363,8 +374,11 @@ export function GraphiqueLignes({
   pasEtiquettes?: number
   /** Faux pour un nombre d'avis : l'échelle part du minimum, pas de zéro. */
   depuisZero?: boolean
+  langue?: Langue
 }) {
   const [actif, setActif] = useState<number | null>(null)
+  const fmt = FMT[langue]
+  const t = textes(langue)
   const n = etiquettes.length
   const toutes = series.flatMap((s) => s.valeurs)
   const maxBrut = Math.max(0, ...toutes)
@@ -499,7 +513,7 @@ export function GraphiqueLignes({
       </div>
 
       <details className="mt-2">
-        <summary className="cursor-pointer text-xs text-[var(--color-encre-doux)] hover:underline">Voir les données</summary>
+        <summary className="cursor-pointer text-xs text-[var(--color-encre-doux)] hover:underline">{t.voirDonnees}</summary>
         <div className="mt-1 max-h-64 overflow-auto">
           <table className="w-full max-w-lg text-xs">
             <thead>
