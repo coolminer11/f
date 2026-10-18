@@ -15,6 +15,90 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://taporacards.com/"/>
   </url>
   <url>
+    <loc>https://taporacards.com/guides/</loc>
+    <lastmod>2026-10-18</lastmod><changefreq>weekly</changefreq><priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://taporacards.com/guides/"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://taporacards.com/en/guides/"/>
+  </url>
+  <url>
+    <loc>https://taporacards.com/en/guides/</loc>
+    <lastmod>2026-10-18</lastmod><changefreq>weekly</changefreq><priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://taporacards.com/guides/"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://taporacards.com/en/guides/"/>
+  </url>
+  <url>
+    <loc>https://taporacards.com/guides/plus-d-avis-google</loc>
+    <lastmod>2026-10-18</lastmod><changefreq>monthly</changefreq><priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://taporacards.com/guides/plus-d-avis-google"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://taporacards.com/en/guides/more-google-reviews"/>
+  </url>
+  <url>
+    <loc>https://taporacards.com/en/guides/more-google-reviews</loc>
+    <lastmod>2026-10-18</lastmod><changefreq>monthly</changefreq><priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://taporacards.com/guides/plus-d-avis-google"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://taporacards.com/en/guides/more-google-reviews"/>
+  </url>
+  <url>
+    <loc>https://taporacards.com/guides/carte-nfc-avis-google</loc>
+    <lastmod>2026-10-18</lastmod><changefreq>monthly</changefreq><priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://taporacards.com/guides/carte-nfc-avis-google"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://taporacards.com/en/guides/nfc-google-review-card"/>
+  </url>
+  <url>
+    <loc>https://taporacards.com/en/guides/nfc-google-review-card</loc>
+    <lastmod>2026-10-18</lastmod><changefreq>monthly</changefreq><priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://taporacards.com/guides/carte-nfc-avis-google"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://taporacards.com/en/guides/nfc-google-review-card"/>
+  </url>
+  <url>
+    <loc>https://taporacards.com/guides/abonnement-ou-paiement-unique</loc>
+    <lastmod>2026-10-18</lastmod><changefreq>monthly</changefreq><priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://taporacards.com/guides/abonnement-ou-paiement-unique"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://taporacards.com/en/guides/subscription-or-one-time-payment"/>
+  </url>
+  <url>
+    <loc>https://taporacards.com/en/guides/subscription-or-one-time-payment</loc>
+    <lastmod>2026-10-18</lastmod><changefreq>monthly</changefreq><priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://taporacards.com/guides/abonnement-ou-paiement-unique"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://taporacards.com/en/guides/subscription-or-one-time-payment"/>
+  </url>
+  <url>
+    <loc>https://taporacards.com/guides/avis-google-restaurants-cafes</loc>
+    <lastmod>2026-10-18</lastmod><changefreq>monthly</changefreq><priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://taporacards.com/guides/avis-google-restaurants-cafes"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://taporacards.com/en/guides/google-reviews-restaurants-cafes"/>
+  </url>
+  <url>
+    <loc>https://taporacards.com/en/guides/google-reviews-restaurants-cafes</loc>
+    <lastmod>2026-10-18</lastmod><changefreq>monthly</changefreq><priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://taporacards.com/guides/avis-google-restaurants-cafes"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://taporacards.com/en/guides/google-reviews-restaurants-cafes"/>
+  </url>
+  <url>
+    <loc>https://taporacards.com/guides/avis-google-salons-cliniques-garages</loc>
+    <lastmod>2026-10-18</lastmod><changefreq>monthly</changefreq><priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://taporacards.com/guides/avis-google-salons-cliniques-garages"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://taporacards.com/en/guides/google-reviews-salons-clinics-garages"/>
+  </url>
+  <url>
+    <loc>https://taporacards.com/en/guides/google-reviews-salons-clinics-garages</loc>
+    <lastmod>2026-10-18</lastmod><changefreq>monthly</changefreq><priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://taporacards.com/guides/avis-google-salons-cliniques-garages"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://taporacards.com/en/guides/google-reviews-salons-clinics-garages"/>
+  </url>
+  <url>
+    <loc>https://taporacards.com/conditions</loc>
+    <lastmod>2026-10-18</lastmod><changefreq>yearly</changefreq><priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://taporacards.com/conditions"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://taporacards.com/en/terms"/>
+  </url>
+  <url>
+    <loc>https://taporacards.com/en/terms</loc>
+    <lastmod>2026-10-18</lastmod><changefreq>yearly</changefreq><priority>0.3</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://taporacards.com/conditions"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://taporacards.com/en/terms"/>
+  </url>
+  <url>
     <loc>https://taporacards.com/confidentialite</loc>
     <lastmod>2026-10-18</lastmod><changefreq>yearly</changefreq><priority>0.3</priority>
     <xhtml:link rel="alternate" hreflang="fr-CA" href="https://taporacards.com/confidentialite"/>

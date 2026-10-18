@@ -192,3 +192,64 @@ details .reponse { overflow: hidden; }
 
 /* En attendant le script d'animation (voir js/pret.js). */
 .attente #entete, .attente .titre-ligne, .attente #scene, .attente [data-apparait], .attente [data-mots], .attente .etape, .attente #carnet { visibility: hidden; }
+
+/* ---- Guides : la mise en page d'un article --------------------------------- */
+.article { font-size: 1.075rem; line-height: 1.75; color: var(--color-encre); }
+.article > * + * { margin-top: 1.1em; }
+.article h2 {
+  margin-top: 2.4em;
+  font-family: var(--font-serif);
+  font-variation-settings: 'SOFT' 100;
+  font-size: 1.85rem;
+  line-height: 1.2;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  scroll-margin-top: 6rem;
+}
+.article h3 { margin-top: 1.8em; font-size: 1.2rem; font-weight: 600; }
+.article ul, .article ol { padding-left: 1.4em; }
+.article ul { list-style: none; }
+.article ul > li { position: relative; }
+.article ul > li::before {
+  content: '';
+  position: absolute;
+  left: -1.05em;
+  top: 0.72em;
+  width: 0.42em;
+  height: 0.42em;
+  border-radius: 9999px;
+  background: var(--color-brique);
+}
+.article ol { list-style: decimal; }
+.article ol > li::marker { color: var(--color-brique); font-weight: 600; }
+.article li + li { margin-top: 0.45em; }
+.article a { color: var(--color-brique); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+.article a:hover { color: var(--color-brique-fonce); }
+.article strong { font-weight: 600; }
+.article .encadre {
+  margin-top: 1.8em;
+  border-radius: 1.5rem;
+  background: var(--color-creme);
+  padding: 1.4rem 1.6rem;
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.8) inset, 0 18px 40px -26px rgb(60 40 20 / 0.45);
+}
+.article .encadre-attention { background: #fbeee6; }
+.article .encadre > :first-child { margin-top: 0; }
+.article .phrase {
+  margin-top: 1.6em;
+  border-left: 3px solid var(--color-brique);
+  padding: 0.2em 0 0.2em 1.1em;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.3rem;
+  line-height: 1.45;
+}
+.article table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+.article th, .article td { padding: 0.7rem 0.8rem; text-align: left; vertical-align: top; border-bottom: 1px dashed var(--color-ligne); }
+.article thead th { font-weight: 600; border-bottom: 1px solid var(--color-ligne); }
+.article .tableau { overflow-x: auto; border-radius: 1.25rem; background: var(--color-creme); padding: 0.4rem 0.6rem; }
+.article .tableau table { min-width: 34rem; }
+.article .indice-tableau { display: none; font-size: 0.85rem; color: var(--color-encre-doux); }
+@media (max-width: 640px) {
+  .article .indice-tableau { display: block; }
+  .article .indice-tableau + .tableau { margin-top: 0.5em; }
+}

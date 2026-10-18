@@ -100,6 +100,8 @@
     const { gsap, ScrollTrigger, Lenis } = window
     if (!gsap || !ScrollTrigger || reduit) return montrer()
     gsap.registerPlugin(ScrollTrigger)
+    // Les guides n'ont pas le décor de l'accueil : pas d'avertissement pour les cibles absentes.
+    gsap.config({ nullTargetWarn: false })
 
     // ---- Défilement fluide, synchronisé avec les animations.
     let lenis = null

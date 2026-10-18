@@ -18,3 +18,4 @@ tsconfig.tsbuildinfo
 .wrangler/
 worker/.dev.vars
 site/dist/
+__pycache__/

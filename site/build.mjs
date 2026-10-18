@@ -52,8 +52,9 @@ const versions = {
   '/js/pret.js': `/js/pret.js?v=${await empreinte('js/pret.js')}`,
 }
 
-// Les pages : src/*.html à la racine, src/en/*.html sous /en/.
-for (const dossier of ['', 'en']) {
+// Les pages : src/*.html à la racine, src/en/*.html sous /en/, et les guides
+// (src/guides, src/en/guides) sous /guides/ et /en/guides/.
+for (const dossier of ['', 'en', 'guides', path.join('en', 'guides')]) {
   const source = path.join(SRC, dossier)
   await mkdir(path.join(DIST, dossier), { recursive: true })
   for (const f of await readdir(source)) {

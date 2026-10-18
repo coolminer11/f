@@ -93,8 +93,8 @@ export function conseils(d: DonneesConseils, l: Langue, combien = 3): Conseil[] 
       emoji: '⭐',
       titre: fr ? `≈ ${d.prochaineNote.estimation} avis 5 ★ pour ${n} ★` : `≈ ${d.prochaineNote.estimation} five-star reviews to ${n} ★`,
       texte: fr
-        ? 'Vous êtes tout près. C’est la semaine idéale pour pousser la carte auprès de vos clients les plus contents.'
-        : 'You’re very close. This is the perfect week to push the card with your happiest customers.',
+        ? 'Vous êtes tout près. C’est la semaine idéale pour rappeler la carte à chaque client, à la fin de chaque visite.'
+        : 'You’re very close. This is the perfect week to mention the card to every customer, at the end of every visit.',
     })
   }
 
@@ -181,7 +181,7 @@ export function conseils(d: DonneesConseils, l: Langue, combien = 3): Conseil[] 
   const generaux: [string, string, string][] = fr
     ? [
         ['🗣️', 'La phrase qui marche', '« Si vous avez aimé, un petit tap ici nous aide énormément — ça prend 10 secondes ! »'],
-        ['😊', 'Demandez au bon moment', 'Quand le client vous remercie ou sourit, c’est le moment : il a envie de vous rendre la pareille.'],
+        ['😊', 'Demandez au bon moment', 'À la fin de la visite, au paiement ou au revoir : l’expérience est encore fraîche. Et à tout le monde — Google interdit de ne demander qu’aux clients satisfaits.'],
         ['👀', 'À hauteur de main', 'Posez la carte là où la main est déjà : à côté du terminal de paiement, sur la table, au comptoir.'],
         ['💬', 'Répondez aux avis', 'Une réponse, même courte, montre que vous lisez. Ça encourage les suivants.'],
         ['🙏', 'Remerciez de vive voix', '« Merci, ça nous aide vraiment ! » : le client repart avec un bon souvenir… et revient.'],
@@ -189,7 +189,7 @@ export function conseils(d: DonneesConseils, l: Langue, combien = 3): Conseil[] 
       ]
     : [
         ['🗣️', 'The line that works', '“If you enjoyed it, a quick tap here helps us a ton — it takes 10 seconds!”'],
-        ['😊', 'Ask at the right moment', 'When the customer thanks you or smiles, that’s the moment: they want to return the favour.'],
+        ['😊', 'Ask at the right moment', 'At the end of the visit, at checkout or goodbye: the experience is still fresh. And ask everyone — Google forbids asking only happy customers.'],
         ['👀', 'Within reach', 'Put the card where hands already are: next to the payment terminal, on the table, at the counter.'],
         ['💬', 'Reply to reviews', 'A reply, even a short one, shows you read them. It encourages the next ones.'],
         ['🙏', 'Say thanks out loud', '“Thanks, that really helps!”: customers leave with a good memory… and come back.'],

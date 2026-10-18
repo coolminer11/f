@@ -385,6 +385,14 @@ L'intégration automatique (API Places de Google) reste dans le code
     seules ; rien à configurer sur Render. **Le Worker doit être redéployé
     une fois** pour que les taps passés par Cloudflare déclenchent le Ding :
     `cd worker && npx wrangler deploy`.
+- **Le Worker ne voit que les taps** (route `go.taporacards.com/t/*`) : les
+  pages client et le mode comptoir vont droit à Render, sans consommer le
+  quota gratuit de 100 000 requêtes par jour. Après `npx wrangler deploy`,
+  vérifier dans Cloudflare → Workers → tapora-cartes → Routes qu'il ne
+  reste que `go.taporacards.com/t/*` (supprimer l'ancienne `/*` si elle y est).
+- **Rapports mensuels étalés** : au plus 60 par jour (variable
+  `RAPPORTS_PAR_JOUR` sur Render pour changer), de 9 h à 19 h, à partir du
+  1er du mois — le forfait gratuit de Resend permet 100 courriels par jour.
 - **Page client, ce qu'elle contient** :
   - « Aujourd'hui » en direct (mis à jour toutes les 15 s), série de jours
     d'affilée et record ;
@@ -427,6 +435,18 @@ Aperçu local avant d'envoyer : `npm run apercu` → http://localhost:4321.
 Deux langues : le français à `/`, l'anglais à `/en/` (`site/src/en/`). Une
 modification de texte se fait dans les deux fichiers ; les balises
 `hreflang` et le plan du site disent à Google quelle page montrer à qui.
+
+### Guides, IndexNow et prix
+
+- **Guides** : le contenu est dans `site/guides/contenu_fr.py` et
+  `contenu_en.py`. Après une modification : `cd site && python3 guides/generer.py`
+  (régénère les pages et le sitemap), puis `npm run deployer`.
+- **IndexNow** : `npm run deployer` prévient Bing tout seul après chaque
+  déploiement (Bing nourrit aussi ChatGPT et Copilot). La clé publique est
+  `site/public/<clé>.txt` ; à relancer à la main : `npm run indexnow`.
+- **Conditions** : `/conditions` et `/en/terms`. Les prix sont aussi dans
+  les données structurées et dans `llms.txt` : à changer partout si les prix
+  changent.
 
 ## Sauvegardes
 

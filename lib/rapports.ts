@@ -249,18 +249,33 @@ export async function historiqueRapports(dossierId: string) {
 const globale = globalThis as typeof globalThis & { __rapports?: number }
 
 /**
- * Appelé à chaque réveil. À partir du 1er du mois à 9 h (heure du Québec),
- * envoie le rapport du mois écoulé aux dossiers qui l'ont demandé et ne l'ont
- * pas encore reçu. Vérifie au plus toutes les 30 minutes.
+ * Plafond d'envois de rapports par jour. Le forfait gratuit de Resend
+ * permet 100 courriels par jour, tous envois confondus : on en garde une
+ * marge pour les factures, documents et demandes de cartes. Avec plus de
+ * dossiers que le plafond, les rapports s'étalent sur les jours suivants.
+ */
+const RAPPORTS_PAR_JOUR = Math.max(1, Number(process.env.RAPPORTS_PAR_JOUR) || 60)
+
+/**
+ * Appelé à chaque réveil. À partir du 1er du mois, de 9 h à 19 h (heure du
+ * Québec), envoie le rapport du mois écoulé aux dossiers qui l'ont demandé et
+ * ne l'ont pas encore reçu, sans dépasser le plafond du jour. Vérifie au plus
+ * toutes les 30 minutes.
  */
 export async function envoyerRapportsDus(baseRepli: string): Promise<void> {
   const maintenant = Date.now()
   if (globale.__rapports && maintenant - globale.__rapports < 30 * 60 * 1000) return
   globale.__rapports = maintenant
 
-  const heure = await requeteUne<{ h: number }>(`select extract(hour from now() at time zone $1)::int as h`, [FUSEAU])
-  const jour = await requeteUne<{ j: number }>(`select extract(day from now() at time zone $1)::int as j`, [FUSEAU])
-  if (!heure || !jour || (jour.j === 1 && heure.h < 9)) return
+  const ici = await requeteUne<{ h: number; deja: number }>(
+    `select extract(hour from now() at time zone $1)::int as h,
+            (select count(*)::int from rapports_mensuels
+              where (cree_le at time zone $1)::date = (now() at time zone $1)::date) as deja`,
+    [FUSEAU],
+  )
+  if (!ici || ici.h < 9 || ici.h >= 19) return
+  const restant = RAPPORTS_PAR_JOUR - ici.deja
+  if (restant <= 0) return
 
   const mois = await moisPrecedent()
   const dus = await requete<{ id: string }>(
@@ -269,8 +284,9 @@ export async function envoyerRapportsDus(baseRepli: string): Promise<void> {
         and d.cree_le < $1::date + interval '1 month'
         and exists (select 1 from cartes_nfc c where c.dossier_id = d.id)
         and not exists (select 1 from rapports_mensuels r where r.dossier_id = d.id and r.mois = $1::date)
-      limit 25`,
-    [mois],
+      order by d.cree_le
+      limit $2`,
+    [mois, Math.min(25, restant)],
   )
   for (const d of dus) {
     await envoyerRapport(d.id, mois, baseRepli).catch(() => {})

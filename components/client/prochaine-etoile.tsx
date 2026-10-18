@@ -12,7 +12,7 @@ const TX = {
     pourquoi: (a: string, b: string) =>
       `Google n’affiche qu’une décimale : votre vraie moyenne se cache entre ${a} et ${b}. D’où la fourchette — le chiffre « garanti » l’est dans tous les cas.`,
     parfaite: 'Note parfaite',
-    parfaiteSous: 'Chaque nouvel avis 5 ★ la protège. Continuez de tendre la carte à vos clients les plus contents.',
+    parfaiteSous: 'Chaque nouvel avis 5 ★ la protège. Continuez de présenter la carte à chaque client.',
     actuelle: 'aujourd’hui',
   },
   en: {
@@ -25,7 +25,7 @@ const TX = {
     pourquoi: (a: string, b: string) =>
       `Google shows only one decimal: your true average hides between ${a} and ${b}. Hence the range — the “guaranteed” number holds in every case.`,
     parfaite: 'Perfect rating',
-    parfaiteSous: 'Every new five-star review protects it. Keep handing the card to your happiest customers.',
+    parfaiteSous: 'Every new five-star review protects it. Keep showing the card to every customer.',
     actuelle: 'today',
   },
 }

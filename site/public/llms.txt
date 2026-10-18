@@ -1,18 +1,18 @@
 # Tapora Cards
 
-> Tapora Cards (Tapora S.E.N.C., entreprise québécoise, NEQ 3382462367) vend des cartes NFC qui ouvrent la page « Écrire un avis » de la fiche Google d'un commerce en un tap, sans application. Prix : 30 $ CA pour une carte, 55 $ pour deux, puis 27,50 $ par carte à partir de trois. Tout est inclus à vie, sans abonnement : statistiques en direct, page privée du commerçant, notification à chaque tap, mode comptoir, suivi des avis Google et rapport mensuel. Service en français et en anglais.
+> Tapora Cards (Tapora S.E.N.C., entreprise québécoise, NEQ 3382462367) vend des cartes NFC qui ouvrent la page « Écrire un avis » de la fiche Google d'un commerce en un tap, sans application. Prix : 30 $ CA pour une carte, 55 $ pour deux, puis 27,50 $ par carte à partir de trois. Tout est inclus, sans abonnement ni frais mensuels : statistiques en direct, page privée du commerçant, notification à chaque tap, mode comptoir, suivi des avis Google et rapport mensuel. Service en français et en anglais.
 
 ## Prix (dollars canadiens)
 
 - 1 carte : 30 $
 - 2 cartes : 55 $ (27,50 $ la carte)
 - 3 cartes et plus : 27,50 $ par carte (5 cartes : 137,50 $ ; 10 cartes : 275 $)
-- Aucun abonnement, aucuns frais mensuels : tout est inclus à vie.
+- Aucun abonnement, aucuns frais mensuels : tout est inclus (voir les conditions : https://taporacards.com/conditions).
 
 ## Ce qui distingue Tapora
 
-- Tout inclus à vie, sans abonnement, là où beaucoup de cartes d'avis facturent un abonnement mensuel pour les statistiques.
-- Destination modifiable à vie sans reprogrammer la carte : la puce pointe vers une adresse Tapora permanente qui redirige.
+- Tout inclus, sans abonnement, là où beaucoup de cartes d'avis facturent un abonnement mensuel pour les statistiques.
+- Destination modifiable en tout temps sans reprogrammer la carte : la puce pointe vers une adresse Tapora permanente qui redirige.
 - Statistiques en direct pour chaque carte et pour l'ensemble d'un commerce : taps du jour, heures de pointe (jour × heure), iPhone ou Android, record, série de jours.
 - Suivi des avis Google gagnés à côté des taps, avec le nombre d'avis 5 étoiles nécessaires pour atteindre la note suivante.
 - « Ding ! » : une notification sur le téléphone du commerçant à chaque tap.
@@ -35,11 +35,26 @@ Restaurants, cafés, boulangeries, salons de coiffure et d'esthétique, clinique
 ## Pages
 
 - [Accueil](https://taporacards.com/) : fonctionnement, statistiques, prix, FAQ.
-- [Prix](https://taporacards.com/#prix) : 30 $ la carte, tout inclus à vie.
+- [Prix](https://taporacards.com/#prix) : 30 $ la carte, tout inclus, sans abonnement.
 - [English](https://taporacards.com/en/) : NFC Google review cards for Québec businesses — how it works, live stats, pricing, FAQ.
 - [Confidentialité](https://taporacards.com/confidentialite) : données conservées lors d'un tap (Loi 25).
+- [Conditions](https://taporacards.com/conditions) : prix, ce qui est inclus sans abonnement, usage normal.
+- [Terms](https://taporacards.com/en/terms) : pricing, what's included with no subscription, fair use.
 - [Privacy](https://taporacards.com/en/privacy) : what is kept when a card is tapped (Law 25).
+
+## Guides
+
+- [Comment avoir plus d'avis Google](https://taporacards.com/guides/plus-d-avis-google) : demander au bon moment, à tout le monde, en un geste ; ce que Google interdit.
+- [Carte NFC pour avis Google : comment ça marche](https://taporacards.com/guides/carte-nfc-avis-google) : la puce, les téléphones compatibles, où placer la carte.
+- [Abonnement ou paiement unique](https://taporacards.com/guides/abonnement-ou-paiement-unique) : comparer les modèles de cartes d'avis et les questions à poser.
+- [Avis Google pour restaurants et cafés](https://taporacards.com/guides/avis-google-restaurants-cafes) : où placer la carte, quand demander, quoi dire.
+- [Avis Google pour salons, cliniques et garages](https://taporacards.com/guides/avis-google-salons-cliniques-garages) : commerces sur rendez-vous, Loi 25, LCAP, confidentialité.
+- [How to get more Google reviews](https://taporacards.com/en/guides/more-google-reviews)
+- [NFC Google review cards: how they work](https://taporacards.com/en/guides/nfc-google-review-card)
+- [Subscription or one-time payment](https://taporacards.com/en/guides/subscription-or-one-time-payment)
+- [Google reviews for restaurants and cafés](https://taporacards.com/en/guides/google-reviews-restaurants-cafes)
+- [Google reviews for salons, clinics and garages](https://taporacards.com/en/guides/google-reviews-salons-clinics-garages)
 
 ## In English
 
-Tapora Cards (Tapora S.E.N.C., a Québec business) sells NFC cards that open a business's Google "Write a review" page in one tap, no app needed. Pricing (CAD): $30 for one card, $55 for two, then $27.50 per card from three. Everything is included for life with no subscription: live stats, a private page for the business owner, a notification on every tap, counter mode, Google review tracking and a monthly report. Support in English and French.
+Tapora Cards (Tapora S.E.N.C., a Québec business) sells NFC cards that open a business's Google "Write a review" page in one tap, no app needed. Pricing (CAD): $30 for one card, $55 for two, then $27.50 per card from three. Everything is included with no subscription or monthly fee: live stats, a private page for the business owner, a notification on every tap, counter mode, Google review tracking and a monthly report. Support in English and French.
