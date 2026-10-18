@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
@@ -140,11 +141,16 @@ export default async function PageCompte({
 
   return (
     <div className="mx-auto max-w-4xl space-y-5">
-      <div>
-        <h1 className="text-lg font-bold tracking-tight">Comptes</h1>
-        <p className="mt-0.5 text-sm text-[var(--color-encre-doux)]">
-          Un compte par associé. Fermer un compte révoque immédiatement ses sessions ouvertes.
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-lg font-bold tracking-tight">Comptes</h1>
+          <p className="mt-0.5 text-sm text-[var(--color-encre-doux)]">
+            Un compte par associé. Fermer un compte révoque immédiatement ses sessions ouvertes.
+          </p>
+        </div>
+        <Link href="/compte/securite" className="bouton text-xs">
+          Sécurité : double authentification et connexions →
+        </Link>
       </div>
 
       {p.erreur && (
@@ -179,6 +185,11 @@ export default async function PageCompte({
                       vous
                     </span>
                   )}
+                  <span
+                    className={`ml-2 rounded px-1.5 py-0.5 text-[11px] font-semibold ${c.totp_actif ? 'bg-[#e3efe6] text-[var(--color-positif)]' : 'bg-[#fbe7da] text-[var(--color-attention)]'}`}
+                  >
+                    {c.totp_actif ? '2FA' : 'sans 2FA'}
+                  </span>
                   {!c.actif && (
                     <span className="ml-2 rounded bg-[var(--color-fond)] px-1.5 py-0.5 text-[11px] font-semibold text-[var(--color-encre-doux)]">
                       désactivé

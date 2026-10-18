@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { createHash, randomBytes, scrypt, timingSafeEqual } from 'node:crypto'
 import { promisify } from 'node:util'
 import { requete, requeteUne } from '@/lib/db'
+import { egal, type Contexte } from '@/lib/securite'
 
 const chiffrer = promisify(scrypt) as (
   motDePasse: string,
@@ -21,6 +22,7 @@ export type Utilisateur = {
   role: 'associe' | 'lecture'
   associe_id: string | null
   actif: boolean
+  totp_actif: boolean
 }
 
 // ---------------------------------------------------------------------------
@@ -106,12 +108,13 @@ async function connexionChiffree(): Promise<boolean> {
   return entetes.get('x-forwarded-proto')?.split(',')[0].trim() === 'https'
 }
 
-export async function ouvrirSession(utilisateurId: string, agent?: string): Promise<void> {
+export async function ouvrirSession(utilisateurId: string, ctx?: Contexte): Promise<void> {
   const jeton = randomBytes(32).toString('base64url')
+  const agent = (await headers()).get('user-agent')
   await requete(
-    `insert into sessions (empreinte, utilisateur_id, expire_le, agent)
-     values ($1, $2::uuid, now() + make_interval(days => $3::int), $4)`,
-    [empreinteJeton(jeton), utilisateurId, DUREE_JOURS, agent?.slice(0, 200) ?? null],
+    `insert into sessions (empreinte, utilisateur_id, expire_le, agent, appareil, ip_masquee)
+     values ($1, $2::uuid, now() + make_interval(days => $3::int), $4, $5, $6)`,
+    [empreinteJeton(jeton), utilisateurId, DUREE_JOURS, agent?.slice(0, 200) ?? null, ctx?.appareil ?? null, ctx?.ipMasquee ?? null],
   )
   await requete(`update utilisateurs set derniere_connexion = now() where id = $1::uuid`, [
     utilisateurId,
@@ -146,10 +149,10 @@ export async function utilisateurCourant(): Promise<Utilisateur | null> {
 
   const [jeton, signature] = brut.split('.')
   if (!jeton || !signature) return null
-  if (signature !== (await signer(jeton))) return null
+  if (!egal(signature, await signer(jeton))) return null
 
   const utilisateur = await requeteUne<Utilisateur>(
-    `select u.id, u.courriel, u.nom, u.role, u.associe_id, u.actif
+    `select u.id, u.courriel, u.nom, u.role, u.associe_id, u.actif, u.totp_actif
        from sessions s
        join utilisateurs u on u.id = s.utilisateur_id
       where s.empreinte = $1 and s.expire_le > now() and u.actif`,
@@ -201,7 +204,7 @@ export async function authentifier(
   motDePasse: string,
 ): Promise<Utilisateur | null> {
   const ligne = await requeteUne<Utilisateur & { empreinte: string }>(
-    `select id, courriel, nom, role, associe_id, actif, empreinte
+    `select id, courriel, nom, role, associe_id, actif, totp_actif, empreinte
        from utilisateurs where lower(courriel) = lower($1) and actif`,
     [courriel],
   )
@@ -223,7 +226,7 @@ export type CompteListe = Utilisateur & {
 
 export async function listerUtilisateurs(): Promise<CompteListe[]> {
   return requete<CompteListe>(
-    `select u.id, u.courriel, u.nom, u.role, u.associe_id, u.actif,
+    `select u.id, u.courriel, u.nom, u.role, u.associe_id, u.actif, u.totp_actif,
             u.derniere_connexion, u.cree_le, a.nom as associe_nom,
             (select count(*)::int from sessions s
               where s.utilisateur_id = u.id and s.expire_le > now()) as sessions_actives
@@ -278,6 +281,33 @@ export async function basculerActif(id: string, actif: boolean): Promise<void> {
  */
 export async function supprimerUtilisateur(id: string): Promise<void> {
   await requete(`delete from utilisateurs where id = $1::uuid`, [id])
+}
+
+/** L'empreinte de la session en cours, pour la reconnaître dans la liste. */
+export async function empreinteSessionCourante(): Promise<string | null> {
+  const jeton = (await cookies()).get(NOM_COOKIE)?.value?.split('.')[0]
+  return jeton ? empreinteJeton(jeton) : null
+}
+
+export type SessionListe = { id: string; appareil: string | null; ip_masquee: string | null; cree_le: string; derniere_vue: string; empreinte: string }
+
+export async function listerSessions(utilisateurId: string): Promise<SessionListe[]> {
+  return requete<SessionListe>(
+    `select id, appareil, ip_masquee, cree_le, derniere_vue, empreinte
+       from sessions where utilisateur_id = $1::uuid and expire_le > now()
+      order by derniere_vue desc`,
+    [utilisateurId],
+  )
+}
+
+export async function fermerUneSession(utilisateurId: string, sessionId: string): Promise<void> {
+  await requete(`delete from sessions where id = $1::uuid and utilisateur_id = $2::uuid`, [sessionId, utilisateurId])
+}
+
+/** Ferme toutes les sessions du compte sauf celle en cours. */
+export async function fermerAutresSessions(utilisateurId: string): Promise<void> {
+  const courante = await empreinteSessionCourante()
+  await requete(`delete from sessions where utilisateur_id = $1::uuid and empreinte is distinct from $2`, [utilisateurId, courante])
 }
 
 export async function fermerToutesSessions(id: string): Promise<void> {

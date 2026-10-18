@@ -87,7 +87,7 @@ export default function TendanceProfit({
           const positif = p.profit_net >= 0
           const y = positif ? zeroY - hauteur : zeroY
           const estActif = i === actif
-          const couleur = positif ? '#2a78d6' : '#e34948'
+          const couleur = positif ? 'var(--color-serie-1)' : 'var(--color-negatif)'
 
           return (
             <g key={p.mois}>

@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import RafraichissementAuto from '@/components/rafraichissement-auto'
+import { cookies } from 'next/headers'
+import EnteteBo, { type Theme } from '@/components/entete-bo'
 import { utilisateurCourant } from '@/lib/auth'
+import { fraunces, inter } from '@/app/stats/polices'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -9,72 +11,41 @@ export const metadata: Metadata = {
   description: 'Gestion des dépenses, des profits et des comptes d’associés',
 }
 
-const LIENS = [
-  ['/transactions', 'Transactions'],
-  ['/ventes', 'Factures'],
-  ['/cartes', 'Cartes'],
-  ['/resultats', 'Résultats'],
-  ['/taxes', 'Taxes'],
-  ['/marge', 'Marge'],
-  ['/import', 'Import'],
-  ['/associes', 'Associés'],
-  ['/export', 'Export'],
-  ['/aide', 'Aide'],
-] as const
-
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // Le nom affiché vient de la session : la page de connexion n'en a pas.
   const utilisateur = await utilisateurCourant()
+  // Le thème est rendu par le serveur (cookie) : aucun éclair de l'autre thème.
+  // Hors session (connexion, pages publiques), toujours aux couleurs Tapora.
+  const theme: Theme = utilisateur && (await cookies()).get('tapora_theme')?.value === 'classique' ? 'classique' : 'tapora'
   return (
-    <html lang="fr-CA">
+    <html lang="fr-CA" data-theme={theme} className={`${fraunces.variable} ${inter.variable}`}>
       <body className="min-h-screen antialiased">
         {/* Le menu n'existe que pour une session ouverte : les pages publiques
             (connexion, document d'un client, statistiques d'un client) ne
             montrent aucun lien vers le reste du back-office. */}
         {utilisateur && (
-        <header className="entete-application border-b border-[var(--color-ligne)] bg-white print:hidden">
-          <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
-            <Link href="/transactions" className="text-sm font-bold tracking-tight">
-              Tapora <span className="font-normal text-[var(--color-encre-doux)]">S.E.N.C.</span>
-            </Link>
-            <nav className="-mx-1 flex max-w-full gap-1 overflow-x-auto">
-              {LIENS.map(([href, libelle]) => (
-                <Link
-                  key={href}
-                  href={href}
-                  className="shrink-0 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium text-[var(--color-encre-doux)] hover:bg-[var(--color-fond)] hover:text-[var(--color-encre)]"
-                >
-                  {libelle}
-                </Link>
-              ))}
-            </nav>
-            {utilisateur && (
-              <div className="ml-auto flex items-center gap-3">
-                <RafraichissementAuto />
-                <Link
-                  href="/etat"
-                  className="text-xs font-medium text-[var(--color-encre-doux)] hover:underline"
-                >
-                  État
-                </Link>
-                <Link
-                  href="/compte"
-                  className="text-xs font-medium text-[var(--color-encre-doux)] hover:underline"
-                >
-                  {utilisateur.nom}
-                  {utilisateur.role === 'lecture' && ' · lecture seule'}
-                </Link>
-                <form action="/connexion/sortie" method="post">
-                  <button className="text-xs font-medium text-[var(--color-encre-doux)] hover:underline">
-                    Fermer la session
-                  </button>
-                </form>
-              </div>
-            )}
-          </div>
-        </header>
+          <EnteteBo nom={utilisateur.nom} lecture={utilisateur.role === 'lecture'} theme={theme} doubleAuth={utilisateur.totp_actif} />
         )}
-        <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
+        {utilisateur && !utilisateur.totp_actif && (
+          <div className="mx-auto max-w-6xl px-4 pt-4 print:hidden">
+            <div className="bandeau-2fa flex flex-wrap items-center gap-3 px-4 py-2.5 text-sm">
+              <span className="grid size-7 shrink-0 place-items-center rounded-full bg-[var(--color-accent)] text-white" aria-hidden>
+                <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z" />
+                </svg>
+              </span>
+              <span className="min-w-0 flex-1">
+                <strong className="font-semibold">Protégez votre compte.</strong>{' '}
+                <span className="hidden text-[var(--color-encre-doux)] sm:inline">Activez la double authentification : même avec votre mot de passe, personne n’entre sans votre téléphone.</span>
+                <span className="text-[var(--color-encre-doux)] sm:hidden">Activez la double authentification.</span>
+              </span>
+              <Link href="/compte/securite#double-auth" className="bouton shrink-0 !py-1.5 text-xs">
+                Activer (2 min)
+              </Link>
+            </div>
+          </div>
+        )}
+        <main className={`mx-auto max-w-6xl px-4 py-6 ${utilisateur ? 'bo-page' : ''}`}>{children}</main>
       </body>
     </html>
   )

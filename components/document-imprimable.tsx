@@ -24,7 +24,7 @@ export default function DocumentImprimable({
   const mentionsObligatoires = Math.abs(doc.montant_ttc) >= 30 && affichePrix
 
   return (
-    <article className="mx-auto max-w-[8.5in] bg-white p-[0.6in] text-[13px] leading-relaxed text-[var(--color-encre)] shadow-sm print:max-w-none print:p-0 print:shadow-none">
+    <article className="document-neutre mx-auto max-w-[8.5in] bg-white p-[0.6in] text-[13px] leading-relaxed text-[var(--color-encre)] shadow-sm print:max-w-none print:p-0 print:shadow-none">
       <header className="flex flex-wrap items-start justify-between gap-6 border-b-2 border-[var(--color-encre)] pb-5">
         <div>
           <h1 className="text-xl font-bold tracking-tight">{societe.nom_entreprise}</h1>

@@ -32,6 +32,9 @@ const nextConfig: NextConfig = {
       { source: '/:chemin*', headers: COMMUNS },
       { source: '/stats/:chemin*', headers: PRIVES },
       { source: '/documents/:chemin*', headers: PRIVES },
+      { source: '/securite/:chemin*', headers: PRIVES },
+      { source: '/connexion/:chemin*', headers: PRIVES },
+      { source: '/compte/:chemin*', headers: PRIVES },
     ]
   },
 }
