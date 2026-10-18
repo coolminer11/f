@@ -1,6 +1,6 @@
 import { GraphiqueLignes } from '@/components/graphiques'
 import { Tuile, depuis, nombreFr } from '@/components/tuiles-cartes'
-import { placesConfigure, resumeAvis, serieAvis } from '@/lib/avis-google'
+import { resumeAvis, serieAvis } from '@/lib/avis-google'
 
 function dateCourte(iso: string): string {
   const [a, m, j] = iso.split('-').map(Number)
@@ -36,9 +36,7 @@ export default async function SectionAvis({
       <section className="carte p-5">
         <h2 className="text-sm font-semibold">Avis Google</h2>
         <p className="mt-1 text-sm text-[var(--color-encre-doux)]">
-          {placesConfigure()
-            ? 'Choisissez la fiche Google du commerce dans « Modifier » : le nombre d’avis et la note s’afficheront ici, à côté des taps.'
-            : 'Non branché. Ajoutez la clé GOOGLE_PLACES_CLE (DEPLOIEMENT.md, section 7) pour suivre les avis et la note à côté des taps.'}
+          Entrez le nombre d’avis et la note dans « Avis Google » ci-dessus : ils s’afficheront ici, à côté des taps.
         </p>
       </section>
     )
@@ -50,7 +48,9 @@ export default async function SectionAvis({
     return (
       <section className="carte p-5">
         <h2 className="text-sm font-semibold">Avis Google</h2>
-        <p className="mt-1 text-sm text-[var(--color-encre-doux)]">Premier relevé en attente : il arrive dans l’heure.</p>
+        <p className="mt-1 text-sm text-[var(--color-encre-doux)]">
+          Pas encore de chiffre : entrez le nombre d’avis et la note dans « Avis Google » ci-dessus.
+        </p>
       </section>
     )
   }
@@ -61,7 +61,7 @@ export default async function SectionAvis({
 
   return (
     <section className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Tuile
           libelle={`Avis gagnés, ${jours} derniers jours`}
           valeur={`${gagnes > 0 ? '+' : ''}${nombreFr.format(gagnes)}`}

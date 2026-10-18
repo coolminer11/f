@@ -25,6 +25,8 @@ export default function ChoixFiche({
   const [resultats, setResultats] = useState<Fiche[]>([])
   const [erreur, setErreur] = useState<string | null>(null)
   const [enCours, demarrer] = useTransition()
+  // Sans clé Google, les avis se saisissent à la main dans le dossier : rien à afficher ici.
+  if (!configure && !initiale) return null
 
   function chercher() {
     setErreur(null)

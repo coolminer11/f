@@ -6,17 +6,21 @@ import StatsTaps from '@/components/stats-taps'
 import SelecteurJours, { joursDepuis } from '@/components/selecteur-jours'
 import { Evolution, Tuile, depuis, nombreFr } from '@/components/tuiles-cartes'
 import TableauCartes from '@/components/tableau-cartes'
+import SuiviAvis from '@/components/suivi-avis'
+import { suiviAvis } from '@/lib/avis-manuels'
 
 export const dynamic = 'force-dynamic'
 
-export default async function PageCartes({ searchParams }: { searchParams: Promise<{ p?: string }> }) {
-  await exigerSession()
-  const jours = joursDepuis((await searchParams).p)
-  const [cartes, t, parCarte, courbes] = await Promise.all([
+export default async function PageCartes({ searchParams }: { searchParams: Promise<{ p?: string; erreur?: string; message?: string }> }) {
+  const moi = await exigerSession()
+  const sp = await searchParams
+  const jours = joursDepuis(sp.p)
+  const [cartes, t, parCarte, courbes, suivis] = await Promise.all([
     listerCartes(),
     totaux({}, jours),
     tapsParCarte(jours),
     tendances(14),
+    suiviAvis(),
   ])
 
   const actives = cartes.filter((c) => c.actif)
@@ -56,6 +60,15 @@ export default async function PageCartes({ searchParams }: { searchParams: Promi
           chez le client.
         </p>
       )}
+
+      {sp.erreur && (
+        <p className="carte border-[var(--color-negatif)] bg-red-50 px-4 py-3 text-sm font-medium text-[var(--color-negatif)]">{sp.erreur}</p>
+      )}
+      {sp.message && (
+        <p className="carte border-[var(--color-positif)] bg-green-50 px-4 py-3 text-sm font-medium text-[var(--color-positif)]">{sp.message}</p>
+      )}
+
+      {moi.role !== 'lecture' && <SuiviAvis suivis={suivis} retour="/cartes" />}
 
       <SelecteurJours chemin="/cartes" jours={jours} />
 

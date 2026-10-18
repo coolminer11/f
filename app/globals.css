@@ -139,3 +139,69 @@ body {
     margin: 0.6in;
   }
 }
+
+/* ========================================================================== */
+/* Page client (/stats/…) : le thème du site taporacards.com.                 */
+/* Tout est scopé à .theme-client — le back-office ne change pas. Les         */
+/* graphiques lisent leurs couleurs dans ces variables : ils prennent le      */
+/* thème sans changer une ligne. Palette validée (terre cuite + sarcelle,     */
+/* daltonisme et contraste sur le papier).                                    */
+/* ========================================================================== */
+body:has(.theme-client) {
+  background: #f7f1e7;
+}
+.theme-client {
+  --color-encre: #2a211a;
+  --color-encre-doux: #6b5d50;
+  --color-ligne: #e2d6c3;
+  --color-fond: #f3ebdf;
+  --color-accent: #c2552f;
+  --color-positif: #2f6b4f;
+  --color-negatif: #b0402a;
+  --color-attention: #a5651a;
+  --color-serie-1: #c2552f;
+  --color-serie-2: #008a7e;
+  --color-serie-attenuee: #b5a693;
+  --color-grille: #ece2d2;
+  --color-seq-0: #efe6d8;
+  --color-seq-1: #f0d2bd;
+  --color-seq-2: #e8b394;
+  --color-seq-3: #dc8f66;
+  --color-seq-4: #c96c41;
+  --color-seq-5: #a9512c;
+  --color-seq-6: #7e3a1d;
+  font-family: var(--police-inter), ui-sans-serif, system-ui, sans-serif;
+  color: var(--color-encre);
+}
+.theme-client .titre-client {
+  font-family: var(--police-fraunces), ui-serif, Georgia, serif;
+  font-variation-settings: 'SOFT' 100;
+  letter-spacing: -0.02em;
+}
+.theme-client .carte {
+  background: #fffaf2;
+  border-color: transparent;
+  border-radius: 1.5rem;
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.8) inset,
+    0 2px 4px rgb(60 40 20 / 0.05),
+    0 18px 40px -22px rgb(60 40 20 / 0.35);
+}
+.theme-client .carte h2 {
+  font-family: var(--police-fraunces), ui-serif, Georgia, serif;
+  font-variation-settings: 'SOFT' 100;
+  font-size: 1.15rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.theme-client .bg-white { background: #fffaf2; }
+.theme-client .masque-mot { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.12em; margin-bottom: -0.12em; }
+.theme-client .mot { display: inline-block; }
+/* En attendant le script d'animation : rien ne clignote. Filet : 2,5 s. */
+.attente .theme-client { visibility: hidden; }
+.theme-client .carte div[style*='proportional-nums'] {
+  font-family: var(--police-fraunces), ui-serif, Georgia, serif;
+  font-variation-settings: 'SOFT' 100;
+  font-weight: 500;
+  font-size: 1.9rem;
+}

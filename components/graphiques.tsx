@@ -87,7 +87,7 @@ export function GraphiqueColonnes({
                 className="group relative flex h-full flex-1 cursor-default items-end justify-center outline-none"
               >
                 <div
-                  className={`w-full max-w-6 rounded-t-[4px] bg-[var(--color-serie-1)] transition-[filter] ${
+                  className={`barre-graphique w-full max-w-6 rounded-t-[4px] bg-[var(--color-serie-1)] transition-[filter] ${
                     actif === i ? 'brightness-110' : actif !== null ? 'opacity-70' : ''
                   } group-focus-visible:ring-2 group-focus-visible:ring-[var(--color-encre)] group-focus-visible:ring-offset-2`}
                   style={{ height: `${(b.valeur / haut) * 100}%`, minHeight: b.valeur > 0 ? 2 : 0 }}
@@ -176,7 +176,7 @@ export function BarreRepartition({ segments, resume }: { segments: Segment[]; re
                 onPointerLeave={() => setActif(null)}
                 onFocus={() => setActif(i)}
                 onBlur={() => setActif(null)}
-                className={`relative h-full outline-none first:rounded-l last:rounded-r ${COULEUR[s.serie]} ${
+                className={`segment-repartition relative h-full outline-none first:rounded-l last:rounded-r ${COULEUR[s.serie]} ${
                   actif !== null && actif !== i ? 'opacity-60' : ''
                 } focus-visible:ring-2 focus-visible:ring-[var(--color-encre)] focus-visible:ring-offset-2`}
                 style={{ flexGrow: s.valeur, flexBasis: 0 }}
@@ -254,7 +254,7 @@ export function CarteChaleur({
                   onPointerLeave={() => setActif(null)}
                   onFocus={() => setActif({ jour: j, heure: h })}
                   onBlur={() => setActif(null)}
-                  className={`h-[18px] rounded-[2px] outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-encre)] ${
+                  className={`case-chaleur h-[18px] rounded-[2px] outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-encre)] ${
                     actif && actif.jour === j && actif.heure === h ? 'ring-2 ring-[var(--color-encre)]' : ''
                   }`}
                   style={{ background: `var(--color-seq-${niveau(v)})` }}
@@ -430,7 +430,7 @@ export function GraphiqueLignes({
             {graduations.map((_, i) => (
               <div key={i} className="absolute inset-x-0 border-t border-[var(--color-grille)]" style={{ top: `${(i / 2) * 100}%` }} aria-hidden />
             ))}
-            <svg className="absolute inset-0 size-full overflow-visible" viewBox={`0 0 100 ${hauteur}`} preserveAspectRatio="none" aria-hidden>
+            <svg className="trace-ligne absolute inset-0 size-full overflow-visible" viewBox={`0 0 100 ${hauteur}`} preserveAspectRatio="none" aria-hidden>
               {series.map((s) => (
                 <polyline
                   key={s.nom}
@@ -477,7 +477,8 @@ export function GraphiqueLignes({
               (i % pas === 0 && n - 1 - i >= pas / 2) || i === n - 1 ? (
                 <span
                   key={i}
-                  className="chiffre absolute whitespace-nowrap"
+                  // Sur un téléphone, seulement la première et la dernière date : les autres se chevaucheraient.
+                  className={`chiffre absolute whitespace-nowrap ${i !== 0 && i !== n - 1 ? 'hidden sm:inline' : ''}`}
                   style={{ left: `${x(i)}%`, transform: i === 0 ? 'none' : i === n - 1 ? 'translateX(-100%)' : 'translateX(-50%)' }}
                 >
                   {e}

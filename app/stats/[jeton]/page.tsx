@@ -1,30 +1,51 @@
 import type { Metadata } from 'next'
+import localFont from 'next/font/local'
 import { notFound, redirect } from 'next/navigation'
 import { dossierDuJeton } from '@/lib/lien-stats'
 import { dossier as lireDossier } from '@/lib/requetes/dossiers'
 import { listerCartes, tapsParCarte, totaux } from '@/lib/requetes/cartes'
+import { cleAvis } from '@/lib/avis-manuels'
 import { requete } from '@/lib/db'
 import StatsTaps from '@/components/stats-taps'
 import SectionAvis from '@/components/section-avis'
-import SelecteurJours, { joursDepuis } from '@/components/selecteur-jours'
-import { Evolution, Tuile, depuis, nombreFr } from '@/components/tuiles-cartes'
+import AnimationsClient from '@/components/animations-client'
+import { PERIODES, joursDepuis } from '@/components/selecteur-jours'
+import { depuis } from '@/components/tuiles-cartes'
 
 export const dynamic = 'force-dynamic'
 
+// Les polices du site taporacards.com, servies par l'application elle-même.
+const fraunces = localFont({
+  src: [
+    { path: '../../polices/fraunces.woff2', style: 'normal', weight: '100 900' },
+    { path: '../../polices/fraunces-italique.woff2', style: 'italic', weight: '100 900' },
+  ],
+  variable: '--police-fraunces',
+  display: 'swap',
+})
+const inter = localFont({ src: '../../polices/inter.woff2', weight: '100 900', variable: '--police-inter', display: 'swap' })
+
 /**
- * Les statistiques d'un commerce, vues par le commerce lui-même.
+ * Les statistiques d'un commerce, vues par le commerce lui-même — aux
+ * couleurs et avec les animations du site taporacards.com.
  *
  * Publique, mais fermée : le jeton (HMAC, lib/lien-stats.ts) n'ouvre QUE ce
- * dossier. La page ne montre que des agrégats de ses propres cartes — ni
- * destination, ni code, ni note interne, ni lien vers le back-office (le
- * menu n'existe que pour une session ouverte). Elle n'est pas indexée et
- * n'envoie pas son adresse aux sites vers lesquels elle pointe.
+ * dossier. Uniquement des agrégats de ses propres cartes — ni destination,
+ * ni code, ni note interne, ni lien vers le back-office (le menu n'existe que
+ * pour une session ouverte). Pas d'indexation, pas d'adresse transmise aux
+ * sites vers lesquels elle pointe.
  */
 export const metadata: Metadata = {
   title: 'Vos statistiques — Tapora Cards',
   robots: { index: false, follow: false, nocache: true },
   referrer: 'no-referrer',
 }
+
+// Pose la classe « attente » avant le premier affichage (voir globals.css) ;
+// filet de sécurité : tout réapparaît au bout de 2,5 s quoi qu'il arrive.
+const ANTI_ECLAIR = `(function(){try{if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;var r=document.documentElement;r.classList.add('attente');setTimeout(function(){r.classList.remove('attente')},2500)}catch(e){}})()`
+
+const nombre = new Intl.NumberFormat('fr-CA')
 
 export default async function StatsClient({
   params,
@@ -52,10 +73,13 @@ export default async function StatsClient({
   ])
   const actives = cartes.filter((c) => c.actif)
   const classement = actives
-    .map((c) => ({ libelle: c.libelle, periode: parCarte[c.id]?.courant ?? 0, total: c.taps_total, dernier: c.dernier_tap }))
+    .map((c) => ({ libelle: c.libelle, periode: parCarte[c.id]?.courant ?? 0, total: c.taps_total }))
     .sort((a, b) => b.periode - a.periode || b.total - a.total)
   const max = Math.max(1, ...classement.map((c) => c.periode))
   const chemin = `/stats/${jeton}`
+  const ecart = t.precedent > 0 ? Math.round(((t.courant - t.precedent) / t.precedent) * 100) : null
+  const moyenne = Math.round((t.courant / jours) * 10) / 10
+  const partQr = t.courant ? Math.round((t.qr / t.courant) * 100) : 0
 
   async function desabonner(donnees: FormData) {
     'use server'
@@ -68,72 +92,139 @@ export default async function StatsClient({
   }
 
   return (
-    <div className="mx-auto max-w-5xl space-y-5">
-      <header className="flex flex-wrap items-end justify-between gap-3 border-b border-[var(--color-ligne)] pb-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-encre-doux)]">Tapora Cards · statistiques</p>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight">{d.nom}</h1>
-          <p className="mt-0.5 text-sm text-[var(--color-encre-doux)]">
-            {actives.length} carte{actives.length > 1 ? 's' : ''} active{actives.length > 1 ? 's' : ''} · mis à jour en direct
-          </p>
+    <div className={`${fraunces.variable} ${inter.variable} theme-client`}>
+      <script dangerouslySetInnerHTML={{ __html: ANTI_ECLAIR }} />
+      <AnimationsClient>
+        <div className="mx-auto max-w-5xl space-y-6 pb-10">
+          {/* ---- Haut de page */}
+          <header className="pt-4">
+            <div className="flex flex-wrap items-center justify-between gap-4" data-intro>
+              <a href="https://taporacards.com" className="flex items-center gap-2.5" aria-label="Tapora Cards">
+                <svg viewBox="0 0 64 64" className="size-8" aria-hidden>
+                  <rect width="64" height="64" rx="18" fill="#c2552f" />
+                  <g fill="none" stroke="#fffaf2" strokeWidth="5" strokeLinecap="round">
+                    <path d="M25 22a14 14 0 0 1 0 20" />
+                    <path d="M33 15a23 23 0 0 1 0 34" />
+                    <path d="M41 9a31 31 0 0 1 0 46" opacity=".55" />
+                  </g>
+                  <circle cx="17.5" cy="32" r="4.2" fill="#fffaf2" />
+                </svg>
+                <span className="titre-client text-xl font-semibold">Tapora</span>
+              </a>
+              <nav className="flex rounded-full bg-[#ede3d3] p-1 text-sm" aria-label="Période">
+                {PERIODES.map((p) => (
+                  <a
+                    key={p}
+                    href={`${chemin}?p=${p}`}
+                    aria-current={p === jours ? 'page' : undefined}
+                    className={`rounded-full px-4 py-1.5 font-medium transition ${
+                      p === jours ? 'bg-[#2a211a] text-[#fffaf2]' : 'text-[#6b5d50] hover:text-[#2a211a]'
+                    }`}
+                  >
+                    {p} jours
+                  </a>
+                ))}
+              </nav>
+            </div>
+            <p className="mt-12 text-sm font-medium text-[#6b5d50]" data-intro>
+              <span className="text-[#c2552f]">♥</span> Vos statistiques, en direct
+            </p>
+            <h1 className="titre-client mt-3 text-5xl font-medium leading-[1.05] sm:text-6xl" data-mots>
+              {d.nom}
+            </h1>
+            <p className="mt-4 max-w-xl text-lg text-[#6b5d50]" data-intro>
+              {actives.length} carte{actives.length > 1 ? 's' : ''} sur place · chaque tap compte, dès la seconde où il arrive.
+            </p>
+          </header>
+
+          {sp.desabonne && (
+            <p className="rounded-2xl bg-[#e3efe7] px-5 py-4 text-sm font-medium text-[#2f6b4f]">
+              C’est noté : vous ne recevrez plus le rapport mensuel. Cette page reste accessible.
+            </p>
+          )}
+
+          {/* ---- Les chiffres clés */}
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <div className="carte col-span-2 p-6" data-tuile>
+              <p className="text-sm text-[#6b5d50]">Taps, {jours} derniers jours</p>
+              <p className="titre-client mt-1 text-6xl font-medium sm:text-7xl">
+                <span data-compteur={t.courant}>{nombre.format(t.courant)}</span>
+              </p>
+              <p className={`mt-2 text-sm font-medium ${ecart === null || ecart === 0 ? 'text-[#6b5d50]' : ecart > 0 ? 'text-[#2f6b4f]' : 'text-[#b0402a]'}`}>
+                {ecart === null
+                  ? t.courant > 0
+                    ? '▲ vos premiers taps'
+                    : 'Les premiers taps arrivent bientôt'
+                  : ecart === 0
+                    ? '= stable par rapport à la période précédente'
+                    : `${ecart > 0 ? '▲ +' : '▼ −'}${Math.abs(ecart)} % par rapport aux ${jours} jours précédents`}
+              </p>
+            </div>
+            <div className="carte p-5 sm:p-6" data-tuile>
+              <p className="text-sm text-[#6b5d50]">Par jour, en moyenne</p>
+              <p className="titre-client mt-1 text-4xl font-medium">
+                <span data-compteur={moyenne}>{moyenne.toLocaleString('fr-CA')}</span>
+              </p>
+              <p className="mt-2 text-sm text-[#6b5d50]">dernier tap {depuis(t.dernier_tap)}</p>
+            </div>
+            <div className="carte p-5 sm:p-6" data-tuile>
+              <p className="text-sm text-[#6b5d50]">Par code QR</p>
+              <p className="titre-client mt-1 text-4xl font-medium">
+                <span data-compteur={partQr}>{partQr}</span> %
+              </p>
+              <p className="mt-2 text-sm text-[#6b5d50]">le reste par la puce NFC</p>
+            </div>
+          </div>
+
+          <div data-bloc>
+            <SectionAvis
+              placeIds={[...places.map((p) => p.place_id), cleAvis({ type: 'dossier', id: d.id })]}
+              jours={jours}
+              tapsPeriode={t.courant}
+              pourClient
+            />
+          </div>
+
+          {classement.length > 1 && (
+            <section className="carte p-6">
+              <h2>Vos cartes</h2>
+              <p className="mt-0.5 text-xs text-[#6b5d50]">Taps sur {jours} jours, et depuis la pose</p>
+              <ul className="mt-5 space-y-3">
+                {classement.map((c, i) => (
+                  <li key={i} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 text-sm sm:grid-cols-[12rem_minmax(0,1fr)_auto]">
+                    <span className="truncate font-medium">{c.libelle}</span>
+                    <span className="hidden h-2.5 overflow-hidden rounded-full bg-[#ece2d2] sm:block" aria-hidden>
+                      <span data-jauge className="block h-full rounded-full bg-[#c2552f]" style={{ width: `${(c.periode / max) * 100}%` }} />
+                    </span>
+                    <span className="text-right tabular-nums">
+                      <strong>{nombre.format(c.periode)}</strong>
+                      <span className="text-xs text-[#6b5d50]"> · {nombre.format(c.total)} au total</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          <StatsTaps portee={{ dossier: d.id }} jours={jours} totaux={t} />
+
+          <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-dashed border-[#e2d6c3] pt-6 text-sm text-[#6b5d50]">
+            <span>
+              Fait avec soin par{' '}
+              <a href="https://taporacards.com" className="titre-client font-semibold text-[#2a211a] hover:text-[#c2552f]">
+                Tapora Cards
+              </a>{' '}
+              · aucune donnée personnelle de vos clients n’est conservée
+            </span>
+            {d.rapport_mensuel && (
+              <form action={desabonner}>
+                <input type="hidden" name="jeton" value={jeton} />
+                <button className="hover:text-[#2a211a] hover:underline">Ne plus recevoir le rapport mensuel</button>
+              </form>
+            )}
+          </footer>
         </div>
-        <SelecteurJours chemin={chemin} jours={jours} />
-      </header>
-
-      {sp.desabonne && (
-        <p className="carte border-[var(--color-positif)] bg-green-50 px-4 py-3 text-sm font-medium text-[var(--color-positif)]">
-          C’est noté : vous ne recevrez plus le rapport mensuel. Cette page reste accessible.
-        </p>
-      )}
-
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="carte p-4">
-          <div className="text-xs font-medium text-[var(--color-encre-doux)]">Taps, {jours} derniers jours</div>
-          <div className="mt-1 text-5xl font-semibold tracking-tight" style={{ fontVariantNumeric: 'proportional-nums' }}>{nombreFr.format(t.courant)}</div>
-          <div className="mt-1.5"><Evolution courant={t.courant} precedent={t.precedent} libelle={`vs ${jours} j précédents`} /></div>
-        </div>
-        <Tuile libelle="Moyenne par jour" valeur={(t.courant / jours).toLocaleString('fr-CA', { maximumFractionDigits: 1 })} sous={<span className="text-xs text-[var(--color-encre-doux)]">sur {jours} jours</span>} />
-        <Tuile libelle="Dernier tap" valeur={depuis(t.dernier_tap)} />
-        <Tuile libelle="Par code QR" valeur={`${t.courant ? Math.round((t.qr / t.courant) * 100) : 0} %`} sous={<span className="text-xs text-[var(--color-encre-doux)]">le reste par la puce NFC</span>} />
-      </div>
-
-      <SectionAvis placeIds={places.map((p) => p.place_id)} jours={jours} tapsPeriode={t.courant} pourClient />
-
-      {classement.length > 1 && (
-        <section className="carte p-5">
-          <h2 className="text-sm font-semibold">Vos cartes</h2>
-          <ul className="mt-3 space-y-2">
-            {classement.map((c, i) => (
-              <li key={i} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 text-sm sm:grid-cols-[12rem_minmax(0,1fr)_auto]">
-                <span className="truncate font-medium">{c.libelle}</span>
-                <span className="hidden h-2 overflow-hidden rounded-r bg-[var(--color-grille)] sm:block" aria-hidden>
-                  <span className="block h-full rounded-r bg-[var(--color-serie-1)]" style={{ width: `${(c.periode / max) * 100}%` }} />
-                </span>
-                <span className="chiffre text-right">
-                  <strong>{nombreFr.format(c.periode)}</strong>
-                  <span className="text-xs text-[var(--color-encre-doux)]"> · {nombreFr.format(c.total)} au total</span>
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      <StatsTaps portee={{ dossier: d.id }} jours={jours} totaux={t} />
-
-      <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--color-ligne)] pt-4 text-xs text-[var(--color-encre-doux)]">
-        <span>
-          Propulsé par{' '}
-          <a href="https://taporacards.com" className="font-semibold text-[var(--color-encre)] hover:underline">Tapora Cards</a>
-          {' '}· aucune donnée personnelle de vos clients n’est conservée
-        </span>
-        {d.rapport_mensuel && (
-          <form action={desabonner}>
-            <input type="hidden" name="jeton" value={jeton} />
-            <button className="hover:underline">Ne plus recevoir le rapport mensuel</button>
-          </form>
-        )}
-      </footer>
+      </AnimationsClient>
     </div>
   )
 }

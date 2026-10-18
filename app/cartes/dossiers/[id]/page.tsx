@@ -14,6 +14,8 @@ import {
 import { creerCartesEnLot, listerCartes, tapsParCarte, tendances, totaux } from '@/lib/requetes/cartes'
 import { listerClients } from '@/lib/requetes/ventes'
 import { enregistrerFiche, placesConfigure } from '@/lib/avis-google'
+import { cleAvis, suiviPour } from '@/lib/avis-manuels'
+import { LigneSuivi } from '@/components/suivi-avis'
 import { premierReleve } from '@/lib/saisie-carte'
 import { urlStats } from '@/lib/lien-stats'
 import { baseCartesAffichee } from '@/lib/cartes-url'
@@ -63,7 +65,7 @@ export default async function FicheDossier({
   const d = await lireDossier(id)
   if (!d) notFound()
 
-  const [cartes, sansDossier, t, parCarte, courbes, clients, base, historique, moisDernier] = await Promise.all([
+  const [cartes, sansDossier, t, parCarte, courbes, clients, base, historique, moisDernier, suivi] = await Promise.all([
     listerCartes(d.id),
     listerCartes().then((toutes) => toutes.filter((c) => !c.dossier_id)),
     totaux({ dossier: d.id }, jours),
@@ -73,10 +75,12 @@ export default async function FicheDossier({
     baseCartesAffichee(),
     historiqueRapports(d.id),
     moisPrecedent(),
+    suiviPour({ type: 'dossier', id: d.id }),
   ])
   const peutEcrire = moi.role !== 'lecture'
   const actives = cartes.filter((c) => c.actif)
   const placeIds = [...new Set(cartes.map((c) => c.place_id).filter(Boolean) as string[])]
+  const avisIds = [...placeIds, cleAvis({ type: 'dossier', id: d.id })]
   const lien = urlStats(d.id, d.version_lien, base)
   const courrielClient = clients.find((c) => c.id === d.client_id)?.courriel ?? null
   const destinataire = d.courriel_rapport ?? courrielClient
@@ -191,7 +195,14 @@ export default async function FicheDossier({
         <Tuile libelle="Dernier tap" valeur={depuis(t.dernier_tap)} sous={<span className="text-xs text-[var(--color-encre-doux)]">{t.courant ? Math.round((t.qr / t.courant) * 100) : 0} % par code QR</span>} />
       </div>
 
-      <SectionAvis placeIds={placeIds} jours={jours} tapsPeriode={t.courant} />
+      {peutEcrire && suivi && (
+        <section id="avis" className="carte scroll-mt-4 px-5 py-2">
+          <h2 className="pt-2 text-sm font-semibold">Avis Google</h2>
+          <LigneSuivi s={suivi} retour={ici} avecNom={false} />
+        </section>
+      )}
+
+      <SectionAvis placeIds={avisIds} jours={jours} tapsPeriode={t.courant} />
 
       <TableauCartes
         cartes={cartes}

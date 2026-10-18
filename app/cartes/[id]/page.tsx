@@ -8,6 +8,8 @@ import { nomsDossiers } from '@/lib/requetes/dossiers'
 import { placesConfigure } from '@/lib/avis-google'
 import { preparerCarte, premierReleve } from '@/lib/saisie-carte'
 import SectionAvis from '@/components/section-avis'
+import { cleAvis, suiviPour } from '@/lib/avis-manuels'
+import { LigneSuivi } from '@/components/suivi-avis'
 import { baseCartesAffichee, baseCartesConfiguree, urlPuce, urlQr } from '@/lib/cartes-url'
 import StatsTaps from '@/components/stats-taps'
 import SelecteurJours, { joursDepuis } from '@/components/selecteur-jours'
@@ -32,11 +34,13 @@ export default async function FicheCarte({
   const c = await carte(id)
   if (!c) notFound()
 
-  const [t, derniers, dossiers, base] = await Promise.all([
+  const [t, derniers, dossiers, base, suivi] = await Promise.all([
     totaux({ carte: c.id }, jours),
     derniersTaps(c.id, 12),
     nomsDossiers(),
     baseCartesAffichee(),
+    // Une carte d'un dossier suit les avis du dossier ; seule une carte isolée a les siens.
+    c.dossier_id ? Promise.resolve(null) : suiviPour({ type: 'carte', id: c.id }),
   ])
   const adressePuce = urlPuce(base, c.code)
   const adresseQr = urlQr(base, c.code)
@@ -195,7 +199,21 @@ export default async function FicheCarte({
         />
       </div>
 
-      <SectionAvis placeIds={c.place_id ? [c.place_id] : []} jours={jours} tapsPeriode={t.courant} />
+      {peutEcrire && suivi && (
+        <section id="avis" className="carte scroll-mt-4 px-5 py-2">
+          <h2 className="pt-2 text-sm font-semibold">Avis Google</h2>
+          <LigneSuivi s={suivi} retour={`/cartes/${c.id}`} avecNom={false} />
+        </section>
+      )}
+
+      <SectionAvis
+        placeIds={[
+          ...(c.place_id ? [c.place_id] : []),
+          cleAvis(c.dossier_id ? { type: 'dossier', id: c.dossier_id } : { type: 'carte', id: c.id }),
+        ]}
+        jours={jours}
+        tapsPeriode={t.courant}
+      />
 
       <StatsTaps portee={{ carte: c.id }} jours={jours} totaux={t} />
 

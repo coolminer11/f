@@ -334,36 +334,20 @@ Render, rien d'autre à toucher.
 Au-delà de 100 000 requêtes par jour : Workers Paid, 5 $ US par mois pour
 10 millions. Rien à changer dans le code.
 
-## 7. Avis Google — suivre le nombre d'avis et la note
+## 7. Avis Google — saisis à la main, une fois par semaine
 
-Facultatif. Sans clé, tout fonctionne ; les écrans disent « non branché ».
+Gratuit, sans clé ni carte de crédit. Chaque semaine, l'écran **Cartes**
+affiche « Avis Google : N commerces à mettre à jour ». Pour chacun : **Voir
+sur Google ↗**, lire le nombre d'avis et la note, les taper, **Enregistrer**
+(dix secondes). Le compte à rebours repart pour 7 jours.
 
-Google exige une carte de crédit au dossier pour activer l'API, même dans
-la part gratuite. L'application garantit 0 $ : un relevé par semaine et par
-fiche (~4 lectures par commerce et par mois, soit ~200 commerces sous la
-part gratuite), et un plafond dur de 900 lectures et 400 recherches par
-mois, compté en base avant chaque appel. L'écran **État** affiche le mois.
+Le relevé se fait par dossier (une carte sans dossier a le sien). Tout le
+reste en découle : tuiles « avis gagnés », courbe des avis, page du client,
+rapport mensuel.
 
-1. **Google Cloud** (le même projet que pour Gmail) → **API et services →
-   Bibliothèque** → « **Places API (New)** » → **Activer**. Google demande
-   d'associer un compte de facturation : suivre ses étapes.
-2. **API et services → Identifiants → Créer des identifiants → Clé API**.
-3. Sur la clé :
-   - **Restrictions relatives aux API → Restreindre la clé → Places API
-     (New)** seulement ;
-   - **Restrictions relatives aux applications → Adresses IP** → coller les
-     adresses sortantes de Render (Render → le service → **Connect** →
-     **Outbound** → les plages d'IP affichées). Une clé volée ne marchera
-     alors depuis nulle part ailleurs.
-   - **Enregistrer**.
-4. **Facturation → Budgets et alertes** → un budget de 1 $ avec alerte par
-   courriel : un filet, au cas où.
-5. **Render → Environment** : `GOOGLE_PLACES_CLE` = la clé → Save, rebuild,
-   and deploy. Ne la collez nulle part ailleurs.
-
-Ensuite : dans une carte, **Modifier → Fiche Google → Chercher** le
-commerce. Le premier relevé est pris tout de suite ; les suivants arrivent
-seuls chaque semaine, avec le réveil de cron-job.org.
+L'intégration automatique (API Places de Google) reste dans le code
+(`lib/avis-google.ts`), éteinte : elle ne s'active que si la variable
+`GOOGLE_PLACES_CLE` existe — ce qui demande une carte de crédit chez Google.
 
 ## 8. Dossiers, lien client et rapport mensuel
 

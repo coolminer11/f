@@ -5,6 +5,7 @@ import { emetteur } from '@/lib/requetes/ventes'
 import { dossier as lireDossier } from '@/lib/requetes/dossiers'
 import { urlStats } from '@/lib/lien-stats'
 import { resumeAvisMois } from '@/lib/avis-google'
+import { cleAvis } from '@/lib/avis-manuels'
 
 /**
  * Le rapport mensuel d'un dossier : un courriel le 1er du mois, qui résume le
@@ -95,7 +96,7 @@ export async function donneesRapport(dossierId: string, mois: string): Promise<D
     meilleur_jour: meilleur,
     par_jour: parJour,
     cartes,
-    avis: await resumeAvisMois(places.map((p) => p.place_id), mois),
+    avis: await resumeAvisMois([...places.map((p) => p.place_id), cleAvis({ type: 'dossier', id: dossierId })], mois),
   }
 }
 
