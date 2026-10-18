@@ -16,9 +16,12 @@ import { masquer, secret } from '@/lib/secrets'
  * part jusqu'au mois suivant. Les plafonds sont sous la part gratuite, avec
  * de la marge : la facture reste à 0 $, quoi qu'il arrive.
  *
- * Le rythme s'adapte : avec 10 fiches, un relevé par jour ; avec 60, un tous
- * les deux jours ; et ainsi de suite, pour tenir sous le plafond.
+ * Un relevé par semaine et par fiche : le nombre d'avis bouge lentement, et
+ * c'est ~4 lectures par commerce et par mois — de quoi suivre environ 200
+ * commerces dans la part gratuite. Au-delà de 200, le rythme s'espace tout
+ * seul pour tenir sous le plafond.
  */
+const JOURS_ENTRE_RELEVES = 7
 const PLAFOND_DETAILS = 900
 const PLAFOND_RECHERCHE = 400
 const DELAI_MS = 8_000
@@ -139,7 +142,7 @@ export async function releverAvisSiNecessaire(): Promise<void> {
     `with suivies as (
        select distinct place_id from cartes_nfc where actif and place_id is not null
      ), rythme as (
-       select greatest(1, ceil(count(*) * 31.0 / $1))::int as jours from suivies
+       select greatest($2::int, ceil(count(*) * 31.0 / $1))::int as jours from suivies
      )
      select s.place_id
        from suivies s cross join rythme r
@@ -149,7 +152,7 @@ export async function releverAvisSiNecessaire(): Promise<void> {
            and a.jour > (now() at time zone 'America/Toronto')::date - r.jours
       )
       limit 20`,
-    [PLAFOND_DETAILS],
+    [PLAFOND_DETAILS, JOURS_ENTRE_RELEVES],
   )
   for (const f of fiches) {
     try {

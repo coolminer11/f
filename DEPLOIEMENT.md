@@ -338,26 +338,32 @@ Au-delà de 100 000 requêtes par jour : Workers Paid, 5 $ US par mois pour
 
 Facultatif. Sans clé, tout fonctionne ; les écrans disent « non branché ».
 
+Google exige une carte de crédit au dossier pour activer l'API, même dans
+la part gratuite. L'application garantit 0 $ : un relevé par semaine et par
+fiche (~4 lectures par commerce et par mois, soit ~200 commerces sous la
+part gratuite), et un plafond dur de 900 lectures et 400 recherches par
+mois, compté en base avant chaque appel. L'écran **État** affiche le mois.
+
 1. **Google Cloud** (le même projet que pour Gmail) → **API et services →
-   Bibliothèque** → « **Places API (New)** » → **Activer**.
+   Bibliothèque** → « **Places API (New)** » → **Activer**. Google demande
+   d'associer un compte de facturation : suivre ses étapes.
 2. **API et services → Identifiants → Créer des identifiants → Clé API**.
-3. Sur la clé : **Restrictions relatives aux API → Restreindre la clé →
-   Places API (New)** seulement → Enregistrer. Une clé volée ne pourra rien
-   faire d'autre.
-4. Ceinture et bretelles : **Places API (New) → Quotas** → limiter
-   « requests per day » à **60**. Et **Facturation → Budgets et alertes** →
-   un budget de 1 $ avec alerte par courriel.
+3. Sur la clé :
+   - **Restrictions relatives aux API → Restreindre la clé → Places API
+     (New)** seulement ;
+   - **Restrictions relatives aux applications → Adresses IP** → coller les
+     adresses sortantes de Render (Render → le service → **Connect** →
+     **Outbound** → les plages d'IP affichées). Une clé volée ne marchera
+     alors depuis nulle part ailleurs.
+   - **Enregistrer**.
+4. **Facturation → Budgets et alertes** → un budget de 1 $ avec alerte par
+   courriel : un filet, au cas où.
 5. **Render → Environment** : `GOOGLE_PLACES_CLE` = la clé → Save, rebuild,
    and deploy. Ne la collez nulle part ailleurs.
 
-L'application plafonne elle-même ses appels (900 lectures et 400
-recherches par mois, compteur en base, sous la part gratuite de Google) ;
-l'écran **État** affiche où en est le mois. Le rythme des relevés s'adapte
-au nombre de fiches suivies pour ne jamais dépasser ce plafond.
-
 Ensuite : dans une carte, **Modifier → Fiche Google → Chercher** le
-commerce. Le premier relevé est pris tout de suite ; les suivants
-arrivent seuls, avec le réveil de cron-job.org.
+commerce. Le premier relevé est pris tout de suite ; les suivants arrivent
+seuls chaque semaine, avec le réveil de cron-job.org.
 
 ## 8. Dossiers, lien client et rapport mensuel
 
