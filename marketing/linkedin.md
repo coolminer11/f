@@ -225,7 +225,7 @@ Joindre 2 ou 3 captures : la page client, le mode comptoir, une image de palier.
 | `banniere-perso-clair-en.png` / `-sombre-en` | Même chose, si votre profil est en anglais |
 | `banniere-page-clair-fr.png` / `-sombre-fr` | Page Tapora Cards → Modifier la page → Image de couverture |
 | `banniere-page-*-en.png` | Version anglaise de la page (Gérer les langues) |
-| `logo-carre-fr.png` / `logo-carre-en.png` | Logo de la page Tapora Cards (carré : le sceau remplit la case) |
+| `logo-carre-1…4-fr.png` / `-en.png` | Logo de la page Tapora Cards, 4 styles au choix (voir `logos-carres-comparaison.png`) : 1 sceau sur papier, 2 soleil sur terre cuite (le plus lisible en petit), 3 sceau + « Tapora Cards », 4 sceau de nuit |
 
 Astuce : l'un de vous prend la version claire et l'autre la sombre. Les deux
 profils se distinguent, et l'ensemble reste cohérent. La photo de profil
