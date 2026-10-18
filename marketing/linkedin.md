@@ -212,3 +212,105 @@ Joindre 2 ou 3 captures : la page client, le mode comptoir, une image de palier.
 > https://taporacards.com/en/guides/more-google-reviews
 >
 > #GoogleReviews #LocalMarketing #SmallBusiness
+
+---
+
+## 4. Le nouveau logo : bannières et publications
+
+### Bannières (dossier `marketing/linkedin/`)
+
+| Fichier | Où le mettre |
+|---|---|
+| `banniere-perso-clair-fr.png` / `-sombre-fr` | Vos profils (Julien et Arthur) → crayon sur la bannière |
+| `banniere-perso-clair-en.png` / `-sombre-en` | Même chose, si votre profil est en anglais |
+| `banniere-page-clair-fr.png` / `-sombre-fr` | Page Tapora Cards → Modifier la page → Image de couverture |
+| `banniere-page-*-en.png` | Version anglaise de la page (Gérer les langues) |
+| `marque/png/sceau-fr.png` | Logo de la page Tapora Cards |
+
+Astuce : l'un de vous prend la version claire et l'autre la sombre. Les deux
+profils se distinguent, et l'ensemble reste cohérent. La photo de profil
+cache le coin en bas à gauche : rien d'important n'y est placé.
+
+### Publication 5 — Le dévoilement (image : `publication-logo-fr.png`)
+
+> On a un nouveau logo, et il a une histoire ☀️
+>
+> On l'appelle le sceau soleil. Chaque détail veut dire quelque chose :
+>
+> ⭐ L'étoile, c'est l'avis 5 étoiles que vos clients laissent.
+> 🌈 Les arcs, ce sont les ondes NFC de la carte, redessinées en arc rétro.
+> 🔴 Le sceau, c'est notre signature : une entreprise d'ici, et fière de l'être.
+>
+> Et autour, notre promesse en une ligne : un tap, un avis.
+>
+> On a dessiné une dizaine de pistes avant d'arriver à celle-ci. Celle-là, on l'a su tout de suite.
+>
+> Vous l'aimez ? Dites-le en commentaire. Et si votre commerce mérite plus d'avis Google, vous savez où nous trouver 👇
+>
+> taporacards.com
+>
+> #Québec #CommerceLocal #AvisGoogle #ImageDeMarque
+
+### Publication 6 — Les coulisses (carrousel)
+
+Images, dans l'ordre (toutes dans `marketing/linkedin/`) : `piste-04.png`,
+`piste-05.png`, `piste-07.png`, `finaliste-carte-arc-en-ciel.png`,
+`finaliste-sceau-soleil.png`, `planche-finale.png`, puis `publication-logo-fr.png`.
+Sur LinkedIn : « Ajouter un document » n'accepte que des PDF ; le plus simple
+est de publier ces images ensemble (jusqu'à 20 par publication).
+
+> Comment on a choisi notre logo, en 4 images 👉
+>
+> 1. On est partis de 8 idées : un T qui émet des ondes, une goutte, une étoile, un arc-en-ciel rétro, un sceau, une carte…
+> 2. On en a gardé 4 qui nous ressemblaient.
+> 3. On les a mélangées. Deux finalistes : « la carte arc-en-ciel » et « le sceau soleil ».
+> 4. Le sceau a gagné. La carte arc-en-ciel n'est pas perdue : elle devient l'emblème de nos cartes.
+>
+> Ce qu'on a appris : un bon logo se reconnaît à 16 pixels (dans l'onglet de votre navigateur) comme sur un autocollant de 10 cm. Le nôtre perd son texte en petit, mais garde son soleil.
+>
+> Vous, vous auriez choisi lequel ?
+>
+> #ImageDeMarque #Entrepreneuriat #Québec #PME
+
+### Partage depuis vos profils (Julien et Arthur)
+
+Repartagez la publication 5 avec une phrase à vous, par exemple :
+
+> Fier de ce qu'on a bâti avec [Julien / Arthur]. Nouveau logo, même mission : aider les commerces d'ici à obtenir les avis qu'ils méritent ☀️
+
+### English versions
+
+**Post 5 — The reveal** (image: `publication-logo-en.png`)
+
+> We have a new logo, and it comes with a story ☀️
+>
+> We call it the sun seal. Every detail means something:
+>
+> ⭐ The star is the 5-star review your customers leave.
+> 🌈 The arcs are the card's NFC waves, redrawn as a retro rainbow.
+> 🔴 The seal is our signature: a Québec business, and proud of it.
+>
+> And around it, our promise in one line: one tap, one review.
+>
+> We sketched about ten directions before landing here. This one, we knew right away.
+>
+> Like it? Tell us in the comments. And if your business deserves more Google reviews, you know where to find us 👇
+>
+> taporacards.com
+>
+> #Quebec #ShopLocal #GoogleReviews #Branding
+
+**Post 6 — Behind the scenes** (carousel)
+
+> How we picked our logo, in 4 images 👉
+>
+> 1. We started with 8 ideas: a T sending out waves, a drop, a star, a retro rainbow, a seal, a card…
+> 2. We kept the 4 that felt like us.
+> 3. We blended them. Two finalists: "the rainbow card" and "the sun seal".
+> 4. The seal won. The rainbow card isn't gone: it's now the emblem of our cards.
+>
+> What we learned: a good logo works at 16 pixels (your browser tab) as well as on a 10 cm sticker. Ours drops its text when small, but keeps its sun.
+>
+> Which one would you have picked?
+>
+> #Branding #Entrepreneurship #SmallBusiness
