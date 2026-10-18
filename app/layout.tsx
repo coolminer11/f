@@ -1,15 +1,30 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import Link from 'next/link'
 import { cookies } from 'next/headers'
 import EnteteBo, { type Theme } from '@/components/entete-bo'
+import InstallerApp from '@/components/installer-app'
 import { utilisateurCourant } from '@/lib/auth'
 import { fraunces, inter } from '@/app/stats/polices'
 import './globals.css'
 
-export const metadata: Metadata = {
-  title: 'Tapora — Back-office',
-  description: 'Gestion des dépenses, des profits et des comptes d’associés',
+/** App installable : le manifeste n'est annoncé qu'aux associés connectés
+ *  (et sur la page de connexion), jamais aux clients ni sur leurs documents. */
+export async function generateMetadata(): Promise<Metadata> {
+  const connecte = (await utilisateurCourant()) !== null
+  return {
+    title: 'Tapora — Back-office',
+    description: 'Gestion des dépenses, des profits et des comptes d’associés',
+    ...(connecte
+      ? {
+          manifest: '/bo-manifeste',
+          icons: { apple: '/icones/apple-touch-icon.png' },
+          appleWebApp: { capable: true, title: 'Tapora', statusBarStyle: 'default' as const },
+        }
+      : {}),
+  }
 }
+
+export const viewport: Viewport = { themeColor: '#f7f1e7', viewportFit: 'cover' }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // Le nom affiché vient de la session : la page de connexion n'en a pas.
@@ -46,6 +61,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </div>
         )}
         <main className={`mx-auto max-w-6xl px-4 py-6 ${utilisateur ? 'bo-page' : ''}`}>{children}</main>
+        {utilisateur && <InstallerApp />}
       </body>
     </html>
   )

@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import Logo from '@/components/client/logo'
 import RafraichissementAuto from '@/components/rafraichissement-auto'
+import { EVENEMENT_INSTALLER } from '@/components/installer-app'
 
 const LIENS = [
   ['/transactions', 'Transactions'],
@@ -84,6 +85,18 @@ export default function EnteteBo({ nom, lecture, theme: initial, doubleAuth }: {
           <Link href="/etat" className="lien-bo hidden rounded-md px-2 py-1 text-xs font-medium text-[var(--color-encre-doux)] sm:inline-block">
             État
           </Link>
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new Event(EVENEMENT_INSTALLER))}
+            className="bouton-installer lien-bo size-8 place-items-center rounded-full text-[var(--color-encre-doux)]"
+            title="Installer l’app sur ce téléphone"
+            aria-label="Installer l’app sur ce téléphone"
+          >
+            <svg viewBox="0 0 24 24" className="size-[18px]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="6" y="2.5" width="12" height="19" rx="2.5" />
+              <path d="M12 8v6M9.5 11.5 12 14l2.5-2.5M10.5 18.5h3" />
+            </svg>
+          </button>
           <button
             type="button"
             onClick={basculer}

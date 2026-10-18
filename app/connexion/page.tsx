@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import {
@@ -15,6 +16,13 @@ import EcranConnexion from '@/components/ecran-connexion'
 import BoutonEnvoi from '@/components/bouton-envoi'
 
 export const dynamic = 'force-dynamic'
+
+// Sur iPhone, « Sur l'écran d'accueil » depuis cette page donne la bonne icône.
+export const metadata: Metadata = {
+  manifest: '/bo-manifeste',
+  icons: { apple: '/icones/apple-touch-icon.png' },
+  appleWebApp: { capable: true, title: 'Tapora', statusBarStyle: 'default' },
+}
 
 const Connexion = z.object({
   courriel: z.string().trim().max(254).email('Courriel invalide.'),

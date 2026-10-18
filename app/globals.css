@@ -576,12 +576,11 @@ html[data-theme='tapora'] body:not(:has(.theme-client))::before {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 0;
+  z-index: -1;
   opacity: 0.35;
   mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .36 0 0 0 0 .27 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
 }
-html[data-theme='tapora'] body:not(:has(.theme-client)) > * { position: relative; z-index: 1; }
 
 /* ---- Surfaces ------------------------------------------------------------ */
 html[data-theme='tapora'] .carte {
@@ -730,3 +729,14 @@ html[data-theme='tapora'] .document-neutre .bg-white { background-color: white; 
   html[data-theme='tapora'] body { background: white !important; }
   .entete-bo, .bandeau-2fa { display: none !important; }
 }
+
+/* ---- App installée (PWA) ------------------------------------------------- */
+.bouton-installer { display: none; }
+html[data-installable] .bouton-installer { display: grid; }
+.entete-bo { padding-top: env(safe-area-inset-top); }
+.carte-installer { animation: bo-monte 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; padding-bottom: env(safe-area-inset-bottom); }
+@media (display-mode: standalone) {
+  /* Plein écran : pas de sélection de texte accidentelle sur les menus. */
+  .entete-bo { -webkit-user-select: none; user-select: none; }
+}
+@media (prefers-reduced-motion: reduce) { .carte-installer { animation: none; } }
