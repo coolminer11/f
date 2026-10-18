@@ -23,6 +23,7 @@ const NOMS_SECRETS = [
   'RESEND_API_KEY',
   'SESSION_SECRET',
   'DATABASE_URL',
+  'GOOGLE_PLACES_CLE',
 ]
 
 export function secret(nom: string): string | undefined {
@@ -47,6 +48,7 @@ export function masquer(texte: string): string {
     .replace(/GOCSPX-[\w-]+/g, 'GOCSPX-•••')
     .replace(/\b1\/\/[\w-]{20,}/g, '1//•••')
     .replace(/eyJ[\w-]{10,}\.[\w-]{10,}\.[\w-]+/g, 'eyJ•••')
+    .replace(/AIza[\w-]{30,}/g, 'AIza•••')
 }
 
 export function supabaseConfigure(): boolean {

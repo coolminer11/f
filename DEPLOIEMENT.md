@@ -334,6 +334,44 @@ Render, rien d'autre à toucher.
 Au-delà de 100 000 requêtes par jour : Workers Paid, 5 $ US par mois pour
 10 millions. Rien à changer dans le code.
 
+## 7. Avis Google — suivre le nombre d'avis et la note
+
+Facultatif. Sans clé, tout fonctionne ; les écrans disent « non branché ».
+
+1. **Google Cloud** (le même projet que pour Gmail) → **API et services →
+   Bibliothèque** → « **Places API (New)** » → **Activer**.
+2. **API et services → Identifiants → Créer des identifiants → Clé API**.
+3. Sur la clé : **Restrictions relatives aux API → Restreindre la clé →
+   Places API (New)** seulement → Enregistrer. Une clé volée ne pourra rien
+   faire d'autre.
+4. Ceinture et bretelles : **Places API (New) → Quotas** → limiter
+   « requests per day » à **60**. Et **Facturation → Budgets et alertes** →
+   un budget de 1 $ avec alerte par courriel.
+5. **Render → Environment** : `GOOGLE_PLACES_CLE` = la clé → Save, rebuild,
+   and deploy. Ne la collez nulle part ailleurs.
+
+L'application plafonne elle-même ses appels (900 lectures et 400
+recherches par mois, compteur en base, sous la part gratuite de Google) ;
+l'écran **État** affiche où en est le mois. Le rythme des relevés s'adapte
+au nombre de fiches suivies pour ne jamais dépasser ce plafond.
+
+Ensuite : dans une carte, **Modifier → Fiche Google → Chercher** le
+commerce. Le premier relevé est pris tout de suite ; les suivants
+arrivent seuls, avec le réveil de cron-job.org.
+
+## 8. Dossiers, lien client et rapport mensuel
+
+- **Cartes → Dossiers** : un dossier par commerce. Ses cartes, ses
+  statistiques, la création en lot, la liste à programmer (CSV) et la
+  planche de QR pour l'imprimeur (PDF).
+- **Lien privé du client** : la page `go.taporacards.com/stats/…` ne montre
+  que les statistiques de ce commerce. Le lien est signé avec
+  `SESSION_SECRET` : changer ce secret invalide tous les liens clients
+  (et toutes les sessions) — à ne faire qu'en cas de fuite.
+- **Rapport mensuel** : cocher « Envoyer le rapport mensuel » dans le
+  dossier. Il part le 1er du mois à partir de 9 h, par le réveil de
+  cron-job.org — qui doit donc rester actif. Jamais deux fois le même mois.
+
 ## Sauvegardes
 
 Le forfait gratuit de Supabase ne garde pas d'historique de sauvegardes long.

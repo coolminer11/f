@@ -4,7 +4,10 @@ import { revalidatePath } from 'next/cache'
 import QRCode from 'qrcode'
 import { exigerEcriture, exigerSession } from '@/lib/auth'
 import { basculerCarte, carte, derniersTaps, modifierCarte, supprimerCarte, totaux } from '@/lib/requetes/cartes'
-import { listerClients } from '@/lib/requetes/ventes'
+import { nomsDossiers } from '@/lib/requetes/dossiers'
+import { placesConfigure } from '@/lib/avis-google'
+import { preparerCarte, premierReleve } from '@/lib/saisie-carte'
+import SectionAvis from '@/components/section-avis'
 import { baseCartesAffichee, baseCartesConfiguree, urlPuce, urlQr } from '@/lib/cartes-url'
 import StatsTaps from '@/components/stats-taps'
 import SelecteurJours, { joursDepuis } from '@/components/selecteur-jours'
@@ -29,10 +32,10 @@ export default async function FicheCarte({
   const c = await carte(id)
   if (!c) notFound()
 
-  const [t, derniers, clients, base] = await Promise.all([
-    totaux(c.id, jours),
+  const [t, derniers, dossiers, base] = await Promise.all([
+    totaux({ carte: c.id }, jours),
     derniersTaps(c.id, 12),
-    listerClients(),
+    nomsDossiers(),
     baseCartesAffichee(),
   ])
   const adressePuce = urlPuce(base, c.code)
@@ -50,13 +53,9 @@ export default async function FicheCarte({
     if (!analyse.success) {
       redirect(`/cartes/${id}?erreur=${encodeURIComponent(analyse.error.issues[0].message)}`)
     }
-    const v = analyse.data
-    await modifierCarte(id, {
-      libelle: v.libelle,
-      clientId: v.client_id || null,
-      destination: v.destination,
-      note: v.note || null,
-    })
+    const saisie = await preparerCarte(analyse.data)
+    await modifierCarte(id, saisie)
+    await premierReleve(saisie.placeId)
     revalidatePath(`/cartes/${id}`)
     redirect(`/cartes/${id}?message=${encodeURIComponent('Carte mise à jour. La nouvelle destination s’applique dès le prochain tap.')}`)
   }
@@ -90,7 +89,14 @@ export default async function FicheCarte({
             </span>
           </h1>
           <p className="mt-0.5 text-sm text-[var(--color-encre-doux)]">
-            {c.client_nom ?? 'Sans client'} · code <span className="chiffre font-semibold text-[var(--color-encre)]">{c.code}</span> ·
+            {c.dossier_id ? (
+              <Link href={`/cartes/dossiers/${c.dossier_id}`} className="font-medium text-[var(--color-accent)] hover:underline">
+                {c.dossier_nom}
+              </Link>
+            ) : (
+              'Sans dossier'
+            )}{' '}
+            · code <span className="chiffre font-semibold text-[var(--color-encre)]">{c.code}</span> ·
             créée {depuis(c.cree_le)}
           </p>
         </div>
@@ -189,9 +195,11 @@ export default async function FicheCarte({
         />
       </div>
 
-      <StatsTaps carteId={c.id} jours={jours} totaux={t} />
+      <SectionAvis placeIds={c.place_id ? [c.place_id] : []} jours={jours} tapsPeriode={t.courant} />
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <StatsTaps portee={{ carte: c.id }} jours={jours} totaux={t} />
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <section className="carte p-5">
           <h2 className="text-sm font-semibold">Derniers taps</h2>
           {derniers.length === 0 ? (
@@ -230,8 +238,16 @@ export default async function FicheCarte({
             </p>
             <form action={enregistrer} className="mt-3 space-y-4">
               <ChampsCarte
-                clients={clients}
-                valeurs={{ libelle: c.libelle, client_id: c.client_id, destination: c.destination, note: c.note }}
+                dossiers={dossiers}
+                googleConfigure={placesConfigure()}
+                valeurs={{
+                  libelle: c.libelle,
+                  dossier_id: c.dossier_id,
+                  destination: c.destination,
+                  note: c.note,
+                  place_id: c.place_id,
+                  fiche_nom: c.fiche_nom,
+                }}
               />
               <button className="bouton">Enregistrer</button>
             </form>

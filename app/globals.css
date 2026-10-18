@@ -19,6 +19,24 @@
   --color-grille: #eceef2;
 }
 
+/* Couleurs utilisées seulement en style direct (style={{ background: … }}) :
+   déclarées ici, hors de @theme, parce que Tailwind n'émet une variable de
+   thème que si une classe s'en sert — sinon la carte de chaleur est blanche. */
+:root {
+  /* Slots 3 et 4 (comparaison de cartes) : validés en paires adjacentes ;
+     sous 3:1 sur blanc, d'où étiquettes directes et table de données. */
+  --color-serie-3: #1baf7a;
+  --color-serie-4: #eda100;
+  /* Rampe séquentielle (une teinte, du clair au foncé) : carte de chaleur. */
+  --color-seq-0: #f1f4f8;
+  --color-seq-1: #cde2fb;
+  --color-seq-2: #9ec5f4;
+  --color-seq-3: #6da7ec;
+  --color-seq-4: #3987e5;
+  --color-seq-5: #256abf;
+  --color-seq-6: #104281;
+}
+
 html {
   color-scheme: light;
 }

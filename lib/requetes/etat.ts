@@ -3,6 +3,7 @@ import { clientSupabase, masquer } from '@/lib/secrets'
 import { requeteUne } from '@/lib/db'
 import { transport } from '@/lib/courriel'
 import { stockageDistant } from '@/lib/stockage'
+import { placesConfigure, quotaDuMois } from '@/lib/avis-google'
 
 /**
  * État réel des trois raccordements de l'application.
@@ -130,8 +131,28 @@ async function controlerParametres(): Promise<Controle> {
       }
 }
 
+/** Avis Google : branché ou non, et où en est le plafond gratuit du mois. */
+async function controlerGoogle(): Promise<Controle> {
+  if (!placesConfigure()) {
+    return {
+      nom: 'Avis Google',
+      verdict: 'attention',
+      detail: 'Non branché : le nombre d’avis et la note ne sont pas suivis.',
+      remede: 'Ajoutez GOOGLE_PLACES_CLE chez l’hébergeur (DEPLOIEMENT.md, section 7).',
+    }
+  }
+  const q = await quotaDuMois()
+  const plein = q.details >= q.plafondDetails
+  return {
+    nom: 'Avis Google',
+    verdict: plein ? 'attention' : 'ok',
+    detail: `Ce mois-ci : ${q.details} / ${q.plafondDetails} lectures, ${q.recherche} / ${q.plafondRecherche} recherches — plafonné sous la part gratuite de Google.`,
+    remede: plein ? 'Plafond atteint : les relevés reprennent le 1er du mois. Rien n’est facturé.' : undefined,
+  }
+}
+
 export async function etatSysteme(): Promise<Controle[]> {
-  const [base, stockage, parametres] = await Promise.all([
+  const [base, stockage, parametres, google] = await Promise.all([
     controlerBase(),
     controlerStockage(),
     controlerParametres().catch(
@@ -141,6 +162,7 @@ export async function etatSysteme(): Promise<Controle[]> {
         detail: 'Table « parametres » illisible.',
       }),
     ),
+    controlerGoogle().catch((): Controle => ({ nom: 'Avis Google', verdict: 'panne', detail: 'Compteur illisible.' })),
   ])
-  return [base, stockage, controlerCourriel(), parametres]
+  return [base, stockage, controlerCourriel(), google, parametres]
 }

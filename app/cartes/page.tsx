@@ -4,7 +4,8 @@ import { listerCartes, tapsParCarte, tendances, totaux } from '@/lib/requetes/ca
 import { baseCartesConfiguree } from '@/lib/cartes-url'
 import StatsTaps from '@/components/stats-taps'
 import SelecteurJours, { joursDepuis } from '@/components/selecteur-jours'
-import { Evolution, MiniCourbe, Tuile, depuis, nombreFr } from '@/components/tuiles-cartes'
+import { Evolution, Tuile, depuis, nombreFr } from '@/components/tuiles-cartes'
+import TableauCartes from '@/components/tableau-cartes'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,7 +14,7 @@ export default async function PageCartes({ searchParams }: { searchParams: Promi
   const jours = joursDepuis((await searchParams).p)
   const [cartes, t, parCarte, courbes] = await Promise.all([
     listerCartes(),
-    totaux(null, jours),
+    totaux({}, jours),
     tapsParCarte(jours),
     tendances(14),
   ])
@@ -21,10 +22,6 @@ export default async function PageCartes({ searchParams }: { searchParams: Promi
   const actives = cartes.filter((c) => c.actif)
   const moyenne = actives.length ? Math.round(t.courant / actives.length) : 0
   const partQr = t.courant ? Math.round((t.qr / t.courant) * 100) : 0
-  const classement = [...cartes].sort(
-    (a, b) => (parCarte[b.id]?.courant ?? 0) - (parCarte[a.id]?.courant ?? 0) || b.taps_total - a.taps_total,
-  )
-  const maxPeriode = Math.max(1, ...classement.map((c) => parCarte[c.id]?.courant ?? 0))
   const libellePeriode = `vs ${jours} j précédents`
 
   return (
@@ -36,10 +33,13 @@ export default async function PageCartes({ searchParams }: { searchParams: Promi
             Chaque carte redirige vers la page de son client — et chaque tap est compté.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Link href="/cartes/direct" className="bouton bouton-secondaire">
             <span className="mr-1.5 inline-block size-2 rounded-full bg-[#0ca30c] align-middle" aria-hidden />
             En direct
+          </Link>
+          <Link href="/cartes/dossiers" className="bouton bouton-secondaire">
+            Dossiers
           </Link>
           <Link href="/cartes/nouvelle" className="bouton">
             Nouvelle carte
@@ -94,78 +94,22 @@ export default async function PageCartes({ searchParams }: { searchParams: Promi
         />
       </div>
 
-      <StatsTaps carteId={null} jours={jours} totaux={t} />
+      <StatsTaps portee={{}} jours={jours} totaux={t} />
 
-      <section className="carte overflow-hidden">
-        <div className="flex items-baseline justify-between px-5 pt-4">
-          <h2 className="text-sm font-semibold">Classement des cartes</h2>
-          <span className="text-xs text-[var(--color-encre-doux)]">{cartes.length} carte{cartes.length > 1 ? 's' : ''}</span>
-        </div>
-        {cartes.length === 0 ? (
-          <p className="px-5 py-10 text-center text-sm text-[var(--color-encre-doux)]">
+      <TableauCartes
+        cartes={cartes}
+        parCarte={parCarte}
+        courbes={courbes}
+        jours={jours}
+        vide={
+          <>
             Aucune carte pour l’instant.{' '}
             <Link href="/cartes/nouvelle" className="font-semibold text-[var(--color-accent)] hover:underline">
               Créer la première
             </Link>
-          </p>
-        ) : (
-          <div className="mt-3 overflow-x-auto">
-            <table className="w-full min-w-[52rem] text-sm">
-              <thead>
-                <tr className="border-y border-[var(--color-ligne)] bg-[var(--color-fond)] text-left text-xs uppercase tracking-wide text-[var(--color-encre-doux)]">
-                  <th className="px-4 py-2 font-semibold">#</th>
-                  <th className="px-4 py-2 font-semibold">Carte</th>
-                  <th className="px-4 py-2 font-semibold">Taps · {jours} j</th>
-                  <th className="px-4 py-2 font-semibold">Évolution</th>
-                  <th className="px-4 py-2 font-semibold">14 derniers jours</th>
-                  <th className="px-4 py-2 text-right font-semibold">Total</th>
-                  <th className="px-4 py-2 font-semibold">Dernier tap</th>
-                </tr>
-              </thead>
-              <tbody>
-                {classement.map((c, i) => {
-                  const p = parCarte[c.id] ?? { courant: 0, precedent: 0 }
-                  return (
-                    <tr key={c.id} className="border-b border-[var(--color-ligne)] last:border-0 hover:bg-[var(--color-fond)]">
-                      <td className="chiffre px-4 py-2.5 text-[var(--color-encre-doux)]">{i + 1}</td>
-                      <td className="px-4 py-2.5">
-                        <Link href={`/cartes/${c.id}`} className="font-medium hover:underline">
-                          {c.libelle}
-                        </Link>
-                        <div className="text-xs text-[var(--color-encre-doux)]">
-                          {c.client_nom ?? 'sans client'} · <span className="chiffre">{c.code}</span>
-                          {!c.actif && (
-                            <span className="ml-1.5 rounded bg-[var(--color-fond)] px-1.5 py-0.5 font-semibold">désactivée</span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-2.5">
-                        <div className="flex items-center gap-2">
-                          <span className="chiffre w-10 text-right font-semibold">{nombreFr.format(p.courant)}</span>
-                          <span className="h-2 w-28 overflow-hidden rounded-r bg-[var(--color-grille)]" aria-hidden>
-                            <span
-                              className="block h-full rounded-r bg-[var(--color-serie-1)]"
-                              style={{ width: `${(p.courant / maxPeriode) * 100}%` }}
-                            />
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-2.5">
-                        <Evolution courant={p.courant} precedent={p.precedent} libelle="" />
-                      </td>
-                      <td className="px-4 py-2.5">
-                        <MiniCourbe serie={courbes[c.id] ?? []} />
-                      </td>
-                      <td className="chiffre px-4 py-2.5 text-right">{nombreFr.format(c.taps_total)}</td>
-                      <td className="px-4 py-2.5 text-[var(--color-encre-doux)]">{depuis(c.dernier_tap)}</td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
+          </>
+        }
+      />
     </div>
   )
 }

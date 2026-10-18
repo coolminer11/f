@@ -54,3 +54,6 @@ services:
         sync: false
       - key: COURRIEL_EXPEDITEUR
         sync: false
+      # Avis Google (facultatif) — DEPLOIEMENT.md, section 7.
+      - key: GOOGLE_PLACES_CLE
+        sync: false

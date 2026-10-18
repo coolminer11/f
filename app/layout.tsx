@@ -28,6 +28,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="fr-CA">
       <body className="min-h-screen antialiased">
+        {/* Le menu n'existe que pour une session ouverte : les pages publiques
+            (connexion, document d'un client, statistiques d'un client) ne
+            montrent aucun lien vers le reste du back-office. */}
+        {utilisateur && (
         <header className="entete-application border-b border-[var(--color-ligne)] bg-white print:hidden">
           <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
             <Link href="/transactions" className="text-sm font-bold tracking-tight">
@@ -69,6 +73,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             )}
           </div>
         </header>
+        )}
         <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
       </body>
     </html>

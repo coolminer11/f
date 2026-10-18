@@ -2,15 +2,18 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { exigerEcriture, exigerSession } from '@/lib/auth'
 import { creerCarte } from '@/lib/requetes/cartes'
-import { listerClients } from '@/lib/requetes/ventes'
+import { nomsDossiers } from '@/lib/requetes/dossiers'
+import { placesConfigure } from '@/lib/avis-google'
+import { preparerCarte, premierReleve } from '@/lib/saisie-carte'
 import ChampsCarte, { SaisieCarte } from '@/components/champs-carte'
 
 export const dynamic = 'force-dynamic'
 
-export default async function NouvelleCarte({ searchParams }: { searchParams: Promise<{ erreur?: string }> }) {
+export default async function NouvelleCarte({ searchParams }: { searchParams: Promise<{ erreur?: string; dossier?: string }> }) {
   await exigerSession()
-  const { erreur } = await searchParams
-  const clients = await listerClients()
+  const { erreur, dossier } = await searchParams
+  const dossiers = await nomsDossiers()
+  const dossierParDefaut = dossiers.some((d) => d.id === dossier) ? dossier! : null
 
   async function creer(donnees: FormData) {
     'use server'
@@ -19,13 +22,9 @@ export default async function NouvelleCarte({ searchParams }: { searchParams: Pr
     if (!analyse.success) {
       redirect(`/cartes/nouvelle?erreur=${encodeURIComponent(analyse.error.issues[0].message)}`)
     }
-    const v = analyse.data
-    const id = await creerCarte({
-      libelle: v.libelle,
-      clientId: v.client_id || null,
-      destination: v.destination,
-      note: v.note || null,
-    })
+    const saisie = await preparerCarte(analyse.data)
+    const id = await creerCarte(saisie)
+    await premierReleve(saisie.placeId)
     redirect(`/cartes/${id}?nouvelle=1`)
   }
 
@@ -47,7 +46,15 @@ export default async function NouvelleCarte({ searchParams }: { searchParams: Pr
         </p>
       )}
       <form action={creer} className="carte space-y-4 p-5">
-        <ChampsCarte clients={clients} />
+        <ChampsCarte
+          dossiers={dossiers}
+          googleConfigure={placesConfigure()}
+          valeurs={
+            dossierParDefaut
+              ? { libelle: '', dossier_id: dossierParDefaut, destination: '', note: null, place_id: null, fiche_nom: null }
+              : undefined
+          }
+        />
         <button className="bouton">Créer la carte</button>
       </form>
     </div>
