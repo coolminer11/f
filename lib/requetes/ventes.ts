@@ -101,7 +101,7 @@ export async function listerDocuments(filtres: {
     valeurs.push(valeur)
     conditions.push(modele.replaceAll('?', `$${valeurs.length}`))
   }
-  if (filtres.type) ajouter('type_document = ?::type_document', filtres.type)
+  if (filtres.type) ajouter('type_document::text = ?', filtres.type)
   if (filtres.statut_paiement === 'en_retard') conditions.push('en_retard')
   else if (filtres.statut_paiement) ajouter('statut_paiement = ?', filtres.statut_paiement)
   if (filtres.recherche) ajouter('(client ilike ? or numero ilike ?)', `%${filtres.recherche}%`)

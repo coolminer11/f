@@ -40,6 +40,12 @@ export type FiltresJournal = {
 
 const PAR_PAGE = 50
 
+function dateValide(d: string | undefined): d is string {
+  if (!d || !/^\d{4}-\d{2}-\d{2}$/.test(d)) return false
+  const t = new Date(`${d}T12:00:00Z`)
+  return !Number.isNaN(t.getTime()) && t.toISOString().slice(0, 10) === d
+}
+
 export async function listerTransactions(filtres: FiltresJournal) {
   const conditions: string[] = []
   const valeurs: unknown[] = []
@@ -48,16 +54,19 @@ export async function listerTransactions(filtres: FiltresJournal) {
     conditions.push(sql.replace('?', `$${valeurs.length}`))
   }
 
-  if (filtres.debut) ajouter('date >= ?', filtres.debut)
-  if (filtres.fin) ajouter('date <= ?', filtres.fin)
-  if (filtres.type) ajouter('type = ?::type_transaction', filtres.type)
-  if (filtres.categorie) ajouter('categorie = ?::categorie_transaction', filtres.categorie)
-  if (filtres.source) ajouter('source = ?::source_transaction', filtres.source)
-  if (filtres.province) ajouter('province = ?::province_canada', filtres.province)
-  if (filtres.recherche) ajouter('description ilike ?', `%${filtres.recherche}%`)
+  // Les filtres viennent de l'adresse de la page : une valeur inconnue
+  // (« ?source=app », une date impossible) est ignorée, jamais une erreur.
+  // Les énumérations sont comparées en texte : aucune conversion ne peut échouer.
+  if (dateValide(filtres.debut)) ajouter('date >= ?', filtres.debut)
+  if (dateValide(filtres.fin)) ajouter('date <= ?', filtres.fin)
+  if (filtres.type) ajouter('type::text = ?', filtres.type)
+  if (filtres.categorie) ajouter('categorie::text = ?', filtres.categorie)
+  if (filtres.source) ajouter('source::text = ?', filtres.source)
+  if (filtres.province) ajouter('province::text = ?', filtres.province)
+  if (filtres.recherche) ajouter('description ilike ?', `%${filtres.recherche.slice(0, 200)}%`)
 
   const ou = conditions.length ? `where ${conditions.join(' and ')}` : ''
-  const page = Math.max(1, filtres.page ?? 1)
+  const page = Number.isFinite(filtres.page) ? Math.min(10_000, Math.max(1, Math.floor(filtres.page!))) : 1
 
   const lignes = await requete<LigneJournal>(
     `select * from v_journal ${ou}

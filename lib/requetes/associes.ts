@@ -62,8 +62,8 @@ export async function listerMouvements(filtres: {
     valeurs.push(valeur)
     conditions.push(modele.replaceAll('?', `$${valeurs.length}`))
   }
-  if (filtres.annee) ajouter('m.annee = ?::int', filtres.annee)
-  if (filtres.associe) ajouter('m.associe_id = ?::uuid', filtres.associe)
+  if (filtres.annee && /^\d{4}$/.test(String(filtres.annee))) ajouter('m.annee = ?::int', filtres.annee)
+  if (filtres.associe && /^[0-9a-f-]{36}$/i.test(String(filtres.associe))) ajouter('m.associe_id = ?::uuid', filtres.associe)
   if (filtres.compte) ajouter('m.compte = ?', filtres.compte)
   const ou = conditions.length ? `where ${conditions.join(' and ')}` : ''
 
@@ -173,7 +173,7 @@ export async function listerDecisions(filtres: {
   }
   if (filtres.categorie) ajouter('categorie = ?', filtres.categorie)
   if (filtres.statut) ajouter('statut_approbation = ?', filtres.statut)
-  if (filtres.annee) ajouter('extract(year from date)::int = ?::int', filtres.annee)
+  if (filtres.annee && /^\d{4}$/.test(String(filtres.annee))) ajouter('extract(year from date)::int = ?::int', filtres.annee)
   if (filtres.recherche) {
     ajouter(
       `to_tsvector('french', titre || ' ' || description || ' ' || decision)

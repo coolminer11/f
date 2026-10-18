@@ -11,7 +11,7 @@ export function GET() {
       short_name: 'Tapora',
       description: 'Ventes, dépenses, cartes et statistiques de Tapora S.E.N.C.',
       lang: 'fr-CA',
-      start_url: '/transactions?source=app',
+      start_url: '/transactions',
       scope: '/',
       display: 'standalone',
       orientation: 'portrait-primary',
