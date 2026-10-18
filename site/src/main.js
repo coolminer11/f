@@ -57,6 +57,40 @@
     }
   }
 
+  // ------------------------------------------------- calculette des prix
+  // 30 $ la carte seule, puis 27,50 $ la carte dès deux (55 $ pour deux).
+  const calculette = document.getElementById('calculette')
+  if (calculette) {
+    const fr = calculette.dataset.langue !== 'en'
+    // « 30 $ », mais « 27,50 $ » : pas de ,00 inutile.
+    const argent = { format: (v) => new Intl.NumberFormat(fr ? 'fr-CA' : 'en-CA', { style: 'currency', currency: 'CAD', currencyDisplay: 'narrowSymbol', minimumFractionDigits: Number.isInteger(v) ? 0 : 2 }).format(v) }
+    const nbEl = document.getElementById('nb-cartes')
+    const totalEl = document.getElementById('total-cartes')
+    const detailEl = document.getElementById('detail-cartes')
+    const lien = document.getElementById('commander-calcul')
+    let n = 3
+    const majPrix = (anime) => {
+      const total = n === 1 ? 30 : n * 27.5
+      const economie = n * 30 - total
+      nbEl.textContent = String(n)
+      totalEl.textContent = argent.format(total)
+      const unitaire = argent.format(total / n)
+      detailEl.textContent = fr
+        ? economie > 0 ? `${unitaire} la carte · ${argent.format(economie)} d’économie` : `${unitaire} la carte`
+        : economie > 0 ? `${unitaire} per card · you save ${argent.format(economie)}` : `${unitaire} per card`
+      const sujet = calculette.dataset.sujet
+      const corps = fr
+        ? `Bonjour,\n\nNom du commerce : \nVille : \nNombre de cartes : ${n} (${argent.format(total)})\n\nMerci !`
+        : `Hi,\n\nBusiness name: \nCity: \nNumber of cards: ${n} (${argent.format(total)})\n\nThanks!`
+      lien.href = `mailto:contact@taporacards.com?subject=${sujet}&body=${encodeURIComponent(corps)}`
+      lien.textContent = fr ? `Commander ${n} carte${n > 1 ? 's' : ''}` : `Order ${n} card${n > 1 ? 's' : ''}`
+      if (anime && !reduit) totalEl.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.08)' }, { transform: 'scale(1)' }], { duration: 320, easing: 'cubic-bezier(.2,.9,.3,1.4)' })
+    }
+    calculette.querySelector('[data-moins]').addEventListener('click', () => { if (n > 1) { n--; majPrix(true) } })
+    calculette.querySelector('[data-plus]').addEventListener('click', () => { if (n < 500) { n++; majPrix(true) } })
+    majPrix(false)
+  }
+
   // FAQ : sans animation, le comportement natif de <details> suffit.
   const faq = [...document.querySelectorAll('#faq details')]
 

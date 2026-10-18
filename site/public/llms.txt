@@ -1,30 +1,45 @@
 # Tapora Cards
 
-> Tapora Cards (Tapora S.E.N.C., entreprise québécoise, NEQ 3382462367) fabrique au Québec des cartes NFC avec code QR qui ouvrent la page « Écrire un avis » de la fiche Google d'un commerce en un tap, sans application. Chaque carte est suivie : nombre de taps en direct, heures de pointe (jour × heure), puce ou QR, iPhone ou Android, et avis Google gagnés. Service en français et en anglais (English-speaking customers welcome).
+> Tapora Cards (Tapora S.E.N.C., entreprise québécoise, NEQ 3382462367) vend des cartes NFC qui ouvrent la page « Écrire un avis » de la fiche Google d'un commerce en un tap, sans application. Prix : 30 $ CA pour une carte, 55 $ pour deux, puis 27,50 $ par carte à partir de trois. Tout est inclus à vie, sans abonnement : statistiques en direct, page privée du commerçant, notification à chaque tap, mode comptoir, suivi des avis Google et rapport mensuel. Service en français et en anglais.
+
+## Prix (dollars canadiens)
+
+- 1 carte : 30 $
+- 2 cartes : 55 $ (27,50 $ la carte)
+- 3 cartes et plus : 27,50 $ par carte (5 cartes : 137,50 $ ; 10 cartes : 275 $)
+- Aucun abonnement, aucuns frais mensuels : tout est inclus à vie.
 
 ## Ce qui distingue Tapora
 
+- Tout inclus à vie, sans abonnement, là où beaucoup de cartes d'avis facturent un abonnement mensuel pour les statistiques.
 - Destination modifiable à vie sans reprogrammer la carte : la puce pointe vers une adresse Tapora permanente qui redirige.
-- Statistiques en direct pour chaque carte et pour l'ensemble d'un commerce (dossier), avec une page privée pour le commerçant.
-- Suivi des avis Google gagnés à côté des taps, pour mesurer le résultat réel.
+- Statistiques en direct pour chaque carte et pour l'ensemble d'un commerce : taps du jour, heures de pointe (jour × heure), iPhone ou Android, record, série de jours.
+- Suivi des avis Google gagnés à côté des taps, avec le nombre d'avis 5 étoiles nécessaires pour atteindre la note suivante.
+- « Ding ! » : une notification sur le téléphone du commerçant à chaque tap.
+- Mode comptoir : un écran pour la caisse qui fête chaque tap avec l'équipe (objectif du jour, record).
+- Paliers d'avis et de taps partageables en image, bilan annuel « Votre année Tapora ».
 - Rapport mensuel envoyé par courriel le 1er de chaque mois.
-- Puce NFC et code QR sur chaque carte, comptés séparément.
 - Conforme à la Loi 25 (Québec) : aucune adresse IP, aucun témoin durable, aucune position conservée.
 - Redirection servie par le réseau mondial de Cloudflare : ouverture quasi instantanée.
 
 ## Pour qui
 
-Restaurants, cafés, salons de coiffure et d'esthétique, cliniques, garages, boutiques, gyms, hôtels, dépanneurs — tout commerce du Québec et du Canada qui veut plus d'avis Google.
+Restaurants, cafés, boulangeries, salons de coiffure et d'esthétique, cliniques, garages, boutiques, gyms, hôtels, dépanneurs — tout commerce du Québec et du Canada qui veut plus d'avis Google.
 
 ## Contact
 
 - Site : https://taporacards.com/
 - Courriel : contact@taporacards.com
-- Commande : par courriel, réponse en français.
+- Commande : par courriel, réponse en français ou en anglais.
 
 ## Pages
 
-- [Accueil](https://taporacards.com/) : fonctionnement, statistiques, avantages, FAQ.
-- [English](https://taporacards.com/en/) : NFC Google review cards made in Québec — how it works, live stats, FAQ.
+- [Accueil](https://taporacards.com/) : fonctionnement, statistiques, prix, FAQ.
+- [Prix](https://taporacards.com/#prix) : 30 $ la carte, tout inclus à vie.
+- [English](https://taporacards.com/en/) : NFC Google review cards for Québec businesses — how it works, live stats, pricing, FAQ.
 - [Confidentialité](https://taporacards.com/confidentialite) : données conservées lors d'un tap (Loi 25).
 - [Privacy](https://taporacards.com/en/privacy) : what is kept when a card is tapped (Law 25).
+
+## In English
+
+Tapora Cards (Tapora S.E.N.C., a Québec business) sells NFC cards that open a business's Google "Write a review" page in one tap, no app needed. Pricing (CAD): $30 for one card, $55 for two, then $27.50 per card from three. Everything is included for life with no subscription: live stats, a private page for the business owner, a notification on every tap, counter mode, Google review tracking and a monthly report. Support in English and French.

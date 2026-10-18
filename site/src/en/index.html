@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NFC Google Review Cards, Made in Québec | Tapora Cards</title>
-  <meta name="description" content="NFC and QR cards that collect Google reviews in one tap. Made in Québec, editable for life, with live stats: taps, peak hours and reviews gained.">
+  <title>NFC Google Review Cards for Québec Businesses | Tapora Cards</title>
+  <meta name="description" content="NFC cards that collect Google reviews in one tap. $30 per card, everything included for life: editable destination, live stats, reviews gained. A Québec business.">
   <link rel="canonical" href="https://taporacards.com/en/">
   <link rel="alternate" hreflang="fr-CA" href="https://taporacards.com/">
   <link rel="alternate" hreflang="en-CA" href="https://taporacards.com/en/">
@@ -44,7 +44,7 @@
         "address": { "@type": "PostalAddress", "addressRegion": "QC", "addressCountry": "CA" },
         "areaServed": [{ "@type": "AdministrativeArea", "name": "Québec" }, { "@type": "Country", "name": "Canada" }],
         "knowsLanguage": ["fr-CA", "en-CA"],
-        "description": "Tapora Cards makes NFC and QR cards in Québec that open a business’s Google review page in one tap, with live statistics (taps, peak hours, reviews gained) and a monthly report."
+        "description": "Tapora Cards, a Québec business, sells NFC cards that open a business’s Google review page in one tap, with live statistics (taps, peak hours, reviews gained), a notification on every tap and a monthly report. $30 per card, everything included for life, no subscription."
       },
       {
         "@type": "WebSite",
@@ -59,18 +59,33 @@
         "name": "Tapora NFC Google review card",
         "brand": { "@id": "https://taporacards.com/#organisation" },
         "category": "NFC Google review card",
-        "description": "NFC card with a QR code that opens the business’s Google review page in one tap, no app needed. Destination editable for life, live tap statistics, Google reviews gained, monthly email report.",
+        "description": "NFC card that opens the business’s Google review page in one tap, no app needed. Everything included for life, no subscription: editable destination, private live stats page, a notification on every tap, counter mode, Google reviews gained, monthly email report.",
+        "offers": {
+          "@type": "AggregateOffer",
+          "priceCurrency": "CAD",
+          "lowPrice": "27.50",
+          "highPrice": "30.00",
+          "offerCount": 3,
+          "availability": "https://schema.org/InStock",
+          "offers": [
+            { "@type": "Offer", "name": "1 card", "price": "30.00", "priceCurrency": "CAD", "eligibleQuantity": { "@type": "QuantitativeValue", "value": 1 } },
+            { "@type": "Offer", "name": "2 cards", "price": "55.00", "priceCurrency": "CAD", "eligibleQuantity": { "@type": "QuantitativeValue", "value": 2 } },
+            { "@type": "Offer", "name": "3 cards or more, price per card", "price": "27.50", "priceCurrency": "CAD", "eligibleQuantity": { "@type": "QuantitativeValue", "minValue": 3 } }
+          ]
+        },
         "audience": { "@type": "BusinessAudience", "audienceType": "Restaurants, cafés, salons, clinics, garages, retail stores" }
       },
       {
         "@type": "FAQPage",
         "mainEntity": [
-          { "@type": "Question", "name": "How does an NFC Google review card work?", "acceptedAnswer": { "@type": "Answer", "text": "Your customer holds their phone near the card and your Google “Write a review” page opens right away — no app to install. A QR code printed on the card covers phones with NFC turned off." } },
-          { "@type": "Question", "name": "Does it work with iPhone and Android?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Every iPhone since the XR and the vast majority of Android phones read NFC with no app. The QR code covers the rest." } },
+          { "@type": "Question", "name": "How does an NFC Google review card work?", "acceptedAnswer": { "@type": "Answer", "text": "Your customer holds their phone near the card and your Google “Write a review” page opens right away — no app to install. Nothing to plug in: the card has no battery." } },
+          { "@type": "Question", "name": "Does it work with iPhone and Android?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Every iPhone since the XR and the vast majority of Android phones read NFC with no app. On Android it’s the same NFC used for tap-to-pay, so it’s on for most phones." } },
           { "@type": "Question", "name": "Can I change where the card leads?", "acceptedAnswer": { "@type": "Answer", "text": "Yes — for life, without touching the card. The chip points to a Tapora address and we handle the redirect. Google reviews today, your menu or Instagram tomorrow." } },
-          { "@type": "Question", "name": "What stats do I get?", "acceptedAnswer": { "@type": "Answer", "text": "Every tap, live: by day, by hour, by weekday, chip or QR, iPhone or Android — with the number of Google reviews gained right beside it. Each business gets a private page and a report on the 1st of every month." } },
-          { "@type": "Question", "name": "Do you collect data about my customers?", "acceptedAnswer": { "@type": "Answer", "text": "No. In line with Québec’s Law 25, we keep no IP address, no lasting cookie and no location — only the time of the tap, the channel (chip or QR) and the type of phone." } },
-          { "@type": "Question", "name": "Where are Tapora cards made?", "acceptedAnswer": { "@type": "Answer", "text": "In Québec. Tapora S.E.N.C. is a Québec business (NEQ 3382462367), with friendly support in English and French." } }
+          { "@type": "Question", "name": "What stats do I get?", "acceptedAnswer": { "@type": "Answer", "text": "Every tap, live: by day, by hour, by weekday, iPhone or Android — with the number of Google reviews gained right beside it. Each business gets a private page and a report on the 1st of every month." } },
+          { "@type": "Question", "name": "Do you collect data about my customers?", "acceptedAnswer": { "@type": "Answer", "text": "No. In line with Québec’s Law 25, we keep no IP address, no lasting cookie and no location — only the time of the tap and the type of phone." } },
+          { "@type": "Question", "name": "How much does a Tapora card cost?", "acceptedAnswer": { "@type": "Answer", "text": "$30 for one card, $55 for two, then $27.50 per card from three (5 cards: $137.50; 10 cards: $275). Everything is included for life: live stats, private page, notifications, counter mode, monthly report." } },
+          { "@type": "Question", "name": "Is there a subscription or a monthly fee?", "acceptedAnswer": { "@type": "Answer", "text": "No. You pay for the card once and everything else is included for life: stats, private page, “Ding!” notifications, counter mode, review tracking and the monthly report." } },
+          { "@type": "Question", "name": "Is Tapora a local business?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Tapora S.E.N.C. is a Québec business (NEQ 3382462367). Your cards are set up, tracked and supported by us, in Québec, in English and French." } }
         ]
       }
     ]
@@ -91,6 +106,7 @@
       <div class="hidden items-center gap-8 text-[15px] text-encre-doux md:flex">
         <a href="#fonctionnement" class="lien-nav transition hover:text-encre">How it works</a>
         <a href="#statistiques" class="lien-nav transition hover:text-encre">The stats</a>
+        <a href="#prix" class="lien-nav transition hover:text-encre">Pricing</a>
         <a href="#faq" class="lien-nav transition hover:text-encre">FAQ</a>
       </div>
       <div class="flex items-center gap-4">
@@ -147,7 +163,7 @@
               <circle cx="60" cy="60" r="58" fill="#2f5c47"/>
               <g class="gommette-texte">
                 <defs><path id="cercle" d="M60 60 m-44 0 a44 44 0 1 1 88 0 a44 44 0 1 1 -88 0"/></defs>
-                <text fill="#fffaf2" font-size="11.5" font-weight="600" font-family="Inter, sans-serif"><textPath href="#cercle" textLength="274" lengthAdjust="spacing">MADE IN QUÉBEC · MADE IN QUÉBEC ·</textPath></text>
+                <text fill="#fffaf2" font-size="11.5" font-weight="600" font-family="Inter, sans-serif"><textPath href="#cercle" textLength="274" lengthAdjust="spacing">LOCAL BUSINESS · LOCAL BUSINESS ·</textPath></text>
               </g>
               <text x="60" y="71" text-anchor="middle" fill="#fffaf2" font-size="30" font-family="Fraunces, serif">⚜</text>
             </svg>
@@ -231,7 +247,7 @@
         <li class="etape soulevable carte-papier rounded-3xl p-7 md:-rotate-1 [--penche:-1deg]">
           <span class="titre text-5xl text-brique">1</span>
           <h3 class="mt-4 text-xl font-semibold">We place the card</h3>
-          <p class="mt-2 leading-relaxed text-encre-doux">On the counter, on tables, by the register. Each card has its own NFC chip, its own QR code — and its own counter.</p>
+          <p class="mt-2 leading-relaxed text-encre-doux">On the counter, on tables, by the register. Each card has its own NFC chip — and its own counter.</p>
         </li>
         <li class="etape soulevable carte-papier rounded-3xl p-7 md:translate-y-6 md:rotate-1 [--penche:1deg]">
           <span class="titre text-5xl text-sapin">2</span>
@@ -323,7 +339,7 @@
 
     <!-- ============================== POURQUOI ============================== -->
     <section id="avantages" class="mx-auto max-w-6xl scroll-mt-20 px-5 py-28">
-      <h2 data-mots class="titre max-w-2xl text-4xl font-medium leading-tight sm:text-5xl">Made here, built to last.</h2>
+      <h2 data-mots class="titre max-w-2xl text-4xl font-medium leading-tight sm:text-5xl">Simple, local, built to last.</h2>
       <div class="mt-14 grid gap-x-12 gap-y-12 md:grid-cols-2">
         <div class="flex gap-5" data-apparait>
           <svg viewBox="0 0 48 48" class="size-12 shrink-0 text-brique" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M38 18a15 15 0 0 0-27-4M10 30a15 15 0 0 0 27 4"/><path d="M11 7v7h7M37 41v-7h-7"/></svg>
@@ -331,11 +347,11 @@
         </div>
         <div class="flex gap-5" data-apparait>
           <svg viewBox="0 0 48 48" class="size-12 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><rect x="27" y="9" width="12" height="12" rx="2"/><rect x="9" y="27" width="12" height="12" rx="2"/><path d="M28 28h4v4M36 28v0M28 36h0M36 36h3v3"/></svg>
-          <div><h3 class="text-xl font-semibold">Chip and QR code</h3><p class="mt-2 leading-relaxed text-encre-doux">NFC for the magic, QR for phones where it’s switched off. Both lead to the same place, and both are counted.</p></div>
+          <div><h3 class="text-xl font-semibold">Everything included, for life</h3><p class="mt-2 leading-relaxed text-encre-doux">You pay for the card once. The stats, your private page, the “Ding!” and the monthly report come with it — no subscription.</p></div>
         </div>
         <div class="flex gap-5" data-apparait>
           <svg viewBox="0 0 48 48" class="size-12 shrink-0 text-miel" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M24 6c3 6 3 10 0 15-3-5-3-9 0-15ZM24 21c5-4 10-4 14 0-5 3-10 3-14 0ZM24 21c-5-4-10-4-14 0 5 3 10 3 14 0ZM24 21v20M18 34h12"/></svg>
-          <div><h3 class="text-xl font-semibold">Made in Québec</h3><p class="mt-2 leading-relaxed text-encre-doux">A small local business, service in English or French, and a real person who answers when you write.</p></div>
+          <div><h3 class="text-xl font-semibold">A local business</h3><p class="mt-2 leading-relaxed text-encre-doux">A small Québec business, service in English or French, and a real person who answers when you write.</p></div>
         </div>
         <div class="flex gap-5" data-apparait>
           <svg viewBox="0 0 48 48" class="size-12 shrink-0 text-brique" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="12" y="21" width="24" height="18" rx="4"/><path d="M17 21v-5a7 7 0 0 1 14 0v5M24 29v4"/></svg>
@@ -357,9 +373,67 @@
             <tr><th scope="row" class="px-5 py-3.5 font-medium">Your peak hours</th><td class="px-5 py-3.5 text-encre-doux">—</td><td class="px-5 py-3.5 font-medium text-sapin">Yes</td></tr>
             <tr><th scope="row" class="px-5 py-3.5 font-medium">Google reviews gained, next to taps</th><td class="px-5 py-3.5 text-encre-doux">—</td><td class="px-5 py-3.5 font-medium text-sapin">Yes</td></tr>
             <tr><th scope="row" class="px-5 py-3.5 font-medium">Monthly email report</th><td class="px-5 py-3.5 text-encre-doux">—</td><td class="px-5 py-3.5 font-medium text-sapin">Yes</td></tr>
+            <tr><th scope="row" class="px-5 py-3.5 font-medium">Monthly subscription for the stats</th><td class="px-5 py-3.5 text-encre-doux">Often</td><td class="px-5 py-3.5 font-medium text-sapin">None</td></tr>
             <tr><th scope="row" class="px-5 py-3.5 font-medium">Local service, in English or French</th><td class="px-5 py-3.5 text-encre-doux">Varies</td><td class="px-5 py-3.5 font-medium text-sapin">Yes</td></tr>
           </tbody>
         </table>
+      </div>
+    </section>
+
+    <!-- ============================== PRIX ============================== -->
+    <section id="prix" class="scroll-mt-20 bg-sable/70 py-28">
+      <div class="mx-auto max-w-6xl px-5">
+        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-brique" data-apparait>Pricing</p>
+        <h2 data-mots class="titre mt-3 max-w-3xl text-4xl font-medium leading-tight sm:text-5xl">Simple pricing. Everything included, for life.</h2>
+        <p class="mt-5 max-w-2xl text-lg leading-relaxed text-encre-doux" data-apparait>You pay for the card once. The stats, your private page, the “Ding!” and the monthly report come with it — no subscription, no hidden fees.</p>
+        <div class="mt-14 grid gap-5 md:grid-cols-3">
+          <div class="carte-prix relative rounded-3xl p-7 carte-papier" data-apparait>
+            
+            <p class="font-medium text-encre-doux">1 card</p>
+            <p class="titre mt-3 text-6xl font-medium tabular-nums">$30 <span class="text-2xl"></span></p>
+            <p class="mt-3 text-sm text-encre-doux">To get started at the counter.</p>
+          </div>
+          <div class="carte-prix relative rounded-3xl p-7 carte-papier" data-apparait>
+            
+            <p class="font-medium text-encre-doux">2 cards</p>
+            <p class="titre mt-3 text-6xl font-medium tabular-nums">$55 <span class="text-2xl"></span></p>
+            <p class="mt-3 text-sm text-encre-doux">$27.50 per card · the counter and a table</p>
+          </div>
+          <div class="carte-prix relative rounded-3xl p-7 bg-encre text-creme" data-apparait>
+            <span class="absolute right-5 top-5 rounded-full bg-brique px-3 py-1 text-xs font-semibold text-creme">Best price</span>
+            <p class="font-medium text-creme/70">3 cards or more</p>
+            <p class="titre mt-3 text-6xl font-medium tabular-nums">$27.50 <span class="text-2xl">/ card</span></p>
+            <p class="mt-3 text-sm text-creme/70">5 cards: $137.50 · 10 cards: $275</p>
+          </div>
+        </div>
+        <div class="mt-5 grid gap-5 lg:grid-cols-[1fr_1.15fr]">
+          <div id="calculette" class="carte-papier flex flex-col rounded-3xl p-7" data-apparait data-langue="en" data-sujet="Tapora%20card%20order">
+            <h3 class="titre text-2xl font-medium">How many cards?</h3>
+            <div class="mt-5 flex items-center gap-4">
+              <button type="button" data-moins class="grid size-12 place-items-center rounded-full bg-sable text-2xl transition hover:bg-ligne" aria-label="One card less">−</button>
+              <output id="nb-cartes" class="titre w-16 text-center text-5xl font-medium tabular-nums" aria-live="polite">3</output>
+              <button type="button" data-plus class="grid size-12 place-items-center rounded-full bg-sable text-2xl transition hover:bg-ligne" aria-label="One card more">+</button>
+            </div>
+            <p class="mt-7 text-sm text-encre-doux">Total</p>
+            <p class="titre text-6xl font-medium tabular-nums"><span id="total-cartes">$82.50</span></p>
+            <p id="detail-cartes" class="mt-2 text-sm text-encre-doux">$27.50 per card · you save $7.50</p>
+            <a id="commander-calcul" href="mailto:contact@taporacards.com?subject=Tapora%20card%20order" class="mt-7 inline-flex w-fit rounded-full bg-brique px-6 py-3.5 text-[15px] font-semibold text-creme transition hover:-translate-y-0.5 hover:bg-brique-fonce">Order</a>
+          </div>
+          <div class="rounded-3xl bg-sapin p-7 text-creme" data-apparait>
+            <h3 class="titre text-2xl font-medium">Included with every card, for life</h3>
+            <ul class="mt-5 space-y-3 text-[15px] leading-snug">
+            <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-miel" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>The NFC card, set up for your business</span></li>
+            <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-miel" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>A destination you can change for life, no reprogramming</span></li>
+            <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-miel" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>Your private live stats page</span></li>
+            <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-miel" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>The “Ding!” on your phone for every tap</span></li>
+            <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-miel" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>Counter mode to celebrate every tap with your team</span></li>
+            <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-miel" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>Your Google reviews tracked, plus a report on the 1st of the month</span></li>
+            <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-miel" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>Your “Tapora year” recap every December</span></li>
+            <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-miel" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>Friendly support in English and French</span></li>
+            </ul>
+            <p class="mt-6 border-t border-creme/20 pt-5 font-semibold">No subscription. No monthly fees.</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -369,11 +443,19 @@
       <div class="mt-12 divide-y divide-dashed divide-ligne border-y border-dashed border-ligne">
         <details class="group py-5" data-apparait>
           <summary class="flex items-center justify-between gap-6 text-lg font-medium">How does an NFC Google review card work?<span class="plus titre text-3xl text-brique transition">+</span></summary>
-          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Your customer holds their phone near the card and your Google “Write a review” page opens right away — no app to install. A QR code printed on the card covers phones with NFC turned off.</p></div>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Your customer holds their phone near the card and your Google “Write a review” page opens right away — no app to install. Nothing to plug in: the card has no battery.</p></div>
+        </details>
+        <details class="group py-5" data-apparait>
+          <summary class="flex items-center justify-between gap-6 text-lg font-medium">How much does a Tapora card cost?<span class="plus titre text-3xl text-brique transition">+</span></summary>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">$30 for one card, $55 for two, then $27.50 per card from three (5 cards: $137.50; 10 cards: $275). Everything is included for life: live stats, private page, notifications, counter mode, monthly report.</p></div>
+        </details>
+        <details class="group py-5" data-apparait>
+          <summary class="flex items-center justify-between gap-6 text-lg font-medium">Is there a subscription or a monthly fee?<span class="plus titre text-3xl text-brique transition">+</span></summary>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">No. You pay for the card once and everything else is included for life: stats, private page, “Ding!” notifications, counter mode, review tracking and the monthly report.</p></div>
         </details>
         <details class="group py-5" data-apparait>
           <summary class="flex items-center justify-between gap-6 text-lg font-medium">Does it work with iPhone and Android?<span class="plus titre text-3xl text-brique transition">+</span></summary>
-          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Yes. Every iPhone since the XR and the vast majority of Android phones read NFC with no app. The QR code covers the rest.</p></div>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Yes. Every iPhone since the XR and the vast majority of Android phones read NFC with no app. On Android it’s the same NFC used for tap-to-pay, so it’s on for most phones.</p></div>
         </details>
         <details class="group py-5" data-apparait>
           <summary class="flex items-center justify-between gap-6 text-lg font-medium">Can I change where the card leads?<span class="plus titre text-3xl text-brique transition">+</span></summary>
@@ -381,15 +463,15 @@
         </details>
         <details class="group py-5" data-apparait>
           <summary class="flex items-center justify-between gap-6 text-lg font-medium">What stats do I get?<span class="plus titre text-3xl text-brique transition">+</span></summary>
-          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Every tap, live: by day, by hour, by weekday, chip or QR, iPhone or Android — with the number of Google reviews gained right beside it. Each business gets a private page and a report on the 1st of every month.</p></div>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Every tap, live: by day, by hour, by weekday, iPhone or Android — with the number of Google reviews gained right beside it. Each business gets a private page and a report on the 1st of every month.</p></div>
         </details>
         <details class="group py-5" data-apparait>
           <summary class="flex items-center justify-between gap-6 text-lg font-medium">Do you collect data about my customers?<span class="plus titre text-3xl text-brique transition">+</span></summary>
-          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">No. In line with Québec’s Law 25, we keep no IP address, no lasting cookie and no location — only the time of the tap, the channel (chip or QR) and the type of phone.</p></div>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">No. In line with Québec’s Law 25, we keep no IP address, no lasting cookie and no location — only the time of the tap and the type of phone.</p></div>
         </details>
         <details class="group py-5" data-apparait>
-          <summary class="flex items-center justify-between gap-6 text-lg font-medium">Where are Tapora cards made?<span class="plus titre text-3xl text-brique transition">+</span></summary>
-          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">In Québec. Tapora S.E.N.C. is a Québec business (NEQ 3382462367), with friendly support in English and French.</p></div>
+          <summary class="flex items-center justify-between gap-6 text-lg font-medium">Is Tapora a local business?<span class="plus titre text-3xl text-brique transition">+</span></summary>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Yes. Tapora S.E.N.C. is a Québec business (NEQ 3382462367). Your cards are set up, tracked and supported by us, in Québec, in English and French.</p></div>
         </details>
       </div>
     </section>
@@ -400,7 +482,7 @@
         <svg id="ondes-cta" viewBox="0 0 400 400" class="pointer-events-none absolute -right-24 -top-24 size-96 text-creme/[0.07]" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="22" stroke-linecap="round"><path d="M150 120a110 110 0 0 1 0 160"/><path d="M210 80a170 170 0 0 1 0 240"/><path d="M270 40a230 230 0 0 1 0 320"/></g></svg>
         <div class="relative max-w-2xl">
           <h2 data-mots class="titre text-4xl font-medium leading-tight sm:text-6xl">Let’s talk!</h2>
-          <p class="mt-5 text-lg leading-relaxed text-creme/80">Tell us the name of your business and how many cards you need. We’ll get back to you with a price and a mock-up — in English, and fast.</p>
+          <p class="mt-5 text-lg leading-relaxed text-creme/80">Tell us the name of your business and how many cards you need. We’ll get back to you with a mock-up and your total — in English, and fast.</p>
           <div class="mt-9 flex flex-wrap gap-3">
             <a href="mailto:contact@taporacards.com?subject=Tapora%20card%20order&amp;body=Hi%2C%0A%0ABusiness%20name%3A%20%0ACity%3A%20%0ANumber%20of%20cards%3A%20%0A%0AThanks!" class="rounded-full bg-creme px-7 py-4 text-[15px] font-semibold text-sapin transition hover:-translate-y-0.5 hover:bg-white">Email us to order</a>
             <a href="mailto:contact@taporacards.com" class="rounded-full border border-creme/30 px-7 py-4 text-[15px] font-medium transition hover:bg-creme/10">contact@taporacards.com</a>
@@ -414,7 +496,7 @@
     <div class="mx-auto flex max-w-6xl flex-col gap-5 px-5 py-10 text-sm text-encre-doux sm:flex-row sm:items-center sm:justify-between">
       <div class="flex items-center gap-2.5">
         <img src="/favicon.svg" alt="" width="22" height="22" class="size-[22px]">
-        <span><strong class="font-semibold text-encre">Tapora S.E.N.C.</strong> · NEQ 3382462367 · made with care in Québec</span>
+        <span><strong class="font-semibold text-encre">Tapora S.E.N.C.</strong> · NEQ 3382462367 · a Québec business</span>
       </div>
       <nav class="flex flex-wrap gap-6" aria-label="Footer">
         <a href="/en/privacy" class="hover:text-encre">Privacy</a>
