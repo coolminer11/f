@@ -22,7 +22,10 @@ import { premierReleve } from '@/lib/saisie-carte'
 import { urlStats } from '@/lib/lien-stats'
 import { baseCartesAffichee } from '@/lib/cartes-url'
 import { envoyerRapport, historiqueRapports, moisPrecedent, nomMois } from '@/lib/rapports'
-import { messagerieConfiguree } from '@/lib/courriel'
+import { envoyerCourriel, messagerieConfiguree } from '@/lib/courriel'
+import { courrielLien, historiqueEnvoisLien, noterEnvoiLien } from '@/lib/courriel-lien'
+import { MODELES } from '@/lib/modeles-lien'
+import EnvoiLien from '@/components/envoi-lien'
 import StatsTaps from '@/components/stats-taps'
 import SectionAvis from '@/components/section-avis'
 import TableauCartes from '@/components/tableau-cartes'
@@ -45,6 +48,16 @@ const SaisieLot = z.object({
   fiche_nom: z.string().max(200).optional(),
   fiche_adresse: z.string().max(300).optional(),
 })
+
+const SaisieEnvoi = z.object({
+  envoi: z.enum(['envoyer', 'essai']),
+  destinataire: z.string().trim().max(254),
+  objet: z.string().trim().min(1, 'Donnez un objet au courriel.').max(150, 'Objet trop long (150 caractères au plus).'),
+  message: z.string().trim().min(1, 'Le message est vide.').max(4000, 'Message trop long (4 000 caractères au plus).'),
+  langue: z.enum(['fr', 'en']),
+  modele: z.enum(['bienvenue', 'rappel', 'nouveau']),
+})
+const COURRIEL = /^[^@\s<>]+@[^@\s<>]+\.[a-z]{2,}$/i
 
 const STATUTS: Record<string, string> = {
   envoye: '✓ envoyé',
@@ -80,6 +93,7 @@ export default async function FicheDossier({
     suiviPour({ type: 'dossier', id: d.id }),
     demandesCartes(id),
   ])
+  const envois = await historiqueEnvoisLien(d.id)
   const peutEcrire = moi.role !== 'lecture'
   const actives = cartes.filter((c) => c.actif)
   const placeIds = [...new Set(cartes.map((c) => c.place_id).filter(Boolean) as string[])]
@@ -150,6 +164,28 @@ export default async function FicheDossier({
     await basculerLien(id, !d!.lien_actif)
     revalidatePath(ici)
     redirect(`${ici}#lien`)
+  }
+
+  async function envoyerLien(_avant: unknown, donnees: FormData): Promise<{ ok: boolean; texte: string }> {
+    'use server'
+    const auteur = await exigerEcriture()
+    const analyse = SaisieEnvoi.safeParse(Object.fromEntries(donnees))
+    if (!analyse.success) return { ok: false, texte: analyse.error.issues[0].message }
+    const e = analyse.data
+    const frais = await lireDossier(id)
+    if (!frais?.lien_actif) return { ok: false, texte: 'Le lien est désactivé : réactivez-le avant de l’envoyer.' }
+    const essai = e.envoi === 'essai'
+    const a = essai ? auteur.courriel : e.destinataire
+    if (!COURRIEL.test(a)) return { ok: false, texte: 'Courriel du client invalide.' }
+    const c = await courrielLien({ commerce: frais.nom, lien: urlStats(frais.id, frais.version_lien, base), message: e.message, langue: e.langue })
+    const r = await envoyerCourriel({ destinataire: a, objet: essai ? `[Essai] ${e.objet}` : e.objet, html: c.html, texte: c.texte, repondreA: c.repondreA })
+    if (!essai) {
+      await noterEnvoiLien({ dossierId: id, destinataire: a, modele: e.modele, langue: e.langue, statut: r.statut, erreur: r.erreur, par: auteur.id })
+      revalidatePath(ici)
+    }
+    if (r.statut === 'echec') return { ok: false, texte: `Envoi impossible : ${r.erreur ?? 'erreur inconnue'}` }
+    if (r.statut === 'simule') return { ok: true, texte: 'Envoi simulé : la messagerie n’est pas configurée, rien n’est parti.' }
+    return { ok: true, texte: essai ? `Essai envoyé à ${a}.` : `Lien envoyé à ${a} ✓` }
   }
 
   async function envoyerMaintenant() {
@@ -280,6 +316,34 @@ export default async function FicheDossier({
             <div className="mt-3 flex flex-wrap gap-2">
               <form action={nouveauLien}><button className="bouton bouton-secondaire text-xs">Renouveler le lien</button></form>
               <form action={basculer}><button className="bouton bouton-secondaire text-xs">{d.lien_actif ? 'Désactiver le lien' : 'Réactiver le lien'}</button></form>
+            </div>
+          )}
+          {peutEcrire && d.lien_actif && (
+            <EnvoiLien
+              action={envoyerLien}
+              commerce={d.nom}
+              lien={lien}
+              destinataire={destinataire}
+              langue={d.langue === 'en' ? 'en' : 'fr'}
+              monCourriel={moi.courriel}
+            />
+          )}
+          {envois.length > 0 && (
+            <div className="mt-3">
+              <p className="text-xs font-medium text-[var(--color-encre-doux)]">Derniers envois</p>
+              <ul className="mt-1 divide-y divide-[var(--color-ligne)] text-xs">
+                {envois.map((h) => (
+                  <li key={h.id} className="flex justify-between gap-2 py-1.5">
+                    <span className="min-w-0 truncate">
+                      {new Date(h.cree_le).toLocaleDateString('fr-CA', { day: 'numeric', month: 'short', timeZone: 'America/Toronto' })} ·{' '}
+                      {MODELES.fr[h.modele as keyof typeof MODELES.fr]?.nom ?? 'Message'} ({h.langue.toUpperCase()})
+                    </span>
+                    <span className={h.statut === 'echec' ? 'text-[var(--color-negatif)]' : 'text-[var(--color-encre-doux)]'} title={h.erreur ?? undefined}>
+                      {STATUTS[h.statut] ?? h.statut} · {h.destinataire}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
         </section>
