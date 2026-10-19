@@ -16,7 +16,7 @@ const ENCRE = '#2a211a'
 const DOUX = '#6b5d50'
 const BRIQUE = '#c2552f'
 
-function polices(): { titre: string; texte: string } {
+export function polices(): { titre: string; texte: string } {
   const racine = document.querySelector('.theme-client') ?? document.documentElement
   const s = getComputedStyle(racine)
   return {
@@ -26,7 +26,7 @@ function polices(): { titre: string; texte: string } {
 }
 
 /** Générateur pseudo-aléatoire à graine : la même image à chaque fois. */
-function hasard(graine: number) {
+export function hasard(graine: number) {
   let x = graine || 1
   return () => {
     x = (x * 16807) % 2147483647
@@ -34,7 +34,7 @@ function hasard(graine: number) {
   }
 }
 
-function texteAjuste(ctx: CanvasRenderingContext2D, texte: string, police: (taille: number) => string, tailleMax: number, largeurMax: number): number {
+export function texteAjuste(ctx: CanvasRenderingContext2D, texte: string, police: (taille: number) => string, tailleMax: number, largeurMax: number): number {
   let t = tailleMax
   ctx.font = police(t)
   while (ctx.measureText(texte).width > largeurMax && t > 20) {
@@ -45,7 +45,7 @@ function texteAjuste(ctx: CanvasRenderingContext2D, texte: string, police: (tail
 }
 
 /** Le sceau soleil sans texte (mêmes tracés que components/client/logo.tsx). */
-function logo(ctx: CanvasRenderingContext2D, x: number, y: number, taille: number) {
+export function logo(ctx: CanvasRenderingContext2D, x: number, y: number, taille: number) {
   const k = taille / 100
   ctx.save()
   ctx.translate(x, y)

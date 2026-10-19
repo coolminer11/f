@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { noterAvis } from '@/lib/avis-manuels'
+import { reglerSommeil } from '@/lib/sommeil'
 
 /** Recherche de fiche Google depuis le formulaire d'une carte. Réservé aux associés. */
 export async function chercherFichesAction(texte: string): Promise<{ fiches: Fiche[]; erreur: string | null }> {
@@ -45,4 +46,11 @@ export async function noterAvisAction(donnees: FormData): Promise<void> {
   await noterAvis({ type: v.type, id: v.id }, v.nb, v.note)
   revalidatePath(retour)
   redirect(`${retour}?message=${encodeURIComponent('Avis enregistrés. Prochaine mise à jour dans 7 jours.')}#avis`)
+}
+
+/** « C'est réglé » sur une carte qui dort : elle quitte la liste pour une semaine. */
+export async function reglerSommeilAction(donnees: FormData): Promise<void> {
+  await exigerEcriture()
+  await reglerSommeil(String(donnees.get('id') ?? ''))
+  revalidatePath('/cartes')
 }

@@ -15,13 +15,17 @@ compatibility_date = "2025-09-01"
 workers_dev = false
 
 # Une ROUTE, pas un « custom domain » : le CNAME go → Render reste en place.
-# Le Worker ne voit QUE les taps (/t/…). Les pages client, le mode comptoir
-# et leurs rafraîchissements vont droit à Render sans toucher au quota
+# Le Worker ne voit QUE les taps (/t/…) et les badges (/b/…). Les pages
+# client, le mode comptoir et leurs rafraîchissements vont droit à Render
+# sans toucher au quota
 # gratuit (100 000 requêtes/jour) : un seul écran comptoir en ferait
 # 14 000 par jour. Si le quota est quand même dépassé (route réglée en
 # « fail open »), Render reprend les taps lui-même.
 routes = [
   { pattern = "go.taporacards.com/t/*", zone_name = "taporacards.com" },
+  # Les badges d'avis collés sur les sites des commerces : servis depuis le
+  # cache, même quand Render dort (voir badge() dans src/index.ts).
+  { pattern = "go.taporacards.com/b/*", zone_name = "taporacards.com" },
 ]
 
 [observability]

@@ -1,9 +1,10 @@
 /**
  * Tapora Cards — redirection des cartes NFC, sur Cloudflare Workers.
  *
- * Toutes les requêtes de go.taporacards.com passent par ici. Seules les
- * adresses de cartes (/t/CODE) sont traitées sur place ; le reste continue
- * vers le serveur d'origine (Render), comme si le Worker n'existait pas.
+ * Le Worker ne voit que deux familles d'adresses de go.taporacards.com : les
+ * cartes (/t/CODE), traitées sur place, et les badges d'avis (/b/…), servis
+ * depuis le cache de Cloudflare. Le reste va droit au serveur d'origine
+ * (Render), sans passer par ici.
  *
  * Pourquoi ici plutôt que sur Render : Cloudflare répond depuis la ville du
  * client (Montréal, Toronto…), ne s'endort jamais, et encaisse des milliers
@@ -61,6 +62,7 @@ const memoire = new Map<string, { resolu: Resolu } | { enCours: Promise<Resolu> 
 export default {
   async fetch(requete: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(requete.url)
+    if (url.pathname.startsWith('/b/') && requete.method === 'GET') return badge(requete, ctx)
     const m = url.pathname.match(/^\/t\/([^/]+)\/?$/)
     if (!m || (requete.method !== 'GET' && requete.method !== 'HEAD')) return fetch(requete)
     if (!env.SUPABASE_URL || !env.SUPABASE_CLE) return fetch(requete)
@@ -115,6 +117,37 @@ export default {
     })
   },
 } satisfies ExportedHandler<Env>
+
+// ---------------------------------------------------------------------------
+// Badges d'avis (/b/…) : servis depuis le cache de Cloudflare
+// ---------------------------------------------------------------------------
+// Le badge est collé sur le site du commerce : il doit s'afficher tout de
+// suite, même quand le serveur gratuit dort. On sert toujours la copie en
+// cache ; si elle a plus d'une heure, on la rafraîchit en arrière-plan.
+
+const BADGE_FRAIS_MS = 60 * 60 * 1000
+
+async function badge(requete: Request, ctx: ExecutionContext): Promise<Response> {
+  const cle = new Request(new URL(requete.url).toString(), { method: 'GET' })
+  const cache = caches.default
+  const enCache = await cache.match(cle)
+  if (enCache) {
+    const age = Date.now() - Number(enCache.headers.get('x-tapora-le') ?? 0)
+    if (age > BADGE_FRAIS_MS) ctx.waitUntil(chercherBadge(cle, cache).catch(() => {}))
+    return enCache
+  }
+  return chercherBadge(cle, cache)
+}
+
+async function chercherBadge(cle: Request, cache: Cache): Promise<Response> {
+  // Sous-requête vers notre propre domaine : elle va droit au serveur d'origine.
+  const r = await fetch(cle, { redirect: 'manual' })
+  if (r.status !== 200 && r.status !== 302) return r
+  const copie = new Response(r.body, r)
+  copie.headers.set('x-tapora-le', String(Date.now()))
+  await cache.put(cle, copie.clone())
+  return copie
+}
 
 function appareil(agent: string): 'ios' | 'android' | 'autre' {
   if (/iphone|ipad|ipod/i.test(agent)) return 'ios'

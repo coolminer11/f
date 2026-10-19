@@ -9,6 +9,8 @@ import { echapper, envoyerCourriel } from '@/lib/courriel'
 import { langueValide, textes } from '@/lib/langue'
 import { clesVapid, endpointValide, essai } from '@/lib/push'
 import { ETAPES_LANCEMENT } from '@/lib/lancement'
+import { accepterPartenaire, enregistrerRecommandation, RABAIS_FILLEUL } from '@/lib/parrainage'
+import { baseLiens } from '@/lib/securite'
 
 export type EtatCommande = { ok: boolean; erreur: string | null }
 
@@ -124,4 +126,126 @@ export async function essaiPush(jeton: string, endpoint: string): Promise<boolea
 
 export async function clePubliquePush(): Promise<string> {
   return (await clesVapid()).publique
+}
+
+// ---------------------------------------------------------------------------
+// Parrainage : « Recommandez-nous »
+// ---------------------------------------------------------------------------
+export type EtatRecommandation = { ok: boolean; erreur: string | null; commerce?: string }
+
+const vide = (v: unknown) => (typeof v === 'string' && v.trim() === '' ? undefined : v)
+
+const Recommandation = z
+  .object({
+    jeton: z.string().max(80),
+    commerce: z.string().trim().min(1).max(120),
+    contact: z.preprocess(vide, z.string().trim().max(120).optional()),
+    courriel: z.preprocess(vide, z.string().trim().max(254).regex(/^[^@\s<>]+@[^@\s<>]+\.[a-z]{2,}$/i).optional()),
+    telephone: z.preprocess(vide, z.string().trim().max(40).regex(/^[\d\s()+.\-]{7,40}$/).optional()),
+    message: z.preprocess(vide, z.string().trim().max(500).optional()),
+    partenaire: z.literal('on').optional(),
+    site_web: z.preprocess(
+      vide,
+      z
+        .string()
+        .trim()
+        .max(300)
+        .transform((v) => (/^https?:\/\//i.test(v) ? v : `https://${v}`))
+        .refine((v) => /^https?:\/\/[^\s<>"']+\.[^\s<>"']+$/i.test(v))
+        .optional(),
+    ),
+  })
+  .refine((v) => v.courriel || v.telephone, { path: ['courriel'] })
+
+const TEXTES_RECO = {
+  fr: {
+    commerce: 'Donnez-nous au moins le nom du commerce.',
+    joindre: 'Ajoutez un courriel ou un téléphone pour qu’on puisse le joindre.',
+    courriel: 'Ce courriel ne semble pas valide.',
+    telephone: 'Ce numéro de téléphone ne semble pas valide.',
+    site: 'Votre site web : une adresse comme lecafe.ca.',
+    trop: 'Merci ! Vous avez déjà fait plusieurs recommandations aujourd’hui : réessayez demain.',
+    lien: 'Ce lien n’est plus valide.',
+  },
+  en: {
+    commerce: 'Please give us at least the business name.',
+    joindre: 'Add an email or a phone number so we can reach them.',
+    courriel: 'This email does not look valid.',
+    telephone: 'This phone number does not look valid.',
+    site: 'Your website: an address like mycafe.ca.',
+    trop: 'Thank you! You already sent several recommendations today: try again tomorrow.',
+    lien: 'This link is no longer valid.',
+  },
+}
+
+/**
+ * Un commerce en recommande un autre. Le jeton est revérifié ; au plus cinq
+ * recommandations par 24 h. La société est prévenue par courriel ; un
+ * courriel qui échoue ne perd pas la recommandation (elle est dans le
+ * back-office).
+ */
+export async function recommander(_: EtatRecommandation, donnees: FormData): Promise<EtatRecommandation> {
+  const langue = langueValide(String(donnees.get('langue') ?? '')) ?? 'fr'
+  const E = TEXTES_RECO[langue]
+  const a = Recommandation.safeParse(Object.fromEntries(donnees))
+  if (!a.success) {
+    const champs = new Set(a.error.issues.map((i) => String(i.path[0] ?? '')))
+    const rempli = (k: string) => String(donnees.get(k) ?? '').trim() !== ''
+    const erreur = champs.has('commerce')
+      ? E.commerce
+      : champs.has('site_web')
+        ? E.site
+        : champs.has('telephone')
+          ? E.telephone
+          : champs.has('courriel') && rempli('courriel')
+            ? E.courriel
+            : E.joindre
+    return { ok: false, erreur }
+  }
+  const v = a.data
+  const parrainId = await dossierDuJeton(v.jeton)
+  if (!parrainId) return { ok: false, erreur: E.lien }
+
+  const r = await enregistrerRecommandation(parrainId, {
+    commerce: v.commerce,
+    contact: v.contact ?? null,
+    courriel: v.courriel ?? null,
+    telephone: v.telephone ?? null,
+    message: v.message ?? null,
+  })
+  if (!r) return { ok: false, erreur: E.trop }
+  if (v.partenaire === 'on') await accepterPartenaire(parrainId, v.site_web ?? null)
+
+  try {
+    const societe = await emetteur()
+    if (societe.courriel_contact) {
+      const lien = `${await baseLiens()}/cartes/parrainages`
+      const lignes: [string, string | undefined][] = [
+        ['Commerce', v.commerce],
+        ['Contact', v.contact],
+        ['Courriel', v.courriel],
+        ['Téléphone', v.telephone],
+        ['Message', v.message],
+      ]
+      const html = `<p><strong>${echapper(r.parrain_nom)}</strong> vous recommande un commerce, depuis sa page de statistiques.</p>
+<table style="border-collapse:collapse;font-size:14px">${lignes
+        .filter(([, x]) => x)
+        .map(([k, x]) => `<tr><td style="padding:4px 14px 4px 0;color:#6b5d50">${k}</td><td style="padding:4px 0;font-weight:600">${echapper(x!)}</td></tr>`)
+        .join('')}</table>
+<p>Rappel : <strong>${RABAIS_FILLEUL} % sur sa première commande</strong>, de la part de ${echapper(r.parrain_nom)}.${v.partenaire === 'on' ? ` ${echapper(r.parrain_nom)} accepte de paraître sur la page Partenaires.` : ''}</p>
+<p><a href="${echapper(lien)}">Ouvrir les recommandations</a></p>`
+      await envoyerCourriel({
+        destinataire: societe.courriel_contact,
+        objet: `🤝 ${r.parrain_nom} vous recommande ${v.commerce}`,
+        html,
+        texte: `${r.parrain_nom} vous recommande un commerce :\n\n${lignes
+          .filter(([, x]) => x)
+          .map(([k, x]) => `${k} : ${x}`)
+          .join('\n')}\n\nRappel : ${RABAIS_FILLEUL} % sur sa première commande.\n\n${lien}`,
+      })
+    }
+  } catch {
+    // La recommandation est enregistrée : elle s'affiche dans le back-office quoi qu'il arrive.
+  }
+  return { ok: true, erreur: null, commerce: v.commerce }
 }

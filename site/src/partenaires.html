@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="fr-CA">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Commerces partenaires | Tapora Cards</title>
+  <meta name="description" content="Les commerces d’ici qui demandent des avis Google à leurs clients avec Tapora.">
+  <link rel="canonical" href="https://taporacards.com/partenaires">
+  <link rel="alternate" hreflang="fr-CA" href="https://taporacards.com/partenaires">
+  <link rel="alternate" hreflang="en-CA" href="https://taporacards.com/en/partners">
+  <meta name="theme-color" content="#f7f1e7">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="papier">
+  <header class="mx-auto flex max-w-6xl items-center justify-between px-5 py-6">
+    <a href="/" class="flex items-center gap-2.5"><img src="/favicon.svg" alt="" width="28" height="28" class="size-7"> <span class="titre text-xl font-semibold">Tapora</span></a>
+    <a href="/" class="text-sm text-encre-doux hover:text-brique">← Accueil</a>
+  </header>
+  <main class="mx-auto max-w-6xl px-5 pb-24 pt-10">
+    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-brique">Partenaires</p>
+    <h1 class="titre mt-3 max-w-3xl text-5xl font-medium leading-[1.05] sm:text-6xl">Ils font parler <em class="text-brique">leurs clients.</em></h1>
+    <p class="mt-5 max-w-2xl text-lg text-encre-doux">Des commerces d’ici qui demandent un avis à chaque client, d’un simple tap. Allez les voir : ils le méritent.</p>
+
+    <div id="partenaires" class="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-source="https://go.taporacards.com/b/partenaires.json" data-langue="fr" aria-live="polite" aria-busy="true">
+        <div class="squelette h-56 rounded-3xl border border-ligne" aria-hidden="true"></div>
+        <div class="squelette h-56 rounded-3xl border border-ligne" aria-hidden="true"></div>
+        <div class="squelette h-56 rounded-3xl border border-ligne" aria-hidden="true"></div>
+    </div>
+
+    <section class="mt-16 flex flex-col items-start gap-5 rounded-[2rem] bg-encre p-8 text-creme sm:flex-row sm:items-center sm:justify-between sm:p-10">
+      <div>
+        <h2 class="titre text-3xl font-medium">Votre commerce ici&nbsp;?</h2>
+        <p class="mt-2 max-w-xl text-creme/75">Commandez vos cartes Tapora : vos clients vous laissent plus d’avis, et votre commerce peut paraître sur cette page.</p>
+      </div>
+      <a href="/#commander" class="shrink-0 rounded-full bg-creme px-6 py-3 text-sm font-semibold text-encre transition hover:-translate-y-0.5 hover:bg-rose">Commander mes cartes →</a>
+    </section>
+  </main>
+  <footer class="border-t border-ligne py-8 text-center text-sm text-encre-doux">
+    <img src="/marque/sceau-fr.svg" alt="" width="48" height="48" class="sceau-pied mx-auto mb-3 size-12">
+    Tapora S.E.N.C. · NEQ 3382462367 · entreprise québécoise
+  </footer>
+  <script src="/js/partenaires.js" defer></script>
+</body>
+</html>

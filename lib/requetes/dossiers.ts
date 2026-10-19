@@ -18,6 +18,11 @@ export type Dossier = {
   avis_pose: number | null
   avis_mois_avant: number | null
   date_pose: string | null
+  cle_badge: string
+  badge_actif: boolean
+  site_web: string | null
+  partenaire_public: boolean
+  ambassadeur_le: string | null
   lancement: string[]
   cree_le: string
   nb_cartes: number
@@ -32,7 +37,8 @@ export type DossierListe = Dossier & {
 
 const COLONNES = `d.id, d.nom, d.client_id, cl.nom as client_nom, d.courriel_rapport,
   d.rapport_mensuel, d.lien_actif, d.version_lien, d.note, d.langue, d.objectif_avis, d.avis_pose, d.avis_mois_avant::float8 as avis_mois_avant,
-  to_char(d.date_pose, 'YYYY-MM-DD') as date_pose, d.lancement, d.cree_le,
+  to_char(d.date_pose, 'YYYY-MM-DD') as date_pose, d.cle_badge, d.badge_actif, d.site_web, d.partenaire_public, d.ambassadeur_le,
+  d.lancement, d.cree_le,
   (select count(*)::int from cartes_nfc c where c.dossier_id = d.id) as nb_cartes,
   (select count(*)::int from cartes_nfc c where c.dossier_id = d.id and c.actif) as nb_actives`
 
@@ -81,13 +87,15 @@ export type SaisieDossierValidee = {
   avisPose: number | null
   avisMoisAvant: number | null
   datePose: string | null
+  siteWeb: string | null
+  partenairePublic: boolean
 }
 
 export async function creerDossier(e: SaisieDossierValidee): Promise<string> {
   const ligne = await requeteUne<{ id: string }>(
-    `insert into dossiers_cartes (nom, client_id, courriel_rapport, rapport_mensuel, note, langue, objectif_avis, avis_pose, avis_mois_avant, date_pose)
-     values ($1, $2::uuid, $3, $4, $5, $6, $7, $8, $9, $10::date) returning id`,
-    [e.nom, e.clientId, e.courrielRapport, e.rapportMensuel, e.note, e.langue, e.objectifAvis, e.avisPose, e.avisMoisAvant, e.datePose],
+    `insert into dossiers_cartes (nom, client_id, courriel_rapport, rapport_mensuel, note, langue, objectif_avis, avis_pose, avis_mois_avant, date_pose, site_web, partenaire_public)
+     values ($1, $2::uuid, $3, $4, $5, $6, $7, $8, $9, $10::date, $11, $12) returning id`,
+    [e.nom, e.clientId, e.courrielRapport, e.rapportMensuel, e.note, e.langue, e.objectifAvis, e.avisPose, e.avisMoisAvant, e.datePose, e.siteWeb, e.partenairePublic],
   )
   await releveDePose(ligne!.id, e)
   return ligne!.id
@@ -97,9 +105,10 @@ export async function modifierDossier(id: string, e: SaisieDossierValidee): Prom
   await requete(
     `update dossiers_cartes
         set nom = $2, client_id = $3::uuid, courriel_rapport = $4, rapport_mensuel = $5, note = $6,
-            langue = $7, objectif_avis = $8, avis_pose = $9, avis_mois_avant = $10, date_pose = $11::date
+            langue = $7, objectif_avis = $8, avis_pose = $9, avis_mois_avant = $10, date_pose = $11::date,
+            site_web = $12, partenaire_public = $13
       where id = $1::uuid`,
-    [id, e.nom, e.clientId, e.courrielRapport, e.rapportMensuel, e.note, e.langue, e.objectifAvis, e.avisPose, e.avisMoisAvant, e.datePose],
+    [id, e.nom, e.clientId, e.courrielRapport, e.rapportMensuel, e.note, e.langue, e.objectifAvis, e.avisPose, e.avisMoisAvant, e.datePose, e.siteWeb, e.partenairePublic],
   )
   await releveDePose(id, e)
   // Le client de facturation des cartes suit celui du dossier.

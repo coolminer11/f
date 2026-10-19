@@ -34,6 +34,11 @@ import ChampsDossier, { SaisieDossier, valeursDossier } from '@/components/champ
 import ChoixFiche from '@/components/choix-fiche'
 import { Destination } from '@/components/champs-carte'
 import BoutonCopier from '@/components/bouton-copier'
+import BadgeAvis from '@/components/badge-avis'
+import EtudeCas from '@/components/etude-cas'
+import { basculerBadge, nouvelleCleBadge } from '@/lib/badge'
+import { donneesEtude } from '@/lib/etude-cas'
+import { LIBELLES_STATUT, listerParrainages } from '@/lib/parrainage'
 import BoutonSupprimer from '@/components/bouton-supprimer'
 import { Evolution, Tuile, depuis, nombreFr } from '@/components/tuiles-cartes'
 
@@ -93,10 +98,14 @@ export default async function FicheDossier({
     suiviPour({ type: 'dossier', id: d.id }),
     demandesCartes(id),
   ])
-  const envois = await historiqueEnvoisLien(d.id)
+  const placeIds = [...new Set(cartes.map((c) => c.place_id).filter(Boolean) as string[])]
+  const [envois, parrainages, etude] = await Promise.all([
+    historiqueEnvoisLien(d.id),
+    listerParrainages(d.id),
+    donneesEtude(d.id, d.nom, placeIds),
+  ])
   const peutEcrire = moi.role !== 'lecture'
   const actives = cartes.filter((c) => c.actif)
-  const placeIds = [...new Set(cartes.map((c) => c.place_id).filter(Boolean) as string[])]
   const avisIds = [...placeIds, cleAvis({ type: 'dossier', id: d.id })]
   const lien = urlStats(d.id, d.version_lien, base)
   const courrielClient = clients.find((c) => c.id === d.client_id)?.courriel ?? null
@@ -164,6 +173,22 @@ export default async function FicheDossier({
     await basculerLien(id, !d!.lien_actif)
     revalidatePath(ici)
     redirect(`${ici}#lien`)
+  }
+
+  async function basculerBadgeAction() {
+    'use server'
+    await exigerEcriture()
+    await basculerBadge(id, !d!.badge_actif)
+    revalidatePath(ici)
+    redirect(`${ici}#badge`)
+  }
+
+  async function nouvelleCleAction() {
+    'use server'
+    await exigerEcriture()
+    await nouvelleCleBadge(id)
+    revalidatePath(ici)
+    redirect(`${ici}?message=${encodeURIComponent('Nouvelle adresse de badge. L’ancien badge a disparu des sites où il était collé.')}#badge`)
   }
 
   async function envoyerLien(_avant: unknown, donnees: FormData): Promise<{ ok: boolean; texte: string }> {
@@ -382,6 +407,91 @@ export default async function FicheDossier({
         </section>
       </div>
 
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+        <section id="badge" className="carte scroll-mt-4 p-5">
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <h2 className="text-sm font-semibold">Badge d’avis pour son site web</h2>
+              <p className="mt-0.5 text-xs leading-relaxed text-[var(--color-encre-doux)]">
+                Note et nombre d’avis Google, mis à jour à chaque relevé. Le client le trouve aussi sur sa page, avec le code à copier.
+              </p>
+            </div>
+            <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${d.badge_actif ? 'bg-[#e9f2ea] text-[var(--color-positif)]' : 'bg-[var(--color-fond)] text-[var(--color-encre-doux)]'}`}>
+              {d.badge_actif ? 'Actif' : 'Désactivé'}
+            </span>
+          </div>
+          {d.badge_actif ? (
+            <div className="mt-4">
+              {suivi?.nb_avis == null && (
+                <p className="mb-3 rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-900">Le badge apparaît dès le premier relevé d’avis (bloc « Avis Google » ci-dessus).</p>
+              )}
+              <BadgeAvis base={base} cle={d.cle_badge} langue={d.langue === 'en' ? 'en' : 'fr'} variante="bo" />
+            </div>
+          ) : (
+            <p className="mt-3 rounded-md bg-[var(--color-fond)] px-3 py-2 text-sm text-[var(--color-encre-doux)]">Désactivé : le badge a disparu des sites où il était collé, et du bloc de la page client.</p>
+          )}
+          {peutEcrire && (
+            <div className="mt-4 flex flex-wrap gap-2 border-t border-[var(--color-ligne)] pt-3">
+              <form action={basculerBadgeAction}><button className="bouton bouton-secondaire text-xs">{d.badge_actif ? 'Désactiver le badge' : 'Réactiver le badge'}</button></form>
+              {d.badge_actif && <form action={nouvelleCleAction}><button className="bouton bouton-secondaire text-xs">Nouvelle adresse</button></form>}
+            </div>
+          )}
+        </section>
+
+        <section id="parrainage" className="carte scroll-mt-4 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-sm font-semibold">Parrainage</h2>
+            {d.ambassadeur_le && (
+              <span className="rounded-full bg-gradient-to-r from-[#f7d27a] to-[#e9a83c] px-2.5 py-0.5 text-xs font-semibold text-[#5a3b05]">🏅 Ambassadeur</span>
+            )}
+          </div>
+          <p className="mt-0.5 text-xs leading-relaxed text-[var(--color-encre-doux)]">
+            {d.partenaire_public
+              ? `Sur la page Partenaires de taporacards.com${d.site_web ? `, avec un lien vers ${d.site_web.replace(/^https?:\/\//, '')}` : ''}.`
+              : 'Pas sur la page Partenaires (le client coche la case en recommandant quelqu’un, ou vous dans « Modifier le dossier », avec son accord).'}
+          </p>
+          {parrainages.length ? (
+            <ul className="mt-3 divide-y divide-[var(--color-ligne)] text-sm">
+              {parrainages.map((p) => (
+                <li key={p.id} className="flex items-center justify-between gap-2 py-2">
+                  <span className="min-w-0 truncate font-medium">{p.commerce}</span>
+                  <span className="shrink-0 text-xs text-[var(--color-encre-doux)]">{LIBELLES_STATUT[p.statut]}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-3 rounded-md bg-[var(--color-fond)] px-3 py-2 text-sm text-[var(--color-encre-doux)]">Aucune recommandation encore.</p>
+          )}
+          <Link href="/cartes/parrainages" className="mt-3 inline-block text-xs font-semibold text-[var(--color-accent)] hover:underline">
+            Toutes les recommandations →
+          </Link>
+        </section>
+      </div>
+
+      <section id="etude" className="carte scroll-mt-4 p-5">
+        <h2 className="text-sm font-semibold">Étude de cas</h2>
+        <p className="mb-4 mt-0.5 text-xs text-[var(--color-encre-doux)]">L’image LinkedIn de ce commerce, avec ses vrais chiffres depuis la pose.</p>
+        {etude ? (
+          <EtudeCas
+            chiffres={{
+              nom: etude.nom,
+              jours: etude.jours,
+              avisPose: etude.avisPose,
+              avisMaintenant: etude.avisMaintenant,
+              note: etude.note,
+              taps: etude.taps,
+              avantParMois: etude.avantParMois,
+              apresParMois: etude.apresParMois,
+            }}
+            nomFichier={d.nom.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'commerce'}
+          />
+        ) : (
+          <p className="rounded-md bg-[var(--color-fond)] px-3 py-2 text-sm text-[var(--color-encre-doux)]">
+            Il faut deux chiffres : les avis le jour de la pose (« Modifier le dossier ») et un relevé d’avis récent.
+          </p>
+        )}
+      </section>
+
       <section id="exports" className="carte scroll-mt-4 p-5">
         <h2 className="text-sm font-semibold">Programmer et imprimer</h2>
         <p className="mt-0.5 text-xs text-[var(--color-encre-doux)]">
@@ -449,7 +559,7 @@ export default async function FicheDossier({
           <form action={enregistrer} className="mt-3 space-y-4">
             <ChampsDossier
               clients={clients}
-              valeurs={{ nom: d.nom, client_id: d.client_id, courriel_rapport: d.courriel_rapport, rapport_mensuel: d.rapport_mensuel, note: d.note, langue: d.langue, objectif_avis: d.objectif_avis, avis_pose: d.avis_pose, avis_mois_avant: d.avis_mois_avant, date_pose: d.date_pose }}
+              valeurs={{ nom: d.nom, client_id: d.client_id, courriel_rapport: d.courriel_rapport, rapport_mensuel: d.rapport_mensuel, note: d.note, langue: d.langue, objectif_avis: d.objectif_avis, avis_pose: d.avis_pose, avis_mois_avant: d.avis_mois_avant, date_pose: d.date_pose, site_web: d.site_web, partenaire_public: d.partenaire_public }}
             />
             <button className="bouton">Enregistrer</button>
           </form>

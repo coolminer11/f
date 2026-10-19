@@ -260,3 +260,27 @@ details .reponse { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .sceau-pied:hover { transform: none; }
 }
+
+/* ---- Page Partenaires */
+.partenaire { animation: partenaire-monte 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes partenaire-monte { from { opacity: 0; transform: translateY(14px); } }
+.pastille-ambassadeur {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(100deg, #f7d27a, #e9a83c 55%, #f3c25a);
+  box-shadow: 0 8px 18px -10px rgb(201 132 22 / 0.8), inset 0 1px 0 rgb(255 255 255 / 0.5);
+}
+.pastille-ambassadeur::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.6) 50%, transparent 65%);
+  transform: translateX(-120%);
+  animation: pastille-reflet 2.4s ease-in-out 1s infinite;
+}
+@keyframes pastille-reflet { to { transform: translateX(120%); } }
+.squelette { background: linear-gradient(100deg, #f3ebdf 30%, #fbf6ee 50%, #f3ebdf 70%); background-size: 300% 100%; animation: squelette 1.4s linear infinite; }
+@keyframes squelette { to { background-position: -150% 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .partenaire, .pastille-ambassadeur::after, .squelette { animation: none; }
+}

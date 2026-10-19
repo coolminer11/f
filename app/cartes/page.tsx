@@ -9,6 +9,9 @@ import TableauCartes from '@/components/tableau-cartes'
 import SuiviAvis from '@/components/suivi-avis'
 import { suiviAvis } from '@/lib/avis-manuels'
 import { demandesCartes } from '@/lib/requetes/dossiers'
+import CartesEndormies from '@/components/cartes-endormies'
+import { cartesEndormies } from '@/lib/sommeil'
+import { parrainagesOuverts } from '@/lib/parrainage'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,13 +19,15 @@ export default async function PageCartes({ searchParams }: { searchParams: Promi
   const moi = await exigerSession()
   const sp = await searchParams
   const jours = joursDepuis(sp.p)
-  const [cartes, t, parCarte, courbes, suivis, demandes] = await Promise.all([
+  const [cartes, t, parCarte, courbes, suivis, demandes, endormies, recos] = await Promise.all([
     listerCartes(),
     totaux({}, jours),
     tapsParCarte(jours),
     tendances(14),
     suiviAvis(),
     demandesCartes(),
+    cartesEndormies(),
+    parrainagesOuverts(),
   ])
 
   const actives = cartes.filter((c) => c.actif)
@@ -46,6 +51,9 @@ export default async function PageCartes({ searchParams }: { searchParams: Promi
           </Link>
           <Link href="/cartes/dossiers" className="bouton bouton-secondaire">
             Dossiers
+          </Link>
+          <Link href="/cartes/parrainages" className="bouton bouton-secondaire">
+            Recommandations
           </Link>
           <Link href="/cartes/nouvelle" className="bouton">
             Nouvelle carte
@@ -81,6 +89,16 @@ export default async function PageCartes({ searchParams }: { searchParams: Promi
           <Link href={`/cartes/dossiers/${demandes[0].dossier_id}#demandes`} className="bouton bouton-secondaire text-xs">Voir</Link>
         </div>
       )}
+      {recos.n > 0 && (
+        <div className="carte flex flex-wrap items-center justify-between gap-3 border-[var(--color-accent)] px-4 py-3">
+          <p className="text-sm">
+            <strong>🤝 {recos.n} recommandation{recos.n > 1 ? 's' : ''} à contacter</strong>{' '}
+            <span className="text-[var(--color-encre-doux)]">— {recos.noms.join(', ')}{recos.n > recos.noms.length ? '…' : ''}</span>
+          </p>
+          <Link href="/cartes/parrainages" className="bouton bouton-secondaire text-xs">Voir</Link>
+        </div>
+      )}
+      <CartesEndormies cartes={endormies} ecriture={moi.role !== 'lecture'} />
       {moi.role !== 'lecture' && <SuiviAvis suivis={suivis} retour="/cartes" />}
 
       <SelecteurJours chemin="/cartes" jours={jours} />

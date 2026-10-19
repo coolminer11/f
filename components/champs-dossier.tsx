@@ -37,6 +37,14 @@ export const SaisieDossier = z.object({
     .refine((v) => v === '' || (/^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(Date.parse(v))), 'Date de la pose invalide.')
     .refine((v) => v === '' || (v >= '2020-01-01' && Date.parse(`${v}T00:00:00-05:00`) <= Date.now()), 'La date de la pose ne peut pas être dans le futur.')
     .optional(),
+  site_web: z
+    .string()
+    .trim()
+    .max(300)
+    .transform((v) => (v && !/^https?:\/\//i.test(v) ? `https://${v}` : v))
+    .refine((v) => v === '' || /^https?:\/\/[^\s<>"']+\.[^\s<>"']+$/i.test(v), 'Site web : une adresse comme https://lecafe.ca')
+    .optional(),
+  partenaire_public: z.literal('on').optional(),
 })
 
 export function valeursDossier(v: z.infer<typeof SaisieDossier>) {
@@ -51,6 +59,8 @@ export function valeursDossier(v: z.infer<typeof SaisieDossier>) {
     avisPose: v.avis_pose ? Number(v.avis_pose) : null,
     avisMoisAvant: v.avis_mois_avant ? Number(v.avis_mois_avant) : null,
     datePose: v.date_pose || null,
+    siteWeb: v.site_web || null,
+    partenairePublic: v.partenaire_public === 'on',
   }
 }
 
@@ -71,6 +81,8 @@ export default function ChampsDossier({
     avis_pose: number | null
     avis_mois_avant: number | null
     date_pose: string | null
+    site_web: string | null
+    partenaire_public: boolean
   }
   /** Faux : seulement le nom et le client (création rapide). */
   complet?: boolean
@@ -167,6 +179,19 @@ export default function ChampsDossier({
             Date de la pose : à remplir si la carte était posée avant d’être ajoutée ici (vide = le jour de la première carte).
             Pour le rythme d’avant : sur Google Maps, triez les avis par « Plus récents » et comptez ceux des 3 derniers mois avant la pose, divisé par 3.
           </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="etiquette" htmlFor="site_web">Site web du commerce (facultatif)</label>
+              <input id="site_web" name="site_web" className="champ" maxLength={300} defaultValue={valeurs?.site_web ?? ''} placeholder="https://lecafe.ca" />
+            </div>
+            <label className="flex items-start gap-2 self-end pb-2 text-sm">
+              <input type="checkbox" name="partenaire_public" defaultChecked={valeurs?.partenaire_public} className="mt-0.5 size-4 accent-[var(--color-accent)]" />
+              <span>
+                Afficher sur <strong>taporacards.com/partenaires</strong>
+                <span className="block text-xs text-[var(--color-encre-doux)]">Seulement avec l’accord du commerce.</span>
+              </span>
+            </label>
+          </div>
           <div>
             <label className="etiquette" htmlFor="note">Note interne (facultatif)</label>
             <input id="note" name="note" className="champ" maxLength={500} defaultValue={valeurs?.note ?? ''} />

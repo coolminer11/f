@@ -36,6 +36,7 @@ for (const style of ['normal', 'italic']) {
 }
 await cp(path.join(SRC, 'main.js'), path.join(DIST, 'js/main.js'))
 await cp(path.join(SRC, 'pret.js'), path.join(DIST, 'js/pret.js'))
+await cp(path.join(SRC, 'partenaires.js'), path.join(DIST, 'js/partenaires.js'))
 
 execFileSync(
   path.join(ICI, 'node_modules/.bin/tailwindcss'),
@@ -50,6 +51,7 @@ const versions = {
   '/styles.css': `/styles.css?v=${await empreinte('styles.css')}`,
   '/js/main.js': `/js/main.js?v=${await empreinte('js/main.js')}`,
   '/js/pret.js': `/js/pret.js?v=${await empreinte('js/pret.js')}`,
+  '/js/partenaires.js': `/js/partenaires.js?v=${await empreinte('js/partenaires.js')}`,
 }
 
 // Les pages : src/*.html à la racine, src/en/*.html sous /en/, et les guides

@@ -1,5 +1,6 @@
 import { releverAvisSiNecessaire } from '@/lib/avis-google'
 import { envoyerRapportsDus } from '@/lib/rapports'
+import { envoyerAlerteSommeil } from '@/lib/sommeil'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,10 +12,11 @@ export const dynamic = 'force-dynamic'
  * (cron-job.org) appelle cette adresse toutes les dix minutes.
  *
  * Le réveil sert aussi d'horloge — l'hébergeur gratuit n'en a pas d'autre :
- * relevé des avis Google (une fois par heure au plus) et rapports mensuels
- * (vérifiés toutes les 30 min). Les deux sont lancés sans être attendus, se
- * limitent eux-mêmes dans le temps, et n'envoient jamais deux fois la même
- * chose : appeler cette adresse mille fois ne fait rien de plus qu'une.
+ * relevé des avis Google (une fois par heure au plus), rapports mensuels
+ * (vérifiés toutes les 30 min) et, le lundi, la liste des cartes qui
+ * dorment. Tous sont lancés sans être attendus, se limitent eux-mêmes dans
+ * le temps, et n'envoient jamais deux fois la même chose : appeler cette
+ * adresse mille fois ne fait rien de plus qu'une.
  */
 export function GET(requete: Request) {
   const h = requete.headers
@@ -24,6 +26,7 @@ export function GET(requete: Request) {
 
   void releverAvisSiNecessaire().catch(() => {})
   void envoyerRapportsDus(base).catch(() => {})
+  void envoyerAlerteSommeil(base).catch(() => {})
 
   return new Response('ok', { headers: { 'cache-control': 'no-store' } })
 }

@@ -28,6 +28,10 @@ import AvantApres from '@/components/client/avant-apres'
 import Course from '@/components/client/course'
 import NotificationsDing from '@/components/client/notifications-ding'
 import PartagePalier from '@/components/client/partage-palier'
+import Parrainage from '@/components/client/parrainage'
+import BadgeAvis from '@/components/badge-avis'
+import { baseCartesAffichee } from '@/lib/cartes-url'
+import { bilanParrain } from '@/lib/parrainage'
 import Logo from '@/components/client/logo'
 import StatsTaps from '@/components/stats-taps'
 import SectionAvis from '@/components/section-avis'
@@ -114,7 +118,13 @@ export default async function StatsClient({ params, searchParams }: Props) {
     requeteUne<{ n: number }>(`select count(*)::int as n from abonnements_push where dossier_id = $1::uuid`, [d.id]),
   ])
   const avisIds = [...places.map((p) => p.place_id), cleManuelle]
-  const [avis, avis14, avisParJour] = await Promise.all([resumeAvis(avisIds, jours), resumeAvis(avisIds, 14), rythmeAvis(avisIds)])
+  const [avis, avis14, avisParJour, bilan, base] = await Promise.all([
+    resumeAvis(avisIds, jours),
+    resumeAvis(avisIds, 14),
+    rythmeAvis(avisIds),
+    bilanParrain(d.id),
+    baseCartesAffichee(),
+  ])
   const actives = cartes.filter((c) => c.actif)
   const chemin = `/stats/${jeton}`
   const ecart = t.precedent > 0 ? Math.round(((t.courant - t.precedent) / t.precedent) * 100) : null
@@ -246,6 +256,13 @@ export default async function StatsClient({ params, searchParams }: Props) {
             <h1 className="titre-client mt-3 text-5xl font-medium leading-[1.05] sm:text-6xl" data-mots>
               {d.nom}
             </h1>
+            {d.ambassadeur_le && (
+              <p className="mt-4" data-intro>
+                <span className="pastille-ambassadeur relative inline-flex items-center gap-1.5 overflow-hidden rounded-full px-3.5 py-1.5 text-sm font-semibold text-[#5a3b05]">
+                  🏅 {X.ambassadeur}
+                </span>
+              </p>
+            )}
             <p className="mt-4 max-w-xl text-lg text-[#6b5d50]" data-intro>
               {phraseDuJour} {T.sousTitre(actives.length)}
             </p>
@@ -358,6 +375,25 @@ export default async function StatsClient({ params, searchParams }: Props) {
           {/* ---- Le Ding (le mode comptoir n'est plus proposé ; sa page existe toujours) */}
           <NotificationsDing jeton={jeton} langue={langue} />
 
+          {/* ---- Le badge d'avis, pour le site du commerce */}
+          {d.badge_actif && avis.nb_actuel !== null && (
+            <section className="carte p-6 sm:p-8" id="badge">
+              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c2552f]">{X.badgeSurtitre}</span>
+              <h2 className="titre-client mt-2 !text-2xl sm:!text-3xl">{X.badgeTitre}</h2>
+              <p className="mb-6 mt-2 max-w-2xl text-[#6b5d50]">{X.badgeSous}</p>
+              <BadgeAvis base={base} cle={d.cle_badge} langue={langue} variante="client" />
+            </section>
+          )}
+
+          <Parrainage
+            jeton={jeton}
+            langue={langue}
+            partenaire={d.partenaire_public}
+            siteWeb={d.site_web}
+            ambassadeur={d.ambassadeur_le !== null}
+            bilan={bilan}
+          />
+
           <CommanderCartes jeton={jeton} langue={langue} />
 
           <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-dashed border-[#e2d6c3] pt-6 text-sm text-[#6b5d50]">
@@ -398,6 +434,10 @@ const PLUS = {
     tapsAuTotal: 'taps au total',
     anneePrete: 'C’est prêt',
     votreAnnee: (a: number) => `Votre année Tapora ${a}`,
+    ambassadeur: 'Ambassadeur Tapora',
+    badgeSurtitre: 'Sur votre site web',
+    badgeTitre: 'Montrez vos avis à tout le monde',
+    badgeSous: 'Un petit badge à coller sur votre site : votre note et votre nombre d’avis Google, mis à jour tout seuls. Les visiteurs voient tout de suite que vos clients vous aiment.',
     comptoirTitre: 'Le mode comptoir',
     comptoirSous: 'Un écran à la caisse qui fête chaque tap avec l’équipe : un « ding », des confettis, l’objectif du jour qui se remplit.',
     comptoirOuvrir: 'Ouvrir le mode comptoir',
@@ -424,6 +464,10 @@ const PLUS = {
     tapsAuTotal: 'taps in total',
     anneePrete: 'It’s ready',
     votreAnnee: (a: number) => `Your ${a} Tapora year`,
+    ambassadeur: 'Tapora Ambassador',
+    badgeSurtitre: 'On your website',
+    badgeTitre: 'Show your reviews to everyone',
+    badgeSous: 'A small badge to paste on your website: your Google rating and review count, updated automatically. Visitors see right away that your customers love you.',
     comptoirTitre: 'Counter mode',
     comptoirSous: 'A screen at the register that celebrates every tap with the team: a “ding”, confetti, and today’s goal filling up.',
     comptoirOuvrir: 'Open counter mode',

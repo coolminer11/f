@@ -349,6 +349,7 @@ PAIRES_PAGES = [
     ('/', '/en/', 'weekly', '1.0'),
     ('/guides/', '/en/guides/', 'weekly', '0.8'),
 ] + [(f"/guides/{g['fr']}", f"/en/guides/{g['slug']}", 'monthly', '0.7') for g in contenu_en.GUIDES] + [
+    ('/partenaires', '/en/partners', 'weekly', '0.6'),
     ('/conditions', '/en/terms', 'yearly', '0.3'),
     ('/confidentialite', '/en/privacy', 'yearly', '0.3'),
 ]

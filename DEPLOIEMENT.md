@@ -451,6 +451,37 @@ modification de texte se fait dans les deux fichiers ; les balises
   les données structurées et dans `llms.txt` : à changer partout si les prix
   changent.
 
+## 10. Croissance : cartes qui dorment, badge, parrainage, étude de cas
+
+- **Cartes qui dorment** (écran Cartes, bloc 😴) : cartes actives sans tap
+  depuis 7 jours, ou jamais tapées une semaine après la pose. Téléphone et
+  courriel du client à côté. « C'est réglé » retire la carte pour 7 jours.
+  Chaque **lundi dès 8 h**, la liste part par courriel à l'adresse de
+  contact de la société (Paramètres) — une fois par semaine, rien si tout
+  dort bien. C'est le réveil (/api/eveil, cron-job.org) qui sert d'horloge.
+- **Badge d'avis** : `go.taporacards.com/b/<clé>.svg`, note + nombre d'avis,
+  clair ou sombre, mis à jour à chaque relevé. Le client copie le code depuis
+  sa page (bloc « Montrez vos avis à tout le monde ») ; vous aussi, depuis le
+  dossier. La clé n'est PAS le lien privé du client. « Désactiver » ou
+  « Nouvelle adresse » le fait disparaître des sites (jusqu'à une heure de
+  cache Cloudflare). Le Worker sert les badges depuis son cache : il faut
+  le **redéployer une fois** (nouvelle route `go.taporacards.com/b/*`).
+- **Parrainage** : bloc « Recommandez-nous » sur la page client. Le filleul
+  a **10 % sur sa première commande** (à appliquer sur sa facture) ; le
+  parrain coche s'il veut paraître sur `taporacards.com/partenaires`.
+  Écran Cartes → **Recommandations** : nouveau → contacté → client. Au
+  passage à « client », le parrain devient **Ambassadeur** (pastille sur sa
+  page et sur la page Partenaires) et un merci LinkedIn est prêt à copier.
+  Au plus 5 recommandations par commerce et par 24 h.
+- **Page Partenaires** du site : construite au chargement à partir de
+  `go.taporacards.com/b/partenaires.json` (cache Cloudflare). Un commerce y
+  paraît s'il l'a accepté (case cochée par lui, ou par vous dans « Modifier
+  le dossier » avec son accord) et a au moins une carte active.
+- **Étude de cas** (fiche du dossier) : image LinkedIn 1080 × 1350, FR ou
+  EN, avec les avis gagnés depuis la pose, la note, les taps, et l'avant /
+  après si le rythme d'avant est saisi. Il faut les avis du jour de la pose
+  et un relevé récent. À publier avec l'accord du commerce.
+
 ## Sauvegardes
 
 Le forfait gratuit de Supabase ne garde pas d'historique de sauvegardes long.
