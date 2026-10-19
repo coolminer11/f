@@ -103,7 +103,7 @@ export default function BadgeAvis({
               height={HAUTEUR_BADGE}
               className="badge-apercu mx-auto max-w-full drop-shadow-[0_14px_22px_rgba(60,30,10,0.18)]"
             />
-            <span className="mt-1 block text-[11px] text-[#8a7b6d]">{langue === 'fr' ? 'propulsé par Tapora' : 'powered by Tapora'}</span>
+            <span className="mt-1 block text-[11px] text-[#8a7b6d]">{langue === 'fr' ? 'propulsé par Tapora Cards' : 'powered by Tapora Cards'}</span>
           </div>
         </div>
       </div>

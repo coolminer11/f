@@ -14,5 +14,5 @@ export function codeBadge(base: string, cle: string, theme: ThemeBadge, langue: 
   const fr = langue === 'fr'
   const img = urlBadge(base, cle, theme)
   return `<a href="${base}/b/${cle}/avis" target="_blank" rel="noopener"><img src="${img}" alt="${fr ? 'Nos avis Google' : 'Our Google reviews'}" width="${LARGEUR_BADGE}" height="${HAUTEUR_BADGE}" loading="lazy" style="border:0;max-width:100%;height:auto"></a>
-<a href="https://taporacards.com/${fr ? '' : 'en/'}?ref=badge" target="_blank" rel="noopener" style="display:block;margin-top:4px;font:11px/1.4 -apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#8a7b6d;text-decoration:none">${fr ? 'propulsé par Tapora' : 'powered by Tapora'}</a>`
+<a href="https://taporacards.com/${fr ? '' : 'en/'}?ref=badge" target="_blank" rel="noopener" style="display:block;margin-top:4px;font:11px/1.4 -apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#8a7b6d;text-decoration:none">${fr ? 'propulsé par Tapora Cards' : 'powered by Tapora Cards'}</a>`
 }
