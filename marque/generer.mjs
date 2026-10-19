@@ -26,7 +26,7 @@ export const C = {
 
 const n = (v) => +v.toFixed(2)
 
-function etoile(cx, cy, R, r) {
+export function etoile(cx, cy, R, r) {
   const p = []
   for (let i = 0; i < 10; i++) {
     const a = ((-90 + i * 36) * Math.PI) / 180
@@ -36,17 +36,17 @@ function etoile(cx, cy, R, r) {
   return p.join(' ')
 }
 /** Étoile aux pointes arrondies (le trait épais, en joints ronds, adoucit les pointes). */
-const douce = (cx, cy, R, couleur, trait) =>
+export const douce = (cx, cy, R, couleur, trait) =>
   `<polygon points="${etoile(cx, cy, R, R * 0.44)}" fill="${couleur}" stroke="${couleur}" stroke-width="${trait}" stroke-linejoin="round"/>`
 
 /** Arc de a1 à a2 (degrés ; 0 = à droite, sens horaire à l'écran). */
-function arc(cx, cy, r, a1, a2) {
+export function arc(cx, cy, r, a1, a2) {
   const p = (a) => [cx + r * Math.cos((a * Math.PI) / 180), cy + r * Math.sin((a * Math.PI) / 180)].map(n)
   const [x1, y1] = p(a1)
   const [x2, y2] = p(a2)
   return `M${x1} ${y1}A${r} ${r} 0 ${a2 - a1 > 180 ? 1 : 0} 1 ${x2} ${y2}`
 }
-const arcs = (cx, cy, rayons, couleurs, trait, a1, a2) =>
+export const arcs = (cx, cy, rayons, couleurs, trait, a1, a2) =>
   `<g fill="none" stroke-width="${trait}" stroke-linecap="round">${rayons
     .map((r, i) => `<path d="${arc(cx, cy, r, a1, a2)}" stroke="${couleurs[i]}"/>`)
     .join('')}</g>`
@@ -105,7 +105,7 @@ export const TEXTES = {
 }
 
 /** Le sceau complet (viewBox 0 0 100 100). */
-export function sceau(langue) {
+export function sceau(langue, centre = soleil()) {
   const t = TEXTES[langue]
   // On garde l'interlettrage lisible : si le texte est long, la taille baisse.
   let taille = 7.4
@@ -120,12 +120,12 @@ export function sceau(langue) {
 ${haut.svg}
 ${bas.svg}
 <circle cx="21.3" cy="73.3" r="1.4" fill="${C.miel}"/><circle cx="78.7" cy="73.3" r="1.4" fill="${C.miel}"/>
-<g transform="translate(50 52.24) scale(.56) translate(-50 -50)">${soleil()}</g>`
+<g transform="translate(50 52.24) scale(.56) translate(-50 -50)">${centre}</g>`
 }
 
 /** L'icône sans texte, pour les petites tailles (onglet, écran d'accueil). */
-export const icone = () =>
-  `<circle cx="50" cy="50" r="49" fill="${C.brique}"/><g transform="translate(50 50) scale(.92) translate(-50 -54)">${soleil()}</g>`
+export const icone = (centre = soleil()) =>
+  `<circle cx="50" cy="50" r="49" fill="${C.brique}"/><g transform="translate(50 50) scale(.92) translate(-50 -54)">${centre}</g>`
 
 /** Le logo horizontal : sceau + « Tapora » + « CARDS ». */
 export function logo(langue, theme) {
