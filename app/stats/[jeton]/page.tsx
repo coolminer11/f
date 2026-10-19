@@ -355,28 +355,8 @@ export default async function StatsClient({ params, searchParams }: Props) {
 
           <StatsTaps portee={{ dossier: d.id }} jours={jours} totaux={t} langue={langue} sansQr={!avecQr} />
 
-          {/* ---- Le Ding et le mode comptoir */}
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <NotificationsDing jeton={jeton} langue={langue} />
-            <section className="carte comptoir-promo relative overflow-hidden p-6 text-[#fffaf2] sm:p-7">
-              <div className="flex items-start gap-4">
-                <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-white/10 text-3xl" aria-hidden>
-                  📺
-                </span>
-                <div>
-                  <h2 className="!text-[#fffaf2]">{X.comptoirTitre}</h2>
-                  <p className="mt-1 text-sm leading-relaxed text-[#fffaf2]/75">{X.comptoirSous}</p>
-                </div>
-              </div>
-              <a
-                href={`${chemin}/comptoir${ql}`}
-                className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#fffaf2] px-6 py-3 text-sm font-semibold text-[#2a211a] transition hover:-translate-y-0.5 hover:bg-[#f6c9a8]"
-              >
-                {X.comptoirOuvrir} <span aria-hidden>→</span>
-              </a>
-              <p className="mt-3 text-xs text-[#fffaf2]/60">{X.comptoirAstuce}</p>
-            </section>
-          </div>
+          {/* ---- Le Ding (le mode comptoir n'est plus proposé ; sa page existe toujours) */}
+          <NotificationsDing jeton={jeton} langue={langue} />
 
           <CommanderCartes jeton={jeton} langue={langue} />
 

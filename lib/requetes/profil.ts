@@ -136,13 +136,13 @@ export async function cartesProfil(dossierId: string, debut?: string, fin?: stri
 export type Pose = { pose: string | null; avis_pose: number | null; avis_mois_avant: number | null; source_pose: 'saisie' | 'releve' | null }
 
 /**
- * Le point de départ du dossier : date de pose (première carte créée) et
+ * Le point de départ du dossier : date de pose (saisie, sinon première carte créée) et
  * nombre d'avis à ce moment — saisi dans le dossier, sinon le tout premier
  * relevé d'avis.
  */
 export async function pointDeDepart(dossierId: string, cleManuelle: string): Promise<Pose> {
   const l = await requeteUne<{ pose: string | null; avis_pose: number | null; avis_mois_avant: number | null; premier_releve: number | null }>(
-    `select to_char((select min(cree_le) at time zone 'America/Toronto' from cartes_nfc where dossier_id = $1::uuid), 'YYYY-MM-DD') as pose,
+    `select to_char(coalesce(d.date_pose, (select min(cree_le) at time zone 'America/Toronto' from cartes_nfc where dossier_id = $1::uuid)), 'YYYY-MM-DD') as pose,
             d.avis_pose, d.avis_mois_avant::float8 as avis_mois_avant,
             (select nb_avis from avis_google where place_id = $2 order by jour limit 1) as premier_releve
        from dossiers_cartes d where d.id = $1::uuid`,

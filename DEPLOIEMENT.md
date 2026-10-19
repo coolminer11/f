@@ -377,8 +377,11 @@ L'intégration automatique (API Places de Google) reste dans le code
     taporacards.com ;
   - « Votre année Tapora » : bannière sur la page en décembre et en janvier ;
     aperçu à tout moment par le bouton « Votre année ↗ » du dossier ;
-  - mode comptoir : `…/stats/<lien>/comptoir`, pour une tablette à la caisse
-    (ding, confettis, objectif du jour) ;
+  - mode comptoir : plus de bouton (ni sur la page client, ni dans le
+    dossier) ; la page `…/stats/<lien>/comptoir` existe toujours ;
+  - date de la pose : si la carte était posée avant d'être ajoutée ici,
+    la saisir dans « Modifier le dossier » avec les avis de ce jour-là.
+    Les avis gagnés (30 jours, graphiques, rapport) partent de cette date ;
   - « Ding ! » : notification sur le téléphone du commerce à chaque tap (au
     plus une par minute, regroupées). Sur iPhone, il faut d'abord ajouter la
     page à l'écran d'accueil (exigence d'Apple). Les clés se créent toutes

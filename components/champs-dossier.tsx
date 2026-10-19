@@ -31,6 +31,12 @@ export const SaisieDossier = z.object({
     .transform((v) => v.replace(',', '.'))
     .refine((v) => v === '' || (/^\d{1,5}(\.\d{1,2})?$/.test(v) && Number(v) <= 100000), 'Avis par mois avant Tapora : un nombre (ex. 2 ou 1,5).')
     .optional(),
+  date_pose: z
+    .string()
+    .trim()
+    .refine((v) => v === '' || (/^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(Date.parse(v))), 'Date de la pose invalide.')
+    .refine((v) => v === '' || (v >= '2020-01-01' && Date.parse(`${v}T00:00:00-05:00`) <= Date.now()), 'La date de la pose ne peut pas être dans le futur.')
+    .optional(),
 })
 
 export function valeursDossier(v: z.infer<typeof SaisieDossier>) {
@@ -44,6 +50,7 @@ export function valeursDossier(v: z.infer<typeof SaisieDossier>) {
     objectifAvis: v.objectif_avis ? Number(v.objectif_avis) : null,
     avisPose: v.avis_pose ? Number(v.avis_pose) : null,
     avisMoisAvant: v.avis_mois_avant ? Number(v.avis_mois_avant) : null,
+    datePose: v.date_pose || null,
   }
 }
 
@@ -63,6 +70,7 @@ export default function ChampsDossier({
     objectif_avis: number | null
     avis_pose: number | null
     avis_mois_avant: number | null
+    date_pose: string | null
   }
   /** Faux : seulement le nom et le client (création rapide). */
   complet?: boolean
@@ -125,7 +133,11 @@ export default function ChampsDossier({
               />
             </div>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div>
+              <label className="etiquette" htmlFor="date_pose">Date de la pose (facultatif)</label>
+              <input id="date_pose" name="date_pose" type="date" className="champ" min="2020-01-01" defaultValue={valeurs?.date_pose ?? ''} />
+            </div>
             <div>
               <label className="etiquette" htmlFor="avis_pose">Avis Google le jour de la pose (facultatif)</label>
               <input
@@ -152,6 +164,7 @@ export default function ChampsDossier({
             </div>
           </div>
           <p className="-mt-2 text-xs text-[var(--color-encre-doux)]">
+            Date de la pose : à remplir si la carte était posée avant d’être ajoutée ici (vide = le jour de la première carte).
             Pour le rythme d’avant : sur Google Maps, triez les avis par « Plus récents » et comptez ceux des 3 derniers mois avant la pose, divisé par 3.
           </p>
           <div>
