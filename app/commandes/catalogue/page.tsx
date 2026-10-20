@@ -5,6 +5,8 @@ import { catalogue, MODELES } from '@/lib/catalogue'
 import { argent } from '@/lib/format'
 import OngletsVentes from '@/components/onglets-ventes'
 import { carteAction } from '@/app/commandes/actions'
+import { VISUELS } from '@/lib/visuels'
+import VisuelCarte from '@/components/visuel-carte'
 
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = { title: 'Catalogue — Tapora' }
@@ -31,6 +33,21 @@ export default async function PageCatalogue({ searchParams }: { searchParams: Pr
       {sp.erreur && <p className="carte border-[var(--color-negatif)] bg-red-50 px-4 py-3 text-sm font-medium text-[var(--color-negatif)]">{sp.erreur}</p>}
       {sp.message && <p className="carte border-[var(--color-positif)] bg-green-50 px-4 py-3 text-sm font-medium text-[var(--color-positif)]">{sp.message}</p>}
 
+      <section aria-labelledby="visuels" className="space-y-3">
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <h2 id="visuels" className="text-sm font-semibold">Visuels des cartes</h2>
+            <p className="mt-0.5 text-xs text-[var(--color-encre-doux)]">
+              Les deux cartes de base, prêtes à télécharger : pour une maquette, l’imprimeur, une publication ou un courriel à un client.
+            </p>
+          </div>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <VisuelCarte visuel={VISUELS.fr_en} />
+          <VisuelCarte visuel={VISUELS.en_fr} />
+        </div>
+      </section>
+
       <div className="grid gap-4 lg:grid-cols-3">
         {cartes.map((c) => {
           const m = MODELES[c.modele]
@@ -48,6 +65,13 @@ export default async function PageCatalogue({ searchParams }: { searchParams: Pr
                   <span className="ml-1 text-sm font-medium text-[var(--color-encre-doux)]">la carte</span>
                 </p>
                 <p className="mt-1 text-sm text-[var(--color-encre-doux)]">{c.quantite_min > 1 ? `${c.quantite_min} cartes au minimum par commande` : 'À l’unité'}</p>
+              </div>
+              <div className="border-b border-[var(--color-ligne)] px-5 py-3">
+                <VisuelCarte
+                  visuel={VISUELS[c.langue]}
+                  variante="vignette"
+                  note={c.personnalisable ? 'Design de base, refait aux couleurs du client' : 'Le visuel livré tel quel'}
+                />
               </div>
               <dl className="flex-1 space-y-2 p-5 text-sm">
                 <div>

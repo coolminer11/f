@@ -78,7 +78,9 @@ export default function RafraichissementAuto() {
         title={`Les écrans se mettent à jour tout seuls, toutes les ${INTERVALLE / 1000} secondes.`}
       >
         <span className="size-1.5 rounded-full bg-emerald-500" aria-hidden />
-        En direct
+        {/* Le point seul sur les écrans moyens : le menu garde sa place. */}
+        <span className="hidden 2xl:inline">En direct</span>
+        <span className="sr-only 2xl:hidden">En direct</span>
       </span>
     )
   }

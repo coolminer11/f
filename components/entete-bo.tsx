@@ -19,7 +19,6 @@ const LIENS = [
   ['/import', 'Import'],
   ['/associes', 'Associés'],
   ['/export', 'Export'],
-  ['/aide', 'Aide'],
 ] as const
 
 export type Theme = 'tapora' | 'classique'
@@ -72,9 +71,6 @@ export default function EnteteBo({
           <span className={theme === 'tapora' ? 'font-[family-name:var(--police-fraunces)] text-xl font-semibold tracking-tight' : 'text-sm font-bold tracking-tight'}>
             Tapora
           </span>
-          <span className="hidden rounded-full border border-[var(--color-ligne)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--color-encre-doux)] 2xl:inline">
-            Back-office
-          </span>
         </Link>
 
         <nav className="order-3 -mx-1 flex w-full max-w-full gap-0.5 overflow-x-auto xl:order-2 xl:w-auto" aria-label="Sections">
@@ -85,7 +81,7 @@ export default function EnteteBo({
                 key={href}
                 href={href}
                 aria-current={actif ? 'page' : undefined}
-                className="lien-bo shrink-0 whitespace-nowrap rounded-md px-2.5 py-1.5 text-sm font-medium text-[var(--color-encre-doux)] hover:text-[var(--color-encre)]"
+                className="lien-bo shrink-0 whitespace-nowrap rounded-md px-2 py-1.5 text-sm font-medium 2xl:px-2.5 text-[var(--color-encre-doux)] hover:text-[var(--color-encre)]"
               >
                 {libelle}
                 {href === '/messages' && aTraiter > 0 && (
@@ -104,6 +100,9 @@ export default function EnteteBo({
           </span>
           <Link href="/etat" className="lien-bo hidden rounded-md px-2 py-1 text-xs font-medium text-[var(--color-encre-doux)] sm:inline-block">
             État
+          </Link>
+          <Link href="/aide" aria-current={chemin.startsWith('/aide') ? 'page' : undefined} className="lien-bo rounded-md px-2 py-1 text-xs font-medium text-[var(--color-encre-doux)]">
+            Aide
           </Link>
           <button
             type="button"

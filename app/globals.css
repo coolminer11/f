@@ -1035,3 +1035,8 @@ html[data-installable] .bouton-installer { display: grid; }
 .barre-chargement[data-etat='fin'] { opacity: 0; width: 100%; transition: width 0.2s ease-out, opacity 0.35s ease 0.2s; }
 @keyframes barre-avance { 0% { width: 0; } 10% { width: 35%; } 100% { width: 88%; } }
 @media (prefers-reduced-motion: reduce) { .barre-chargement[data-etat='en-cours'] { animation: none; width: 60%; } }
+
+/* ---- Back-office : visuels des cartes ------------------------------------ */
+.visuel-carte img { transition: transform 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2), box-shadow 0.45s; }
+.visuel-carte:hover img { transform: translateY(-4px) rotate(-1.2deg) scale(1.02); }
+@media (prefers-reduced-motion: reduce) { .visuel-carte:hover img { transform: none; } }
