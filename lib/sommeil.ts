@@ -3,6 +3,7 @@ import { requete, requeteUne } from '@/lib/db'
 import { echapper, envoyerCourriel } from '@/lib/courriel'
 import { emetteur } from '@/lib/requetes/ventes'
 import { baseCartesConfiguree } from '@/lib/cartes-url'
+import { etatStock } from '@/lib/stock'
 
 /**
  * Les cartes qui dorment : actives, posées depuis au moins une semaine, et
@@ -85,18 +86,30 @@ export async function envoyerAlerteSommeil(baseRepli: string): Promise<void> {
   )
   if (!ici || ici.jour !== 1 || ici.h < 8 || ici.h >= 19) return
 
-  const cartes = await cartesEndormies()
+  const [cartes, stock] = await Promise.all([cartesEndormies(), etatStock()])
+  const stockBas = !!stock.produit_id && (stock.quantite < 0 || stock.quantite < stock.seuil)
   const reservee = await requeteUne<{ semaine: string }>(
     `insert into alertes_sommeil (semaine, nb_cartes, statut) values ($1::date, $2, 'rien')
      on conflict (semaine) do nothing returning semaine`,
     [ici.semaine, cartes.length],
   )
-  if (!reservee || !cartes.length) return
+  if (!reservee || (!cartes.length && !stockBas)) return
 
   const societe = await emetteur()
   if (!societe.courriel_contact) return
   const base = (process.env.URL_APP?.trim() || baseCartesConfiguree() || baseRepli).replace(/\/+$/, '')
-  const c = courrielSommeil(cartes, `${base}/cartes#sommeil`, societe.nom_entreprise)
+  const c = courrielSommeil(
+    cartes,
+    `${base}/cartes#sommeil`,
+    societe.nom_entreprise,
+    stockBas
+      ? {
+          quantite: stock.quantite,
+          semaines: stock.rythme_semaine > 0 && stock.quantite > 0 && stock.quantite / stock.rythme_semaine <= 52 ? Math.floor(stock.quantite / stock.rythme_semaine) : null,
+          lien: `${base}/cartes/stock`,
+        }
+      : null,
+  )
   const r = await envoyerCourriel({ destinataire: societe.courriel_contact, ...c })
   await requete(`update alertes_sommeil set statut = $2 where semaine = $1::date`, [ici.semaine, r.statut])
 }
@@ -105,9 +118,19 @@ function depuisTexte(c: CarteEndormie): string {
   return c.total === 0 ? `jamais tapée (posée il y a ${c.jours} jours)` : `aucun tap depuis ${c.jours} jours`
 }
 
-export function courrielSommeil(cartes: CarteEndormie[], lien: string, societe: string) {
+export type AlerteStock = { quantite: number; semaines: number | null; lien: string }
+
+function texteStock(a: AlerteStock): string {
+  return a.quantite < 0
+    ? `Stock négatif (${a.quantite}) : des cartes vendues n’ont pas de réception inscrite.`
+    : `Plus que ${a.quantite} carte${a.quantite > 1 ? 's' : ''} en stock${a.semaines !== null ? `, environ ${a.semaines} semaine${a.semaines > 1 ? 's' : ''} au rythme actuel` : ''} : pensez à commander.`
+}
+
+export function courrielSommeil(cartes: CarteEndormie[], lien: string, societe: string, stock: AlerteStock | null = null) {
   const n = cartes.length
-  const objet = `😴 ${n} carte${n > 1 ? 's' : ''} qui dor${n > 1 ? 'ment' : 't'} cette semaine`
+  const objet = n
+    ? `😴 ${n} carte${n > 1 ? 's' : ''} qui dor${n > 1 ? 'ment' : 't'} cette semaine${stock ? ' · stock bas' : ''}`
+    : `📦 ${stock && stock.quantite >= 0 ? `Plus que ${stock.quantite} carte${stock.quantite > 1 ? 's' : ''} en stock` : 'Stock de cartes à corriger'}`
   const lignes = cartes
     .slice(0, 25)
     .map((c) => {
@@ -137,22 +160,31 @@ export function courrielSommeil(cartes: CarteEndormie[], lien: string, societe: 
 </td></tr>
 <tr><td style="background:#fffaf2;border-radius:20px;padding:28px 26px;box-shadow:0 18px 40px -26px rgba(60,40,20,.45)">
   <p style="margin:0 0 4px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#c2552f;font-weight:700">Le point du lundi</p>
-  <p style="margin:0 0 12px;font-family:Georgia,serif;font-size:24px;line-height:1.25;color:#2a211a">${n} carte${n > 1 ? 's' : ''} à réveiller</p>
+  ${n ? `<p style="margin:0 0 12px;font-family:Georgia,serif;font-size:24px;line-height:1.25;color:#2a211a">${n} carte${n > 1 ? 's' : ''} à réveiller</p>
   <p style="margin:0 0 8px;font-size:15px;line-height:1.6;color:#2a211a">Aucun tap depuis au moins ${JOURS_SOMMEIL} jours. Le plus souvent : la carte est cachée, tombée, ou l’équipe a oublié d’en parler. Un appel de deux minutes suffit — et c’est le bon moment pour proposer une deuxième carte.</p>
   <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-top:8px">${lignes}</table>
   ${reste}
   <table role="presentation" cellpadding="0" cellspacing="0" style="margin:22px 0 0"><tr><td style="background:#c2552f;border-radius:999px">
     <a href="${echapper(lien)}" style="display:inline-block;padding:13px 24px;font-size:15px;font-weight:700;color:#fffaf2;text-decoration:none">Ouvrir la liste</a>
-  </td></tr></table>
+  </td></tr></table>` : ''}
+  ${stock ? `<div style="margin:${n ? '22px' : '0'} 0 0;padding:16px 18px;border-radius:14px;background:#fdf3dc;color:#6b4a05">
+    <p style="margin:0;font-size:15px;font-weight:700">📦 ${echapper(texteStock(stock))}</p>
+    <p style="margin:8px 0 0;font-size:14px"><a href="${echapper(stock.lien)}" style="color:#c2552f;font-weight:700">Voir le stock</a> — à la réception, deux chiffres suffisent : cartes reçues, total payé.</p>
+  </div>` : ''}
 </td></tr>
 <tr><td style="padding:18px 6px 0;font-size:12px;line-height:1.5;color:#6b5d50;text-align:center">Courriel automatique du lundi · ${echapper(societe)}</td></tr>
 </table></td></tr></table></body></html>`
   const texte = [
-    `${n} carte${n > 1 ? 's' : ''} à réveiller (aucun tap depuis au moins ${JOURS_SOMMEIL} jours) :`,
-    '',
-    ...cartes.slice(0, 25).map((c) => `- ${c.dossier_nom ?? c.libelle} (${c.libelle}) : ${depuisTexte(c)}${c.telephone ? ` · ${c.telephone}` : ''}`),
-    '',
-    lien,
+    ...(n
+      ? [
+          `${n} carte${n > 1 ? 's' : ''} à réveiller (aucun tap depuis au moins ${JOURS_SOMMEIL} jours) :`,
+          '',
+          ...cartes.slice(0, 25).map((c) => `- ${c.dossier_nom ?? c.libelle} (${c.libelle}) : ${depuisTexte(c)}${c.telephone ? ` · ${c.telephone}` : ''}`),
+          '',
+          lien,
+        ]
+      : []),
+    ...(stock ? ['', texteStock(stock), stock.lien] : []),
   ].join('\n')
   return { objet, html, texte }
 }

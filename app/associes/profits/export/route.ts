@@ -4,6 +4,7 @@ import { exercicesConnus } from '@/lib/requetes/associes'
 import { partages, resumeAnnee } from '@/lib/profits'
 import { emetteur } from '@/lib/requetes/ventes'
 import { versCsv } from '@/lib/requetes/export'
+import { stockAu } from '@/lib/stock'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,7 +23,9 @@ export async function GET(requete: Request) {
   const p = new URL(requete.url).searchParams
   const annee = Number(p.get('annee'))
   if (!(await exercicesConnus()).some((e) => e.annee === annee)) return new NextResponse('Année inconnue', { status: 400 })
-  const [r, histo, societe] = await Promise.all([resumeAnnee(annee), partages(), emetteur()])
+  const auj = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Toronto' }).format(new Date())
+  const finStock = auj.startsWith(String(annee)) ? auj : `${annee}-12-31`
+  const [r, histo, societe, stockDebut, stockFin] = await Promise.all([resumeAnnee(annee), partages(), emetteur(), stockAu(`${annee - 1}-12-31`), stockAu(finStock)])
   const a = r.associes.find((x) => x.associe_id === p.get('associe'))
   if (!a) return new NextResponse('Associé inconnu', { status: 400 })
 
@@ -35,6 +38,10 @@ export async function GET(requete: Request) {
     { section: 'Société', libelle: 'Bénéfice net', montant: r.societe.benefice },
     { section: 'Société', libelle: 'Repas et représentation non déductibles (50 %)', montant: r.societe.repas_non_deductible },
     { section: 'Société', libelle: 'Bénéfice imposable estimé', montant: r.societe.benefice_fiscal },
+    { section: 'Coût des produits vendus', libelle: `Stock au ${annee}-01-01 (${Math.max(0, stockDebut.quantite)} cartes)`, montant: stockDebut.valeur },
+    { section: 'Coût des produits vendus', libelle: 'Achats de cartes de l’année (au stock)', montant: stockFin.achats },
+    { section: 'Coût des produits vendus', libelle: `Stock au ${finStock} (${Math.max(0, stockFin.quantite)} cartes)`, montant: stockFin.valeur },
+    { section: 'Coût des produits vendus', libelle: 'Coût des cartes vendues (inclus dans les dépenses)', montant: stockFin.cogs },
     { section: 'Associé', libelle: a.nom, montant: null },
     { section: 'Associé', libelle: 'Part du bénéfice imposable estimé (revenu d’entreprise à déclarer)', montant: a.fiscal },
     { section: 'Associé', libelle: 'Part du bénéfice net', montant: a.comptable },

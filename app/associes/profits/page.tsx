@@ -4,6 +4,7 @@ import { exigerSession } from '@/lib/auth'
 import { exercicesConnus, listerAssocies } from '@/lib/requetes/associes'
 import { partages, RESERVE_IMPOTS, resumeAnnee, type Partage } from '@/lib/profits'
 import { argent } from '@/lib/format'
+import { stockAu } from '@/lib/stock'
 import OngletsAssocies from '@/components/onglets-associes'
 import FormulairePartage from '@/components/formulaire-partage'
 import { annulerPartageAction, approuverPartageAction } from '@/app/associes/actions'
@@ -39,7 +40,8 @@ export default async function PageProfits({
   const [exercices, associes, histo] = await Promise.all([exercicesConnus(), listerAssocies(), partages()])
   const anneeCourante = Number(aujourdhui().slice(0, 4))
   const annee = exercices.some((e) => e.annee === Number(sp.annee)) ? Number(sp.annee) : anneeCourante
-  const r = await resumeAnnee(annee)
+  const finStock = annee === anneeCourante ? aujourdhui() : `${annee}-12-31`
+  const [r, stockDebut, stockFin] = await Promise.all([resumeAnnee(annee), stockAu(`${annee - 1}-12-31`), stockAu(finStock)])
   const choisi = r.associes.find((a) => a.associe_id === sp.associe) ?? r.associes.find((a) => a.associe_id === moi.associe_id) ?? r.associes[0]
   const mien = choisi?.associe_id === moi.associe_id
   const parId = new Map(histo.appliques.map((p) => [p.id, p]))
@@ -295,6 +297,18 @@ export default async function PageProfits({
                 <Ligne libelle="Bénéfice imposable estimé de la société" valeur={argent(r.societe.benefice_fiscal)} fort />
                 <Ligne libelle={`Part de ${mien ? 'vous' : prenom(choisi.nom)}, selon le partage de chaque période`} valeur={argent(choisi.fiscal)} fort />
               </dl>
+              {(stockFin.achats > 0 || stockFin.cogs > 0 || stockDebut.valeur > 0 || stockFin.valeur > 0) && (
+                <div className="mt-5 rounded-xl bg-[var(--color-fond)] p-4">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-encre-doux)]">Coût des cartes vendues (section « coût des produits vendus »)</h3>
+                  <dl className="mt-2 space-y-1.5 text-sm">
+                    <Ligne libelle={`Stock au 1er janvier ${annee}`} valeur={`${argent(stockDebut.valeur)} · ${Math.max(0, stockDebut.quantite)} cartes`} />
+                    <Ligne libelle="+ Cartes reçues dans l’année (achats)" valeur={argent(stockFin.achats)} />
+                    <Ligne libelle={`− Stock au ${annee === anneeCourante ? 'aujourd’hui' : `31 décembre ${annee}`}`} valeur={`${argent(stockFin.valeur)} · ${Math.max(0, stockFin.quantite)} cartes`} />
+                    <Ligne libelle="= Coût des cartes vendues (déjà dans les dépenses)" valeur={argent(stockFin.cogs)} fort />
+                  </dl>
+                  <p className="mt-2 text-xs leading-relaxed text-[var(--color-encre-doux)]">Les cartes encore en stock ne sont pas une dépense : elles comptent l’année où elles se vendent.</p>
+                </div>
+              )}
               {exportUrl && (
                 <a href={exportUrl} className="bouton mt-5 inline-flex text-sm">Télécharger le résumé pour le comptable (CSV)</a>
               )}

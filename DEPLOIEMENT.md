@@ -526,6 +526,33 @@ modification de texte se fait dans les deux fichiers ; les balises
   « Télécharger le résumé pour le comptable » donne un CSV par associé et par
   année. La réserve de 30 % est un repère, pas un calcul d'impôt.
 
+## 13. Stock de cartes : réceptions et coût réel
+
+- **Réception de cartes** (Cartes → Stock, ou Transactions → « Réception de
+  cartes ») : le nombre de cartes reçues et le total payé. Les cartes vont
+  au STOCK (un actif) : ce n'est pas une dépense tant qu'elles ne sont pas
+  vendues. Chaque reçu ou facture en sort une à son coût moyen ; la vente
+  montre son vrai profit. Société non inscrite aux taxes : le total payé est
+  le coût (si elle s'inscrit, un champ « dont TPS + TVQ » apparaît).
+- **Coût moyen pondéré perpétuel** : il se refait à chaque réception sur les
+  cartes encore en stock. Ce qui a été payé = cartes vendues + stock, au
+  cent près. Une réception datée dans le passé recalcule les ventes qui
+  suivent.
+- **Automatique** : une dépense qui ressemble à un achat de cartes
+  (« carte », « Alibaba », « NFC »…) est proposée en conversion ; la part
+  « cartes » va au stock, le reste reste une dépense. « Corriger » change le
+  nombre de cartes ou sépare des frais (ex. immatriculation) sans rien
+  perdre du total payé. Annuler un reçu remet sa carte en stock et retire son
+  coût (avant : seul le revenu disparaissait). Sous le seuil (10 par défaut),
+  alerte dans Cartes et dans le courriel du lundi.
+- L'écran Marge prend le coût réel de la carte dès qu'une réception existe.
+  Le résumé fiscal (Vos profits) donne le stock au début, les achats, le
+  stock à la fin et le coût des cartes vendues (section « coût des produits
+  vendus » du T2125).
+- Correction faite le 20 octobre 2026 en production (migration
+  `20261020000300`) : la dépense du 29 septembre (357,95 $) est devenue la
+  réception de 50 cartes ; le reçu test R-2026-00009 est annulé.
+
 ## Sauvegardes
 
 Le forfait gratuit de Supabase ne garde pas d'historique de sauvegardes long.

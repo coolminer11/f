@@ -73,9 +73,14 @@ export default async function PageTransactions({
             Journal complet. Le revenu est toujours le montant hors taxes.
           </p>
         </div>
-        <Link href="/transactions/nouvelle" className="bouton">
-          Saisir une dépense
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/cartes/stock#reception" className="bouton bouton-secondaire" title="Cartes reçues : elles vont au stock, pas aux dépenses">
+            Réception de cartes
+          </Link>
+          <Link href="/transactions/nouvelle" className="bouton">
+            Saisir une dépense
+          </Link>
+        </div>
       </div>
 
       <FiltresJournal categories={categories} provinces={PROVINCES} valeurs={p} />

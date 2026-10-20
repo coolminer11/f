@@ -15,6 +15,8 @@ import {
 import { listerProduits } from '@/lib/requetes/ventes'
 import { argent, nombre, pourcent, taux } from '@/lib/format'
 import { exigerEcriture, exigerSession } from '@/lib/auth'
+import Link from 'next/link'
+import { etatStock } from '@/lib/stock'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,7 +28,8 @@ const CANAUX: Record<string, string> = {
 }
 
 const SaisieCouts = z.object({
-  carte_vierge: z.coerce.number().min(0),
+  // Absent quand le coût de la carte vient des réceptions (Stock de cartes).
+  carte_vierge: z.coerce.number().min(0).optional(),
   impression: z.coerce.number().min(0),
   expedition: z.coerce.number().min(0),
   emballage: z.coerce.number().min(0),
@@ -45,13 +48,14 @@ export default async function PageMarge({
 }) {
   await exigerSession()
   const p = await searchParams
-  const [reelles, references, seuil, couts, produits, hypo] = await Promise.all([
+  const [reelles, references, seuil, couts, produits, hypo, stock] = await Promise.all([
     margeReelle(),
     margeReference(),
     seuilRentabilite(),
     coutsReference(),
     listerProduits(),
     hypotheses(),
+    etatStock(),
   ])
 
   const coutParComposante = Object.fromEntries(couts.map((c) => [c.composante, c.montant_ht]))
@@ -65,7 +69,8 @@ export default async function PageMarge({
     }
     const v = analyse.data
     for (const [composante] of COMPOSANTES) {
-      await definirCoutReference(composante, v[composante as keyof typeof v] as number, v.date_effet)
+      const valeur = v[composante as keyof typeof v]
+      if (typeof valeur === 'number') await definirCoutReference(composante, valeur, v.date_effet)
     }
 
     for (const produit of produits) {
@@ -311,7 +316,17 @@ export default async function PageMarge({
           </p>
 
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            {COMPOSANTES.map(([code, libelle]) => (
+            {COMPOSANTES.map(([code, libelle]) =>
+              code === 'carte_vierge' && stock.depuis_receptions ? (
+                <div key={code}>
+                  <span className="etiquette">{libelle}</span>
+                  <p className="champ bg-[var(--color-fond)] tabular-nums">{argent(stock.cout_moyen)}</p>
+                  <p className="mt-1 text-xs text-[var(--color-encre-doux)]">
+                    Calculé tout seul à partir des{' '}
+                    <Link href="/cartes/stock" className="font-medium text-[var(--color-accent)] hover:underline">réceptions de cartes</Link>.
+                  </p>
+                </div>
+              ) : (
               <div key={code}>
                 <label className="etiquette" htmlFor={`cout_${code}`}>
                   {libelle}
@@ -328,7 +343,8 @@ export default async function PageMarge({
                   required
                 />
               </div>
-            ))}
+              ),
+            )}
           </div>
 
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
