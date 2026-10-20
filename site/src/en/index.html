@@ -44,7 +44,7 @@
         "address": { "@type": "PostalAddress", "addressRegion": "QC", "addressCountry": "CA" },
         "areaServed": [{ "@type": "AdministrativeArea", "name": "Québec" }, { "@type": "Country", "name": "Canada" }],
         "knowsLanguage": ["fr-CA", "en-CA"],
-        "description": "Tapora Cards, a Québec business, sells NFC cards that open a business’s Google review page in one tap, with live statistics (taps, peak hours, reviews gained), a notification on every tap and a monthly report. Québec Card: $35 per card; custom Business offer: $30 per card from 25 cards. Everything included, no subscription."
+        "description": "Tapora Cards, a Québec business, sells NFC cards that open a business’s Google review page in one tap, with live statistics (taps, peak hours, reviews gained), a notification on every tap and a monthly report. Individual cards: $35 each, compliant with Québec’s language law; custom Business offer: $30 per card from 25 cards. Everything included, no subscription."
       },
       {
         "@type": "WebSite",
@@ -68,7 +68,7 @@
           "offerCount": 2,
           "availability": "https://schema.org/InStock",
           "offers": [
-            { "@type": "Offer", "name": "Québec Card — ready to use, bilingual (French featured), price per card", "price": "35.00", "priceCurrency": "CAD", "eligibleQuantity": { "@type": "QuantitativeValue", "minValue": 1 } },
+            { "@type": "Offer", "name": "Individual card — ready to use, bilingual, compliant with Québec’s language law, price per card", "price": "35.00", "priceCurrency": "CAD", "eligibleQuantity": { "@type": "QuantitativeValue", "minValue": 1 } },
             { "@type": "Offer", "name": "Business — custom design, price per card, from 25 cards", "price": "30.00", "priceCurrency": "CAD", "eligibleQuantity": { "@type": "QuantitativeValue", "minValue": 25 } }
           ]
         },
@@ -82,7 +82,7 @@
           { "@type": "Question", "name": "Can I change where the card leads?", "acceptedAnswer": { "@type": "Answer", "text": "Yes — any time, without touching the card. The chip points to a Tapora address and we handle the redirect. Google reviews today, your menu or Instagram tomorrow." } },
           { "@type": "Question", "name": "What stats do I get?", "acceptedAnswer": { "@type": "Answer", "text": "Every tap, live: by day, by hour, by weekday, iPhone or Android — with the number of Google reviews gained right beside it. Each business gets a private page and a report on the 1st of every month." } },
           { "@type": "Question", "name": "Do you collect data about my customers?", "acceptedAnswer": { "@type": "Answer", "text": "No. In line with Québec’s Law 25, we keep no IP address, no lasting cookie and no location — only the time of the tap and the type of phone." } },
-          { "@type": "Question", "name": "How much does a Tapora card cost?", "acceptedAnswer": { "@type": "Answer", "text": "The Québec Card is $35 per card, with no minimum (5 cards: $175). From 25 cards, the Business offer is $30 per card with a custom design. Everything is included, no subscription: live stats, private page, notifications, counter mode, monthly report." } },
+          { "@type": "Question", "name": "How much does a Tapora card cost?", "acceptedAnswer": { "@type": "Answer", "text": "Individual cards are $35 each, with no minimum (5 cards: $175): bilingual and compliant with Québec’s language law (French first in Québec, English first everywhere else). From 25 cards, the Business offer is $30 per card with a custom design. Everything is included, no subscription: live stats, private page, notifications, counter mode, monthly report." } },
           { "@type": "Question", "name": "Do you have an offer for businesses (hotels, chains…)?", "acceptedAnswer": { "@type": "Answer", "text": "Yes: the Business offer, $30 per card from 25 cards. The design is made in your colours (logo, text, a name for each card such as “Room 101”), in a Québec version (French first) or an outside-Québec version (English first). You follow your stats card by card and by group, on a page that can be password-protected. Lead time is longer than for a standard card: a mock-up to approve, then custom production; we confirm the exact date with your mock-up." } },
           { "@type": "Question", "name": "Is there a subscription or a monthly fee?", "acceptedAnswer": { "@type": "Answer", "text": "No. You pay for the card once and everything else is included, with no monthly fees: stats, private page, “Ding!” notifications, counter mode, review tracking and the monthly report." } },
           { "@type": "Question", "name": "Is Tapora a local business?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Tapora S.E.N.C. is a Québec business (NEQ 3382462367). Your cards are set up, tracked and supported by us, in Québec, in English and French." } }
@@ -392,14 +392,14 @@
         <div class="mt-14 grid gap-5 lg:grid-cols-2">
           <article class="carte-prix relative flex flex-col rounded-3xl p-7 carte-papier sm:p-9" data-apparait>
             <div class="flex flex-wrap items-center justify-between gap-3">
-              <h3 class="titre text-2xl font-medium">Québec Card</h3>
+              <h3 class="titre text-2xl font-medium">Individual cards</h3>
               <span class="rounded-full bg-sable px-3 py-1 text-xs font-semibold text-encre-doux">Ready to use</span>
             </div>
-            <p class="mt-1 text-sm text-encre-doux">For every business · per card, no minimum</p>
+            <p class="mt-1 text-sm text-encre-doux">For every business · no minimum</p>
             <p class="titre mt-7 text-7xl font-medium tabular-nums">$35 <span class="text-2xl">/ card</span></p>
             <p class="mt-2 text-sm text-encre-doux">5 cards: $175 · 10 cards: $350</p>
             <ul class="mt-6 space-y-3 text-[15px] leading-snug">
-              <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>Bilingual: French featured first, then English — compliant with Québec’s Charter of the French Language</span></li>
+              <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>Bilingual and compliant with Québec’s language law: French first in Québec (Charter of the French Language), English first everywhere else</span></li>
               <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>A destination you can change any time, no reprogramming</span></li>
               <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>Live stats, a private page and a report on the 1st of the month</span></li>
               <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>The “Ding!” on your phone for every tap</span></li>
@@ -439,7 +439,7 @@
             <div class="mt-4 flex flex-wrap gap-1.5" role="group" aria-label="Quick pick"><button type="button" data-nb="1" aria-pressed="false" class="puce-nb min-w-10 rounded-full px-3 py-1.5 text-sm font-semibold tabular-nums transition">1</button><button type="button" data-nb="3" aria-pressed="true" class="puce-nb min-w-10 rounded-full px-3 py-1.5 text-sm font-semibold tabular-nums transition">3</button><button type="button" data-nb="5" aria-pressed="false" class="puce-nb min-w-10 rounded-full px-3 py-1.5 text-sm font-semibold tabular-nums transition">5</button><button type="button" data-nb="10" aria-pressed="false" class="puce-nb min-w-10 rounded-full px-3 py-1.5 text-sm font-semibold tabular-nums transition">10</button><button type="button" data-nb="25" aria-pressed="false" class="puce-nb min-w-10 rounded-full px-3 py-1.5 text-sm font-semibold tabular-nums transition">25</button><button type="button" data-nb="50" aria-pressed="false" class="puce-nb min-w-10 rounded-full px-3 py-1.5 text-sm font-semibold tabular-nums transition">50</button></div>
             <p class="mt-7 text-sm text-encre-doux">Total</p>
             <p class="titre text-6xl font-medium tabular-nums"><span id="total-cartes">$105</span></p>
-            <p id="detail-cartes" class="mt-2 text-sm text-encre-doux">$35 per card · Québec Card</p>
+            <p id="detail-cartes" class="mt-2 text-sm text-encre-doux">$35 per card · individual cards</p>
             <a id="conseil-entreprise" href="#entreprise" hidden class="bouton-fleche group mt-5 flex items-start gap-3 rounded-2xl bg-encre px-4 py-3.5 text-sm leading-snug text-creme transition hover:bg-brique">
               <svg viewBox="0 0 24 24" class="mt-0.5 size-4 shrink-0 text-miel" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.4.3.6.8.6 1.2v1h6v-1c0-.4.2-.9.6-1.2A6 6 0 0 0 12 3Z"/></svg>
               <span id="conseil-texte" class="flex-1"></span>
@@ -656,7 +656,7 @@
         </details>
         <details class="group py-5" data-apparait>
           <summary class="flex items-center justify-between gap-6 text-lg font-medium">How much does a Tapora card cost?<span class="plus titre text-3xl text-brique transition">+</span></summary>
-          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">The Québec Card is $35 per card, with no minimum (5 cards: $175). From 25 cards, the <a href="#entreprise" class="text-brique underline underline-offset-4">Business offer</a> is $30 per card with a custom design. Everything is included, no subscription: live stats, private page, notifications, counter mode, monthly report.</p></div>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Individual cards are $35 each, with no minimum (5 cards: $175): bilingual and compliant with Québec’s language law — French first in Québec, English first everywhere else. From 25 cards, the <a href="#entreprise" class="text-brique underline underline-offset-4">Business offer</a> is $30 per card with a custom design. Everything is included, no subscription: live stats, private page, notifications, counter mode, monthly report.</p></div>
         </details>
         <details class="group py-5" data-apparait>
           <summary class="flex items-center justify-between gap-6 text-lg font-medium">Do you have an offer for businesses (hotels, chains…)?<span class="plus titre text-3xl text-brique transition">+</span></summary>

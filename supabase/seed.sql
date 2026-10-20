@@ -80,11 +80,11 @@ insert into categories_defauts
   ('autre',                    'Autre',                          'depense', 'fixe',     1,   true, 900)
 on conflict (categorie) do nothing;
 
--- La Carte Québec (les cartes Entreprise viennent de la migration du
+-- La carte à l'unité — Québec (la carte hors Québec et les cartes Entreprise viennent de la migration du
 -- catalogue). Seulement si elle n'existe pas encore, quel que soit son code.
 insert into produits (sku, nom, description, prix_vente_ht, est_carte, suivi_stock,
                       modele, langue, personnalisable, quantite_min, seuil_stock, ordre)
-select 'CARTE-QC', 'Carte Québec',
+select 'CARTE-QC', 'Carte à l’unité — Québec',
        'Carte NFC d''avis Google, français mis en valeur, anglais après. Sans personnalisation.',
        35.00, true, true, 'quebec', 'fr_en', false, 1, 10, 1
  where not exists (select 1 from produits where modele = 'quebec')

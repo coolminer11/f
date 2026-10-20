@@ -138,7 +138,7 @@ GUIDES = [
 </ol>
 '''),
       ('Tapora’s choice', '''
-<p>At Tapora we chose a one-time payment: <strong>$35 per card</strong> (Québec Card, no minimum), or <strong>$30 per card from 25 cards</strong> with the custom-design Business offer. The changeable destination, the private live stats page, a notification on every tap, counter mode and the monthly report are included, <strong>with no subscription or monthly fee</strong>. Details are in our <a href="/en/terms">terms</a>.</p>
+<p>At Tapora we chose a one-time payment: <strong>$35 per card</strong> (individual cards, no minimum), or <strong>$30 per card from 25 cards</strong> with the custom-design Business offer. The changeable destination, the private live stats page, a notification on every tap, counter mode and the monthly report are included, <strong>with no subscription or monthly fee</strong>. Details are in our <a href="/en/terms">terms</a>.</p>
 '''),
     ],
     faq=[

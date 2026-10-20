@@ -1,10 +1,10 @@
 # Tapora Cards
 
-> Tapora Cards (Tapora S.E.N.C., entreprise québécoise, NEQ 3382462367) vend des cartes NFC qui ouvrent la page « Écrire un avis » de la fiche Google d'un commerce en un tap, sans application. Prix : Carte Québec à 35 $ CA la carte, sans minimum ; offre Entreprise à 30 $ la carte dès 25 cartes, avec un design sur mesure. Tout est inclus, sans abonnement ni frais mensuels : statistiques en direct, page privée du commerçant, notification à chaque tap, mode comptoir, suivi des avis Google et rapport mensuel. Service en français et en anglais.
+> Tapora Cards (Tapora S.E.N.C., entreprise québécoise, NEQ 3382462367) vend des cartes NFC qui ouvrent la page « Écrire un avis » de la fiche Google d'un commerce en un tap, sans application. Prix : à l’unité, 35 $ CA la carte, sans minimum, conforme à la loi québécoise ; offre Entreprise à 30 $ la carte dès 25 cartes, avec un design sur mesure. Tout est inclus, sans abonnement ni frais mensuels : statistiques en direct, page privée du commerçant, notification à chaque tap, mode comptoir, suivi des avis Google et rapport mensuel. Service en français et en anglais.
 
 ## Prix (dollars canadiens)
 
-- Carte Québec : 35 $ la carte, sans minimum (5 cartes : 175 $). Prête à poser, bilingue : le français en vedette, puis l'anglais (conforme à la Charte de la langue française).
+- À l’unité : 35 $ la carte, sans minimum (5 cartes : 175 $). Prête à poser, bilingue et conforme à la loi québécoise : au Québec, le français en vedette (Charte de la langue française) ; ailleurs, une version anglais d’abord.
 - Entreprise : 30 $ la carte, à partir de 25 cartes (25 cartes : 750 $). Design sur mesure : logo, couleurs, texte, nom de chaque carte (ex. « Chambre 101 »). Version Québec (français d'abord) ou hors Québec (anglais d'abord). Statistiques carte par carte et par groupe, page protégée par mot de passe, export. Délai plus long qu'une carte standard : maquette à approuver, puis fabrication sur mesure ; la date est confirmée avec la maquette. Demande : https://taporacards.com/#entreprise
 - Aucun abonnement, aucuns frais mensuels : tout est inclus (voir les conditions : https://taporacards.com/conditions).
 
@@ -58,4 +58,4 @@ Restaurants, cafés, boulangeries, salons de coiffure et d'esthétique, clinique
 
 ## In English
 
-Tapora Cards (Tapora S.E.N.C., a Québec business) sells NFC cards that open a business's Google "Write a review" page in one tap, no app needed. Pricing (CAD): Québec Card $35 per card, no minimum; Business offer $30 per card from 25 cards, with a custom design (longer lead time: a mock-up to approve, then custom production). Everything is included with no subscription or monthly fee: live stats, a private page for the business owner, a notification on every tap, counter mode, Google review tracking and a monthly report. Support in English and French.
+Tapora Cards (Tapora S.E.N.C., a Québec business) sells NFC cards that open a business's Google "Write a review" page in one tap, no app needed. Pricing (CAD): individual cards $35 each, no minimum, compliant with Québec’s language law (French first in Québec, English first elsewhere); Business offer $30 per card from 25 cards, with a custom design (longer lead time: a mock-up to approve, then custom production). Everything is included with no subscription or monthly fee: live stats, a private page for the business owner, a notification on every tap, counter mode, Google review tracking and a monthly report. Support in English and French.

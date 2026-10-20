@@ -2,19 +2,22 @@ import 'server-only'
 import { requete } from '@/lib/db'
 
 /**
- * Le catalogue : trois cartes, et seulement trois.
+ * Le catalogue : quatre cartes, deux familles.
  *
- *   - Carte Québec : français mis en valeur, anglais après ; sans
- *     personnalisation ; gardée en stock.
- *   - Entreprise — Québec : personnalisée, français d'abord ; 25 au minimum.
- *   - Entreprise — International : personnalisée, anglais d'abord ; hors
- *     Québec seulement (la base le refuse au Québec).
+ *   À l'unité — prêtes à poser, sans personnalisation, gardées en stock :
+ *   - Québec : français d'abord, anglais ensuite (Charte de la langue française) ;
+ *   - Hors Québec : anglais d'abord, français ensuite.
+ *   Entreprise — personnalisées, 25 au minimum :
+ *   - Québec : français d'abord ;
+ *   - International : anglais d'abord ; hors Québec seulement (la base le
+ *     refuse au Québec).
  */
 
-export type Modele = 'quebec' | 'entreprise_qc' | 'entreprise_intl'
+export type Modele = 'quebec' | 'hors_quebec' | 'entreprise_qc' | 'entreprise_intl'
 
 export const MODELES: Record<Modele, { court: string; langue: string; pour: string }> = {
-  quebec: { court: 'Québec', langue: 'Français mis en valeur, anglais après', pour: 'Tout commerce au Québec. Prête à poser, sans personnalisation.' },
+  quebec: { court: 'À l’unité — Québec', langue: 'Français d’abord, anglais ensuite', pour: 'Tout commerce au Québec. Prête à poser, sans personnalisation.' },
+  hors_quebec: { court: 'À l’unité — Hors Québec', langue: 'Anglais d’abord, français ensuite', pour: 'Reste du Canada, États-Unis, ailleurs. Prête à poser, sans personnalisation.' },
   entreprise_qc: { court: 'Entreprise — Québec', langue: 'Français d’abord, anglais après', pour: 'Restos, hôtels, chaînes au Québec. Logo, couleurs, texte, nom de chaque carte.' },
   entreprise_intl: { court: 'Entreprise — International', langue: 'Anglais d’abord, français après', pour: 'Les mêmes, hors Québec (reste du Canada, États-Unis…).' },
 }

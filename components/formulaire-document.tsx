@@ -104,6 +104,8 @@ export default function FormulaireDocument({
       ? prefill.lignes.map((l) => ({ ...l, cle: crypto.randomUUID() }))
       : [ligneVide()],
   )
+  // Une carte « anglais d'abord » vers le Québec : on prévient (sans bloquer : un client hors Canada garde « Québec » comme province de vente).
+  const anglaisAuQuebec = province === 'QC' && lignes.some((l) => produits.find((p) => p.id === l.produit_id)?.langue === 'en_fr')
   const [taxes, setTaxes] = useState<ApercuTaxe[]>([])
   const [paiementImmediat, setPaiementImmediat] = useState('')
 
@@ -360,6 +362,12 @@ export default function FormulaireDocument({
                 </option>
               ))}
             </select>
+            {anglaisAuQuebec && (
+              <p className="mt-1.5 rounded-md bg-[#fdf3dc] px-2.5 py-1.5 text-xs text-[#6b4a05]" role="status">
+                Carte « anglais d’abord » pour le Québec ? La Charte de la langue française y exige le français nettement prédominant : pour
+                un commerce au Québec, prenez la carte à l’unité — Québec. (Client hors Canada : ignorez ce message.)
+              </p>
+            )}
           </div>
           <div>
             <label className="etiquette" htmlFor="regime_taxe">

@@ -58,7 +58,7 @@
   }
 
   // ------------------------------------------------- calculette des prix
-  // Carte Québec : 35 $ la carte, à l'unité. Dès 25 cartes, l'offre
+  // À l'unité : 35 $ la carte. Dès 25 cartes, l'offre
   // Entreprise (30 $ la carte, design sur mesure) est proposée à côté.
   const PRIX_QC = 35
   const PRIX_ENTREPRISE = 30
@@ -80,7 +80,7 @@
       const total = n * PRIX_QC
       nbEl.textContent = String(n)
       totalEl.textContent = argent.format(total)
-      detailEl.textContent = fr ? `${argent.format(PRIX_QC)} la carte · Carte Québec` : `${argent.format(PRIX_QC)} per card · Québec Card`
+      detailEl.textContent = fr ? `${argent.format(PRIX_QC)} la carte · à l’unité` : `${argent.format(PRIX_QC)} per card · individual cards`
       for (const p of puces) p.setAttribute('aria-pressed', String(Number(p.dataset.nb) === n))
       if (conseil && conseilTexte) {
         const entreprise = n >= MIN_ENTREPRISE
@@ -94,8 +94,8 @@
       }
       const sujet = calculette.dataset.sujet
       const corps = fr
-        ? `Bonjour,\n\nNom du commerce : \nVille : \nNombre de cartes Québec : ${n} (${argent.format(total)})\n\nMerci !`
-        : `Hi,\n\nBusiness name: \nCity: \nNumber of Québec Cards: ${n} (${argent.format(total)})\n\nThanks!`
+        ? `Bonjour,\n\nNom du commerce : \nVille et province (ou pays) : \nNombre de cartes à l’unité : ${n} (${argent.format(total)})\n\nMerci !`
+        : `Hi,\n\nBusiness name: \nCity and province (or country): \nNumber of individual cards: ${n} (${argent.format(total)})\n\nThanks!`
       lien.href = `mailto:contact@taporacards.com?subject=${sujet}&body=${encodeURIComponent(corps)}`
       lien.textContent = fr ? `Commander ${n} carte${n > 1 ? 's' : ''}` : `Order ${n} card${n > 1 ? 's' : ''}`
       if (anime && !reduit) totalEl.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.08)' }, { transform: 'scale(1)' }], { duration: 320, easing: 'cubic-bezier(.2,.9,.3,1.4)' })

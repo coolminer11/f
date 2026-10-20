@@ -136,7 +136,7 @@ GUIDES = [
 </ol>
 '''),
       ('Le choix de Tapora', '''
-<p>Chez Tapora, nous avons choisi le paiement unique : <strong>35 $ la carte</strong> (Carte Québec, sans minimum), ou <strong>30 $ la carte dès 25 cartes</strong> avec l’offre Entreprise, au design sur mesure. La destination modifiable, la page privée de statistiques en direct, la notification à chaque tap, le mode comptoir et le rapport mensuel sont inclus, <strong>sans abonnement ni frais mensuels</strong>. Les détails sont dans nos <a href="/conditions">conditions</a>.</p>
+<p>Chez Tapora, nous avons choisi le paiement unique : <strong>35 $ la carte</strong> (à l’unité, sans minimum), ou <strong>30 $ la carte dès 25 cartes</strong> avec l’offre Entreprise, au design sur mesure. La destination modifiable, la page privée de statistiques en direct, la notification à chaque tap, le mode comptoir et le rapport mensuel sont inclus, <strong>sans abonnement ni frais mensuels</strong>. Les détails sont dans nos <a href="/conditions">conditions</a>.</p>
 '''),
     ],
     faq=[

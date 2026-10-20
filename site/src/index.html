@@ -44,7 +44,7 @@
         "address": { "@type": "PostalAddress", "addressRegion": "QC", "addressCountry": "CA" },
         "areaServed": [{ "@type": "AdministrativeArea", "name": "Québec" }, { "@type": "Country", "name": "Canada" }],
         "knowsLanguage": ["fr-CA", "en-CA"],
-        "description": "Tapora Cards, entreprise québécoise, vend des cartes NFC qui ouvrent la page d’avis Google d’un commerce en un tap, avec des statistiques en direct (taps, heures de pointe, avis gagnés), une notification à chaque tap et un rapport mensuel. Carte Québec : 35 $ la carte ; offre Entreprise sur mesure : 30 $ la carte dès 25 cartes. Tout inclus, sans abonnement."
+        "description": "Tapora Cards, entreprise québécoise, vend des cartes NFC qui ouvrent la page d’avis Google d’un commerce en un tap, avec des statistiques en direct (taps, heures de pointe, avis gagnés), une notification à chaque tap et un rapport mensuel. À l’unité : 35 $ la carte, conforme à la loi québécoise ; offre Entreprise sur mesure : 30 $ la carte dès 25 cartes. Tout inclus, sans abonnement."
       },
       {
         "@type": "WebSite",
@@ -68,7 +68,7 @@
           "offerCount": 2,
           "availability": "https://schema.org/InStock",
           "offers": [
-            { "@type": "Offer", "name": "Carte Québec — prête à poser, bilingue (français en vedette), prix par carte", "price": "35.00", "priceCurrency": "CAD", "eligibleQuantity": { "@type": "QuantitativeValue", "minValue": 1 } },
+            { "@type": "Offer", "name": "Carte à l’unité — prête à poser, bilingue, conforme à la loi québécoise, prix par carte", "price": "35.00", "priceCurrency": "CAD", "eligibleQuantity": { "@type": "QuantitativeValue", "minValue": 1 } },
             { "@type": "Offer", "name": "Entreprise — design sur mesure, prix par carte, dès 25 cartes", "price": "30.00", "priceCurrency": "CAD", "eligibleQuantity": { "@type": "QuantitativeValue", "minValue": 25 } }
           ]
         },
@@ -82,7 +82,7 @@
           { "@type": "Question", "name": "Peut-on changer la page où mène la carte ?", "acceptedAnswer": { "@type": "Answer", "text": "Oui, en tout temps et sans toucher à la carte : la puce mène à une adresse Tapora, et c’est nous qui redirigeons. Avis Google aujourd’hui, menu ou Instagram demain." } },
           { "@type": "Question", "name": "Quelles statistiques voit-on ?", "acceptedAnswer": { "@type": "Answer", "text": "Chaque tap, en direct : par jour, par heure, par jour de la semaine, iPhone ou Android, et le nombre d’avis Google gagnés à côté. Chaque commerce a sa page privée et reçoit un rapport le 1er du mois." } },
           { "@type": "Question", "name": "Collectez-vous des données sur mes clients ?", "acceptedAnswer": { "@type": "Answer", "text": "Non. Conformément à la Loi 25, nous ne gardons ni adresse IP, ni témoin durable, ni position : seulement l’heure du tap, et le type de téléphone." } },
-          { "@type": "Question", "name": "Combien coûte une carte Tapora ?", "acceptedAnswer": { "@type": "Answer", "text": "La Carte Québec coûte 35 $ la carte, sans minimum (5 cartes : 175 $). Dès 25 cartes, l’offre Entreprise est à 30 $ la carte, avec un design sur mesure. Tout est inclus, sans abonnement : statistiques en direct, page privée, notifications, mode comptoir, rapport mensuel." } },
+          { "@type": "Question", "name": "Combien coûte une carte Tapora ?", "acceptedAnswer": { "@type": "Answer", "text": "À l’unité, une carte coûte 35 $, sans minimum (5 cartes : 175 $) : bilingue et conforme à la loi québécoise (le français en vedette au Québec, l’anglais d’abord ailleurs). Dès 25 cartes, l’offre Entreprise est à 30 $ la carte, avec un design sur mesure. Tout est inclus, sans abonnement : statistiques en direct, page privée, notifications, mode comptoir, rapport mensuel." } },
           { "@type": "Question", "name": "Avez-vous une offre pour les entreprises (hôtels, chaînes…) ?", "acceptedAnswer": { "@type": "Answer", "text": "Oui : l’offre Entreprise, à 30 $ la carte dès 25 cartes. Le design est fait à vos couleurs (logo, texte, nom de chaque carte, par exemple « Chambre 101 »), en version Québec (français d’abord) ou hors Québec (anglais d’abord). Vous suivez vos statistiques carte par carte et par groupe, sur une page qui peut être protégée par un mot de passe. Le délai est plus long qu’une carte standard : maquette à approuver, puis fabrication sur mesure ; la date exacte vous est confirmée avec la maquette." } },
           { "@type": "Question", "name": "Y a-t-il un abonnement ou des frais mensuels ?", "acceptedAnswer": { "@type": "Answer", "text": "Non. Vous payez la carte une fois et tout le reste est inclus, sans frais mensuels : statistiques, page privée, notifications « Ding ! », mode comptoir, suivi des avis et rapport mensuel." } },
           { "@type": "Question", "name": "Tapora, c’est une entreprise d’ici ?", "acceptedAnswer": { "@type": "Answer", "text": "Oui. Tapora S.E.N.C. est une entreprise québécoise (NEQ 3382462367). Vos cartes sont configurées, suivies et soutenues par nous, au Québec, en français comme en anglais." } }
@@ -392,14 +392,14 @@
         <div class="mt-14 grid gap-5 lg:grid-cols-2">
           <article class="carte-prix relative flex flex-col rounded-3xl p-7 carte-papier sm:p-9" data-apparait>
             <div class="flex flex-wrap items-center justify-between gap-3">
-              <h3 class="titre text-2xl font-medium">Carte Québec</h3>
+              <h3 class="titre text-2xl font-medium">À l’unité</h3>
               <span class="rounded-full bg-sable px-3 py-1 text-xs font-semibold text-encre-doux">Prête à poser</span>
             </div>
-            <p class="mt-1 text-sm text-encre-doux">Pour tous les commerces · à l’unité, sans minimum</p>
+            <p class="mt-1 text-sm text-encre-doux">Pour tous les commerces · sans minimum</p>
             <p class="titre mt-7 text-7xl font-medium tabular-nums">35&nbsp;<span class="text-2xl">$ / carte</span></p>
             <p class="mt-2 text-sm text-encre-doux">5 cartes&nbsp;: 175&nbsp;$ · 10 cartes&nbsp;: 350&nbsp;$</p>
             <ul class="mt-6 space-y-3 text-[15px] leading-snug">
-              <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>Bilingue&nbsp;: le français en vedette, l’anglais ensuite — conforme à la Charte de la langue française</span></li>
+              <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>Bilingue et conforme à la loi québécoise&nbsp;: au Québec, le français en vedette (Charte de la langue française)&nbsp;; ailleurs, une version anglais d’abord</span></li>
               <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>La destination modifiable en tout temps, sans reprogrammer</span></li>
               <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>Statistiques en direct, page privée et rapport du 1<sup>er</sup> du mois</span></li>
               <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>Le «&nbsp;Ding&nbsp;!&nbsp;» sur votre téléphone à chaque tap</span></li>
@@ -439,7 +439,7 @@
             <div class="mt-4 flex flex-wrap gap-1.5" role="group" aria-label="Choix rapide"><button type="button" data-nb="1" aria-pressed="false" class="puce-nb min-w-10 rounded-full px-3 py-1.5 text-sm font-semibold tabular-nums transition">1</button><button type="button" data-nb="3" aria-pressed="true" class="puce-nb min-w-10 rounded-full px-3 py-1.5 text-sm font-semibold tabular-nums transition">3</button><button type="button" data-nb="5" aria-pressed="false" class="puce-nb min-w-10 rounded-full px-3 py-1.5 text-sm font-semibold tabular-nums transition">5</button><button type="button" data-nb="10" aria-pressed="false" class="puce-nb min-w-10 rounded-full px-3 py-1.5 text-sm font-semibold tabular-nums transition">10</button><button type="button" data-nb="25" aria-pressed="false" class="puce-nb min-w-10 rounded-full px-3 py-1.5 text-sm font-semibold tabular-nums transition">25</button><button type="button" data-nb="50" aria-pressed="false" class="puce-nb min-w-10 rounded-full px-3 py-1.5 text-sm font-semibold tabular-nums transition">50</button></div>
             <p class="mt-7 text-sm text-encre-doux">Total</p>
             <p class="titre text-6xl font-medium tabular-nums"><span id="total-cartes">105&nbsp;$</span></p>
-            <p id="detail-cartes" class="mt-2 text-sm text-encre-doux">35&nbsp;$ la carte · Carte Québec</p>
+            <p id="detail-cartes" class="mt-2 text-sm text-encre-doux">35&nbsp;$ la carte · à l’unité</p>
             <a id="conseil-entreprise" href="#entreprise" hidden class="bouton-fleche group mt-5 flex items-start gap-3 rounded-2xl bg-encre px-4 py-3.5 text-sm leading-snug text-creme transition hover:bg-brique">
               <svg viewBox="0 0 24 24" class="mt-0.5 size-4 shrink-0 text-miel" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.4.3.6.8.6 1.2v1h6v-1c0-.4.2-.9.6-1.2A6 6 0 0 0 12 3Z"/></svg>
               <span id="conseil-texte" class="flex-1"></span>
@@ -656,7 +656,7 @@
         </details>
         <details class="group py-5" data-apparait>
           <summary class="flex items-center justify-between gap-6 text-lg font-medium">Combien coûte une carte Tapora ?<span class="plus titre text-3xl text-brique transition">+</span></summary>
-          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">La Carte Québec coûte 35&nbsp;$ la carte, sans minimum (5 cartes&nbsp;: 175&nbsp;$). Dès 25 cartes, l’<a href="#entreprise" class="text-brique underline underline-offset-4">offre Entreprise</a> est à 30&nbsp;$ la carte, avec un design sur mesure. Tout est inclus, sans abonnement&nbsp;: statistiques en direct, page privée, notifications, mode comptoir, rapport mensuel.</p></div>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">À l’unité, une carte coûte 35&nbsp;$, sans minimum (5 cartes&nbsp;: 175&nbsp;$)&nbsp;: bilingue et conforme à la loi québécoise — le français en vedette au Québec, l’anglais d’abord ailleurs. Dès 25 cartes, l’<a href="#entreprise" class="text-brique underline underline-offset-4">offre Entreprise</a> est à 30&nbsp;$ la carte, avec un design sur mesure. Tout est inclus, sans abonnement&nbsp;: statistiques en direct, page privée, notifications, mode comptoir, rapport mensuel.</p></div>
         </details>
         <details class="group py-5" data-apparait>
           <summary class="flex items-center justify-between gap-6 text-lg font-medium">Avez-vous une offre pour les entreprises (hôtels, chaînes…)&nbsp;?<span class="plus titre text-3xl text-brique transition">+</span></summary>

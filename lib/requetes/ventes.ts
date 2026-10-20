@@ -279,11 +279,13 @@ export type Produit = {
   nom: string
   prix_vente_ht: number
   taxable: boolean
+  /** Les cartes : « en_fr » (anglais d'abord) ne va jamais à un commerce au Québec. */
+  langue: 'fr_en' | 'en_fr' | null
 }
 
 export async function listerProduits(): Promise<Produit[]> {
   return requete<Produit>(
-    `select id, sku, nom, prix_vente_ht, taxable from produits where actif order by nom`,
+    `select id, sku, nom, prix_vente_ht, taxable, langue from produits where actif order by ordre, nom`,
   )
 }
 

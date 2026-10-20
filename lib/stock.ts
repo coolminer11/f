@@ -55,7 +55,7 @@ export async function etatsStock(): Promise<EtatStock[]> {
   return l.map(versEtat)
 }
 
-/** La carte par défaut (Carte Québec). */
+/** La carte par défaut (la carte à l’unité — Québec). */
 export async function etatStock(): Promise<EtatStock> {
   return versEtat(await requeteUne<Record<string, unknown>>(`${SELECT_ETAT} and p.id = produit_carte()`))
 }

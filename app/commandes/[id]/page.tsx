@@ -10,8 +10,6 @@ import { argent } from '@/lib/format'
 import OngletsVentes from '@/components/onglets-ventes'
 import FormulaireCommande from '@/components/formulaire-commande'
 import BoutonEnvoi from '@/components/bouton-envoi'
-import VisuelCarte from '@/components/visuel-carte'
-import { VISUELS } from '@/lib/visuels'
 import {
   annulerAction,
   devisAction,
@@ -154,9 +152,6 @@ export default async function PageCommande({ params, searchParams }: { params: P
 
           <section className="carte p-5 text-sm">
             <h2 className="text-sm font-semibold">Personnalisation</h2>
-            <div className="mt-3 rounded-lg bg-[var(--color-fond)] p-2.5">
-              <VisuelCarte visuel={VISUELS[c.langue]} variante="vignette" note="Le design de base, à refaire avec son logo et ses couleurs" />
-            </div>
             <dl className="mt-3 space-y-1.5">
               <Ligne libelle="Destination" valeur={c.destination ? c.destination.replace(/^https?:\/\//, '').slice(0, 40) : '— à indiquer'} />
               <Ligne libelle="Texte FR" valeur={c.texte_fr ?? '—'} />

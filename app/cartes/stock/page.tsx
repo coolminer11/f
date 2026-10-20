@@ -45,7 +45,7 @@ export default async function PageStock({ searchParams }: { searchParams: Promis
         <p className="carte px-5 py-6 text-sm text-[var(--color-encre-doux)]">Aucune carte suivie au stock.</p>
       ) : (
         <>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {stocks.map((s) => (
               <CarteStock key={s.produit_id} s={s} ecriture={ecriture} />
             ))}
