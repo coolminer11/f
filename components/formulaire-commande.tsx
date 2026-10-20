@@ -51,12 +51,15 @@ export default function FormulaireCommande({
   clients,
   valeurs,
   libelle,
+  demandeId,
 }: {
   action: (d: FormData) => Promise<void>
   modeles: ModeleEntreprise[]
   clients: string[]
   valeurs?: ValeursCommande
   libelle: string
+  /** Venue d'une demande Entreprise du site : elle y sera rattachée. */
+  demandeId?: string
 }) {
   const [produit, setProduit] = useState(valeurs?.produit_id ?? modeles[0]?.id ?? '')
   const m = modeles.find((x) => x.id === produit) ?? modeles[0]
@@ -80,6 +83,7 @@ export default function FormulaireCommande({
   return (
     <form action={action} className="space-y-4">
       {valeurs?.id && <input type="hidden" name="id" value={valeurs.id} />}
+      {demandeId && <input type="hidden" name="demande_id" value={demandeId} />}
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
           <label className="etiquette" htmlFor="cc">Client</label>

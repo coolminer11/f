@@ -585,6 +585,46 @@ modification de texte se fait dans les deux fichiers ; les balises
   « Bar »…), et export CSV (une ligne par carte et par jour ; point-virgule
   en français, virgule en anglais).
 
+## 15. Portail des entreprises, Messages et double authentification obligatoire
+
+- **Double authentification obligatoire** pour tous les comptes : un compte
+  qui ne l'a pas activée n'ouvre QUE la page Sécurité (aucun menu, API en
+  401) jusqu'à ce qu'il scanne le code QR. On ne la désactive plus : « Changer
+  de téléphone » (mot de passe + code) mène directement au nouveau code QR.
+- **Portail du client** = sa page privée (`/stats/…`, avec son mot de passe
+  s'il en a un) :
+  - « Où en sont vos cartes » : ses commandes, étape par étape ;
+  - la maquette à voir et à **approuver en un clic** (la commande passe
+    d'elle-même à « Approuvée », vous recevez un courriel) ou « Demander un
+    changement » ;
+  - « Écrivez-nous » : son message arrive dans **Messages** (pastille dans le
+    menu) et par courriel ; votre réponse s'affiche sur sa page et part par
+    courriel. 10 messages par jour et par client au plus.
+- **Espace client** : `go.taporacards.com/portail` (lien « Espace client »
+  du site). Le client entre son courriel ; s'il est celui d'un dossier, son
+  lien lui est envoyé. Même réponse pour une adresse inconnue.
+- **Messages** (back-office) : le compte rendu de tout ce qui attend —
+  demandes Entreprise du site, messages des portails, cartes demandées,
+  maquettes pas encore approuvées, commandes immobiles depuis 7 jours. Le
+  courriel du lundi en fait le résumé.
+- **Formulaire Entreprise du site** → `POST /api/demande-entreprise`
+  (seulement depuis taporacards.com ; champ piège, délai minimal, 5 par heure
+  et par adresse, 40 par jour). « Créer la commande » ouvre la commande
+  préremplie et range la demande.
+- Sur une commande : « Ouvrir le portail du client » crée son dossier dès le
+  début ; joindre la maquette prévient alors le client tout seul.
+- **Durcissement** (migration `20261020000600`) : destinations https
+  seulement (le Worker refuse le http), `search_path` fixe sur chaque
+  fonction, index manquants. Les liens des courriels viennent toujours de la
+  configuration (`URL_APP` ou `URL_CARTES`), jamais de l'en-tête Host. Les
+  téléversements n'acceptent que photos, PDF et fichiers de logo ; les
+  exports pour le comptable neutralisent les formules.
+- **Site** : prix (Carte Québec 35 $, Entreprise 30 $ dès 25), section
+  Entreprises et son formulaire, lien Espace client. Mise en ligne :
+  `cd site && npm run deployer` APRÈS le déploiement du back-office (sinon
+  le formulaire retombe sur le courriel prérempli, sans rien perdre).
+- Revenus récurrents et paiements (Stripe) : voir `PLAN-REVENUS.md`.
+
 ## Sauvegardes
 
 Le forfait gratuit de Supabase ne garde pas d'historique de sauvegardes long.

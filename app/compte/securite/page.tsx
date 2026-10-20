@@ -43,7 +43,7 @@ function ilYa(d: string): string {
 
 /** Les gestes sensibles demandent un code frais (et, pour désactiver, le mot de passe). */
 async function preuve(donnees: FormData, avecMotDePasse: boolean): Promise<string | null> {
-  const u = await exigerSession()
+  const u = await exigerSession({ sansDoubleAuth: true })
   const ctx = await contexteRequete()
   const verrou = await verrouConnexion(u.courriel, ctx)
   if (verrou.bloque) return `Trop d’essais. Réessayez dans ${verrou.minutes} min.`
@@ -62,7 +62,7 @@ async function preuve(donnees: FormData, avecMotDePasse: boolean): Promise<strin
 }
 
 export default async function PageSecurite({ searchParams }: { searchParams: Promise<{ etape?: string; message?: string; erreur?: string }> }) {
-  const moi = await exigerSession()
+  const moi = await exigerSession({ sansDoubleAuth: true })
   const p = await searchParams
   const [sessions, courante, journal, restants, enAttente] = await Promise.all([
     listerSessions(moi.id),
@@ -82,14 +82,14 @@ export default async function PageSecurite({ searchParams }: { searchParams: Pro
 
   async function commencer() {
     'use server'
-    const u = await exigerSession()
+    const u = await exigerSession({ sansDoubleAuth: true })
     if (!u.totp_actif) await preparerDoubleAuth(u.id)
     redirect('/compte/securite?etape=scanner#double-auth')
   }
 
   async function activer(_: EtatCodes, donnees: FormData): Promise<EtatCodes> {
     'use server'
-    const u = await exigerSession()
+    const u = await exigerSession({ sansDoubleAuth: true })
     const codes = await activerDoubleAuth(u.id, String(donnees.get('code') ?? ''))
     if (!codes) return { ok: false, erreur: 'Ce code ne correspond pas. Vérifiez l’heure de votre téléphone et entrez le code affiché maintenant.' }
     await courrielDoubleAuth(u, await contexteRequete(), true).catch(() => null)
@@ -101,33 +101,36 @@ export default async function PageSecurite({ searchParams }: { searchParams: Pro
 
   async function regenerer(_: EtatCodes, donnees: FormData): Promise<EtatCodes> {
     'use server'
-    const u = await exigerSession()
+    const u = await exigerSession({ sansDoubleAuth: true })
     const erreur = await preuve(donnees, false)
     if (erreur) return { ok: false, erreur }
     return { ok: true, codes: await nouveauxCodes(u.id) }
   }
 
-  async function desactiver(_: EtatCodes, donnees: FormData): Promise<EtatCodes> {
+  // La double authentification est obligatoire : on ne la retire pas, on la
+  // déplace. L'ancienne clé cesse de marcher, la nouvelle se scanne aussitôt.
+  async function changerTelephone(_: EtatCodes, donnees: FormData): Promise<EtatCodes> {
     'use server'
-    const u = await exigerSession()
+    const u = await exigerSession({ sansDoubleAuth: true })
     const erreur = await preuve(donnees, true)
     if (erreur) return { ok: false, erreur }
     await desactiverDoubleAuth(u.id)
     await courrielDoubleAuth(u, await contexteRequete(), false).catch(() => null)
+    await preparerDoubleAuth(u.id)
     revalidatePath('/', 'layout')
-    redirect(`/compte/securite?message=${encodeURIComponent('Double authentification désactivée.')}`)
+    redirect('/compte/securite?etape=scanner#double-auth')
   }
 
   async function fermer(donnees: FormData) {
     'use server'
-    const u = await exigerSession()
+    const u = await exigerSession({ sansDoubleAuth: true })
     await fermerUneSession(u.id, String(donnees.get('id')))
     revalidatePath('/compte/securite')
   }
 
   async function fermerAutres() {
     'use server'
-    const u = await exigerSession()
+    const u = await exigerSession({ sansDoubleAuth: true })
     await fermerAutresSessions(u.id)
     revalidatePath('/compte/securite')
     redirect(`/compte/securite?message=${encodeURIComponent('Toutes vos autres sessions sont fermées.')}`)
@@ -142,8 +145,32 @@ export default async function PageSecurite({ searchParams }: { searchParams: Pro
           <h1 className="text-lg font-bold tracking-tight">Sécurité</h1>
           <p className="mt-1 text-sm text-[var(--color-encre-doux)]">Double authentification, appareils connectés et journal des connexions.</p>
         </div>
-        <Link href="/compte" className="bouton bouton-secondaire text-xs">Comptes et mot de passe →</Link>
+        {moi.totp_actif ? (
+          <Link href="/compte" className="bouton bouton-secondaire text-xs">Comptes et mot de passe →</Link>
+        ) : (
+          <form action="/connexion/sortie" method="post">
+            <button className="bouton bouton-secondaire text-xs">Se déconnecter</button>
+          </form>
+        )}
       </div>
+
+      {!moi.totp_actif && (
+        <div className="carte flex items-start gap-4 border-[var(--color-accent)] bg-[var(--color-accent-doux)] p-5">
+          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[var(--color-accent)] text-white" aria-hidden>
+            <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="5" y="11" width="14" height="10" rx="2" />
+              <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+            </svg>
+          </span>
+          <div>
+            <p className="font-semibold">Double authentification obligatoire pour la sécurité</p>
+            <p className="mt-1 text-sm leading-relaxed text-[var(--color-encre-doux)]">
+              Le back-office contient les finances, les clients et les comptes de Tapora : aucun compte n’y entre sans un code de son téléphone en plus du
+              mot de passe. Activez-la ci-dessous (2 minutes) : tout le reste s’ouvrira ensuite.
+            </p>
+          </div>
+        </div>
+      )}
 
       {p.erreur && <p className="carte border-[var(--color-negatif)] bg-red-50 px-4 py-3 text-sm font-medium text-[var(--color-negatif)]">{p.erreur}</p>}
       {p.message && <p className="carte border-[var(--color-positif)] bg-green-50 px-4 py-3 text-sm font-medium text-[var(--color-positif)]">{p.message}</p>}
@@ -168,7 +195,7 @@ export default async function PageSecurite({ searchParams }: { searchParams: Pro
             </div>
           </div>
           <span className={`rounded-full px-3 py-1 text-xs font-semibold ${moi.totp_actif ? 'bg-[#e3efe6] text-[var(--color-positif)]' : 'bg-[#fbe7da] text-[var(--color-attention)]'}`}>
-            {moi.totp_actif ? '● Activée' : '● Désactivée'}
+            {moi.totp_actif ? '● Activée' : '● À activer'}
           </span>
         </div>
 
@@ -207,9 +234,11 @@ export default async function PageSecurite({ searchParams }: { searchParams: Pro
               <FormulaireCodes action={regenerer} libelle="Générer de nouveaux codes" />
             </details>
             <details className="group">
-              <summary className="cursor-pointer text-sm font-semibold text-[var(--color-negatif)]">Désactiver la double authentification</summary>
-              <p className="mt-1 mb-3 text-xs text-[var(--color-encre-doux)]">Déconseillé. Un courriel vous préviendra.</p>
-              <FormulaireCodes action={desactiver} libelle="Désactiver" champMotDePasse />
+              <summary className="cursor-pointer text-sm font-semibold">Changer de téléphone</summary>
+              <p className="mt-1 mb-3 text-xs text-[var(--color-encre-doux)]">
+                Votre mot de passe et un code de l’ancien téléphone (ou un code de secours), puis vous scannez le nouveau code QR. Un courriel vous préviendra.
+              </p>
+              <FormulaireCodes action={changerTelephone} libelle="Changer de téléphone" champMotDePasse />
             </details>
           </div>
         )}

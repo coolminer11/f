@@ -17,6 +17,7 @@ import {
   facturerAction,
   fichierAction,
   modifierCommandeAction,
+  portailAction,
   poserAction,
   recevoirAction,
 } from '@/app/commandes/actions'
@@ -114,6 +115,39 @@ export default async function PageCommande({ params, searchParams }: { params: P
               {c.facture_id && <Link href={`/ventes/${c.facture_id}`} className="bouton bouton-secondaire py-1 text-xs">Facture {c.facture_numero} ↗</Link>}
               {c.dossier_id && <Link href={`/cartes/dossiers/${c.dossier_id}`} className="bouton bouton-secondaire py-1 text-xs">Dossier du client ↗</Link>}
             </div>
+          </section>
+
+          <section className="carte p-5 text-sm">
+            <h2 className="text-sm font-semibold">Portail du client</h2>
+            {c.dossier_id ? (
+              <>
+                <p className="mt-1 text-xs leading-relaxed text-[var(--color-encre-doux)]">
+                  Le client suit sa commande sur sa page privée, y approuve sa maquette en un clic et vous écrit de là (Messages).
+                </p>
+                {c.maquette_approuvee_le ? (
+                  <p className="mt-2 text-xs font-semibold text-[var(--color-positif)]">
+                    ✓ Maquette approuvée par le client le {new Date(c.maquette_approuvee_le).toLocaleDateString('fr-CA', { day: 'numeric', month: 'long', timeZone: 'America/Toronto' })}
+                  </p>
+                ) : c.maquette_url && rangEtape(c.etape) <= rangEtape('maquette') ? (
+                  <p className="mt-2 text-xs font-semibold text-[var(--color-attention)]">Maquette en attente de son approbation.</p>
+                ) : null}
+                <Link href={`/cartes/dossiers/${c.dossier_id}#lien`} className="bouton bouton-secondaire mt-3 py-1 text-xs">
+                  Son lien et son mot de passe ↗
+                </Link>
+              </>
+            ) : ecriture ? (
+              <form action={portailAction} className="mt-1">
+                <input type="hidden" name="id" value={c.id} />
+                <p className="text-xs leading-relaxed text-[var(--color-encre-doux)]">
+                  Pas encore de portail. Ouvrez-le maintenant : le client y suivra sa commande, approuvera sa maquette en un clic et pourra vous écrire.
+                </p>
+                <BoutonEnvoi className="mt-3 py-1.5 text-sm" attente="Création…">
+                  Ouvrir le portail du client
+                </BoutonEnvoi>
+              </form>
+            ) : (
+              <p className="mt-1 text-xs text-[var(--color-encre-doux)]">Pas encore de portail.</p>
+            )}
           </section>
 
           <section className="carte p-5 text-sm">

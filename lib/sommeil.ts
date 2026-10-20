@@ -4,6 +4,7 @@ import { echapper, envoyerCourriel } from '@/lib/courriel'
 import { emetteur } from '@/lib/requetes/ventes'
 import { baseCartesConfiguree } from '@/lib/cartes-url'
 import { alertesStock } from '@/lib/stock'
+import { compteRendu } from '@/lib/portail'
 
 /**
  * Les cartes qui dorment : actives, posées depuis au moins une semaine, et
@@ -86,14 +87,22 @@ export async function envoyerAlerteSommeil(baseRepli: string): Promise<void> {
   )
   if (!ici || ici.jour !== 1 || ici.h < 8 || ici.h >= 19) return
 
-  const [cartes, alertes] = await Promise.all([cartesEndormies(), alertesStock()])
+  const [cartes, alertes, rendu] = await Promise.all([cartesEndormies(), alertesStock(), compteRendu()])
   const stockBas = alertes.length > 0
+  const attente: ATraiter = {
+    messages: rendu.conversations.filter((c) => c.a_traiter > 0).length,
+    demandes: rendu.demandes.filter((d) => !d.traitee_le).length,
+    cartes: rendu.cartes.length,
+    maquettes: rendu.maquettes.length,
+    bloquees: rendu.bloquees.length,
+  }
+  const rienEnAttente = Object.values(attente).every((v) => v === 0)
   const reservee = await requeteUne<{ semaine: string }>(
     `insert into alertes_sommeil (semaine, nb_cartes, statut) values ($1::date, $2, 'rien')
      on conflict (semaine) do nothing returning semaine`,
     [ici.semaine, cartes.length],
   )
-  if (!reservee || (!cartes.length && !stockBas)) return
+  if (!reservee || (!cartes.length && !stockBas && rienEnAttente)) return
 
   const societe = await emetteur()
   if (!societe.courriel_contact) return
@@ -108,6 +117,7 @@ export async function envoyerAlerteSommeil(baseRepli: string): Promise<void> {
       semaines: a.rythme_semaine > 0 && a.quantite > 0 && a.quantite / a.rythme_semaine <= 52 ? Math.floor(a.quantite / a.rythme_semaine) : null,
       lien: `${base}/cartes/stock`,
     })),
+    rienEnAttente ? null : { ...attente, lien: `${base}/messages` },
   )
   const r = await envoyerCourriel({ destinataire: societe.courriel_contact, ...c })
   await requete(`update alertes_sommeil set statut = $2 where semaine = $1::date`, [ici.semaine, r.statut])
@@ -125,11 +135,27 @@ function texteStock(a: AlerteStock): string {
     : `${a.nom} : plus que ${a.quantite} carte${a.quantite > 1 ? 's' : ''} en stock${a.semaines !== null ? `, environ ${a.semaines} semaine${a.semaines > 1 ? 's' : ''} au rythme actuel` : ''} — pensez à commander.`
 }
 
-export function courrielSommeil(cartes: CarteEndormie[], lien: string, societe: string, stocks: AlerteStock[] = []) {
+export type ATraiter = { messages: number; demandes: number; cartes: number; maquettes: number; bloquees: number }
+
+function lignesATraiter(a: ATraiter): string[] {
+  const p = (n: number, un: string, plusieurs: string) => `${n} ${n > 1 ? plusieurs : un}`
+  return [
+    a.messages && `✉️ ${p(a.messages, 'client attend une réponse', 'clients attendent une réponse')}`,
+    a.demandes && `🏨 ${p(a.demandes, 'demande Entreprise à rappeler', 'demandes Entreprise à rappeler')}`,
+    a.cartes && `🛒 ${p(a.cartes, 'demande de cartes', 'demandes de cartes')}`,
+    a.maquettes && `🎨 ${p(a.maquettes, 'maquette attend l’approbation du client', 'maquettes attendent l’approbation du client')}`,
+    a.bloquees && `⏳ ${p(a.bloquees, 'commande immobile depuis 7 jours', 'commandes immobiles depuis 7 jours')}`,
+  ].filter((l): l is string => Boolean(l))
+}
+
+export function courrielSommeil(cartes: CarteEndormie[], lien: string, societe: string, stocks: AlerteStock[] = [], attente: (ATraiter & { lien: string }) | null = null) {
   const n = cartes.length
+  const aFaire = attente ? lignesATraiter(attente) : []
   const objet = n
-    ? `😴 ${n} carte${n > 1 ? 's' : ''} qui dor${n > 1 ? 'ment' : 't'} cette semaine${stocks.length ? ' · stock bas' : ''}`
-    : `📦 ${stocks.length === 1 && stocks[0].quantite >= 0 ? `${stocks[0].nom} : plus que ${stocks[0].quantite} carte${stocks[0].quantite > 1 ? 's' : ''} en stock` : 'Stock de cartes à surveiller'}`
+    ? `😴 ${n} carte${n > 1 ? 's' : ''} qui dor${n > 1 ? 'ment' : 't'} cette semaine${stocks.length ? ' · stock bas' : ''}${aFaire.length ? ' · clients en attente' : ''}`
+    : stocks.length
+      ? `📦 ${stocks.length === 1 && stocks[0].quantite >= 0 ? `${stocks[0].nom} : plus que ${stocks[0].quantite} carte${stocks[0].quantite > 1 ? 's' : ''} en stock` : 'Stock de cartes à surveiller'}${aFaire.length ? ' · clients en attente' : ''}`
+      : `📬 Le point du lundi : ${aFaire.length} chose${aFaire.length > 1 ? 's' : ''} attend${aFaire.length > 1 ? 'ent' : ''} un geste`
   const lignes = cartes
     .slice(0, 25)
     .map((c) => {
@@ -159,6 +185,11 @@ export function courrielSommeil(cartes: CarteEndormie[], lien: string, societe: 
 </td></tr>
 <tr><td style="background:#fffaf2;border-radius:20px;padding:28px 26px;box-shadow:0 18px 40px -26px rgba(60,40,20,.45)">
   <p style="margin:0 0 4px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#c2552f;font-weight:700">Le point du lundi</p>
+  ${aFaire.length ? `<div style="margin:6px 0 ${n || stocks.length ? '22px' : '0'};padding:16px 18px;border-radius:14px;background:#f3ebdf;color:#2a211a">
+    <p style="margin:0 0 8px;font-family:Georgia,serif;font-size:20px">Vos clients attendent</p>
+    ${aFaire.map((l) => `<p style="margin:0 0 4px;font-size:15px">${echapper(l)}</p>`).join('')}
+    <p style="margin:10px 0 0;font-size:14px"><a href="${echapper(attente!.lien)}" style="color:#c2552f;font-weight:700">Ouvrir Messages</a> — chaque ligne a son bouton.</p>
+  </div>` : ''}
   ${n ? `<p style="margin:0 0 12px;font-family:Georgia,serif;font-size:24px;line-height:1.25;color:#2a211a">${n} carte${n > 1 ? 's' : ''} à réveiller</p>
   <p style="margin:0 0 8px;font-size:15px;line-height:1.6;color:#2a211a">Aucun tap depuis au moins ${JOURS_SOMMEIL} jours. Le plus souvent : la carte est cachée, tombée, ou l’équipe a oublié d’en parler. Un appel de deux minutes suffit — et c’est le bon moment pour proposer une deuxième carte.</p>
   <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-top:8px">${lignes}</table>
@@ -174,6 +205,7 @@ export function courrielSommeil(cartes: CarteEndormie[], lien: string, societe: 
 <tr><td style="padding:18px 6px 0;font-size:12px;line-height:1.5;color:#6b5d50;text-align:center">Courriel automatique du lundi · ${echapper(societe)}</td></tr>
 </table></td></tr></table></body></html>`
   const texte = [
+    ...(aFaire.length ? ['Vos clients attendent :', ...aFaire, attente!.lien, ''] : []),
     ...(n
       ? [
           `${n} carte${n > 1 ? 's' : ''} à réveiller (aucun tap depuis au moins ${JOURS_SOMMEIL} jours) :`,

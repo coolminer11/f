@@ -166,20 +166,28 @@ export async function utilisateurCourant(): Promise<Utilisateur | null> {
   return utilisateur
 }
 
+/** Où va un compte sans double authentification : nulle part ailleurs. */
+export const PAGE_DOUBLE_AUTH = '/compte/securite?obligatoire=1'
+
 /**
  * À appeler en tête de CHAQUE page et route protégée. Le middleware ne fait
  * qu'écarter les cookies absents ou forgés ; c'est ici que la session est
  * réellement validée contre la base.
+ *
+ * La double authentification est OBLIGATOIRE : un compte qui ne l'a pas
+ * activée n'ouvre que la page Sécurité (qui seule passe `sansDoubleAuth`),
+ * le temps de l'activer. Ni lecture ni écriture avant.
  */
-export async function exigerSession(): Promise<Utilisateur> {
+export async function exigerSession(options: { sansDoubleAuth?: boolean } = {}): Promise<Utilisateur> {
   const utilisateur = await utilisateurCourant()
   if (!utilisateur) redirect('/connexion')
+  if (!utilisateur.totp_actif && !options.sansDoubleAuth) redirect(PAGE_DOUBLE_AUTH)
   return utilisateur
 }
 
-/** Variante pour les routes d'API : renvoie null plutôt que de rediriger. */
+/** Variante pour les routes d'API : une session sans double authentification ne compte pas. */
 export async function sessionOuverte(): Promise<boolean> {
-  return (await utilisateurCourant()) !== null
+  return (await utilisateurCourant())?.totp_actif === true
 }
 
 export async function exigerEcriture(): Promise<Utilisateur> {

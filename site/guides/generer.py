@@ -22,18 +22,18 @@ import contenu_en  # noqa: E402
 import contenu_fr  # noqa: E402
 
 SITE = 'https://taporacards.com'
-DATE = '2026-10-18'
+DATE = '2026-10-20'
 ORG = {'@type': 'Organization', '@id': f'{SITE}/#organisation', 'name': 'Tapora Cards', 'url': f'{SITE}/', 'logo': f'{SITE}/logo.png'}
 
 TX = {
     'fr': dict(
         lang='fr-CA', og='fr_CA', base='/guides', accueil='/', autre='/en/guides',
-        accueil_txt='Accueil', guides_txt='Guides', lecture='min de lecture', maj='Mis à jour le 18 octobre 2026',
+        accueil_txt='Accueil', guides_txt='Guides', lecture='min de lecture', maj='Mis à jour le 20 octobre 2026',
         sommaire='Dans ce guide', faq='Questions fréquentes', autres='Les autres guides', lire='Lire le guide',
-        nav=[('/#fonctionnement', 'Comment ça marche'), ('/#statistiques', 'Les stats'), ('/#prix', 'Prix'), ('/guides/', 'Guides')],
+        nav=[('/#fonctionnement', 'Comment ça marche'), ('/#statistiques', 'Les stats'), ('/#prix', 'Prix'), ('/#entreprise', 'Entreprises'), ('/guides/', 'Guides')],
         commander='Commander', commander_lien='/#commander', autre_txt='EN', autre_titre='English version',
         cta_titre='Une carte, un tap, un avis.',
-        cta_texte='Tapora : des cartes NFC qui ouvrent votre page d’avis Google en un tap, avec vos statistiques en direct. 30 $ la carte, tout inclus, sans abonnement.',
+        cta_texte='Tapora : des cartes NFC qui ouvrent votre page d’avis Google en un tap, avec vos statistiques en direct. 35 $ la carte, tout inclus, sans abonnement — et 30 $ la carte en Entreprise, dès 25 cartes, avec un design sur mesure.',
         cta_btn='Voir les prix', cta_btn_lien='/#prix', cta_btn2='Écrire pour commander',
         cta_mail='mailto:contact@taporacards.com?subject=Commande%20de%20cartes%20Tapora',
         pied='entreprise québécoise', conf=('/confidentialite', 'Confidentialité'), cond=('/conditions', 'Conditions'),
@@ -41,12 +41,12 @@ TX = {
     ),
     'en': dict(
         lang='en-CA', og='en_CA', base='/en/guides', accueil='/en/', autre='/guides',
-        accueil_txt='Home', guides_txt='Guides', lecture='min read', maj='Updated October 18, 2026',
+        accueil_txt='Home', guides_txt='Guides', lecture='min read', maj='Updated October 20, 2026',
         sommaire='In this guide', faq='Frequently asked questions', autres='More guides', lire='Read the guide',
-        nav=[('/en/#fonctionnement', 'How it works'), ('/en/#statistiques', 'The stats'), ('/en/#prix', 'Pricing'), ('/en/guides/', 'Guides')],
+        nav=[('/en/#fonctionnement', 'How it works'), ('/en/#statistiques', 'The stats'), ('/en/#prix', 'Pricing'), ('/en/#entreprise', 'Businesses'), ('/en/guides/', 'Guides')],
         commander='Order', commander_lien='/en/#commander', autre_txt='FR', autre_titre='Version française',
         cta_titre='One card, one tap, one review.',
-        cta_texte='Tapora: NFC cards that open your Google review page in one tap, with live stats. $30 per card, everything included, no subscription.',
+        cta_texte='Tapora: NFC cards that open your Google review page in one tap, with live stats. $35 per card, everything included, no subscription — and $30 per card for Business orders from 25 cards, with a custom design.',
         cta_btn='See pricing', cta_btn_lien='/en/#prix', cta_btn2='Email us to order',
         cta_mail='mailto:contact@taporacards.com?subject=Tapora%20card%20order',
         pied='a Québec business', conf=('/en/privacy', 'Privacy'), cond=('/en/terms', 'Terms'),
@@ -115,7 +115,7 @@ def page(l, titre, desc, canon, alt_fr, alt_en, jsonld, corps):
         <img src="/favicon.svg" alt="" width="30" height="30" class="size-[30px]">
         <span class="titre text-xl font-semibold">Tapora</span>
       </a>
-      <div class="hidden items-center gap-8 text-[15px] text-encre-doux md:flex">
+      <div class="hidden items-center gap-7 text-[15px] text-encre-doux lg:flex">
 {nav}
       </div>
       <div class="flex items-center gap-4">

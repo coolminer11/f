@@ -58,37 +58,165 @@
   }
 
   // ------------------------------------------------- calculette des prix
-  // 30 $ la carte seule, puis 27,50 $ la carte dès deux (55 $ pour deux).
+  // Carte Québec : 35 $ la carte, à l'unité. Dès 25 cartes, l'offre
+  // Entreprise (30 $ la carte, design sur mesure) est proposée à côté.
+  const PRIX_QC = 35
+  const PRIX_ENTREPRISE = 30
+  const MIN_ENTREPRISE = 25
   const calculette = document.getElementById('calculette')
   if (calculette) {
     const fr = calculette.dataset.langue !== 'en'
-    // « 30 $ », mais « 27,50 $ » : pas de ,00 inutile.
+    // « 35 $ » plutôt que « 35,00 $ » : pas de ,00 inutile.
     const argent = { format: (v) => new Intl.NumberFormat(fr ? 'fr-CA' : 'en-CA', { style: 'currency', currency: 'CAD', currencyDisplay: 'narrowSymbol', minimumFractionDigits: Number.isInteger(v) ? 0 : 2 }).format(v) }
     const nbEl = document.getElementById('nb-cartes')
     const totalEl = document.getElementById('total-cartes')
     const detailEl = document.getElementById('detail-cartes')
     const lien = document.getElementById('commander-calcul')
+    const conseil = document.getElementById('conseil-entreprise')
+    const conseilTexte = document.getElementById('conseil-texte')
+    const puces = [...calculette.querySelectorAll('[data-nb]')]
     let n = 3
     const majPrix = (anime) => {
-      const total = n === 1 ? 30 : n * 27.5
-      const economie = n * 30 - total
+      const total = n * PRIX_QC
       nbEl.textContent = String(n)
       totalEl.textContent = argent.format(total)
-      const unitaire = argent.format(total / n)
-      detailEl.textContent = fr
-        ? economie > 0 ? `${unitaire} la carte · ${argent.format(economie)} d’économie` : `${unitaire} la carte`
-        : economie > 0 ? `${unitaire} per card · you save ${argent.format(economie)}` : `${unitaire} per card`
+      detailEl.textContent = fr ? `${argent.format(PRIX_QC)} la carte · Carte Québec` : `${argent.format(PRIX_QC)} per card · Québec Card`
+      for (const p of puces) p.setAttribute('aria-pressed', String(Number(p.dataset.nb) === n))
+      if (conseil && conseilTexte) {
+        const entreprise = n >= MIN_ENTREPRISE
+        conseil.hidden = !entreprise
+        if (entreprise) {
+          const t = n * PRIX_ENTREPRISE
+          conseilTexte.textContent = fr
+            ? `En Entreprise : ${argent.format(PRIX_ENTREPRISE)} la carte, design sur mesure → ${argent.format(t)} (${argent.format(total - t)} d’économie).`
+            : `As a Business order: ${argent.format(PRIX_ENTREPRISE)} per card, custom design → ${argent.format(t)} (save ${argent.format(total - t)}).`
+        }
+      }
       const sujet = calculette.dataset.sujet
       const corps = fr
-        ? `Bonjour,\n\nNom du commerce : \nVille : \nNombre de cartes : ${n} (${argent.format(total)})\n\nMerci !`
-        : `Hi,\n\nBusiness name: \nCity: \nNumber of cards: ${n} (${argent.format(total)})\n\nThanks!`
+        ? `Bonjour,\n\nNom du commerce : \nVille : \nNombre de cartes Québec : ${n} (${argent.format(total)})\n\nMerci !`
+        : `Hi,\n\nBusiness name: \nCity: \nNumber of Québec Cards: ${n} (${argent.format(total)})\n\nThanks!`
       lien.href = `mailto:contact@taporacards.com?subject=${sujet}&body=${encodeURIComponent(corps)}`
       lien.textContent = fr ? `Commander ${n} carte${n > 1 ? 's' : ''}` : `Order ${n} card${n > 1 ? 's' : ''}`
       if (anime && !reduit) totalEl.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.08)' }, { transform: 'scale(1)' }], { duration: 320, easing: 'cubic-bezier(.2,.9,.3,1.4)' })
     }
     calculette.querySelector('[data-moins]').addEventListener('click', () => { if (n > 1) { n--; majPrix(true) } })
     calculette.querySelector('[data-plus]').addEventListener('click', () => { if (n < 500) { n++; majPrix(true) } })
+    for (const p of puces) p.addEventListener('click', () => { n = Number(p.dataset.nb); majPrix(true) })
     majPrix(false)
+  }
+
+  // ------------------------------------------- demande Entreprise (formulaire)
+  // Envoyée au back-office (go.taporacards.com) : un envoi « simple »
+  // (urlencoded, sans témoin), donc sans requête préalable. Si le serveur ne
+  // répond pas, la demande part par courriel, déjà rédigée.
+  const formE = document.getElementById('form-entreprise')
+  if (formE) {
+    const fr = formE.dataset.langue !== 'en'
+    const T = fr
+      ? {
+          nom: 'Indiquez votre nom.',
+          entreprise: 'Indiquez le nom de l’entreprise.',
+          courriel: 'Indiquez un courriel valide.',
+          quantite: 'L’offre Entreprise commence à 25 cartes.',
+          envoi: 'Envoi…',
+          patience: 'Encore un instant…',
+          erreur: 'Envoi impossible pour le moment.',
+          corps: (d) => `Bonjour,\n\nNom : ${d.nom}\nEntreprise : ${d.entreprise}\nCourriel : ${d.courriel}\nTéléphone : ${d.telephone || '—'}\nNombre de cartes : ${d.quantite}\nLieu : ${d.lieu === 'QC' ? 'Au Québec' : 'Hors Québec'}\n\n${d.message || ''}\n\nMerci !`,
+        }
+      : {
+          nom: 'Please enter your name.',
+          entreprise: 'Please enter your business name.',
+          courriel: 'Please enter a valid email.',
+          quantite: 'Business orders start at 25 cards.',
+          envoi: 'Sending…',
+          patience: 'Almost there…',
+          erreur: 'Can’t send right now.',
+          corps: (d) => `Hi,\n\nName: ${d.nom}\nBusiness: ${d.entreprise}\nEmail: ${d.courriel}\nPhone: ${d.telephone || '—'}\nNumber of cards: ${d.quantite}\nLocation: ${d.lieu === 'QC' ? 'In Québec' : 'Outside Québec'}\n\n${d.message || ''}\n\nThanks!`,
+        }
+    const champT = formE.querySelector('[name=t]')
+    if (champT) champT.value = String(Date.now())
+    const etat = document.getElementById('etat-entreprise')
+    const bouton = document.getElementById('envoyer-entreprise')
+    const libelle = bouton.querySelector('[data-libelle]')
+    const libelleBase = libelle.textContent
+    const secours = document.getElementById('secours-entreprise')
+    const secoursLien = document.getElementById('secours-lien')
+    const merci = document.getElementById('merci-entreprise')
+    const aideLieu = document.getElementById('e-lieu-aide')
+    formE.querySelectorAll('[name=lieu]').forEach((r) =>
+      r.addEventListener('change', () => { if (aideLieu) aideLieu.textContent = r.value === 'QC' ? aideLieu.dataset.qc : aideLieu.dataset.hqc }),
+    )
+    const COURRIEL = /^[^@\s<>]+@[^@\s<>]+\.[a-z]{2,}$/i
+    const marquer = (champ, faux) => (faux ? champ.setAttribute('aria-invalid', 'true') : champ.removeAttribute('aria-invalid'))
+    formE.querySelectorAll('.champ-site').forEach((c) => c.addEventListener('input', () => marquer(c, false)))
+
+    const valider = (d) => {
+      const verifs = [
+        ['nom', d.nom.trim().length > 0, T.nom],
+        ['entreprise', d.entreprise.trim().length > 0, T.entreprise],
+        ['courriel', COURRIEL.test(d.courriel.trim()), T.courriel],
+        ['quantite', /^\d+$/.test(d.quantite.trim()) && Number(d.quantite) >= 25 && Number(d.quantite) <= 5000, T.quantite],
+      ]
+      let premier = null
+      for (const [nom, ok, message] of verifs) {
+        const champ = formE.querySelector(`[name=${nom}]`)
+        marquer(champ, !ok)
+        if (!ok && !premier) premier = { champ, message }
+      }
+      return premier
+    }
+
+    formE.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      const d = Object.fromEntries(new FormData(formE))
+      etat.textContent = ''
+      secours.hidden = true
+      const faute = valider(d)
+      if (faute) {
+        etat.textContent = faute.message
+        faute.champ.focus()
+        return
+      }
+      bouton.disabled = true
+      libelle.textContent = T.envoi
+      const patience = setTimeout(() => (libelle.textContent = T.patience), 6000)
+      // Le serveur gratuit peut dormir : on lui laisse le temps de se réveiller.
+      const arret = new AbortController()
+      const delai = setTimeout(() => arret.abort(), 45000)
+      let reponse = null
+      try {
+        const r = await fetch('https://go.taporacards.com/api/demande-entreprise', {
+          method: 'POST',
+          mode: 'cors',
+          credentials: 'omit',
+          body: new URLSearchParams(d),
+          signal: arret.signal,
+        })
+        reponse = await r.json().catch(() => null)
+      } catch {
+        reponse = null
+      }
+      clearTimeout(patience)
+      clearTimeout(delai)
+      bouton.disabled = false
+      libelle.textContent = libelleBase
+      if (reponse && reponse.ok === true) {
+        formE.hidden = true
+        merci.hidden = false
+        merci.focus({ preventScroll: true })
+        if (!reduit) merci.animate([{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'none' }], { duration: 500, easing: 'cubic-bezier(.2,.8,.2,1)' })
+        return
+      }
+      if (reponse && typeof reponse.erreur === 'string' && reponse.erreur) {
+        etat.textContent = reponse.erreur
+        return
+      }
+      // Pas de réponse lisible : la demande part par courriel, déjà rédigée.
+      etat.textContent = T.erreur
+      secoursLien.href = `mailto:contact@taporacards.com?subject=${formE.dataset.sujet}&body=${encodeURIComponent(T.corps(d))}`
+      secours.hidden = false
+    })
   }
 
   // FAQ : sans animation, le comportement natif de <details> suffit.
@@ -285,6 +413,19 @@
         onUpdate: () => (el.textContent = fmt.format(Math.round(etat.v))),
       })
     })
+
+    // ---- Entreprise : les cartes sur mesure se posent en éventail.
+    if (document.getElementById('eventail')) {
+      gsap.from('#eventail .carte-eventail', {
+        y: 70,
+        rotation: (i) => [10, -10, 6][i] ?? 0,
+        opacity: 0,
+        duration: 1.1,
+        ease: 'back.out(1.4)',
+        stagger: 0.14,
+        scrollTrigger: { trigger: '#eventail', start: 'top 80%', once: true },
+      })
+    }
 
     // ---- Tableau de comparaison : ligne par ligne.
     gsap.from('#lignes-comparaison tr', {

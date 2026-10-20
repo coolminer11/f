@@ -680,15 +680,6 @@ html[data-theme='tapora'] .lien-bo[aria-current='page'] {
 }
 html[data-theme='classique'] .lien-bo[aria-current='page'] { background: var(--color-accent-doux); color: var(--color-accent); }
 
-/* Bandeau « activez la double authentification » */
-.bandeau-2fa { animation: bo-monte 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
-html[data-theme='tapora'] .bandeau-2fa {
-  background: linear-gradient(90deg, #fbe7da, #fdf2e3);
-  border: 1px solid #f0cdb6;
-  border-radius: 1rem;
-}
-html[data-theme='classique'] .bandeau-2fa { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 0.75rem; }
-
 /* ---- Connexion ----------------------------------------------------------- */
 .connexion-fond {
   background:
@@ -718,7 +709,6 @@ html[data-theme='tapora'] .document-neutre .bg-white { background-color: white; 
 
 @media (prefers-reduced-motion: reduce) {
   html[data-theme='tapora'] main.bo-page:not(:has(.theme-client, .document-neutre)) > * > *,
-  .bandeau-2fa,
   .connexion-carte,
   .connexion-sceau,
   .connexion-arcs path { animation: none !important; stroke-dashoffset: 0; }
@@ -727,7 +717,7 @@ html[data-theme='tapora'] .document-neutre .bg-white { background-color: white; 
 @media print {
   html[data-theme='tapora'] body::before { display: none; }
   html[data-theme='tapora'] body { background: white !important; }
-  .entete-bo, .bandeau-2fa { display: none !important; }
+  .entete-bo { display: none !important; }
   /* L'animation d'entrée ne doit jamais laisser une page à moitié transparente sur papier. */
   html[data-theme='tapora'] main.bo-page > * > * { animation: none !important; opacity: 1 !important; transform: none !important; }
 }

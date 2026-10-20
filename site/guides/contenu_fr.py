@@ -122,7 +122,7 @@ GUIDES = [
 </table></div>
 '''),
       ('Faire le calcul sur deux ans', '''
-<p>Un abonnement paraît petit chaque mois, mais il s’additionne. Exemple purement arithmétique : une carte à 30 $ plus un abonnement de 15 $ par mois revient à <strong>390 $</strong> après deux ans (30 + 24 × 15). Avec un paiement unique de 30 $, vous restez à 30 $.</p>
+<p>Un abonnement paraît petit chaque mois, mais il s’additionne. Exemple purement arithmétique : une carte à 35 $ plus un abonnement de 15 $ par mois revient à <strong>395 $</strong> après deux ans (35 + 24 × 15). Avec un paiement unique de 35 $, vous restez à 35 $.</p>
 <p>Un abonnement peut se justifier s’il apporte vraiment plus — mais il faut le savoir avant d’acheter, et le comparer.</p>
 '''),
       ('Les six questions à poser avant d’acheter', '''
@@ -136,7 +136,7 @@ GUIDES = [
 </ol>
 '''),
       ('Le choix de Tapora', '''
-<p>Chez Tapora, nous avons choisi le paiement unique : <strong>30 $ pour une carte, 55 $ pour deux, puis 27,50 $ par carte</strong> à partir de trois. La destination modifiable, la page privée de statistiques en direct, la notification à chaque tap, le mode comptoir et le rapport mensuel sont inclus, <strong>sans abonnement ni frais mensuels</strong>. Les détails sont dans nos <a href="/conditions">conditions</a>.</p>
+<p>Chez Tapora, nous avons choisi le paiement unique : <strong>35 $ la carte</strong> (Carte Québec, sans minimum), ou <strong>30 $ la carte dès 25 cartes</strong> avec l’offre Entreprise, au design sur mesure. La destination modifiable, la page privée de statistiques en direct, la notification à chaque tap, le mode comptoir et le rapport mensuel sont inclus, <strong>sans abonnement ni frais mensuels</strong>. Les détails sont dans nos <a href="/conditions">conditions</a>.</p>
 '''),
     ],
     faq=[

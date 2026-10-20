@@ -5,11 +5,13 @@ import { redirect } from 'next/navigation'
 import { exigerEcriture } from '@/lib/auth'
 import {
   annulerCommande,
+  assurerDossier,
   creerCommande,
   creerDevisCommande,
   ETAPES,
   facturerCommande,
   joindreFichier,
+  lireCommande,
   modifierCommande,
   noterEtape,
   poserCommande,
@@ -19,6 +21,7 @@ import {
 } from '@/lib/commandes'
 import { modifierCarte } from '@/lib/catalogue'
 import { televerserRecu } from '@/lib/stockage'
+import { marquerDemande, prevenirMaquettePrete } from '@/lib/portail'
 
 const erreur = (e: unknown) => (e instanceof Error ? e.message : 'Opération impossible.').replace(/^error:\s*/i, '')
 const aller = (chemin: string, cle: 'message' | 'erreur', texte: string): never =>
@@ -42,8 +45,10 @@ function lireSaisie(d: FormData, retour: string): SaisieCommande {
   const lieu = String(d.get('lieu') ?? 'QC')
   const courriel = texte(d, 'courriel', 254)
   if (courriel && !/^[^@\s<>]+@[^@\s<>]+\.[a-z]{2,}$/i.test(courriel)) aller(retour, 'erreur', 'Courriel invalide.')
+  // Les cartes passent par le Worker, qui n'ouvre que du https : « http:// » devient « https:// ».
   let destination = texte(d, 'destination', 600)
-  if (destination && !/^https?:\/\//i.test(destination)) destination = `https://${destination}`
+  if (destination) destination = /^https?:\/\//i.test(destination) ? destination.replace(/^http:\/\//i, 'https://') : `https://${destination}`
+  if (destination && !adresseWeb(destination)) aller(retour, 'erreur', 'La destination doit être une adresse web complète (https://…).')
   return {
     clientNom: clientNom!,
     courriel,
@@ -60,6 +65,15 @@ function lireSaisie(d: FormData, retour: string): SaisieCommande {
   }
 }
 
+function adresseWeb(v: string): boolean {
+  try {
+    const u = new URL(v)
+    return u.protocol === 'https:' && u.hostname.includes('.')
+  } catch {
+    return false
+  }
+}
+
 export async function creerCommandeAction(d: FormData): Promise<void> {
   const moi = await exigerEcriture()
   const e = lireSaisie(d, '/commandes')
@@ -69,8 +83,22 @@ export async function creerCommandeAction(d: FormData): Promise<void> {
   } catch (x) {
     aller('/commandes', 'erreur', erreur(x))
   }
-  revalidatePath('/commandes')
+  // Venue d'une demande du site : la demande est rattachée et sort de « à traiter ».
+  const demande = String(d.get('demande_id') ?? '')
+  if (/^[0-9a-f-]{36}$/i.test(demande)) await marquerDemande(demande, true, id!)
+  revalidatePath('/', 'layout')
   aller(`/commandes/${id!}`, 'message', 'Commande créée. Prochaine étape : le devis.')
+}
+
+/** Le portail du client (son dossier et son lien), avant même la pose : il y suivra sa commande et approuvera sa maquette. */
+export async function portailAction(d: FormData): Promise<void> {
+  await exigerEcriture()
+  const id = String(d.get('id') ?? '')
+  const c = await lireCommande(id)
+  if (!c) aller('/commandes', 'erreur', 'Commande introuvable.')
+  const dossier = await assurerDossier(c!)
+  revalidatePath(`/commandes/${id}`)
+  redirect(`/cartes/dossiers/${dossier}?message=${encodeURIComponent('Portail du client prêt : envoyez-lui son lien ci-dessous (et un mot de passe si vous voulez).')}#lien`)
 }
 
 export async function modifierCommandeAction(d: FormData): Promise<void> {
@@ -129,8 +157,18 @@ export async function fichierAction(d: FormData): Promise<void> {
   } catch (x) {
     aller(ici, 'erreur', erreur(x))
   }
-  revalidatePath(ici)
-  aller(ici, 'message', quoi === 'logo' ? 'Logo joint.' : 'Maquette jointe : envoyez-la au client pour approbation.')
+  // Le client est prévenu tout seul s'il a son portail : il approuve en un clic.
+  const prevenu = quoi === 'maquette' && (await prevenirMaquettePrete(id))
+  revalidatePath('/', 'layout')
+  aller(
+    ici,
+    'message',
+    quoi === 'logo'
+      ? 'Logo joint.'
+      : prevenu
+        ? 'Maquette jointe : le client est prévenu par courriel et peut l’approuver depuis son portail.'
+        : 'Maquette jointe. Ouvrez le portail du client (à droite) pour qu’il l’approuve en ligne, ou envoyez-la-lui.',
+  )
 }
 
 export async function recevoirAction(d: FormData): Promise<void> {

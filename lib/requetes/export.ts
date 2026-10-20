@@ -23,7 +23,9 @@ function cellule(valeur: string | number | null, montant = false): string {
     const texte = valeur.toFixed(montant ? 2 : 0)
     return montant ? texte.replace('.', ',') : texte
   }
-  const texte = String(valeur)
+  // Un tableur EXÉCUTE une cellule qui commence par = + - @ : une description
+  // importée d'un relevé bancaire ne doit jamais devenir une formule.
+  const texte = /^[=+\-@\t\r]/.test(String(valeur)) ? `'${valeur}` : String(valeur)
   return /[;"\n\r]/.test(texte) ? `"${texte.replace(/"/g, '""')}"` : texte
 }
 

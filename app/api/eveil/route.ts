@@ -1,6 +1,7 @@
 import { releverAvisSiNecessaire } from '@/lib/avis-google'
 import { envoyerRapportsDus } from '@/lib/rapports'
 import { envoyerAlerteSommeil } from '@/lib/sommeil'
+import { baseLiens } from '@/lib/securite'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,11 +19,9 @@ export const dynamic = 'force-dynamic'
  * le temps, et n'envoient jamais deux fois la même chose : appeler cette
  * adresse mille fois ne fait rien de plus qu'une.
  */
-export function GET(requete: Request) {
-  const h = requete.headers
-  const hote = h.get('x-forwarded-host') ?? h.get('host')
-  const proto = h.get('x-forwarded-proto')?.split(',')[0] ?? 'https'
-  const base = hote ? `${proto}://${hote}` : new URL(requete.url).origin
+export async function GET() {
+  // Les liens des courriels viennent de la configuration (URL_APP ou URL_CARTES).
+  const base = await baseLiens()
 
   void releverAvisSiNecessaire().catch(() => {})
   void envoyerRapportsDus(base).catch(() => {})

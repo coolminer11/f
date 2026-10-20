@@ -11,6 +11,7 @@ const LIENS = [
   ['/transactions', 'Transactions'],
   ['/ventes', 'Factures'],
   ['/commandes', 'Commandes'],
+  ['/messages', 'Messages'],
   ['/cartes', 'Cartes'],
   ['/resultats', 'Résultats'],
   ['/taxes', 'Taxes'],
@@ -28,7 +29,20 @@ export type Theme = 'tapora' | 'classique'
  * soulignée, et la bascule de thème (Tapora ↔ classique), retenue dans un
  * cookie pour que le serveur rende directement le bon thème.
  */
-export default function EnteteBo({ nom, lecture, theme: initial, doubleAuth }: { nom: string; lecture: boolean; theme: Theme; doubleAuth: boolean }) {
+export default function EnteteBo({
+  nom,
+  lecture,
+  theme: initial,
+  doubleAuth,
+  aTraiter = 0,
+}: {
+  nom: string
+  lecture: boolean
+  theme: Theme
+  doubleAuth: boolean
+  /** Messages, demandes Entreprise et demandes de cartes qui attendent : la pastille de « Messages ». */
+  aTraiter?: number
+}) {
   const chemin = usePathname()
   const [theme, setTheme] = useState<Theme>(initial)
 
@@ -74,6 +88,11 @@ export default function EnteteBo({ nom, lecture, theme: initial, doubleAuth }: {
                 className="lien-bo shrink-0 whitespace-nowrap rounded-md px-2.5 py-1.5 text-sm font-medium text-[var(--color-encre-doux)] hover:text-[var(--color-encre)]"
               >
                 {libelle}
+                {href === '/messages' && aTraiter > 0 && (
+                  <span className="ml-1 inline-grid min-w-[1.15rem] place-items-center rounded-full bg-[var(--color-accent)] px-1 text-[10px] font-bold leading-[1.15rem] text-white" aria-label={`${aTraiter} à traiter`}>
+                    {aTraiter > 99 ? '99+' : aTraiter}
+                  </span>
+                )}
               </Link>
             )
           })}

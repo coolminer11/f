@@ -124,7 +124,7 @@ GUIDES = [
 </table></div>
 '''),
       ('Do the math over two years', '''
-<p>A subscription looks small each month, but it adds up. A purely arithmetic example: a $30 card plus a $15 monthly subscription comes to <strong>$390</strong> after two years (30 + 24 × 15). With a one-time $30 payment, you stay at $30.</p>
+<p>A subscription looks small each month, but it adds up. A purely arithmetic example: a $35 card plus a $15 monthly subscription comes to <strong>$395</strong> after two years (35 + 24 × 15). With a one-time $35 payment, you stay at $35.</p>
 <p>A subscription can make sense if it truly brings more — but you should know before you buy, and compare.</p>
 '''),
       ('Six questions to ask before buying', '''
@@ -138,7 +138,7 @@ GUIDES = [
 </ol>
 '''),
       ('Tapora’s choice', '''
-<p>At Tapora we chose a one-time payment: <strong>$30 for one card, $55 for two, then $27.50 per card</strong> from three. The changeable destination, the private live stats page, a notification on every tap, counter mode and the monthly report are included, <strong>with no subscription or monthly fee</strong>. Details are in our <a href="/en/terms">terms</a>.</p>
+<p>At Tapora we chose a one-time payment: <strong>$35 per card</strong> (Québec Card, no minimum), or <strong>$30 per card from 25 cards</strong> with the custom-design Business offer. The changeable destination, the private live stats page, a notification on every tap, counter mode and the monthly report are included, <strong>with no subscription or monthly fee</strong>. Details are in our <a href="/en/terms">terms</a>.</p>
 '''),
     ],
     faq=[

@@ -8,6 +8,8 @@ import { argent } from '@/lib/format'
 import OngletsVentes from '@/components/onglets-ventes'
 import FormulaireCommande from '@/components/formulaire-commande'
 import { creerCommandeAction } from '@/app/commandes/actions'
+import { lireDemande } from '@/lib/portail'
+import type { ValeursCommande } from '@/components/formulaire-commande'
 
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = { title: 'Commandes Entreprise — Tapora' }
@@ -15,12 +17,32 @@ export const metadata: Metadata = { title: 'Commandes Entreprise — Tapora' }
 const jour = (iso: string) => new Date(iso).toLocaleDateString('fr-CA', { day: 'numeric', month: 'short', timeZone: 'America/Toronto' })
 
 /** Les commandes Entreprise : où en est chacune, et une nouvelle en un formulaire. */
-export default async function PageCommandes({ searchParams }: { searchParams: Promise<{ message?: string; erreur?: string; nouvelle?: string }> }) {
+export default async function PageCommandes({ searchParams }: { searchParams: Promise<{ message?: string; erreur?: string; nouvelle?: string; demande?: string }> }) {
   const moi = await exigerSession()
   const sp = await searchParams
   const ecriture = moi.role !== 'lecture'
   const [commandes, cartes, clients] = await Promise.all([listerCommandes(), catalogue(), listerClients()])
   const entreprise = cartes.filter((c) => c.personnalisable).map((c) => ({ id: c.id, nom: c.nom, prix: c.prix, min: c.quantite_min, langue: c.langue }))
+  // « Créer la commande » depuis une demande du site : le formulaire arrive prérempli.
+  const demande = sp.demande ? await lireDemande(sp.demande) : null
+  const modeleDemande = demande ? entreprise.find((m) => m.langue === (demande.lieu === 'QC' ? 'fr_en' : 'en_fr')) : undefined
+  const prerempli: ValeursCommande | undefined =
+    demande && modeleDemande
+      ? {
+          client_nom: demande.entreprise,
+          courriel: demande.courriel,
+          produit_id: modeleDemande.id,
+          quantite: Math.max(demande.quantite, modeleDemande.min),
+          prix_unitaire: modeleDemande.prix,
+          lieu: demande.lieu === 'QC' ? 'QC' : 'ON',
+          couleurs: null,
+          texte_fr: null,
+          texte_en: null,
+          noms_cartes: null,
+          destination: null,
+          notes: [`Demande du site — ${demande.contact_nom}${demande.telephone ? `, ${demande.telephone}` : ''}`, demande.message].filter(Boolean).join('\n').slice(0, 2000),
+        }
+      : undefined
   const actives = commandes.filter((c) => !c.annulee_le)
   const enCours = actives.filter((c) => c.etape !== 'facturee')
 
@@ -52,10 +74,22 @@ export default async function PageCommandes({ searchParams }: { searchParams: Pr
       </div>
 
       {ecriture && (
-        <details className="carte p-5" open={sp.nouvelle === '1' || commandes.length === 0}>
+        <details id="nouvelle" className="carte scroll-mt-20 p-5" open={sp.nouvelle === '1' || commandes.length === 0}>
           <summary className="cursor-pointer text-sm font-semibold text-[var(--color-accent)]">+ Nouvelle commande</summary>
           <div className="mt-4">
-            <FormulaireCommande action={creerCommandeAction} modeles={entreprise} clients={clients.map((c) => c.nom)} libelle="Créer la commande" />
+            {demande && (
+              <p className="mb-4 rounded-lg bg-[var(--color-accent-doux)] px-4 py-2.5 text-sm">
+                Préremplie depuis la demande de <strong>{demande.entreprise}</strong> ({demande.contact_nom}). Vérifiez le lieu de pose{demande.lieu === 'HORS_QC' ? ' (hors Québec : choisissez la province ou « Hors Canada »)' : ''}.
+              </p>
+            )}
+            <FormulaireCommande
+              action={creerCommandeAction}
+              modeles={entreprise}
+              clients={clients.map((c) => c.nom)}
+              libelle="Créer la commande"
+              valeurs={prerempli}
+              demandeId={demande && !demande.commande_id ? demande.id : undefined}
+            />
           </div>
         </details>
       )}

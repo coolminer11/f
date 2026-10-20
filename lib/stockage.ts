@@ -21,14 +21,30 @@ export function stockageDistant(): boolean {
 
 const client = clientSupabase
 
-function cheminLocal(chemin: string): string {
+export function cheminLocal(chemin: string): string {
   // Empêche toute remontée hors du dossier de dépôt.
   const normalise = path.normalize(chemin).replace(/^(\.\.[/\\])+/, '')
   return path.join(process.cwd(), 'recus-local', normalise)
 }
 
+// Ce qu'on accepte : photos et PDF de reçus, fichiers de maquette et de logo.
+const TYPES_PERMIS: Record<string, string> = {
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  webp: 'image/webp',
+  heic: 'image/heic',
+  heif: 'image/heif',
+  pdf: 'application/pdf',
+  svg: 'image/svg+xml',
+  ai: 'application/postscript',
+  eps: 'application/postscript',
+}
+
 export async function televerserRecu(fichier: File): Promise<string> {
-  const extension = (fichier.name.split('.').pop() ?? 'jpg').toLowerCase().slice(0, 5)
+  // L'extension et le type viennent de NOTRE liste, jamais du navigateur.
+  const extension = (fichier.name.split('.').pop() ?? '').toLowerCase()
+  if (!TYPES_PERMIS[extension]) throw new Error('Type de fichier refusé : une photo (JPG, PNG, HEIC), un PDF, ou un fichier de logo (SVG, AI, EPS).')
   const maintenant = new Date()
   const chemin = `${maintenant.getFullYear()}/${String(maintenant.getMonth() + 1).padStart(2, '0')}/${crypto.randomUUID()}.${extension}`
   const contenu = Buffer.from(await fichier.arrayBuffer())
@@ -36,7 +52,7 @@ export async function televerserRecu(fichier: File): Promise<string> {
   if (stockageDistant()) {
     const { error } = await client()
       .storage.from(BUCKET)
-      .upload(chemin, contenu, { contentType: fichier.type, upsert: false })
+      .upload(chemin, contenu, { contentType: TYPES_PERMIS[extension], upsert: false })
     if (error) throw new Error(`Téléversement du reçu impossible : ${masquer(error.message)}`)
     return chemin
   }

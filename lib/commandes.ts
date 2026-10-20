@@ -56,6 +56,7 @@ export type Commande = {
   destination: string | null
   logo_url: string | null
   maquette_url: string | null
+  maquette_approuvee_le: string | null
   notes: string | null
   etape: Etape
   annulee_le: string | null
@@ -72,7 +73,7 @@ export type Commande = {
 const SELECT = `
   select c.id, c.numero, c.client_id, c.client_nom, c.courriel, c.dossier_id, c.produit_id, p.nom as produit_nom,
          p.modele, p.langue, c.quantite, c.prix_unitaire, round(c.quantite * c.prix_unitaire, 2) as total, c.lieu,
-         c.couleurs, c.texte_fr, c.texte_en, c.noms_cartes, c.destination, c.logo_url, c.maquette_url, c.notes,
+         c.couleurs, c.texte_fr, c.texte_en, c.noms_cartes, c.destination, c.logo_url, c.maquette_url, c.maquette_approuvee_le, c.notes,
          c.etape, c.annulee_le, c.devis_id, dv.numero as devis_numero, c.facture_id, fa.numero as facture_numero,
          c.reception_id, rc.cout_reel as cout_cartes, c.cree_le
     from commandes c
@@ -147,7 +148,8 @@ export async function modifierCommande(id: string, e: SaisieCommande): Promise<v
 }
 
 /** Une étape faite : sa date (et qui), et la commande avance jusque-là si elle était derrière. */
-export async function noterEtape(id: string, etape: Etape, utilisateurId: string, note: string | null): Promise<void> {
+/** Une étape faite (par un associé, ou par le client depuis son portail : `utilisateurId` null). */
+export async function noterEtape(id: string, etape: Etape, utilisateurId: string | null, note: string | null): Promise<void> {
   await requete(
     `insert into commandes_etapes (commande_id, etape, par, note) values ($1::uuid, $2, $3::uuid, $4)
      on conflict (commande_id, etape) do update set fait_le = now(), par = excluded.par, note = coalesce(excluded.note, commandes_etapes.note)`,
@@ -242,6 +244,31 @@ export async function recevoirCommande(id: string, total: number, date: string, 
 }
 
 /**
+ * Le dossier (et donc le portail) du client de la commande, créé au besoin :
+ * dès qu'il existe, le client suit sa commande et approuve sa maquette depuis
+ * sa page privée.
+ */
+export async function assurerDossier(c: Commande): Promise<string> {
+  if (c.dossier_id) return c.dossier_id
+  const dossierId = await creerDossier({
+    nom: c.client_nom.slice(0, 120),
+    clientId: c.client_id,
+    courrielRapport: c.courriel,
+    rapportMensuel: false,
+    note: `Commande ${c.numero}`,
+    langue: c.langue === 'en_fr' ? 'en' : 'fr',
+    objectifAvis: null,
+    avisPose: null,
+    avisMoisAvant: null,
+    datePose: null,
+    siteWeb: null,
+    partenairePublic: false,
+  })
+  await requete(`update commandes set dossier_id = $2::uuid where id = $1::uuid and dossier_id is null`, [c.id, dossierId])
+  return dossierId
+}
+
+/**
  * Étape 6 : les cartes NFC sont créées dans le dossier du client (créé au
  * besoin), une par nom de la liste, sinon « Carte 1 » à « Carte N ».
  */
@@ -252,24 +279,7 @@ export async function poserCommande(id: string, utilisateurId: string): Promise<
   const deja = await requeteUne<{ n: number }>(`select count(*)::int as n from cartes_nfc where note = $1`, [`Commande ${c.numero}`])
   if (deja && deja.n > 0) throw new Error(`Les cartes de cette commande existent déjà (${deja.n}).`)
 
-  let dossierId = c.dossier_id
-  if (!dossierId) {
-    dossierId = await creerDossier({
-      nom: c.client_nom.slice(0, 120),
-      clientId: c.client_id,
-      courrielRapport: c.courriel,
-      rapportMensuel: false,
-      note: `Commande ${c.numero}`,
-      langue: c.langue === 'en_fr' ? 'en' : 'fr',
-      objectifAvis: null,
-      avisPose: null,
-      avisMoisAvant: null,
-      datePose: null,
-      siteWeb: null,
-      partenairePublic: false,
-    })
-    await requete(`update commandes set dossier_id = $2::uuid where id = $1::uuid`, [id, dossierId])
-  }
+  const dossierId = await assurerDossier(c)
 
   const noms = (c.noms_cartes ?? '').split('\n').map((l) => l.trim()).filter(Boolean).slice(0, c.quantite)
   const libelles = Array.from({ length: c.quantite }, (_, i) => (noms[i] ?? `Carte ${i + 1}`).slice(0, 80))

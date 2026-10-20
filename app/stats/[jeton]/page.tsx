@@ -10,6 +10,7 @@ import { rythmeAvis, resumeAvis } from '@/lib/avis-google'
 import { direct, exploits } from '@/lib/requetes/exploits'
 import { cartesProfil, course, pointDeDepart, profil } from '@/lib/requetes/profil'
 import { classement } from '@/lib/requetes/classement'
+import { commandesClient, filMessages, SUJETS } from '@/lib/portail'
 import { depuisL, langueValide, locale, textes } from '@/lib/langue'
 import { maintenantQuebec } from '@/lib/quebec'
 import { prochainesNotes } from '@/lib/note-google'
@@ -28,6 +29,8 @@ import ProchaineEtoile from '@/components/client/prochaine-etoile'
 import AvantApres from '@/components/client/avant-apres'
 import Course from '@/components/client/course'
 import DetailCartes from '@/components/client/detail-cartes'
+import CommandesClient from '@/components/client/commandes-client'
+import MessagesTapora from '@/components/client/messages-tapora'
 import NotificationsDing from '@/components/client/notifications-ding'
 import PartagePalier from '@/components/client/partage-palier'
 import Parrainage from '@/components/client/parrainage'
@@ -56,7 +59,7 @@ export const dynamic = 'force-dynamic'
  */
 type Props = {
   params: Promise<{ jeton: string }>
-  searchParams: Promise<{ p?: string; l?: string; desabonne?: string }>
+  searchParams: Promise<{ p?: string; l?: string; desabonne?: string; approuvee?: string; sujet?: string }>
 }
 
 // Une seule lecture du dossier par affichage, partagée avec les métadonnées.
@@ -112,7 +115,7 @@ export default async function StatsClient({ params, searchParams }: Props) {
   const ici = maintenantQuebec()
   const cleManuelle = cleAvis({ type: 'dossier', id: d.id })
 
-  const [cartes, t, places, maintenant, records, portrait, parCarte, lignesCourse, depart, grille, abonnes, detail] = await Promise.all([
+  const [cartes, t, places, maintenant, records, portrait, parCarte, lignesCourse, depart, grille, abonnes, detail, commandes, messages] = await Promise.all([
     listerCartes(d.id),
     totaux({ dossier: d.id }, jours),
     requete<{ place_id: string }>(
@@ -128,6 +131,8 @@ export default async function StatsClient({ params, searchParams }: Props) {
     tapsJourHeure({ dossier: d.id }, 3650),
     requeteUne<{ n: number }>(`select count(*)::int as n from abonnements_push where dossier_id = $1::uuid`, [d.id]),
     classement(d.id, jours),
+    commandesClient(d.id),
+    filMessages(d.id),
   ])
   const avisIds = [...places.map((p) => p.place_id), cleManuelle]
   const [avis, avis14, avisParJour, bilan, base] = await Promise.all([
@@ -294,6 +299,9 @@ export default async function StatsClient({ params, searchParams }: Props) {
             </a>
           )}
 
+          {/* ---- Le portail : les commandes en cours, la maquette à approuver */}
+          <CommandesClient commandes={commandes} jeton={jeton} langue={langue} merci={sp.approuvee === '1'} suffixeL={suffixeL} />
+
           {/* ---- Aujourd'hui, en direct */}
           <DirectAujourdhui
             jeton={jeton}
@@ -406,6 +414,14 @@ export default async function StatsClient({ params, searchParams }: Props) {
             siteWeb={d.site_web}
             ambassadeur={d.ambassadeur_le !== null}
             bilan={bilan}
+          />
+
+          <MessagesTapora
+            jeton={jeton}
+            langue={langue}
+            messages={messages.map((m) => ({ id: m.id, auteur: m.auteur, sujet: m.sujet, texte: m.texte, cree_le: new Date(m.cree_le).toISOString(), par_nom: m.par_nom }))}
+            sujets={SUJETS}
+            sujetInitial={sp.sujet}
           />
 
           <CommanderCartes jeton={jeton} langue={langue} />

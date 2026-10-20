@@ -1,7 +1,7 @@
 'use server'
 
-import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { deverrouiller, dossierDuJeton } from '@/lib/lien-stats'
 import { requeteUne } from '@/lib/db'
@@ -11,9 +11,35 @@ import { langueValide, textes } from '@/lib/langue'
 import { clesVapid, endpointValide, essai } from '@/lib/push'
 import { ETAPES_LANCEMENT } from '@/lib/lancement'
 import { accepterPartenaire, enregistrerRecommandation, RABAIS_FILLEUL } from '@/lib/parrainage'
-import { baseLiens } from '@/lib/securite'
+import { baseLiens, contexteRequete } from '@/lib/securite'
+import { approuverMaquette, envoyerMessageClient, estSujet } from '@/lib/portail'
 
 export type EtatCommande = { ok: boolean; erreur: string | null }
+
+export type EtatMessage = { ok: boolean; erreur: 'vide' | 'trop' | 'lien' | null; envoye: number }
+
+/** « Écrire à Tapora » depuis le portail : arrive dans le back-office (Messages), avec un courriel. */
+export async function ecrireTapora(avant: EtatMessage, donnees: FormData): Promise<EtatMessage> {
+  const id = await dossierDuJeton(String(donnees.get('jeton') ?? '').slice(0, 80))
+  if (!id) return { ...avant, ok: false, erreur: 'lien' }
+  const texte = String(donnees.get('texte') ?? '').trim()
+  const sujet = donnees.get('sujet')
+  if (!texte || texte.length > 2000 || !estSujet(sujet)) return { ...avant, ok: false, erreur: 'vide' }
+  const r = await envoyerMessageClient(id, sujet, texte, await contexteRequete())
+  if (r === 'trop') return { ...avant, ok: false, erreur: 'trop' }
+  revalidatePath(`/stats/${String(donnees.get('jeton'))}`)
+  return { ok: true, erreur: null, envoye: avant.envoye + 1 }
+}
+
+/** « J'approuve la maquette » : la commande avance, Tapora est prévenue. */
+export async function approuverMaquetteAction(donnees: FormData): Promise<void> {
+  const jeton = String(donnees.get('jeton') ?? '').slice(0, 80)
+  const id = await dossierDuJeton(jeton)
+  if (!id) return
+  await approuverMaquette(id, String(donnees.get('commande') ?? ''))
+  const l = langueValide(String(donnees.get('l') ?? ''))
+  redirect(`/stats/${jeton}?approuvee=1${l ? `&l=${l}` : ''}#commandes`)
+}
 
 export type EtatVerrou = { erreur: 'faux' | 'bloque' | 'invalide' | null }
 
@@ -64,9 +90,8 @@ export async function commanderCartes(_: EtatCommande, donnees: FormData): Promi
   try {
     const societe = await emetteur()
     if (societe.courriel_contact) {
-      const h = await headers()
-      const hote = h.get('x-forwarded-host') ?? h.get('host')
-      const lien = hote ? `https://${hote}/cartes/dossiers/${dossierId}#demandes` : null
+      // Construit depuis la configuration, jamais depuis l'en-tête Host du visiteur.
+      const lien = `${await baseLiens()}/cartes/dossiers/${dossierId}#demandes`
       const nom = d.nom
       const q = a.data.quantite
       await envoyerCourriel({
