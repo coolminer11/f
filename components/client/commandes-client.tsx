@@ -1,6 +1,7 @@
 import { approuverMaquetteAction } from '@/app/stats/[jeton]/actions'
 import { ETAPES_CLIENT, ORDRE_ETAPES, type CommandeClient } from '@/lib/portail'
 import { locale, type Langue } from '@/lib/langue'
+import ConfettisApprobation from '@/components/client/confettis-approbation'
 
 const T = {
   fr: {
@@ -59,9 +60,10 @@ export default function CommandesClient({
 
   return (
     <section className="carte p-6 sm:p-8" id="commandes">
-      <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c2552f]">{X.surtitre}</span>
+      <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--cl-brique)]">{X.surtitre}</span>
       <h2 className="titre-client mt-2 !text-2xl sm:!text-3xl">{X.titre}</h2>
-      {merci && <p className="mt-4 rounded-2xl bg-[#e3efe7] px-5 py-3 text-sm font-medium text-[#2f6b4f]">{X.merci}</p>}
+      {merci && <ConfettisApprobation />}
+      {merci && <p className="mt-4 rounded-2xl bg-[var(--cl-vert-pale)] px-5 py-3 text-sm font-medium text-[var(--cl-sapin)]">{X.merci}</p>}
       <div className="mt-6 space-y-8">
         {enCours.map((c) => {
           const rang = ORDRE_ETAPES.indexOf(c.etape)
@@ -72,32 +74,32 @@ export default function CommandesClient({
                 <h3 className="font-semibold">
                   {c.produit_nom} · {X.cartes(c.quantite)}
                 </h3>
-                <span className="text-xs text-[#6b5d50]">{c.numero}</span>
+                <span className="text-xs text-[var(--cl-doux)]">{c.numero}</span>
               </div>
               {/* La frise : une pastille par étape, la courante en terre cuite. */}
               <ol className="mt-4 grid grid-cols-7 gap-1.5" aria-label={X.surtitre}>
                 {ORDRE_ETAPES.map((e, i) => (
                   <li key={e} className="min-w-0">
-                    <span className={`block h-2 rounded-full ${i < rang ? 'bg-[#2a211a]' : i === rang ? 'bg-[#c2552f]' : 'bg-[#ede3d3]'}`} />
-                    <span className={`mt-1.5 hidden text-[11px] leading-tight sm:block ${i === rang ? 'font-semibold text-[#2a211a]' : 'text-[#6b5d50]'}`}>{ETAPES_CLIENT[e][langue]}</span>
+                    <span className={`block h-2 rounded-full ${i < rang ? 'bg-[var(--cl-nuit)]' : i === rang ? 'bg-[var(--cl-brique)]' : 'bg-[var(--cl-sable-2)]'}`} />
+                    <span className={`mt-1.5 hidden text-[11px] leading-tight sm:block ${i === rang ? 'font-semibold text-[var(--cl-encre)]' : 'text-[var(--cl-doux)]'}`}>{ETAPES_CLIENT[e][langue]}</span>
                   </li>
                 ))}
               </ol>
               <p className="mt-3 text-sm">
                 <strong>{ETAPES_CLIENT[c.etape][langue]}</strong>
-                {c.etapes[c.etape] && <span className="text-[#6b5d50]"> · {X.fait(jour(c.etapes[c.etape]))}</span>}
+                {c.etapes[c.etape] && <span className="text-[var(--cl-doux)]"> · {X.fait(jour(c.etapes[c.etape]))}</span>}
               </p>
 
               {aApprouver ? (
-                <div className="mt-4 rounded-2xl bg-[#fdf3dc] p-5">
-                  <p className="font-semibold text-[#5a3b05]">✨ {X.maquettePrete}</p>
-                  <p className="mt-1 text-sm text-[#6b4a05]">{X.maquetteSous}</p>
+                <div className="mt-4 rounded-2xl bg-[var(--cl-miel-pale)] p-5">
+                  <p className="font-semibold text-[var(--cl-miel-texte)]">✨ {X.maquettePrete}</p>
+                  <p className="mt-1 text-sm text-[var(--cl-miel-texte)]">{X.maquetteSous}</p>
                   <div className="mt-4 flex flex-wrap items-center gap-2">
                     <a
                       href={`/stats/${jeton}/maquette/${c.id}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="rounded-full bg-[#fffaf2] px-5 py-2.5 text-sm font-semibold text-[#2a211a] ring-1 ring-[#e2d6c3] transition hover:ring-[#c2552f]"
+                      className="rounded-full bg-[var(--cl-papier)] px-5 py-2.5 text-sm font-semibold text-[var(--cl-encre)] ring-1 ring-[var(--cl-ligne)] transition hover:ring-[var(--cl-brique)]"
                     >
                       {X.voir} ↗
                     </a>
@@ -105,17 +107,17 @@ export default function CommandesClient({
                       <input type="hidden" name="jeton" value={jeton} />
                       <input type="hidden" name="commande" value={c.id} />
                       <input type="hidden" name="l" value={suffixeL ? langue : ''} />
-                      <button className="rounded-full bg-[#2f6b4f] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#245840]">✓ {X.approuver}</button>
+                      <button className="rounded-full bg-[var(--cl-sapin)] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--cl-sapin-fonce)]">✓ {X.approuver}</button>
                     </form>
-                    <a href={`/stats/${jeton}?sujet=design${suffixeL}#messages`} className="px-2 text-sm font-semibold text-[#c2552f] hover:underline">
+                    <a href={`/stats/${jeton}?sujet=design${suffixeL}#messages`} className="px-2 text-sm font-semibold text-[var(--cl-brique)] hover:underline">
                       {X.changer}
                     </a>
                   </div>
                 </div>
               ) : (
-                c.maquette_approuvee_le && <p className="mt-2 text-sm text-[#2f6b4f]">✓ {X.approuvee(jour(c.maquette_approuvee_le))}</p>
+                c.maquette_approuvee_le && <p className="mt-2 text-sm text-[var(--cl-sapin)]">✓ {X.approuvee(jour(c.maquette_approuvee_le))}</p>
               )}
-              {rang >= ORDRE_ETAPES.indexOf('approuvee') && rang < ORDRE_ETAPES.indexOf('recue') && <p className="mt-2 text-sm text-[#6b5d50]">{X.delai}</p>}
+              {rang >= ORDRE_ETAPES.indexOf('approuvee') && rang < ORDRE_ETAPES.indexOf('recue') && <p className="mt-2 text-sm text-[var(--cl-doux)]">{X.delai}</p>}
             </article>
           )
         })}

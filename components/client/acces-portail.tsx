@@ -26,7 +26,7 @@ export default function AccesPortail({ langue }: { langue: Langue }) {
   const [etat, envoyer, enCours] = useActionState<EtatAcces, FormData>(demanderAcces, { envoye: false, erreur: false })
   if (etat.envoye)
     return (
-      <p role="status" className="rounded-2xl bg-[#e3efe7] px-5 py-4 text-sm font-medium leading-relaxed text-[#2f6b4f]">
+      <p role="status" className="rounded-2xl bg-[var(--cl-vert-pale)] px-5 py-4 text-sm font-medium leading-relaxed text-[var(--cl-sapin)]">
         ✓ {X.envoye}
       </p>
     )
@@ -43,10 +43,10 @@ export default function AccesPortail({ langue }: { langue: Langue }) {
         autoComplete="email"
         maxLength={254}
         aria-invalid={etat.erreur || undefined}
-        className="w-full rounded-xl border border-[#e2d6c3] bg-[#fffaf2] px-4 py-3 text-base outline-none transition focus:border-[#c2552f] focus:ring-2 focus:ring-[#f6dccd]"
+        className="w-full rounded-xl border border-[var(--cl-ligne)] bg-[var(--cl-papier)] px-4 py-3 text-base outline-none transition focus:border-[var(--cl-brique)] focus:ring-2 focus:ring-[var(--cl-rose-pale)]"
       />
-      {etat.erreur && <p className="text-sm font-medium text-[#b0402a]">{X.erreur}</p>}
-      <button disabled={enCours} className="w-full rounded-full bg-[#2a211a] px-5 py-3 font-semibold text-[#fffaf2] transition hover:bg-[#c2552f] disabled:opacity-60">
+      {etat.erreur && <p className="text-sm font-medium text-[var(--cl-rouge)]">{X.erreur}</p>}
+      <button disabled={enCours} className="w-full rounded-full bg-[var(--cl-nuit)] px-5 py-3 font-semibold text-[var(--cl-sur-nuit)] transition hover:bg-[var(--cl-brique)] disabled:opacity-60">
         {enCours ? X.attente : X.bouton}
       </button>
     </form>

@@ -136,25 +136,25 @@ export default function PartagePalier({ nom, langue }: { nom: string; langue: La
 
   if (!contenu) return null
   return createPortal(
-    <div className="fenetre-partage fixed inset-0 z-[55] flex items-center justify-center bg-[#2a211a]/70 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label={T.titre} onClick={fermer}>
-      <div className="w-full max-w-md rounded-[2rem] bg-[#fffaf2] p-5 shadow-2xl sm:p-6" onClick={(e) => e.stopPropagation()}>
+    <div className="fenetre-partage fixed inset-0 z-[55] flex items-center justify-center bg-[var(--cl-nuit)]/70 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label={T.titre} onClick={fermer}>
+      <div className="w-full max-w-md rounded-[2rem] bg-[var(--cl-papier)] p-5 shadow-2xl sm:p-6" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="titre-client text-2xl font-medium">{T.titre}</p>
-            <p className="mt-0.5 text-sm text-[#6b5d50]">{T.sous}</p>
+            <p className="mt-0.5 text-sm text-[var(--cl-doux)]">{T.sous}</p>
           </div>
-          <button ref={fermerBtn} onClick={fermer} className="grid size-9 shrink-0 place-items-center rounded-full text-[#6b5d50] hover:bg-[#f3ebdf]" aria-label={T.fermer}>
+          <button ref={fermerBtn} onClick={fermer} className="grid size-9 shrink-0 place-items-center rounded-full text-[var(--cl-doux)] hover:bg-[var(--cl-sable)]" aria-label={T.fermer}>
             ✕
           </button>
         </div>
 
-        <div className="mt-4 flex justify-center gap-1 rounded-full bg-[#f3ebdf] p-1 text-sm">
+        <div className="mt-4 flex justify-center gap-1 rounded-full bg-[var(--cl-sable)] p-1 text-sm">
           {(['carre', 'story'] as const).map((f) => (
             <button
               key={f}
               onClick={() => setFormat(f)}
               aria-pressed={format === f}
-              className={`flex-1 rounded-full px-4 py-1.5 font-medium transition ${format === f ? 'bg-[#2a211a] text-[#fffaf2]' : 'text-[#6b5d50] hover:text-[#2a211a]'}`}
+              className={`flex-1 rounded-full px-4 py-1.5 font-medium transition ${format === f ? 'bg-[var(--cl-nuit)] text-[var(--cl-sur-nuit)]' : 'text-[var(--cl-doux)] hover:text-[var(--cl-encre)]'}`}
             >
               {f === 'carre' ? T.carre : T.story}
             </button>
@@ -170,21 +170,21 @@ export default function PartagePalier({ nom, langue }: { nom: string; langue: La
               // eslint-disable-next-line @next/next/no-img-element
               <img src={image.url} alt={T.texte(contenu)} className="size-full object-cover" />
             ) : (
-              <div className="grid size-full animate-pulse place-items-center bg-[#f3ebdf] text-sm text-[#6b5d50]">{T.preparation}</div>
+              <div className="grid size-full animate-pulse place-items-center bg-[var(--cl-sable)] text-sm text-[var(--cl-doux)]">{T.preparation}</div>
             )}
           </div>
         </div>
 
         <div className="mt-5 flex flex-wrap gap-2">
           {peutPartager && (
-            <button onClick={partager} disabled={!image} className="flex-1 rounded-full bg-[#c2552f] px-5 py-3 text-sm font-semibold text-[#fffaf2] transition hover:bg-[#a9481f] disabled:opacity-50">
+            <button onClick={partager} disabled={!image} className="flex-1 rounded-full bg-[var(--cl-brique)] px-5 py-3 text-sm font-semibold text-[var(--cl-blanc)] transition hover:bg-[var(--cl-brique-fonce)] disabled:opacity-50">
               {T.partager}
             </button>
           )}
           <button
             onClick={enregistrer}
             disabled={!image}
-            className={`flex-1 rounded-full px-5 py-3 text-sm font-semibold transition disabled:opacity-50 ${peutPartager ? 'bg-[#f3ebdf] text-[#2a211a] hover:bg-[#ede3d3]' : 'bg-[#c2552f] text-[#fffaf2] hover:bg-[#a9481f]'}`}
+            className={`flex-1 rounded-full px-5 py-3 text-sm font-semibold transition disabled:opacity-50 ${peutPartager ? 'bg-[var(--cl-sable)] text-[var(--cl-encre)] hover:bg-[var(--cl-sable-2)]' : 'bg-[var(--cl-brique)] text-[var(--cl-blanc)] hover:bg-[var(--cl-brique-fonce)]'}`}
           >
             {T.telecharger}
           </button>

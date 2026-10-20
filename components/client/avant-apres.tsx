@@ -57,20 +57,20 @@ export default function AvantApres({
       {comparer ? (
         <>
           <div className="mt-5 space-y-4">
-            <Barre libelle={T.avant} valeur={un(avisMoisAvant!)} unite={T.parMois} largeur={(avisMoisAvant! / max) * 100} couleur="bg-[#d9cbb6]" />
-            <Barre libelle={T.apres} valeur={un(apres)} unite={T.parMois} largeur={100} couleur="bg-gradient-to-r from-[#c2552f] to-[#e0794f]" fort />
+            <Barre libelle={T.avant} valeur={un(avisMoisAvant!)} unite={T.parMois} largeur={(avisMoisAvant! / max) * 100} couleur="bg-[var(--cl-ligne-forte)]" />
+            <Barre libelle={T.apres} valeur={un(apres)} unite={T.parMois} largeur={100} couleur="bg-gradient-to-r from-[var(--cl-brique)] to-[var(--cl-brique-clair)]" fort />
           </div>
           {avisMoisAvant! > 0 && (
-            <p className="titre-client mt-5 text-2xl font-medium text-[#2f6b4f]">{T.fois(un(apres / avisMoisAvant!))}</p>
+            <p className="titre-client mt-5 text-2xl font-medium text-[var(--cl-sapin)]">{T.fois(un(apres / avisMoisAvant!))}</p>
           )}
         </>
       ) : (
-        <p className="titre-client mt-4 text-5xl font-medium text-[#2f6b4f]">
+        <p className="titre-client mt-4 text-5xl font-medium text-[var(--cl-sapin)]">
           +<span data-compteur={gagnes}>{gagnes}</span>
         </p>
       )}
-      <p className="mt-2 text-sm text-[#6b5d50]">{T.depuis(gagnes, dateDePose)}</p>
-      {!comparer && <p className="mt-1 text-sm text-[#6b5d50]">{T.sansAvant}</p>}
+      <p className="mt-2 text-sm text-[var(--cl-doux)]">{T.depuis(gagnes, dateDePose)}</p>
+      {!comparer && <p className="mt-1 text-sm text-[var(--cl-doux)]">{T.sansAvant}</p>}
     </section>
   )
 }
@@ -79,12 +79,12 @@ function Barre({ libelle, valeur, unite, largeur, couleur, fort }: { libelle: st
   return (
     <div>
       <div className="flex items-baseline justify-between text-sm">
-        <span className={fort ? 'font-semibold' : 'text-[#6b5d50]'}>{libelle}</span>
+        <span className={fort ? 'font-semibold' : 'text-[var(--cl-doux)]'}>{libelle}</span>
         <span>
-          <strong className="titre-client text-xl font-medium tabular-nums">{valeur}</strong> <span className="text-xs text-[#6b5d50]">{unite}</span>
+          <strong className="titre-client text-xl font-medium tabular-nums">{valeur}</strong> <span className="text-xs text-[var(--cl-doux)]">{unite}</span>
         </span>
       </div>
-      <div className="mt-1.5 h-3.5 overflow-hidden rounded-full bg-[#f1e8da]" aria-hidden>
+      <div className="mt-1.5 h-3.5 overflow-hidden rounded-full bg-[var(--cl-creme)]" aria-hidden>
         <div data-jauge className={`h-full rounded-full ${couleur}`} style={{ width: `${Math.max(3, largeur)}%` }} />
       </div>
     </div>

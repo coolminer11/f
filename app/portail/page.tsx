@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { langueValide } from '@/lib/langue'
-import { fraunces, inter } from '@/app/stats/polices'
+import CadreClient from '@/components/client/cadre-client'
+import BasculeMode from '@/components/client/bascule-mode'
 import Logo from '@/components/client/logo'
 import AccesPortail from '@/components/client/acces-portail'
 
@@ -11,7 +12,12 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
   referrer: 'no-referrer',
 }
-export const viewport: Viewport = { themeColor: '#f7f1e7' }
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f7f1e7' },
+    { media: '(prefers-color-scheme: dark)', color: '#15100c' },
+  ],
+}
 
 const T = {
   fr: {
@@ -42,20 +48,23 @@ export default async function PagePortail({ searchParams }: { searchParams: Prom
   const langue = langueValide((await searchParams).l) ?? 'fr'
   const X = T[langue]
   return (
-    <div className={`${fraunces.variable} ${inter.variable} theme-client`} lang={langue === 'fr' ? 'fr-CA' : 'en-CA'}>
+    <CadreClient lang={langue === 'fr' ? 'fr-CA' : 'en-CA'}>
       <main className="mx-auto grid min-h-[85vh] max-w-5xl items-center gap-10 px-4 py-12 lg:grid-cols-[1.1fr_1fr]">
         <div>
-          <a href="https://taporacards.com" className="flex items-center gap-2.5" aria-label="Tapora Cards">
-            <Logo />
-            <span className="titre-client text-xl font-semibold">Tapora</span>
-          </a>
-          <p className="mt-12 text-xs font-semibold uppercase tracking-[0.2em] text-[#c2552f]">{X.surtitre}</p>
+          <div className="flex items-center justify-between gap-3">
+            <a href="https://taporacards.com" className="flex items-center gap-2.5" aria-label="Tapora Cards">
+              <Logo />
+              <span className="titre-client text-xl font-semibold">Tapora</span>
+            </a>
+            <BasculeMode langue={langue} />
+          </div>
+          <p className="mt-12 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--cl-brique)]">{X.surtitre}</p>
           <h1 className="titre-client mt-3 text-5xl font-medium leading-[1.05]">{X.titre}</h1>
-          <p className="mt-4 max-w-md text-lg text-[#6b5d50]">{X.sous}</p>
+          <p className="mt-4 max-w-md text-lg text-[var(--cl-doux)]">{X.sous}</p>
           <ul className="mt-6 space-y-2 text-[15px]">
             {X.points.map((p) => (
               <li key={p} className="flex gap-2.5">
-                <span className="text-[#2f6b4f]" aria-hidden>
+                <span className="text-[var(--cl-sapin)]" aria-hidden>
                   ✓
                 </span>
                 {p}
@@ -64,17 +73,17 @@ export default async function PagePortail({ searchParams }: { searchParams: Prom
           </ul>
         </div>
         <div className="carte p-7 sm:p-9">
-          <p className="text-[#6b5d50]">{X.comment}</p>
+          <p className="text-[var(--cl-doux)]">{X.comment}</p>
           <div className="mt-6">
             <AccesPortail langue={langue} />
           </div>
           <p className="mt-6 text-right text-xs">
-            <a href={`/portail?l=${langue === 'fr' ? 'en' : 'fr'}`} className="font-semibold text-[#6b5d50] hover:text-[#2a211a]">
+            <a href={`/portail?l=${langue === 'fr' ? 'en' : 'fr'}`} className="font-semibold text-[var(--cl-doux)] hover:text-[var(--cl-encre)]">
               {X.autre}
             </a>
           </p>
         </div>
       </main>
-    </div>
+    </CadreClient>
   )
 }

@@ -2,6 +2,7 @@ import { releverAvisSiNecessaire } from '@/lib/avis-google'
 import { envoyerRapportsDus } from '@/lib/rapports'
 import { envoyerAlerteSommeil } from '@/lib/sommeil'
 import { baseLiens } from '@/lib/securite'
+import { rechaufferPool } from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,6 +24,8 @@ export async function GET() {
   // Les liens des courriels viennent de la configuration (URL_APP ou URL_CARTES).
   const base = await baseLiens()
 
+  // Des connexions prêtes pour la prochaine visite d'un client.
+  void rechaufferPool().catch(() => {})
   void releverAvisSiNecessaire().catch(() => {})
   void envoyerRapportsDus(base).catch(() => {})
   void envoyerAlerteSommeil(base).catch(() => {})

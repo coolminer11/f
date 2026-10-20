@@ -8,7 +8,7 @@ import { requete } from '@/lib/db'
 import { langueValide } from '@/lib/langue'
 import { maintenantQuebec } from '@/lib/quebec'
 import { PALIERS_AVIS, PALIERS_TAPS } from '@/lib/paliers'
-import { fraunces, inter } from '@/app/stats/polices'
+import CadreClient from '@/components/client/cadre-client'
 import AnneeTapora, { type Bilan } from '@/components/client/annee-tapora'
 import PartagePalier from '@/components/client/partage-palier'
 
@@ -82,10 +82,10 @@ export default async function PageAnnee({
   }
 
   return (
-    <div className={`${fraunces.variable} ${inter.variable} theme-client`} lang={langue === 'en' ? 'en-CA' : 'fr-CA'}>
+    <CadreClient lang={langue === 'en' ? 'en-CA' : 'fr-CA'} force="clair">
       <AnneeTapora bilan={bilan} langue={langue} retour={`/stats/${jeton}${sp.l ? `?l=${langue}` : ''}`} />
       <div id="calque-client" />
       <PartagePalier nom={d.nom} langue={langue} />
-    </div>
+    </CadreClient>
   )
 }

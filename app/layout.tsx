@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next'
 import { cookies } from 'next/headers'
 import EnteteBo, { type Theme } from '@/components/entete-bo'
 import InstallerApp from '@/components/installer-app'
+import BarreChargement from '@/components/barre-chargement'
+import { Suspense } from 'react'
 import { utilisateurCourant } from '@/lib/auth'
 import { nombreATraiter } from '@/lib/portail'
 import { fraunces, inter } from '@/app/stats/polices'
@@ -41,6 +43,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             montrent aucun lien vers le reste du back-office. */}
         {/* Sans double authentification, aucun menu : seule la page Sécurité
             s'ouvre (voir exigerSession), le temps de l'activer. */}
+        {utilisateur?.totp_actif && (
+          <Suspense>
+            <BarreChargement />
+          </Suspense>
+        )}
         {utilisateur?.totp_actif && (
           <EnteteBo nom={utilisateur.nom} lecture={utilisateur.role === 'lecture'} theme={theme} doubleAuth={utilisateur.totp_actif} aTraiter={aTraiter} />
         )}

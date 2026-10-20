@@ -93,12 +93,12 @@ export default function ListeLancement({
     <section ref={section} className="carte p-6 sm:p-7">
       {fini ? (
         <div className="flex items-center gap-4 py-2">
-          <span className="coche-merci grid size-14 shrink-0 place-items-center rounded-full bg-[#2f6b4f] text-2xl text-white" aria-hidden>
+          <span className="coche-merci grid size-14 shrink-0 place-items-center rounded-full bg-[var(--cl-sapin)] text-2xl text-white" aria-hidden>
             ✓
           </span>
           <div>
             <h2 className="titre-client !text-2xl">{T.bravo}</h2>
-            <p className="mt-0.5 text-[#6b5d50]">{T.bravoSous}</p>
+            <p className="mt-0.5 text-[var(--cl-doux)]">{T.bravoSous}</p>
           </div>
         </div>
       ) : (
@@ -106,15 +106,15 @@ export default function ListeLancement({
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <h2>{T.titre}</h2>
-              <p className="mt-0.5 text-sm text-[#6b5d50]">{T.sous}</p>
+              <p className="mt-0.5 text-sm text-[var(--cl-doux)]">{T.sous}</p>
             </div>
             <span className="titre-client text-3xl font-medium tabular-nums">
               {faites}
-              <span className="text-lg text-[#6b5d50]">/{etapes.length}</span>
+              <span className="text-lg text-[var(--cl-doux)]">/{etapes.length}</span>
             </span>
           </div>
-          <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-[#ece2d2]" aria-hidden>
-            <div className="h-full rounded-full bg-gradient-to-r from-[#c2552f] to-[#e0794f] transition-[width] duration-700 ease-out" style={{ width: `${(faites / etapes.length) * 100}%` }} />
+          <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-[var(--cl-ligne-douce)]" aria-hidden>
+            <div className="h-full rounded-full bg-gradient-to-r from-[var(--cl-brique)] to-[var(--cl-brique-clair)] transition-[width] duration-700 ease-out" style={{ width: `${(faites / etapes.length) * 100}%` }} />
           </div>
           <ul className="mt-5 space-y-2">
             {etapes.map((e) => {
@@ -127,7 +127,7 @@ export default function ListeLancement({
                     onClick={() => cocher(e)}
                     aria-pressed={fait}
                     disabled={automatique}
-                    className={`flex w-full items-start gap-3 rounded-2xl px-3 py-2.5 text-left transition ${fait ? 'bg-[#eef5f0]' : 'hover:bg-[#f8f1e6]'} disabled:cursor-default`}
+                    className={`flex w-full items-start gap-3 rounded-2xl px-3 py-2.5 text-left transition ${fait ? 'bg-[var(--cl-vert-pale)]' : 'hover:bg-[var(--cl-creme)]'} disabled:cursor-default`}
                   >
                     <span className={`case-lancement ${fait ? 'case-cochee' : ''}`} aria-hidden>
                       <svg viewBox="0 0 16 16" className="size-3.5">
@@ -135,8 +135,8 @@ export default function ListeLancement({
                       </svg>
                     </span>
                     <span className="text-sm leading-snug">
-                      <span className={fait ? 'text-[#6b5d50] line-through decoration-[#2f6b4f]/40' : 'font-medium'}>{T.etapes[e]}</span>
-                      {automatique && <span className="ml-1.5 whitespace-nowrap text-xs text-[#2f6b4f]">· {T.auto}</span>}
+                      <span className={fait ? 'text-[var(--cl-doux)] line-through decoration-[var(--cl-sapin)]/40' : 'font-medium'}>{T.etapes[e]}</span>
+                      {automatique && <span className="ml-1.5 whitespace-nowrap text-xs text-[var(--cl-sapin)]">· {T.auto}</span>}
                     </span>
                   </button>
                 </li>

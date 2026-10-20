@@ -51,9 +51,9 @@ export default function Course({ lignes, langue, joursAvantLundi }: { lignes: Li
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <div>
           <h2>{T.titre}</h2>
-          <p className="mt-0.5 text-sm text-[#6b5d50]">{T.sous(joursAvantLundi)}</p>
+          <p className="mt-0.5 text-sm text-[var(--cl-doux)]">{T.sous(joursAvantLundi)}</p>
         </div>
-        <p className="text-sm font-semibold text-[#c2552f]">{message}</p>
+        <p className="text-sm font-semibold text-[var(--cl-brique)]">{message}</p>
       </div>
 
       <div className="mt-6 grid grid-cols-3 items-end gap-3 sm:mx-auto sm:max-w-xl">
@@ -71,10 +71,10 @@ export default function Course({ lignes, langue, joursAvantLundi }: { lignes: Li
                 <span data-compteur={l.semaine}>{nf.format(l.semaine)}</span>
               </p>
               {aChampion && champion.id === l.id && (
-                <span className="mt-1 rounded-full bg-[#fbe9c6] px-2 py-0.5 text-[11px] font-medium text-[#7a4a0c]">👑 {T.champion}</span>
+                <span className="mt-1 rounded-full bg-[var(--cl-miel-pale)] px-2 py-0.5 text-[11px] font-medium text-[var(--cl-miel-texte)]">👑 {T.champion}</span>
               )}
               <div
-                className={`barre-graphique mt-2 w-full rounded-t-2xl ${i === 0 ? 'bg-gradient-to-b from-[#d96a40] to-[#c2552f]' : i === 1 ? 'bg-[#e8b394]' : 'bg-[#f0d2bd]'}`}
+                className={`barre-graphique mt-2 w-full rounded-t-2xl ${i === 0 ? 'bg-gradient-to-b from-[var(--cl-brique-clair)] to-[var(--cl-brique)]' : i === 1 ? 'bg-[#e8b394]' : 'bg-[var(--cl-rose-pale)]'}`}
                 style={{ height: `${HAUTEURS[i]}px` }}
                 aria-hidden
               />
@@ -84,15 +84,15 @@ export default function Course({ lignes, langue, joursAvantLundi }: { lignes: Li
       </div>
 
       {reste.length > 0 && (
-        <ul className="mt-5 space-y-2.5 border-t border-dashed border-[#e2d6c3] pt-4">
+        <ul className="mt-5 space-y-2.5 border-t border-dashed border-[var(--cl-ligne)] pt-4">
           {reste.map((l, k) => (
             <li key={l.id} className="grid grid-cols-[2rem_minmax(0,1fr)_minmax(0,40%)_auto] items-center gap-3 text-sm">
-              <span className="text-center font-semibold text-[#6b5d50]">{k + 4}</span>
+              <span className="text-center font-semibold text-[var(--cl-doux)]">{k + 4}</span>
               <span className="truncate font-medium">
                 {l.libelle}
                 {aChampion && champion.id === l.id && ' 👑'}
               </span>
-              <span className="h-2 overflow-hidden rounded-full bg-[#ece2d2]" aria-hidden>
+              <span className="h-2 overflow-hidden rounded-full bg-[var(--cl-ligne-douce)]" aria-hidden>
                 <span data-jauge className="block h-full rounded-full bg-[#e8b394]" style={{ width: `${(l.semaine / max) * 100}%` }} />
               </span>
               <span className="text-right font-semibold tabular-nums">{nf.format(l.semaine)}</span>
@@ -100,7 +100,7 @@ export default function Course({ lignes, langue, joursAvantLundi }: { lignes: Li
           ))}
         </ul>
       )}
-      {a.semaine > b.semaine && <p className="mt-4 text-center text-xs text-[#6b5d50]">{T.ecart(a.semaine - b.semaine, b.libelle)}</p>}
+      {a.semaine > b.semaine && <p className="mt-4 text-center text-xs text-[var(--cl-doux)]">{T.ecart(a.semaine - b.semaine, b.libelle)}</p>}
     </section>
   )
 }

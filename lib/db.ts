@@ -71,22 +71,48 @@ types.setTypeParser(types.builtins.TIMESTAMP, versIso)
 // en rendant faux le moniteur qui en lit l'état.
 const globale = globalThis as typeof globalThis & { __poolTapora?: Pool }
 
-/** Connexions simultanées à la base. Le pooler de Supabase en accepte bien plus côté client. */
-const TAILLE_POOL = 10
+/**
+ * Connexions simultanées à la base. Le pooler de Supabase en accepte bien
+ * plus côté client ; une page client lance une trentaine de requêtes d'un
+ * coup, et chacune attend un aller-retour Render ↔ Supabase.
+ */
+const TAILLE_POOL = 24
+
+/**
+ * Une connexion neuve coûte cher (TCP, chiffrement, authentification auprès
+ * du pooler : plusieurs allers-retours). On les garde donc ouvertes
+ * longtemps : le réveil (/api/eveil, toutes les 10 minutes) les réchauffe
+ * avant qu'elles n'expirent, et la première visite trouve des connexions
+ * prêtes.
+ */
+const INACTIVITE_MAX_MS = 15 * 60_000
 
 function obtenirPool(): Pool {
   if (!process.env.DATABASE_URL) {
     throw new Error('DATABASE_URL est requis. Voir .env.example.')
   }
   if (!globale.__poolTapora) {
-    globale.__poolTapora = new Pool({
+    const pool = new Pool({
       connectionString: process.env.DATABASE_URL,
       max: TAILLE_POOL,
-      idleTimeoutMillis: 30_000,
+      idleTimeoutMillis: INACTIVITE_MAX_MS,
+      keepAlive: true,
       ssl: process.env.DATABASE_SSL === 'false' ? undefined : { rejectUnauthorized: false },
     })
+    // Une connexion au repos coupée par le pooler ne doit jamais faire tomber
+    // le serveur : le pool la retire et en ouvrira une autre au besoin.
+    pool.on('error', () => {})
+    globale.__poolTapora = pool
   }
   return globale.__poolTapora
+}
+
+/** Ouvre (ou garde ouvertes) quelques connexions d'avance : appelé par le réveil. */
+export async function rechaufferPool(n = 8): Promise<void> {
+  const pool = obtenirPool()
+  const clients = await Promise.all(Array.from({ length: Math.min(n, TAILLE_POOL) }, () => pool.connect().catch(() => null)))
+  await Promise.all(clients.map((c) => c?.query('select 1').catch(() => null)))
+  clients.forEach((c) => c?.release())
 }
 
 /**

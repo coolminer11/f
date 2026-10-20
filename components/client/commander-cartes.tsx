@@ -18,17 +18,17 @@ export default function CommanderCartes({ jeton, langue }: { jeton: string; lang
 
   return (
     <section className="carte relative overflow-hidden p-6 sm:p-8" id="commander">
-      <div aria-hidden className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-[#f6dccd] opacity-70" />
-      <div aria-hidden className="pointer-events-none absolute -bottom-20 right-24 size-40 rounded-full bg-[#d8ece8] opacity-70" />
+      <div aria-hidden className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-[var(--cl-rose-pale)] opacity-70" />
+      <div aria-hidden className="pointer-events-none absolute -bottom-20 right-24 size-40 rounded-full bg-[var(--cl-menthe-pale)] opacity-70" />
 
       {etat.ok ? (
         <div className="relative flex items-center gap-4 py-4" role="status">
-          <span className="coche-merci grid size-14 shrink-0 place-items-center rounded-full bg-[#2f6b4f] text-2xl text-white" aria-hidden>
+          <span className="coche-merci grid size-14 shrink-0 place-items-center rounded-full bg-[var(--cl-sapin)] text-2xl text-white" aria-hidden>
             ✓
           </span>
           <div>
             <h2 className="titre-client !text-2xl">{T.merci}</h2>
-            <p className="mt-0.5 text-[#6b5d50]">{T.merciSous}</p>
+            <p className="mt-0.5 text-[var(--cl-doux)]">{T.merciSous}</p>
           </div>
         </div>
       ) : (
@@ -36,7 +36,7 @@ export default function CommanderCartes({ jeton, langue }: { jeton: string; lang
           <div>
             <CarteArcEnCiel className="mb-3 size-16 -translate-x-1.5" />
             <h2 className="titre-client !text-2xl sm:!text-3xl">{T.commanderTitre}</h2>
-            <p className="mt-2 max-w-sm text-[#6b5d50]">{T.commanderSous}</p>
+            <p className="mt-2 max-w-sm text-[var(--cl-doux)]">{T.commanderSous}</p>
           </div>
           <div className="space-y-4">
             <input type="hidden" name="jeton" value={jeton} />
@@ -51,7 +51,7 @@ export default function CommanderCartes({ jeton, langue }: { jeton: string; lang
                     onClick={() => setQuantite(n)}
                     aria-pressed={quantite === n}
                     className={`min-w-12 rounded-full px-4 py-2 text-sm font-semibold tabular-nums transition ${
-                      quantite === n ? 'bg-[#2a211a] text-[#fffaf2]' : 'bg-[#f3ebdf] text-[#2a211a] hover:bg-[#ede3d3]'
+                      quantite === n ? 'bg-[var(--cl-nuit)] text-[var(--cl-sur-nuit)]' : 'bg-[var(--cl-sable)] text-[var(--cl-encre)] hover:bg-[var(--cl-sable-2)]'
                     }`}
                   >
                     {n}
@@ -62,7 +62,7 @@ export default function CommanderCartes({ jeton, langue }: { jeton: string; lang
                   onClick={() => setQuantite('autre')}
                   aria-pressed={quantite === 'autre'}
                   className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                    quantite === 'autre' ? 'bg-[#2a211a] text-[#fffaf2]' : 'bg-[#f3ebdf] text-[#2a211a] hover:bg-[#ede3d3]'
+                    quantite === 'autre' ? 'bg-[var(--cl-nuit)] text-[var(--cl-sur-nuit)]' : 'bg-[var(--cl-sable)] text-[var(--cl-encre)] hover:bg-[var(--cl-sable-2)]'
                   }`}
                 >
                   {T.autreQte}
@@ -77,7 +77,7 @@ export default function CommanderCartes({ jeton, langue }: { jeton: string; lang
                     autoFocus
                     defaultValue={20}
                     aria-label={T.combien}
-                    className="w-24 rounded-full border border-[#e2d6c3] bg-[#fffaf2] px-4 py-2 text-sm font-semibold tabular-nums outline-none focus:border-[#c2552f]"
+                    className="w-24 rounded-full border border-[var(--cl-ligne)] bg-[var(--cl-papier)] px-4 py-2 text-sm font-semibold tabular-nums outline-none focus:border-[var(--cl-brique)]"
                   />
                 ) : (
                   <input type="hidden" name="quantite" value={quantite} />
@@ -94,18 +94,18 @@ export default function CommanderCartes({ jeton, langue }: { jeton: string; lang
                 maxLength={500}
                 rows={2}
                 placeholder={T.motExemple}
-                className="mt-2 block w-full resize-none rounded-2xl border border-[#e2d6c3] bg-[#fffaf2] px-4 py-3 text-sm outline-none placeholder:text-[#b5a693] focus:border-[#c2552f]"
+                className="mt-2 block w-full resize-none rounded-2xl border border-[var(--cl-ligne)] bg-[var(--cl-papier)] px-4 py-3 text-sm outline-none placeholder:text-[var(--cl-gris)] focus:border-[var(--cl-brique)]"
               />
             </div>
-            {etat.erreur && <p className="text-sm font-medium text-[#b0402a]">{etat.erreur}</p>}
+            {etat.erreur && <p className="text-sm font-medium text-[var(--cl-rouge)]">{etat.erreur}</p>}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
               <button
                 disabled={enCours}
-                className="rounded-full bg-[#c2552f] px-6 py-3 text-sm font-semibold text-[#fffaf2] shadow-[0_10px_24px_-12px_#c2552f] transition hover:-translate-y-0.5 hover:bg-[#a9481f] disabled:opacity-60"
+                className="rounded-full bg-[var(--cl-brique)] px-6 py-3 text-sm font-semibold text-[var(--cl-blanc)] shadow-[0_10px_24px_-12px_#c2552f] transition hover:-translate-y-0.5 hover:bg-[var(--cl-brique-fonce)] disabled:opacity-60"
               >
                 {enCours ? T.envoi : T.envoyerDemande}
               </button>
-              <span className="text-xs text-[#6b5d50]">{T.sansPaiement}</span>
+              <span className="text-xs text-[var(--cl-doux)]">{T.sansPaiement}</span>
             </div>
           </div>
         </form>

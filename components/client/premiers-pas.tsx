@@ -24,18 +24,18 @@ export default function PremiersPas({ etapes, langue }: { etapes: EtapePas[]; la
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <div>
           <h2>{T.titre}</h2>
-          <p className="mt-0.5 text-sm text-[#6b5d50]">{T.sous}</p>
+          <p className="mt-0.5 text-sm text-[var(--cl-doux)]">{T.sous}</p>
         </div>
-        <span className="rounded-full bg-[#f6ecdf] px-3 py-1 text-sm font-semibold tabular-nums">{T.sur(faites, etapes.length)}</span>
+        <span className="rounded-full bg-[var(--cl-creme)] px-3 py-1 text-sm font-semibold tabular-nums">{T.sur(faites, etapes.length)}</span>
       </div>
 
       <ol className="relative mt-7 flex flex-col gap-5 sm:grid sm:auto-cols-fr sm:grid-flow-col sm:gap-2">
         {/* La piste : verticale sur mobile, horizontale dès 640 px. */}
-        <li role="presentation" aria-hidden className="absolute bottom-5 left-[calc(1.375rem-2px)] top-5 w-1 rounded-full bg-[#ece2d2] sm:hidden">
-          <span data-jauge-v className="block w-full rounded-full bg-[#c2552f]" style={{ height: `${avancement * 100}%` }} />
+        <li role="presentation" aria-hidden className="absolute bottom-5 left-[calc(1.375rem-2px)] top-5 w-1 rounded-full bg-[var(--cl-ligne-douce)] sm:hidden">
+          <span data-jauge-v className="block w-full rounded-full bg-[var(--cl-brique)]" style={{ height: `${avancement * 100}%` }} />
         </li>
-        <li role="presentation" aria-hidden className="absolute left-[calc(100%/var(--n)/2)] right-[calc(100%/var(--n)/2)] top-[calc(1.375rem-2px)] hidden h-1 rounded-full bg-[#ece2d2] sm:block" style={{ ['--n' as string]: etapes.length }}>
-          <span data-jauge className="block h-full rounded-full bg-[#c2552f]" style={{ width: `${avancement * 100}%` }} />
+        <li role="presentation" aria-hidden className="absolute left-[calc(100%/var(--n)/2)] right-[calc(100%/var(--n)/2)] top-[calc(1.375rem-2px)] hidden h-1 rounded-full bg-[var(--cl-ligne-douce)] sm:block" style={{ ['--n' as string]: etapes.length }}>
+          <span data-jauge className="block h-full rounded-full bg-[var(--cl-brique)]" style={{ width: `${avancement * 100}%` }} />
         </li>
           {etapes.map((e, i) => {
             const etat = e.fait ? 'fait' : i === prochaine ? 'prochain' : 'avenir'
@@ -44,7 +44,7 @@ export default function PremiersPas({ etapes, langue }: { etapes: EtapePas[]; la
                 <span className={`pas-rond pas-${etat}`} aria-hidden>
                   {e.fait ? '✓' : i + 1}
                 </span>
-                <span className={`text-sm leading-tight ${e.fait ? 'font-medium' : etat === 'prochain' ? 'font-semibold text-[#c2552f]' : 'text-[#6b5d50]'}`}>
+                <span className={`text-sm leading-tight ${e.fait ? 'font-medium' : etat === 'prochain' ? 'font-semibold text-[var(--cl-brique)]' : 'text-[var(--cl-doux)]'}`}>
                   {e.libelle}
                   <span className="sr-only">{e.fait ? ' ✓' : ''}</span>
                 </span>

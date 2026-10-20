@@ -16,6 +16,7 @@ export default async function SectionAvis({
   tapsPeriode,
   pourClient = false,
   langue = 'fr',
+  donnees,
 }: {
   placeIds: string[]
   jours: number
@@ -23,6 +24,8 @@ export default async function SectionAvis({
   /** Sur la page du client : pas de consignes de configuration. */
   pourClient?: boolean
   langue?: Langue
+  /** Déjà chargés par la page (même période, mêmes fiches) : aucune requête de plus. */
+  donnees?: { r: Awaited<ReturnType<typeof resumeAvis>>; serie: Awaited<ReturnType<typeof serieAvis>> }
 }) {
   const T = textes(langue)
   const nombreFr = new Intl.NumberFormat(locale(langue))
@@ -38,7 +41,7 @@ export default async function SectionAvis({
     )
   }
 
-  const [r, serie] = await Promise.all([resumeAvis(placeIds, jours), serieAvis(placeIds, jours)])
+  const [r, serie] = donnees ? [donnees.r, donnees.serie] : await Promise.all([resumeAvis(placeIds, jours), serieAvis(placeIds, jours)])
   if (r.nb_actuel === null) {
     if (pourClient) return null
     return (

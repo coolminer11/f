@@ -67,7 +67,7 @@ const TEXTES = {
 } as const
 
 const champ =
-  'mt-1.5 block w-full rounded-2xl border border-[#e2d6c3] bg-[#fffaf2] px-4 py-2.5 text-sm outline-none placeholder:text-[#b5a693] focus:border-[#c2552f]'
+  'mt-1.5 block w-full rounded-2xl border border-[var(--cl-ligne)] bg-[var(--cl-papier)] px-4 py-2.5 text-sm outline-none placeholder:text-[var(--cl-gris)] focus:border-[var(--cl-brique)]'
 
 /**
  * « Recommandez-nous » : le parrainage sans carte gratuite. Le filleul a
@@ -97,43 +97,43 @@ export default function Parrainage({
 
   return (
     <section className="carte relative overflow-hidden p-6 sm:p-8" id="parrainage">
-      <div aria-hidden className="pointer-events-none absolute -left-20 -top-24 size-64 rounded-full bg-[#fbe6c4] opacity-60" />
-      <div aria-hidden className="pointer-events-none absolute -bottom-24 -right-10 size-56 rounded-full bg-[#f6dccd] opacity-70" />
+      <div aria-hidden className="pointer-events-none absolute -left-20 -top-24 size-64 rounded-full bg-[var(--cl-miel-pale)] opacity-60" />
+      <div aria-hidden className="pointer-events-none absolute -bottom-24 -right-10 size-56 rounded-full bg-[var(--cl-rose-pale)] opacity-70" />
 
       <div className="relative">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c2552f]">{T.surtitre}</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--cl-brique)]">{T.surtitre}</span>
           {ambassadeur && (
-            <span className="pastille-ambassadeur relative overflow-hidden rounded-full px-3 py-1 text-xs font-semibold text-[#5a3b05]">
+            <span className="pastille-ambassadeur relative overflow-hidden rounded-full px-3 py-1 text-xs font-semibold text-[var(--cl-miel-texte)]">
               🏅 {T.ambassadeur}
             </span>
           )}
         </div>
         <h2 className="titre-client mt-2 !text-2xl sm:!text-3xl">{T.titre}</h2>
-        <p className="mt-2 max-w-2xl text-[#6b5d50]">{T.sous}</p>
+        <p className="mt-2 max-w-2xl text-[var(--cl-doux)]">{T.sous}</p>
 
         <ul className="mt-6 grid gap-3 sm:grid-cols-3">
           {T.avantages.map(([emoji, titre, texte]) => (
-            <li key={titre} className="rounded-2xl border border-[#eadfcd] bg-[#fffaf2]/80 p-4" data-tuile>
-              <span className="grid size-10 place-items-center rounded-xl bg-[#f3ebdf] text-xl" aria-hidden>
+            <li key={titre} className="rounded-2xl border border-[var(--cl-ligne-douce)] bg-[var(--cl-papier)]/80 p-4" data-tuile>
+              <span className="grid size-10 place-items-center rounded-xl bg-[var(--cl-sable)] text-xl" aria-hidden>
                 {emoji}
               </span>
               <strong className="titre-client mt-3 block text-lg font-semibold">{titre}</strong>
-              <span className="mt-0.5 block text-sm leading-relaxed text-[#6b5d50]">{texte}</span>
+              <span className="mt-0.5 block text-sm leading-relaxed text-[var(--cl-doux)]">{texte}</span>
             </li>
           ))}
         </ul>
 
-        {bilan.recommandes > 0 && <p className="mt-4 text-sm font-medium text-[#2f6b4f]">{T.bilan(bilan.recommandes, bilan.clients)}</p>}
+        {bilan.recommandes > 0 && <p className="mt-4 text-sm font-medium text-[var(--cl-sapin)]">{T.bilan(bilan.recommandes, bilan.clients)}</p>}
 
         {merci ? (
-          <div className="mt-6 flex flex-wrap items-center gap-4 rounded-2xl bg-[#e9f2ea] p-5" role="status">
-            <span className="coche-merci grid size-12 shrink-0 place-items-center rounded-full bg-[#2f6b4f] text-xl text-white" aria-hidden>
+          <div className="mt-6 flex flex-wrap items-center gap-4 rounded-2xl bg-[var(--cl-vert-pale)] p-5" role="status">
+            <span className="coche-merci grid size-12 shrink-0 place-items-center rounded-full bg-[var(--cl-sapin)] text-xl text-white" aria-hidden>
               ✓
             </span>
             <div className="min-w-0 flex-1">
               <p className="titre-client text-xl font-semibold">{T.merci(etat.commerce ?? '')}</p>
-              <p className="mt-0.5 text-sm text-[#2f5c47]">{T.merciSous}</p>
+              <p className="mt-0.5 text-sm text-[var(--cl-sapin-fonce)]">{T.merciSous}</p>
             </div>
             <button
               type="button"
@@ -141,7 +141,7 @@ export default function Parrainage({
                 setAfficher(false)
                 setCle((k) => k + 1)
               }}
-              className="rounded-full bg-[#fffaf2] px-4 py-2 text-sm font-semibold text-[#2a211a] transition hover:-translate-y-0.5"
+              className="rounded-full bg-[var(--cl-papier)] px-4 py-2 text-sm font-semibold text-[var(--cl-encre)] transition hover:-translate-y-0.5"
             >
               {T.encore}
             </button>
@@ -165,21 +165,21 @@ export default function Parrainage({
             <label className="text-sm font-medium">
               {T.telephone}
               <input name="telephone" type="tel" maxLength={40} className={champ} />
-              <span className="mt-1 block text-xs font-normal text-[#6b5d50]">{T.unDesDeux}</span>
+              <span className="mt-1 block text-xs font-normal text-[var(--cl-doux)]">{T.unDesDeux}</span>
             </label>
             <label className="text-sm font-medium sm:col-span-2">
               {T.message}
               <textarea name="message" maxLength={500} rows={2} placeholder={T.messageEx} className={`${champ} resize-none`} />
             </label>
-            <div className="rounded-2xl bg-[#f3ebdf] p-4 sm:col-span-2">
+            <div className="rounded-2xl bg-[var(--cl-sable)] p-4 sm:col-span-2">
               {partenaire ? (
-                <p className="flex items-center gap-2 text-sm font-medium text-[#2f5c47]">
+                <p className="flex items-center gap-2 text-sm font-medium text-[var(--cl-sapin-fonce)]">
                   <input type="hidden" name="partenaire" value="on" />
                   <span aria-hidden>✓</span> {T.dejaPartenaire}
                 </p>
               ) : (
                 <label className="flex items-start gap-3 text-sm">
-                  <input type="checkbox" name="partenaire" defaultChecked className="mt-0.5 size-4 accent-[#c2552f]" />
+                  <input type="checkbox" name="partenaire" defaultChecked className="mt-0.5 size-4 accent-[var(--cl-brique)]" />
                   <span className="font-medium">{T.partenaire}</span>
                 </label>
               )}
@@ -188,11 +188,11 @@ export default function Parrainage({
                 <input name="site_web" maxLength={300} defaultValue={siteWeb ?? ''} placeholder="lecafe.ca" className={champ} />
               </label>
             </div>
-            {etat.erreur && <p className="text-sm font-medium text-[#b0402a] sm:col-span-2">{etat.erreur}</p>}
+            {etat.erreur && <p className="text-sm font-medium text-[var(--cl-rouge)] sm:col-span-2">{etat.erreur}</p>}
             <div className="sm:col-span-2">
               <button
                 disabled={enCours}
-                className="rounded-full bg-[#c2552f] px-6 py-3 text-sm font-semibold text-[#fffaf2] shadow-[0_10px_24px_-12px_#c2552f] transition hover:-translate-y-0.5 hover:bg-[#a9481f] disabled:opacity-60"
+                className="rounded-full bg-[var(--cl-brique)] px-6 py-3 text-sm font-semibold text-[var(--cl-blanc)] shadow-[0_10px_24px_-12px_#c2552f] transition hover:-translate-y-0.5 hover:bg-[var(--cl-brique-fonce)] disabled:opacity-60"
               >
                 {enCours ? T.envoi : T.envoyer}
               </button>

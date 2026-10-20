@@ -3,6 +3,7 @@ import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createHash, randomBytes, scrypt, timingSafeEqual } from 'node:crypto'
 import { promisify } from 'node:util'
+import { cache } from 'react'
 import { requete, requeteUne } from '@/lib/db'
 import { egal, type Contexte } from '@/lib/securite'
 
@@ -143,10 +144,13 @@ export async function fermerSession(): Promise<void> {
 
 /** Utilisateur de la session en cours, ou null. Vérifie signature ET base. */
 export async function utilisateurCourant(): Promise<Utilisateur | null> {
-  const magasin = await cookies()
-  const brut = magasin.get(NOM_COOKIE)?.value
-  if (!brut) return null
+  const brut = (await cookies()).get(NOM_COOKIE)?.value
+  return brut ? lireSession(brut) : null
+}
 
+// Une seule lecture par affichage : le gabarit et la page demandent tous deux
+// la session ; sans ce cache, chaque page payait deux allers-retours de plus.
+const lireSession = cache(async (brut: string): Promise<Utilisateur | null> => {
   const [jeton, signature] = brut.split('.')
   if (!jeton || !signature) return null
   if (!egal(signature, await signer(jeton))) return null
@@ -160,11 +164,13 @@ export async function utilisateurCourant(): Promise<Utilisateur | null> {
   )
   if (!utilisateur) return null
 
-  await requete(`update sessions set derniere_vue = now() where empreinte = $1`, [
+  // « Vue pour la dernière fois » : au plus une écriture par minute, sans la
+  // faire attendre à la page.
+  void requete(`update sessions set derniere_vue = now() where empreinte = $1 and derniere_vue < now() - interval '1 minute'`, [
     empreinteJeton(jeton),
-  ])
+  ]).catch(() => {})
   return utilisateur
-}
+})
 
 /** Où va un compte sans double authentification : nulle part ailleurs. */
 export const PAGE_DOUBLE_AUTH = '/compte/securite?obligatoire=1'

@@ -11,6 +11,18 @@ import {
 
 import { JOURS, dateCourte, dateLongue, heure, locale, plage, textes, type Langue } from '@/lib/langue'
 
+/** Les données des graphiques : la page client les demande d'avance, avec tout le reste. */
+export async function chargerStatsTaps(portee: Portee, jours: number, avecCumul = true) {
+  const [parJour, parHeure, parJourSemaine, grille, cumul] = await Promise.all([
+    tapsParJour(portee, jours),
+    tapsParHeure(portee, jours),
+    tapsParJourSemaine(portee, jours),
+    tapsJourHeure(portee, jours),
+    avecCumul ? cumulDepuisPose(portee) : Promise.resolve([]),
+  ])
+  return { parJour, parHeure, parJourSemaine, grille, cumul }
+}
+
 /**
  * Les graphiques communs au tableau de bord et à la fiche d'une carte. La
  * période choisie en haut de page s'applique à tout ce qui est ici.
@@ -22,6 +34,7 @@ export default async function StatsTaps({
   avecCumul = true,
   langue = 'fr',
   sansQr = false,
+  donnees,
 }: {
   portee: Portee
   jours: number
@@ -31,17 +44,13 @@ export default async function StatsTaps({
   langue?: Langue
   /** Cartes 100 % NFC : pas de section « puce ou QR ». */
   sansQr?: boolean
+  /** Déjà chargées (chargerStatsTaps) : aucune requête de plus. */
+  donnees?: Awaited<ReturnType<typeof chargerStatsTaps>>
 }) {
   const T = textes(langue)
   const J = JOURS[langue]
   const nombre = (n: number) => new Intl.NumberFormat(locale(langue)).format(n)
-  const [parJour, parHeure, parJourSemaine, grille, cumul] = await Promise.all([
-    tapsParJour(portee, jours),
-    tapsParHeure(portee, jours),
-    tapsParJourSemaine(portee, jours),
-    tapsJourHeure(portee, jours),
-    avecCumul ? cumulDepuisPose(portee) : Promise.resolve([]),
-  ])
+  const { parJour, parHeure, parJourSemaine, grille, cumul } = donnees ?? (await chargerStatsTaps(portee, jours, avecCumul))
   const caseForte = grille.reduce((a, b) => (b.taps > a.taps ? b : a), grille[0])
 
   const barresJour: Barre[] = parJour.map((p) => ({

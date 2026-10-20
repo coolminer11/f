@@ -49,11 +49,11 @@ const SILENCE = 14
 
 function Evolution({ courant, precedent, langue }: { courant: number; precedent: number; langue: Langue }) {
   if (precedent === 0)
-    return courant > 0 ? <span className="text-xs font-semibold text-[#2f6b4f]">{TX[langue].nouveau}</span> : <span className="text-[#a8998a]">—</span>
+    return courant > 0 ? <span className="text-xs font-semibold text-[var(--cl-sapin)]">{TX[langue].nouveau}</span> : <span className="text-[var(--cl-gris)]">—</span>
   const pct = Math.round(((courant - precedent) / precedent) * 100)
-  if (pct === 0) return <span className="text-xs text-[#6b5d50]">=</span>
+  if (pct === 0) return <span className="text-xs text-[var(--cl-doux)]">=</span>
   return (
-    <span className={`text-xs font-semibold tabular-nums ${pct > 0 ? 'text-[#2f6b4f]' : 'text-[#b0402a]'}`}>
+    <span className={`text-xs font-semibold tabular-nums ${pct > 0 ? 'text-[var(--cl-sapin)]' : 'text-[var(--cl-rouge)]'}`}>
       {pct > 0 ? '▲' : '▼'} {Math.abs(pct)}
       {langue === 'fr' ? ' %' : '%'}
     </span>
@@ -76,18 +76,18 @@ export default function DetailCartes({ lignes, jours, langue, lienExport }: { li
     // « Bar » dans le groupe « Bar » : inutile de le dire deux fois.
     const groupe = l.groupe && l.groupe.toLowerCase() !== l.libelle.toLowerCase() ? l.groupe : null
     return (
-      <tr key={l.id} className="border-t border-[#efe5d6]">
-        <td className="w-8 py-2.5 pr-2 text-right text-xs tabular-nums text-[#a8998a]">{i + 1}</td>
+      <tr key={l.id} className="border-t border-[var(--cl-ligne-douce)]">
+        <td className="w-8 py-2.5 pr-2 text-right text-xs tabular-nums text-[var(--cl-gris)]">{i + 1}</td>
         <td className="py-2.5 pr-3">
           <span className="block font-medium">{l.libelle}</span>
-          <span className="relative mt-1 block h-1.5 overflow-hidden rounded-full bg-[#f3ebdf]" aria-hidden>
-            <span className="absolute inset-y-0 left-0 rounded-full bg-[#c2552f]" style={{ width: `${(l.courant / max) * 100}%` }} />
+          <span className="relative mt-1 block h-1.5 overflow-hidden rounded-full bg-[var(--cl-sable)]" aria-hidden>
+            <span className="barre-carte absolute inset-y-0 left-0 rounded-full bg-[var(--cl-brique)]" style={{ width: `${(l.courant / max) * 100}%` }} />
           </span>
           {(groupe || l.jours_silence === null || l.jours_silence >= SILENCE) && (
-            <span className="mt-1 block text-xs text-[#6b5d50]">
+            <span className="mt-1 block text-xs text-[var(--cl-doux)]">
               {groupe}
               {groupe && (l.jours_silence === null || l.jours_silence >= SILENCE) ? ' · ' : ''}
-              {l.jours_silence === null ? T.jamais : l.jours_silence >= SILENCE ? <span className="text-[#b0402a]">{T.silence(l.jours_silence)}</span> : null}
+              {l.jours_silence === null ? T.jamais : l.jours_silence >= SILENCE ? <span className="text-[var(--cl-rouge)]">{T.silence(l.jours_silence)}</span> : null}
             </span>
           )}
         </td>
@@ -95,14 +95,14 @@ export default function DetailCartes({ lignes, jours, langue, lienExport }: { li
         <td className="py-2.5 pr-3 text-right">
           <Evolution courant={l.courant} precedent={l.precedent} langue={langue} />
         </td>
-        <td className="hidden py-2.5 pr-3 text-right tabular-nums text-[#6b5d50] sm:table-cell">{nf.format(l.total)}</td>
-        <td className="hidden py-2.5 text-right text-xs text-[#6b5d50] md:table-cell">{depuisL(l.dernier_tap, langue)}</td>
+        <td className="hidden py-2.5 pr-3 text-right tabular-nums text-[var(--cl-doux)] sm:table-cell">{nf.format(l.total)}</td>
+        <td className="hidden py-2.5 text-right text-xs text-[var(--cl-doux)] md:table-cell">{depuisL(l.dernier_tap, langue)}</td>
       </tr>
     )
   }
   const entete = (
     <thead>
-      <tr className="text-left text-xs text-[#6b5d50]">
+      <tr className="text-left text-xs text-[var(--cl-doux)]">
         <th className="pb-2 pr-2 font-medium" />
         <th className="pb-2 pr-3 font-medium">{T.carte}</th>
         <th className="pb-2 pr-3 text-right font-medium">{T.taps}</th>
@@ -115,27 +115,27 @@ export default function DetailCartes({ lignes, jours, langue, lienExport }: { li
 
   return (
     <section className="carte p-6 sm:p-8" id="detail" data-bloc>
-      <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c2552f]">{T.surtitre}</span>
+      <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--cl-brique)]">{T.surtitre}</span>
       <h2 className="titre-client mt-2 !text-2xl sm:!text-3xl">{T.titre}</h2>
-      <p className="mt-1 text-[#6b5d50]">{T.sous(jours)}</p>
+      <p className="mt-1 text-[var(--cl-doux)]">{T.sous(jours)}</p>
 
       {groupes.length > 1 && (
         <div className="mt-6">
           <h3 className="text-sm font-semibold">{T.groupes}</h3>
           <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {groupes.map((g) => (
-              <li key={g.nom ?? '—'} className="rounded-2xl bg-[#f7f1e7] p-4">
+              <li key={g.nom ?? '—'} className="tuile-survol rounded-2xl bg-[var(--cl-fond)] p-4">
                 <div className="flex items-baseline justify-between gap-2">
                   <span className="font-semibold">{g.nom ?? T.sansGroupe}</span>
-                  <span className="text-xs text-[#6b5d50]">{T.cartes(g.cartes)}</span>
+                  <span className="text-xs text-[var(--cl-doux)]">{T.cartes(g.cartes)}</span>
                 </div>
                 <div className="mt-1 flex items-baseline justify-between gap-2">
                   <span className="titre-client text-3xl font-medium tabular-nums">{nf.format(g.courant)}</span>
                   <Evolution courant={g.courant} precedent={g.precedent} langue={langue} />
                 </div>
                 <div className="mt-2 flex items-center gap-2">
-                  <span className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-[#ede3d3]" aria-hidden>
-                    <span className="absolute inset-y-0 left-0 rounded-full bg-[#2a211a]" style={{ width: `${g.part}%` }} />
+                  <span className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-[var(--cl-sable-2)]" aria-hidden>
+                    <span className="absolute inset-y-0 left-0 rounded-full bg-[var(--cl-nuit)]" style={{ width: `${g.part}%` }} />
                   </span>
                   <span className="text-xs font-semibold tabular-nums">
                     {g.part}
@@ -148,7 +148,7 @@ export default function DetailCartes({ lignes, jours, langue, lienExport }: { li
         </div>
       )}
 
-      {aVerifier > 0 && <p className="mt-6 rounded-2xl bg-[#fdf3dc] px-4 py-3 text-sm text-[#6b4a05]">{T.aVerifier(aVerifier)}</p>}
+      {aVerifier > 0 && <p className="mt-6 rounded-2xl bg-[var(--cl-miel-pale)] px-4 py-3 text-sm text-[var(--cl-miel-texte)]">{T.aVerifier(aVerifier)}</p>}
 
       {/* Au-delà de dix cartes, le reste se déplie (une case à cocher : pas de JavaScript). */}
       <div className="group mt-6 overflow-x-auto">
@@ -163,18 +163,18 @@ export default function DetailCartes({ lignes, jours, langue, lienExport }: { li
         {lignes.length > VISIBLES && (
           <label
             htmlFor="detail-tout"
-            className="mt-3 inline-block cursor-pointer text-sm font-semibold text-[#c2552f] hover:underline group-has-[:checked]:hidden"
+            className="mt-3 inline-block cursor-pointer text-sm font-semibold text-[var(--cl-brique)] hover:underline group-has-[:checked]:hidden"
           >
             {T.voirTout(lignes.length)}
           </label>
         )}
       </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-dashed border-[#e2d6c3] pt-5">
-        <a href={lienExport} className="rounded-full bg-[#2a211a] px-5 py-2.5 text-sm font-semibold text-[#fffaf2] transition hover:bg-[#c2552f]" download>
+      <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-dashed border-[var(--cl-ligne)] pt-5">
+        <a href={lienExport} className="rounded-full bg-[var(--cl-nuit)] px-5 py-2.5 text-sm font-semibold text-[var(--cl-sur-nuit)] transition hover:bg-[var(--cl-brique)]" download>
           ↓ {T.exporter}
         </a>
-        <span className="text-xs text-[#6b5d50]">{T.exporterSous}</span>
+        <span className="text-xs text-[var(--cl-doux)]">{T.exporterSous}</span>
       </div>
     </section>
   )

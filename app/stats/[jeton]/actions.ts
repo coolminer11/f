@@ -41,15 +41,16 @@ export async function approuverMaquetteAction(donnees: FormData): Promise<void> 
   redirect(`/stats/${jeton}?approuvee=1${l ? `&l=${l}` : ''}#commandes`)
 }
 
-export type EtatVerrou = { erreur: 'faux' | 'bloque' | 'invalide' | null }
-
-/** Le mot de passe d'une page protégée : le bon ouvre la page 30 jours sur cet appareil. */
-export async function deverrouillerPage(_: EtatVerrou, donnees: FormData): Promise<EtatVerrou> {
+/**
+ * Sans JavaScript seulement (l'écran du cadenas passe d'habitude par la route
+ * /stats/[jeton]/deverrouiller, pour jouer son animation) : le bon mot de passe
+ * ouvre la page 30 jours sur cet appareil.
+ */
+export async function deverrouillerPage(donnees: FormData): Promise<void> {
   const jeton = String(donnees.get('jeton') ?? '').slice(0, 80)
   const r = await deverrouiller(jeton, String(donnees.get('mot_de_passe') ?? ''))
-  if (r !== 'ok') return { erreur: r }
   const l = langueValide(String(donnees.get('l') ?? ''))
-  redirect(`/stats/${jeton}${l ? `?l=${l}` : ''}`)
+  redirect(`/stats/${jeton}${l ? `?l=${l}` : ''}${r === 'ok' ? '' : `${l ? '&' : '?'}refus=${r}`}`)
 }
 
 const Saisie = z.object({

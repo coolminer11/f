@@ -247,11 +247,15 @@ réveil prend près d'une minute. Pour le back-office, c'est agaçant. Pour une
 carte tapée au comptoir, c'est rédhibitoire : le client range son téléphone
 avant que la page ne s'ouvre.
 
-Solution gratuite : **cron-job.org** → créer une tâche qui appelle
-`https://go.taporacards.com/api/eveil` **toutes les 10 minutes**. Ce point
-répond « ok » sans toucher à la base. Le serveur reste éveillé en permanence,
-ce qui consomme environ 744 des 750 heures gratuites du mois — assez pour ce
-service, à condition de ne pas en ajouter un deuxième sur le forfait gratuit.
+Solution gratuite, en place : **le Worker Cloudflare appelle
+`https://go.taporacards.com/api/eveil` toutes les 10 minutes** (`[triggers]`
+dans `worker/wrangler.toml`, fonction `scheduled`). Rien à configurer
+ailleurs ; cron-job.org n'est plus nécessaire (le garder ne fait pas de mal).
+Le réveil garde aussi des connexions à la base ouvertes et chaudes : la
+première visite d'un client ne paie pas l'ouverture des connexions. Le
+serveur reste éveillé en permanence, ce qui consomme environ 744 des 750
+heures gratuites du mois — assez pour ce service, à condition de ne pas en
+ajouter un deuxième sur le forfait gratuit.
 
 Solution sûre, quand les cartes rapportent : le forfait payant le plus bas de
 Render (environ 7 $ US par mois) ne s'endort jamais.
@@ -624,6 +628,26 @@ modification de texte se fait dans les deux fichiers ; les balises
   `cd site && npm run deployer` APRÈS le déploiement du back-office (sinon
   le formulaire retombe sur le courriel prérempli, sans rien perdre).
 - Revenus récurrents et paiements (Stripe) : voir `PLAN-REVENUS.md`.
+
+## 16. Vitesse, mode sombre et animations de la page client
+
+- **Vitesse** : la page client réunit ses chiffres en deux vagues de requêtes
+  au lieu de six (vérification du lien et lectures en parallèle, graphiques
+  et avis demandés d'avance) ; les connexions à la base restent ouvertes
+  15 minutes et le réveil les réchauffe ; la session du back-office n'est lue
+  qu'une fois par page. Mesuré avec 100 ms d'aller-retour vers la base :
+  670 ms → 270 ms, et un squelette animé s'affiche en moins de 50 ms.
+- **Back-office** : une fine barre terre cuite en haut dès le clic sur un
+  lien ; la page d'avant reste affichée jusqu'à la suivante.
+- **Mode sombre** de la page client, de l'écran du mot de passe et de
+  l'espace client : il suit le téléphone, et le bouton soleil/lune le fixe
+  (cookie `tapora_mode`, un an). Les pages « Votre année » et comptoir
+  gardent leur décor. Toutes les couleurs sont des variables `--cl-…`
+  (globals.css) : un composant client n'écrit jamais une couleur en dur.
+- **Animations** : boutons et tuiles qui répondent au survol, cadenas qui
+  s'ouvre au bon mot de passe (et carte qui secoue au mauvais), bulles de
+  messages, confettis à l'approbation d'une maquette, défilement Lenis plus
+  doux. « Réduire les animations » sur le téléphone : tout reste immobile.
 
 ## Sauvegardes
 

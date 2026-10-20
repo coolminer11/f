@@ -39,6 +39,11 @@ export function jetonStats(dossierId: string, version: number): string {
 
 const FORME = /^([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\.([A-Za-z0-9_-]{32})$/
 
+/** L'id écrit dans le jeton, SANS rien vérifier : pour lancer les lectures en même temps que la vérification. */
+export function idDuJeton(jeton: string): string | null {
+  return FORME.exec(jeton)?.[1] ?? null
+}
+
 type DossierSigne = {
   id: string
   nom: string

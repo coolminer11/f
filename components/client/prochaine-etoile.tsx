@@ -46,7 +46,7 @@ export default function ProchaineEtoile({ nb, note, langue }: { nb: number; note
       <section className="carte flex flex-col justify-center p-6 sm:p-7">
         <Etoiles valeur={5} />
         <h2 className="titre-client mt-3 !text-3xl">{dec(5)} ★ · {T.parfaite}</h2>
-        <p className="mt-2 text-[#6b5d50]">{T.parfaiteSous}</p>
+        <p className="mt-2 text-[var(--cl-doux)]">{T.parfaiteSous}</p>
       </section>
     )
   }
@@ -59,24 +59,24 @@ export default function ProchaineEtoile({ nb, note, langue }: { nb: number; note
     <section className="carte p-6 sm:p-7">
       <h2>{T.titre}</h2>
       <div className="mt-4 flex items-center gap-3 text-2xl">
-        <span className="titre-client font-medium tabular-nums text-[#6b5d50]">{actuelle} ★</span>
-        <svg viewBox="0 0 40 12" className="h-3 w-10 text-[#c2552f]" aria-hidden>
+        <span className="titre-client font-medium tabular-nums text-[var(--cl-doux)]">{actuelle} ★</span>
+        <svg viewBox="0 0 40 12" className="h-3 w-10 text-[var(--cl-brique)]" aria-hidden>
           <path data-fleche d="M1 6h34M30 1l6 5-6 5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
-        <span className="titre-client font-medium tabular-nums text-[#c2552f]">{cible} ★</span>
+        <span className="titre-client font-medium tabular-nums text-[var(--cl-brique)]">{cible} ★</span>
       </div>
       <p className="mt-4 flex items-baseline gap-2">
         <span className="titre-client text-6xl font-medium leading-none tabular-nums">
           {e.auMoins === e.auPlus ? '' : '≈ '}
           <span data-compteur={e.estimation}>{e.estimation}</span>
         </span>
-        <span className="text-[#6b5d50]">{T.environ}</span>
+        <span className="text-[var(--cl-doux)]">{T.environ}</span>
       </p>
-      <p className="mt-1 text-sm text-[#6b5d50]">{T.pour(cible)}</p>
+      <p className="mt-1 text-sm text-[var(--cl-doux)]">{T.pour(cible)}</p>
       <p className="mt-3 text-sm font-medium">{e.auMoins === e.auPlus ? T.exact(e.auPlus) : T.fourchette(e.auPlus, e.auMoins)}</p>
-      {etapes[1] && <p className="mt-1 text-sm text-[#6b5d50]">{T.ensuite(dec(etapes[1].cible / 10), etapes[1].estimation)}</p>}
+      {etapes[1] && <p className="mt-1 text-sm text-[var(--cl-doux)]">{T.ensuite(dec(etapes[1].cible / 10), etapes[1].estimation)}</p>}
       {e.auMoins !== e.auPlus && (
-        <p className="mt-4 border-t border-dashed border-[#e2d6c3] pt-3 text-xs leading-relaxed text-[#6b5d50]">
+        <p className="mt-4 border-t border-dashed border-[var(--cl-ligne)] pt-3 text-xs leading-relaxed text-[var(--cl-doux)]">
           {T.pourquoi(dec((r * 10 - 5) / 100), dec((r * 10 + 5) / 100))}
         </p>
       )}
@@ -86,7 +86,7 @@ export default function ProchaineEtoile({ nb, note, langue }: { nb: number; note
 
 function Etoiles({ valeur }: { valeur: number }) {
   return (
-    <span className="text-2xl tracking-[0.15em] text-[#eda100]" aria-hidden>
+    <span className="text-2xl tracking-[0.15em] text-[var(--cl-miel)]" aria-hidden>
       {'★★★★★'.slice(0, valeur)}
     </span>
   )

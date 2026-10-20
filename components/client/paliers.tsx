@@ -65,18 +65,17 @@ export default function Paliers({
       <div className="grid items-center gap-6 sm:grid-cols-[auto_minmax(0,1fr)]">
         <div className="relative mx-auto size-40" role="img" aria-label={`${fmt.format(valeur)} / ${cible !== null ? fmt.format(cible) : '—'}`}>
           <svg viewBox="0 0 120 120" className="size-full -rotate-90">
-            <circle cx="60" cy="60" r={RAYON} fill="none" stroke="#ece2d2" strokeWidth="10" />
+            <circle cx="60" cy="60" r={RAYON} fill="none" style={{ stroke: 'var(--cl-ligne-douce)' }} strokeWidth="10" />
             <circle
               data-anneau={CIRCONFERENCE}
               cx="60"
               cy="60"
               r={RAYON}
               fill="none"
-              stroke="#c2552f"
               strokeWidth="10"
               strokeLinecap="round"
               strokeDasharray={CIRCONFERENCE}
-              style={{ strokeDashoffset: CIRCONFERENCE * (1 - avancement) }}
+              style={{ stroke: 'var(--cl-brique)', strokeDashoffset: CIRCONFERENCE * (1 - avancement) }}
             />
           </svg>
           <div className="absolute inset-0 grid place-items-center text-center">
@@ -84,13 +83,13 @@ export default function Paliers({
               <div className="titre-client text-4xl font-medium leading-none tabular-nums">
                 <span data-compteur={valeur}>{fmt.format(valeur)}</span>
               </div>
-              {cible !== null && <div className="mt-1 text-xs text-[#6b5d50]">/ {fmt.format(cible)}</div>}
+              {cible !== null && <div className="mt-1 text-xs text-[var(--cl-doux)]">/ {fmt.format(cible)}</div>}
             </div>
           </div>
         </div>
 
         <div className="text-center sm:text-left">
-          <p className="text-sm font-medium text-[#c2552f]">{objectifActif ? T.objectif : T.prochainPalier}</p>
+          <p className="text-sm font-medium text-[var(--cl-brique)]">{objectifActif ? T.objectif : T.prochainPalier}</p>
           {cible !== null ? (
             <>
               <h2 className="titre-client mt-1 !text-3xl sm:!text-4xl">
@@ -103,26 +102,26 @@ export default function Paliers({
           ) : (
             <h2 className="titre-client mt-1 !text-3xl">{T.objectifAtteint}</h2>
           )}
-          {arrivee && <p className="mt-1 text-sm text-[#6b5d50]">{T.rythme(arrivee)}</p>}
+          {arrivee && <p className="mt-1 text-sm text-[var(--cl-doux)]">{T.rythme(arrivee)}</p>}
           <div className="mt-3 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
             {note !== null && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#f6ecdf] px-3 py-1 text-sm">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--cl-creme)] px-3 py-1 text-sm">
                 <Etoiles note={note} />
                 <strong className="tabular-nums">{note.toLocaleString(locale(langue), { minimumFractionDigits: 1 })}</strong>
               </span>
             )}
             {objectifAtteint && (
-              <span className="rounded-full bg-[#e3efe7] px-3 py-1 text-sm font-medium text-[#2f6b4f]">✓ {T.objectifAtteint}</span>
+              <span className="rounded-full bg-[var(--cl-vert-pale)] px-3 py-1 text-sm font-medium text-[var(--cl-sapin)]">✓ {T.objectifAtteint}</span>
             )}
           </div>
         </div>
       </div>
 
-      <div className="mt-7 grid gap-6 border-t border-dashed border-[#e2d6c3] pt-6 lg:grid-cols-2">
+      <div className="mt-7 grid gap-6 border-t border-dashed border-[var(--cl-ligne)] pt-6 lg:grid-cols-2">
         {avis && <Rangee type="avis" titre={T.paliersAvis} paliers={PALIERS_AVIS} s={avis} court={court} T={T} partager={partager} />}
         <Rangee type="taps" titre={T.trophees} paliers={PALIERS_TAPS} s={taps} court={court} T={T} partager={partager} />
       </div>
-      <p className="mt-4 text-xs text-[#6b5d50]">{T.paliersSous} {partager}</p>
+      <p className="mt-4 text-xs text-[var(--cl-doux)]">{T.paliersSous} {partager}</p>
 
       <Celebration dossierId={dossierId} franchis={franchis} langue={langue} />
     </section>
@@ -180,8 +179,8 @@ function Etoiles({ note }: { note: number }) {
   const pct = Math.max(0, Math.min(100, (note / 5) * 100))
   return (
     <span className="relative inline-block text-sm leading-none tracking-[0.1em]" aria-hidden>
-      <span className="text-[#e2d6c3]">★★★★★</span>
-      <span className="absolute inset-0 overflow-hidden whitespace-nowrap text-[#eda100]" style={{ width: `${pct}%` }}>
+      <span className="text-[var(--cl-ligne)]">★★★★★</span>
+      <span className="absolute inset-0 overflow-hidden whitespace-nowrap text-[var(--cl-miel)]" style={{ width: `${pct}%` }}>
         ★★★★★
       </span>
     </span>

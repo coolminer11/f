@@ -111,14 +111,14 @@ export default function DirectAujourdhui({
           <span className={`point-direct ${enLigne ? '' : 'point-direct-pause'}`} aria-hidden />
           {enLigne ? T.direct : T.reconnexion}
         </span>
-        <span className="text-[#6b5d50]">
+        <span className="text-[var(--cl-doux)]">
           {T.dernierTap} {depuisL(d.dernier_tap, langue)}
         </span>
       </div>
 
       <div className="mt-4 grid gap-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
         <div>
-          <p className="text-sm text-[#6b5d50]">{T.aujourdhui}</p>
+          <p className="text-sm text-[var(--cl-doux)]">{T.aujourdhui}</p>
           <p className="mt-1 flex items-baseline gap-3">
             <span className="relative">
               <span ref={chiffre} className="titre-client inline-block origin-left text-7xl font-medium leading-none tabular-nums sm:text-8xl">
@@ -130,9 +130,9 @@ export default function DirectAujourdhui({
                 </span>
               )}
             </span>
-            <span className="text-lg text-[#6b5d50]">{T.tapsAujourdhui(n)}</span>
+            <span className="text-lg text-[var(--cl-doux)]">{T.tapsAujourdhui(n)}</span>
           </p>
-          <p className={`mt-3 text-sm font-medium ${devant ? 'text-[#2f6b4f]' : 'text-[#6b5d50]'}`}>
+          <p className={`mt-3 text-sm font-medium ${devant ? 'text-[var(--cl-sapin)]' : 'text-[var(--cl-doux)]'}`}>
             {nouveauRecord ? (
               <span className="badge-record">★ {T.nouveauRecord}</span>
             ) : recordEgal ? (
@@ -146,25 +146,25 @@ export default function DirectAujourdhui({
         </div>
 
         <div className="grid grid-cols-2 gap-3 sm:w-72">
-          <div className="rounded-2xl bg-[#f6ecdf] p-4" title={T.serieAide}>
-            <p className="flex items-center gap-1.5 text-xs font-medium text-[#6b5d50]">
-              <svg viewBox="0 0 24 24" className="size-4 text-[#c2552f]" fill="currentColor" aria-hidden>
+          <div className="rounded-2xl bg-[var(--cl-creme)] p-4" title={T.serieAide}>
+            <p className="flex items-center gap-1.5 text-xs font-medium text-[var(--cl-doux)]">
+              <svg viewBox="0 0 24 24" className="size-4 text-[var(--cl-brique)]" fill="currentColor" aria-hidden>
                 <path d="M12 2c.6 3.2 2.4 4.9 4 6.6 1.7 1.8 3 3.7 3 6.4A7 7 0 0 1 5 15c0-2.2 1-4 2.6-5.3-.1 1.7.6 3 1.9 3.6C9 9 10.6 5.6 12 2Z" />
               </svg>
               {T.serie}
             </p>
             <p className="titre-client mt-1 text-3xl font-medium tabular-nums">{fmt.format(serieJours)}</p>
-            <p className="text-xs text-[#6b5d50]">{T.serieUnite(serieJours)}</p>
+            <p className="text-xs text-[var(--cl-doux)]">{T.serieUnite(serieJours)}</p>
           </div>
-          <div className="rounded-2xl bg-[#f6ecdf] p-4">
-            <p className="flex items-center gap-1.5 text-xs font-medium text-[#6b5d50]">
-              <svg viewBox="0 0 24 24" className="size-4 text-[#a5651a]" fill="currentColor" aria-hidden>
+          <div className="rounded-2xl bg-[var(--cl-creme)] p-4">
+            <p className="flex items-center gap-1.5 text-xs font-medium text-[var(--cl-doux)]">
+              <svg viewBox="0 0 24 24" className="size-4 text-[var(--cl-attention)]" fill="currentColor" aria-hidden>
                 <path d="M7 3h10v2h3v3a4 4 0 0 1-4 4h-.3A5 5 0 0 1 13 14.9V18h3v3H8v-3h3v-3.1A5 5 0 0 1 8.3 12H8a4 4 0 0 1-4-4V5h3V3Zm0 4H6v1a2 2 0 0 0 1 1.7V7Zm10 0v2.7A2 2 0 0 0 18 8V7h-1Z" />
               </svg>
               {T.record}
             </p>
             <p className="titre-client mt-1 text-3xl font-medium tabular-nums">{fmt.format(meilleur)}</p>
-            <p className="truncate text-xs text-[#6b5d50]">
+            <p className="truncate text-xs text-[var(--cl-doux)]">
               {nouveauRecord || (!record.jour && n > 0) ? T.aujourdhui.toLowerCase() : record.jour ? dateCourte(record.jour, langue) : '—'}
             </p>
           </div>

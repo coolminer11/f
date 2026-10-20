@@ -147,31 +147,162 @@ body {
 /* thème sans changer une ligne. Palette validée (terre cuite + sarcelle,     */
 /* daltonisme et contraste sur le papier).                                    */
 /* ========================================================================== */
-body:has(.theme-client) {
-  background: #f7f1e7;
+/* La palette de la page client, en clair et en sombre. Les composants
+   n'écrivent que des var(--cl-…) ; le sombre suit le téléphone (prefers-
+   color-scheme), sauf si le client a choisi (cookie tapora_mode → data-mode). */
+.theme-client {
+  color-scheme: light;
+  --cl-encre: #2a211a;
+  --cl-doux: #6b5d50;
+  --cl-papier: #fffaf2;
+  --cl-fond: #f7f1e7;
+  --cl-creme: #f6ecdf;
+  --cl-sable: #f3ebdf;
+  --cl-sable-2: #ede3d3;
+  --cl-ligne-douce: #ece2d2;
+  --cl-ligne: #e2d6c3;
+  --cl-ligne-forte: #d9cbb6;
+  --cl-nuit: #2a211a;
+  --cl-sur-nuit: #fffaf2;
+  --cl-blanc: #fffaf2;
+  --cl-brique: #c2552f;
+  --cl-brique-fonce: #a9481f;
+  --cl-brique-clair: #e0794f;
+  --cl-sapin: #2f6b4f;
+  --cl-sapin-fonce: #245840;
+  --cl-vert-vif: #2f9e6a;
+  --cl-rouge: #b0402a;
+  --cl-miel: #eda100;
+  --cl-miel-texte: #6b4a05;
+  --cl-attention: #a5651a;
+  --cl-gris: #b5a693;
+  --cl-sarcelle: #008a7e;
+  --cl-vert-pale: #e3efe7;
+  --cl-miel-pale: #fdf3dc;
+  --cl-rose-pale: #f6dccd;
+  --cl-menthe-pale: #d8ece8;
+  --cl-ombre: 60 40 20;
+  --cl-reflet: 255 255 255;
+  --cl-seq-0: #efe6d8;
+  --cl-seq-1: #f0d2bd;
+  --cl-seq-2: #e8b394;
+  --cl-seq-3: #dc8f66;
+  --cl-seq-4: #c96c41;
+  --cl-seq-5: #a9512c;
+  --cl-seq-6: #7e3a1d;
+}
+/* Le sombre : papier de nuit, encre crème, terre cuite plus vive pour garder le contraste. */
+.theme-client[data-mode='sombre'] {
+  color-scheme: dark;
+  --cl-encre: #f4ece0;
+  --cl-doux: #b9a995;
+  --cl-papier: #221a14;
+  --cl-fond: #15100c;
+  --cl-creme: #2a2119;
+  --cl-sable: #2e251d;
+  --cl-sable-2: #3a2f25;
+  --cl-ligne-douce: #33291f;
+  --cl-ligne: #43372b;
+  --cl-ligne-forte: #57493b;
+  --cl-nuit: #f4ece0;
+  --cl-sur-nuit: #1b1510;
+  --cl-brique: #e2774f;
+  --cl-brique-fonce: #f08d66;
+  --cl-brique-clair: #f39a74;
+  --cl-sapin: #6cc196;
+  --cl-sapin-fonce: #86d3ab;
+  --cl-vert-vif: #4cc48b;
+  --cl-rouge: #f08a70;
+  --cl-miel: #f3b63c;
+  --cl-miel-texte: #f2cf86;
+  --cl-attention: #e7a861;
+  --cl-gris: #8c7e6e;
+  --cl-sarcelle: #3cc4b5;
+  --cl-vert-pale: #1d3127;
+  --cl-miel-pale: #382b12;
+  --cl-rose-pale: #3b2419;
+  --cl-menthe-pale: #15302b;
+  --cl-ombre: 0 0 0;
+  --cl-reflet: 255 255 255;
+  --cl-seq-0: #2c231b;
+  --cl-seq-1: #4a2c1e;
+  --cl-seq-2: #6e3922;
+  --cl-seq-3: #9a4a28;
+  --cl-seq-4: #c75f34;
+  --cl-seq-5: #e57d4f;
+  --cl-seq-6: #f5a47c;
+}
+@media (prefers-color-scheme: dark) {
+  .theme-client:not([data-mode='clair']) {
+    color-scheme: dark;
+    --cl-encre: #f4ece0;
+    --cl-doux: #b9a995;
+    --cl-papier: #221a14;
+    --cl-fond: #15100c;
+    --cl-creme: #2a2119;
+    --cl-sable: #2e251d;
+    --cl-sable-2: #3a2f25;
+    --cl-ligne-douce: #33291f;
+    --cl-ligne: #43372b;
+    --cl-ligne-forte: #57493b;
+    --cl-nuit: #f4ece0;
+    --cl-sur-nuit: #1b1510;
+    --cl-brique: #e2774f;
+    --cl-brique-fonce: #f08d66;
+    --cl-brique-clair: #f39a74;
+    --cl-sapin: #6cc196;
+    --cl-sapin-fonce: #86d3ab;
+    --cl-vert-vif: #4cc48b;
+    --cl-rouge: #f08a70;
+    --cl-miel: #f3b63c;
+    --cl-miel-texte: #f2cf86;
+    --cl-attention: #e7a861;
+    --cl-gris: #8c7e6e;
+    --cl-sarcelle: #3cc4b5;
+    --cl-vert-pale: #1d3127;
+    --cl-miel-pale: #382b12;
+    --cl-rose-pale: #3b2419;
+    --cl-menthe-pale: #15302b;
+    --cl-ombre: 0 0 0;
+    --cl-seq-0: #2c231b;
+    --cl-seq-1: #4a2c1e;
+    --cl-seq-2: #6e3922;
+    --cl-seq-3: #9a4a28;
+    --cl-seq-4: #c75f34;
+    --cl-seq-5: #e57d4f;
+    --cl-seq-6: #f5a47c;
+  }
+}
+/* Le fond de la page (et du rebond du défilement) suit le mode. */
+body:has(.theme-client) { background: var(--cl-fond); }
+body:has(.theme-client[data-mode='sombre']) { background: #15100c; }
+@media (prefers-color-scheme: dark) {
+  body:has(.theme-client:not([data-mode='clair'])) { background: #15100c; }
 }
 .theme-client {
-  --color-encre: #2a211a;
-  --color-encre-doux: #6b5d50;
-  --color-ligne: #e2d6c3;
-  --color-fond: #f3ebdf;
-  --color-accent: #c2552f;
-  --color-positif: #2f6b4f;
-  --color-negatif: #b0402a;
-  --color-attention: #a5651a;
-  --color-serie-1: #c2552f;
-  --color-serie-2: #008a7e;
-  --color-serie-attenuee: #b5a693;
-  --color-grille: #ece2d2;
-  --color-seq-0: #efe6d8;
-  --color-seq-1: #f0d2bd;
-  --color-seq-2: #e8b394;
-  --color-seq-3: #dc8f66;
-  --color-seq-4: #c96c41;
-  --color-seq-5: #a9512c;
-  --color-seq-6: #7e3a1d;
+  /* Les composants partagés avec le back-office (graphiques, avis) lisent ces noms-là. */
+  --color-encre: var(--cl-encre);
+  --color-encre-doux: var(--cl-doux);
+  --color-ligne: var(--cl-ligne);
+  --color-fond: var(--cl-sable);
+  --color-accent: var(--cl-brique);
+  --color-accent-doux: var(--cl-rose-pale);
+  --color-positif: var(--cl-sapin);
+  --color-negatif: var(--cl-rouge);
+  --color-attention: var(--cl-attention);
+  --color-serie-1: var(--cl-brique);
+  --color-serie-2: var(--cl-sarcelle);
+  --color-serie-attenuee: var(--cl-gris);
+  --color-grille: var(--cl-ligne-douce);
+  --color-seq-0: var(--cl-seq-0);
+  --color-seq-1: var(--cl-seq-1);
+  --color-seq-2: var(--cl-seq-2);
+  --color-seq-3: var(--cl-seq-3);
+  --color-seq-4: var(--cl-seq-4);
+  --color-seq-5: var(--cl-seq-5);
+  --color-seq-6: var(--cl-seq-6);
   font-family: var(--police-inter), ui-sans-serif, system-ui, sans-serif;
-  color: var(--color-encre);
+  color: var(--cl-encre);
   /* Le back-office force les chiffres à chasse fixe partout ; avec Inter,
      cela élargit aussi le trait d'union (« Montrez - la »). Ici, seuls les
      chiffres alignés (classe tabular-nums) le gardent. */
@@ -183,13 +314,13 @@ body:has(.theme-client) {
   letter-spacing: -0.02em;
 }
 .theme-client .carte {
-  background: #fffaf2;
+  background: var(--cl-papier);
   border-color: transparent;
   border-radius: 1.5rem;
   box-shadow:
     0 1px 0 rgb(255 255 255 / 0.8) inset,
-    0 2px 4px rgb(60 40 20 / 0.05),
-    0 18px 40px -22px rgb(60 40 20 / 0.35);
+    0 2px 4px rgb(var(--cl-ombre) / 0.05),
+    0 18px 40px -22px rgb(var(--cl-ombre) / 0.35);
 }
 .theme-client .carte h2 {
   font-family: var(--police-fraunces), ui-serif, Georgia, serif;
@@ -198,7 +329,7 @@ body:has(.theme-client) {
   font-weight: 500;
   letter-spacing: -0.01em;
 }
-.theme-client .bg-white { background: #fffaf2; }
+.theme-client .bg-white { background: var(--cl-papier); }
 .theme-client .masque-mot { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.12em; margin-bottom: -0.12em; }
 .theme-client .mot { display: inline-block; }
 /* En attendant le script d'animation : rien ne clignote. Filet : 2,5 s. */
@@ -216,17 +347,17 @@ body:has(.theme-client) {
   width: 0.6rem;
   height: 0.6rem;
   border-radius: 9999px;
-  background: #2f9e6a;
+  background: var(--cl-vert-vif);
 }
 .theme-client .point-direct::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: #2f9e6a;
+  background: var(--cl-vert-vif);
   animation: pouls-direct 1.8s cubic-bezier(0.2, 0.7, 0.3, 1) infinite;
 }
-.theme-client .point-direct-pause { background: #b5a693; }
+.theme-client .point-direct-pause { background: var(--cl-gris); }
 .theme-client .point-direct-pause::after { display: none; }
 @keyframes pouls-direct {
   from { transform: scale(1); opacity: 0.55; }
@@ -238,7 +369,7 @@ body:has(.theme-client) {
   top: 0;
   padding: 0.15rem 0.6rem;
   border-radius: 9999px;
-  background: #2f6b4f;
+  background: var(--cl-sapin);
   color: #fff;
   font-size: 0.9rem;
   font-weight: 700;
@@ -256,8 +387,8 @@ body:has(.theme-client) {
   align-items: center;
   gap: 0.35rem;
   border-radius: 9999px;
-  background: #fbe9c6;
-  color: #7a4a0c;
+  background: var(--cl-miel-pale);
+  color: var(--cl-miel-texte);
   padding: 0.25rem 0.75rem;
   animation: apparition-pop 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.4);
 }
@@ -281,19 +412,19 @@ body:has(.theme-client) {
   font-variant-numeric: tabular-nums;
 }
 .theme-client .medaille-atteint .medaille-rond {
-  background: radial-gradient(circle at 30% 25%, #e0794f, #c2552f 60%, #a9481f);
-  color: #fffaf2;
+  background: radial-gradient(circle at 30% 25%, var(--cl-brique-clair), var(--cl-brique) 60%, var(--cl-brique-fonce));
+  color: var(--cl-blanc);
   box-shadow: 0 6px 14px -6px rgb(169 72 31 / 0.7), inset 0 1px 0 rgb(255 255 255 / 0.35);
 }
 .theme-client .medaille-prochain .medaille-rond {
-  background: #fffaf2;
-  color: #c2552f;
-  border: 2px dashed #c2552f;
+  background: var(--cl-papier);
+  color: var(--cl-brique);
+  border: 2px dashed var(--cl-brique);
   animation: respire 2.4s ease-in-out infinite;
 }
 .theme-client .medaille-avenir .medaille-rond {
-  background: #f3ebdf;
-  color: #b5a693;
+  background: var(--cl-sable);
+  color: var(--cl-gris);
 }
 .theme-client .medaille-coche {
   position: absolute;
@@ -304,11 +435,11 @@ body:has(.theme-client) {
   width: 1.15rem;
   height: 1.15rem;
   border-radius: 9999px;
-  background: #2f6b4f;
+  background: var(--cl-sapin);
   color: #fff;
   font-size: 0.65rem;
   font-weight: 700;
-  box-shadow: 0 0 0 2px #fffaf2;
+  box-shadow: 0 0 0 2px var(--cl-papier);
 }
 @keyframes respire {
   0%, 100% { transform: scale(1); }
@@ -350,21 +481,21 @@ body:has(.theme-client) {
   font-size: 0.95rem;
 }
 .theme-client .pas-fait {
-  background: radial-gradient(circle at 30% 25%, #e0794f, #c2552f 60%, #a9481f);
-  color: #fffaf2;
-  box-shadow: 0 6px 14px -6px rgb(169 72 31 / 0.7), 0 0 0 4px #fffaf2;
+  background: radial-gradient(circle at 30% 25%, var(--cl-brique-clair), var(--cl-brique) 60%, var(--cl-brique-fonce));
+  color: var(--cl-blanc);
+  box-shadow: 0 6px 14px -6px rgb(169 72 31 / 0.7), 0 0 0 4px var(--cl-papier);
 }
 .theme-client .pas-prochain {
-  background: #fffaf2;
-  color: #c2552f;
-  border: 2px dashed #c2552f;
-  box-shadow: 0 0 0 4px #fffaf2;
+  background: var(--cl-papier);
+  color: var(--cl-brique);
+  border: 2px dashed var(--cl-brique);
+  box-shadow: 0 0 0 4px var(--cl-papier);
   animation: respire 2.4s ease-in-out infinite;
 }
 .theme-client .pas-avenir {
-  background: #f3ebdf;
-  color: #b5a693;
-  box-shadow: 0 0 0 4px #fffaf2;
+  background: var(--cl-sable);
+  color: var(--cl-gris);
+  box-shadow: 0 0 0 4px var(--cl-papier);
 }
 
 .theme-client .case-lancement {
@@ -375,13 +506,13 @@ body:has(.theme-client) {
   height: 1.4rem;
   margin-top: 0.05rem;
   border-radius: 0.45rem;
-  border: 2px solid #d9cbb6;
+  border: 2px solid var(--cl-ligne-forte);
   color: transparent;
   transition: all 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.4);
 }
 .theme-client .case-cochee {
-  background: #2f6b4f;
-  border-color: #2f6b4f;
+  background: var(--cl-sapin);
+  border-color: var(--cl-sapin);
   color: #fff;
   transform: scale(1.08);
 }
@@ -419,7 +550,7 @@ body:has(.theme-client) {
   background: linear-gradient(120deg, #2a211a, #7e3a1d 45%, #c2552f 70%, #2a211a);
   background-size: 250% 100%;
   animation: degrade-annee 9s ease-in-out infinite alternate;
-  box-shadow: 0 18px 40px -22px rgb(60 40 20 / 0.6);
+  box-shadow: 0 18px 40px -22px rgb(var(--cl-ombre) / 0.6);
 }
 @keyframes degrade-annee { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
 
@@ -441,7 +572,7 @@ body:has(.theme-client) {
 
 .theme-client .medaille-bouton { position: relative; display: block; border-radius: 9999px; transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.4); }
 .theme-client .medaille-bouton:hover { transform: translateY(-3px) scale(1.06); }
-.theme-client .medaille-bouton:focus-visible { outline: 3px solid #2a211a; outline-offset: 3px; }
+.theme-client .medaille-bouton:focus-visible { outline: 3px solid var(--cl-encre); outline-offset: 3px; }
 
 .theme-client .fenetre-partage { animation: fondu 0.25s ease-out; }
 @keyframes fondu { from { opacity: 0; } }
@@ -476,6 +607,141 @@ body:has(.theme-client) {
   .theme-client .reflet-partage::after,
   .theme-client .cloche-active,
   .theme-client .case-cochee svg path { animation: none; }
+}
+
+/* ---- Défilement fluide (Lenis) : les réglages recommandés, sinon le
+   défilement natif « smooth » et Lenis se contrarient et ça saccade. */
+html.lenis, html.lenis body { height: auto; }
+html.lenis { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: clip; }
+.lenis [data-lenis-prevent] { overscroll-behavior: contain; }
+
+/* ---- Page client : mode sombre, mouvement au survol, voile de chargement -- */
+/* Les cartes : un reflet plus discret et des ombres plus profondes la nuit. */
+.theme-client[data-mode='sombre'] .carte {
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.05) inset,
+    0 2px 4px rgb(0 0 0 / 0.3),
+    0 18px 40px -22px rgb(0 0 0 / 0.75);
+}
+.theme-client[data-mode='sombre'] .pastille-ambassadeur { color: #3b2603; }
+
+/* Clair ↔ sombre : un cercle qui s'ouvre depuis le bouton. */
+::view-transition-old(root),
+::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-new(root) { animation: ouvre-mode 0.65s cubic-bezier(0.65, 0, 0.35, 1); }
+@keyframes ouvre-mode {
+  from { clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 0)); }
+  to { clip-path: circle(150vmax at var(--vt-x, 50%) var(--vt-y, 0)); }
+}
+.fondu-mode .theme-client,
+.fondu-mode .theme-client * { transition: background-color 0.45s, color 0.45s, border-color 0.45s, fill 0.45s, stroke 0.45s !important; }
+.theme-client .bascule-mode svg { transition: transform 0.6s cubic-bezier(0.3, 1.5, 0.5, 1); }
+.theme-client .bascule-mode:hover svg { transform: rotate(-18deg) scale(1.08); }
+.theme-client .icone-soleil,
+.theme-client .icone-lune { transform-origin: 12px 12px; transition: transform 0.55s cubic-bezier(0.3, 1.4, 0.5, 1), opacity 0.35s; }
+.theme-client .icone-soleil.cache { transform: rotate(90deg) scale(0.4); opacity: 0; }
+.theme-client .icone-lune.cache { transform: rotate(-90deg) scale(0.4); opacity: 0; }
+
+/* Au survol : tout ce qui se clique répond. `translate` et `scale` (et non
+   `transform`) : les animations GSAP écrivent `transform`, les deux s'additionnent. */
+.theme-client a,
+.theme-client button,
+.theme-client summary,
+.theme-client label[for],
+.theme-client [role='button'] {
+  transition: translate 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.3), scale 0.2s cubic-bezier(0.2, 0.9, 0.3, 1.3), background-color 0.25s, color 0.25s,
+    box-shadow 0.3s, border-color 0.25s, opacity 0.25s;
+}
+.theme-client :is(a, button).rounded-full:not(:disabled):hover { translate: 0 -2px; box-shadow: 0 12px 24px -14px rgb(var(--cl-ombre) / 0.6); }
+.theme-client :is(a, button).rounded-full:not(:disabled):active { translate: 0 0; scale: 0.96; transition-duration: 0.08s; }
+.theme-client .carte[data-tuile],
+.theme-client .tuile-survol { transition: translate 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2), box-shadow 0.45s; }
+.theme-client .carte[data-tuile]:hover,
+.theme-client .tuile-survol:hover { translate: 0 -4px; box-shadow: 0 1px 0 rgb(255 255 255 / 0.6) inset, 0 26px 50px -24px rgb(var(--cl-ombre) / 0.5); }
+.theme-client[data-mode='sombre'] .carte[data-tuile]:hover { box-shadow: 0 1px 0 rgb(255 255 255 / 0.06) inset, 0 26px 50px -24px rgb(0 0 0 / 0.9); }
+.theme-client tbody tr { transition: background-color 0.2s; }
+.theme-client tbody tr:hover { background-color: var(--cl-creme); }
+.theme-client tbody tr:hover .barre-carte { filter: saturate(1.25) brightness(1.05); }
+.theme-client .barre-carte { transition: width 0.9s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.25s; }
+/* Les champs : un halo qui s'ouvre au focus. */
+.theme-client :is(input, textarea, select) { transition: border-color 0.25s, box-shadow 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2), background-color 0.25s; }
+.theme-client :is(input, textarea, select):focus { box-shadow: 0 0 0 4px rgb(194 85 47 / 0.16), 0 10px 24px -16px rgb(194 85 47 / 0.55); }
+
+/* Les bulles d'une conversation arrivent en douceur ; la dernière rebondit. */
+.theme-client .bulle { animation: bulle 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.3) both; }
+.theme-client .bulle:last-child { animation-duration: 0.6s; }
+@keyframes bulle { from { opacity: 0; translate: 0 10px; scale: 0.96; } }
+
+/* Le voile de chargement : la page squelette reste à l'écran jusqu'au début
+   des animations (classe « attente »), puis s'efface — jamais d'écran vide. */
+.theme-client .voile-client {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  overflow: hidden;
+  background: var(--cl-fond);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.35s ease-out, visibility 0s linear 0.35s;
+}
+.attente .theme-client .voile-client { opacity: 1; visibility: visible; transition: none; }
+.theme-client .squelette {
+  border-radius: 1.25rem;
+  background: linear-gradient(100deg, var(--cl-sable) 30%, var(--cl-creme) 50%, var(--cl-sable) 70%);
+  background-size: 300% 100%;
+  animation: miroite 1.4s ease-in-out infinite;
+}
+@keyframes miroite { from { background-position: 100% 0; } to { background-position: 0 0; } }
+
+/* L'écran du mot de passe : la carte arrive, secoue au mauvais mot de passe, s'ouvre au bon. */
+.theme-client .verrou-carte { animation: verrou-arrive 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+.theme-client .verrou-secoue { animation: verrou-secoue 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
+.theme-client .verrou-ouvert { animation: verrou-ouvre 0.75s cubic-bezier(0.6, 0, 0.4, 1) both; }
+@keyframes verrou-arrive { from { opacity: 0; translate: 0 24px; scale: 0.97; } }
+@keyframes verrou-secoue {
+  10%, 90% { translate: -2px 0; }
+  20%, 80% { translate: 4px 0; }
+  30%, 50%, 70% { translate: -7px 0; }
+  40%, 60% { translate: 7px 0; }
+}
+@keyframes verrou-ouvre {
+  0% { scale: 1; opacity: 1; }
+  35% { scale: 1.02; opacity: 1; }
+  100% { scale: 1.06; opacity: 0; filter: blur(3px); }
+}
+.theme-client .cadenas { transition: background-color 0.3s, color 0.3s; }
+.theme-client .cadenas svg { animation: cadenas-respire 3s ease-in-out infinite; }
+.theme-client .cadenas-anse { transition: transform 0.45s cubic-bezier(0.3, 1.6, 0.5, 1); transform-origin: 16px 11px; }
+.theme-client .verrou-ouvert .cadenas-anse { transform: translateY(-3px) rotate(28deg); }
+.theme-client .verrou-secoue .cadenas svg { animation: cadenas-non 0.5s ease-in-out; }
+@keyframes cadenas-respire { 0%, 100% { translate: 0 0; } 50% { translate: 0 -2px; } }
+@keyframes cadenas-non { 20%, 60% { rotate: -12deg; } 40%, 80% { rotate: 12deg; } }
+.theme-client .trait-oeil { stroke-dasharray: 24; animation: trait-oeil 0.3s ease-out both; }
+@keyframes trait-oeil { from { stroke-dashoffset: 24; } }
+.theme-client .points-attente::after { content: ''; display: inline-block; width: 1em; text-align: left; animation: points 1.2s steps(4) infinite; }
+@keyframes points { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; } }
+.theme-client .bouton-verrou::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.25) 50%, transparent 65%);
+  translate: -120% 0;
+  pointer-events: none;
+}
+.theme-client .bouton-verrou:not(:disabled):hover::before { translate: 120% 0; transition: translate 0.8s ease-in-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-client .bulle,
+  .theme-client .squelette,
+  .theme-client .verrou-carte,
+  .theme-client .verrou-secoue,
+  .theme-client .cadenas svg { animation: none; }
+  .theme-client :is(a, button).rounded-full:hover,
+  .theme-client .carte[data-tuile]:hover,
+  .theme-client .tuile-survol:hover { translate: none; }
+  ::view-transition-new(root) { animation: none; }
 }
 
 /* ---- Mode comptoir ------------------------------------------------------ */
@@ -583,7 +849,8 @@ html[data-theme='tapora'] body:not(:has(.theme-client))::before {
 }
 
 /* ---- Surfaces ------------------------------------------------------------ */
-html[data-theme='tapora'] .carte {
+/* Pas sur les pages client : elles ont leurs cartes (et leur mode sombre). */
+html[data-theme='tapora'] .carte:not(.theme-client .carte) {
   background: var(--surface);
   border-color: rgb(42 33 26 / 0.07);
   border-radius: 1.1rem;
@@ -750,3 +1017,21 @@ html[data-installable] .bouton-installer { display: grid; }
 @media (prefers-reduced-motion: reduce) {
   .theme-client .pastille-ambassadeur::after { animation: none; }
 }
+
+/* ---- Back-office : la barre de chargement d'une navigation ----------------- */
+.barre-chargement {
+  position: fixed;
+  inset: 0 auto auto 0;
+  z-index: 80;
+  height: 3px;
+  width: 0;
+  border-radius: 0 999px 999px 0;
+  background: linear-gradient(90deg, #c2552f, #e4a53a);
+  box-shadow: 0 0 10px rgb(194 85 47 / 0.6);
+  pointer-events: none;
+  opacity: 0;
+}
+.barre-chargement[data-etat='en-cours'] { opacity: 1; animation: barre-avance 8s cubic-bezier(0.1, 0.7, 0.2, 1) forwards; }
+.barre-chargement[data-etat='fin'] { opacity: 0; width: 100%; transition: width 0.2s ease-out, opacity 0.35s ease 0.2s; }
+@keyframes barre-avance { 0% { width: 0; } 10% { width: 35%; } 100% { width: 88%; } }
+@media (prefers-reduced-motion: reduce) { .barre-chargement[data-etat='en-cours'] { animation: none; width: 60%; } }

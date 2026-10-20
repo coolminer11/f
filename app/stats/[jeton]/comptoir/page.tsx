@@ -6,7 +6,7 @@ import { direct, exploits } from '@/lib/requetes/exploits'
 import { profil } from '@/lib/requetes/profil'
 import { langueValide } from '@/lib/langue'
 import { maintenantQuebec } from '@/lib/quebec'
-import { fraunces, inter } from '@/app/stats/polices'
+import CadreClient from '@/components/client/cadre-client'
 import Comptoir from '@/components/client/comptoir'
 
 export const dynamic = 'force-dynamic'
@@ -63,7 +63,7 @@ export default async function PageComptoir({
   }
 
   return (
-    <div className={`${fraunces.variable} ${inter.variable} theme-client`} lang={langue === 'en' ? 'en-CA' : 'fr-CA'}>
+    <CadreClient lang={langue === 'en' ? 'en-CA' : 'fr-CA'} force="clair">
       <Comptoir
         jeton={jeton}
         langue={langue}
@@ -76,6 +76,6 @@ export default async function PageComptoir({
         serieInclutAujourdhui={records.serie_inclut_aujourdhui}
         retour={`/stats/${jeton}${sp.l ? `?l=${langue}` : ''}`}
       />
-    </div>
+    </CadreClient>
   )
 }

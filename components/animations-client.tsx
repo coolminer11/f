@@ -24,7 +24,8 @@ export default function AnimationsClient({ children, langue = 'fr' }: { children
     if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return montrer()
 
     gsap.registerPlugin(ScrollTrigger)
-    const lenis = new Lenis({ lerp: 0.09, smoothWheel: true })
+    // Plus doux qu'avant (lerp plus bas), au doigt aussi, et les liens #ancre glissent.
+    const lenis = new Lenis({ lerp: 0.075, smoothWheel: true, wheelMultiplier: 0.95, touchMultiplier: 1.25, anchors: { offset: -24 } })
     lenis.on('scroll', ScrollTrigger.update)
     const tic = (t: number) => lenis.raf(t * 1000)
     gsap.ticker.add(tic)

@@ -128,39 +128,39 @@ export default function NotificationsDing({ jeton, langue }: { jeton: string; la
   return (
     <section className="carte relative overflow-hidden p-6 sm:p-7">
       <div className="flex items-start gap-4">
-        <span className={`cloche grid size-14 shrink-0 place-items-center rounded-2xl text-3xl ${etat === 'actif' ? 'cloche-active bg-[#e3efe7]' : 'bg-[#f6ecdf]'}`} aria-hidden>
+        <span className={`cloche grid size-14 shrink-0 place-items-center rounded-2xl text-3xl ${etat === 'actif' ? 'cloche-active bg-[var(--cl-vert-pale)]' : 'bg-[var(--cl-creme)]'}`} aria-hidden>
           🔔
         </span>
         <div className="min-w-0">
           <h2>{T.titre}</h2>
-          <p className="mt-1 text-sm leading-relaxed text-[#6b5d50]">{T.sous}</p>
+          <p className="mt-1 text-sm leading-relaxed text-[var(--cl-doux)]">{T.sous}</p>
         </div>
       </div>
 
       <div className="mt-5">
-        {etat === 'chargement' && <p className="text-sm text-[#6b5d50]">{T.patience}</p>}
+        {etat === 'chargement' && <p className="text-sm text-[var(--cl-doux)]">{T.patience}</p>}
         {etat === 'inactif' && (
-          <button onClick={activer} disabled={occupe} className="rounded-full bg-[#2a211a] px-6 py-3 text-sm font-semibold text-[#fffaf2] transition hover:-translate-y-0.5 hover:bg-[#c2552f] disabled:opacity-60">
+          <button onClick={activer} disabled={occupe} className="rounded-full bg-[var(--cl-nuit)] px-6 py-3 text-sm font-semibold text-[var(--cl-sur-nuit)] transition hover:-translate-y-0.5 hover:bg-[var(--cl-brique)] disabled:opacity-60">
             {occupe ? T.patience : T.activer}
           </button>
         )}
         {etat === 'actif' && (
           <div className="flex flex-wrap items-center gap-3">
-            <span className="inline-flex items-center gap-2 rounded-full bg-[#e3efe7] px-4 py-2 text-sm font-medium text-[#2f6b4f]">
+            <span className="inline-flex items-center gap-2 rounded-full bg-[var(--cl-vert-pale)] px-4 py-2 text-sm font-medium text-[var(--cl-sapin)]">
               <span className="point-direct" aria-hidden /> {T.actives}
             </span>
-            <button onClick={essayer} disabled={occupe} className="rounded-full bg-[#f3ebdf] px-4 py-2 text-sm font-medium hover:bg-[#ede3d3] disabled:opacity-60">
+            <button onClick={essayer} disabled={occupe} className="rounded-full bg-[var(--cl-sable)] px-4 py-2 text-sm font-medium hover:bg-[var(--cl-sable-2)] disabled:opacity-60">
               {T.essai}
             </button>
-            <button onClick={desactiver} disabled={occupe} className="text-sm text-[#6b5d50] underline-offset-4 hover:underline disabled:opacity-60">
+            <button onClick={desactiver} disabled={occupe} className="text-sm text-[var(--cl-doux)] underline-offset-4 hover:underline disabled:opacity-60">
               {T.desactiver}
             </button>
           </div>
         )}
-        {etat === 'refuse' && <p className="rounded-2xl bg-[#fbeee6] px-4 py-3 text-sm text-[#7a3a1d]">{T.refuse}</p>}
-        {etat === 'ios' && <p className="rounded-2xl bg-[#f6ecdf] px-4 py-3 text-sm leading-relaxed">{T.ios}</p>}
-        {etat === 'non-supporte' && <p className="text-sm text-[#6b5d50]">{T.nonSupporte}</p>}
-        {message && <p className="mt-3 text-sm font-medium text-[#2f6b4f]" role="status">{message}</p>}
+        {etat === 'refuse' && <p className="rounded-2xl bg-[var(--cl-rose-pale)] px-4 py-3 text-sm text-[var(--cl-brique-fonce)]">{T.refuse}</p>}
+        {etat === 'ios' && <p className="rounded-2xl bg-[var(--cl-creme)] px-4 py-3 text-sm leading-relaxed">{T.ios}</p>}
+        {etat === 'non-supporte' && <p className="text-sm text-[var(--cl-doux)]">{T.nonSupporte}</p>}
+        {message && <p className="mt-3 text-sm font-medium text-[var(--cl-sapin)]" role="status">{message}</p>}
       </div>
     </section>
   )

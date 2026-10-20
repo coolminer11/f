@@ -28,5 +28,9 @@ routes = [
   { pattern = "go.taporacards.com/b/*", zone_name = "taporacards.com" },
 ]
 
+# Le réveil du serveur, toutes les 10 minutes (gratuit) : voir scheduled() dans src/index.ts.
+[triggers]
+crons = ["*/10 * * * *"]
+
 [observability]
 enabled = true

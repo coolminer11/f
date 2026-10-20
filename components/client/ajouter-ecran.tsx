@@ -77,17 +77,17 @@ export default function AjouterEcran({ langue }: { langue: Langue }) {
   if (!mode) return null
   return createPortal(
     <div className="fixed inset-x-3 bottom-3 z-40 flex justify-center sm:bottom-6" role="dialog" aria-label={T.installTitre}>
-      <div className="toast-install w-full max-w-md rounded-3xl bg-[#fffaf2] p-4 shadow-[0_24px_60px_-20px_rgb(60_40_20/0.45)] ring-1 ring-[#e2d6c3]">
+      <div className="toast-install w-full max-w-md rounded-3xl bg-[var(--cl-papier)] p-4 shadow-[0_24px_60px_-20px_rgb(60_40_20/0.45)] ring-1 ring-[var(--cl-ligne)]">
         <div className="flex items-start gap-3.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/icones/icone-192.png" alt="" className="size-12 shrink-0 rounded-[14px]" />
           <div className="min-w-0 flex-1">
             <p className="titre-client text-lg font-medium leading-tight">{T.installTitre}</p>
-            <p className="mt-0.5 text-sm text-[#6b5d50]">{T.installSous}</p>
+            <p className="mt-0.5 text-sm text-[var(--cl-doux)]">{T.installSous}</p>
             {mode === 'ios' && (
               <p className="mt-2 text-sm leading-relaxed">
                 {T.iosEtape1}{' '}
-                <span className="inline-flex items-center gap-1 rounded-md bg-[#f3ebdf] px-1.5 py-0.5 align-middle font-medium">
+                <span className="inline-flex items-center gap-1 rounded-md bg-[var(--cl-sable)] px-1.5 py-0.5 align-middle font-medium">
                   <svg viewBox="0 0 24 24" className="size-4 text-[#007aff]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                     <path d="M12 3v12M8 7l4-4 4 4" />
                     <path d="M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1" />
@@ -100,11 +100,11 @@ export default function AjouterEcran({ langue }: { langue: Langue }) {
           </div>
         </div>
         <div className="mt-3 flex justify-end gap-2">
-          <button onClick={plusTard} className="rounded-full px-4 py-2 text-sm font-medium text-[#6b5d50] hover:bg-[#f3ebdf]">
+          <button onClick={plusTard} className="rounded-full px-4 py-2 text-sm font-medium text-[var(--cl-doux)] hover:bg-[var(--cl-sable)]">
             {T.plusTard}
           </button>
           {mode === 'android' && (
-            <button onClick={installer} className="rounded-full bg-[#2a211a] px-5 py-2 text-sm font-medium text-[#fffaf2] hover:bg-[#c2552f]">
+            <button onClick={installer} className="rounded-full bg-[var(--cl-nuit)] px-5 py-2 text-sm font-medium text-[var(--cl-sur-nuit)] hover:bg-[var(--cl-brique)]">
               {T.installer}
             </button>
           )}

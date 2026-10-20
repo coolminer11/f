@@ -79,19 +79,19 @@ export default function MessagesTapora({
 
   return (
     <section className="carte relative overflow-hidden p-6 sm:p-8" id="messages">
-      <div aria-hidden className="pointer-events-none absolute -left-20 -top-24 size-60 rounded-full bg-[#d8ece8] opacity-60" />
+      <div aria-hidden className="pointer-events-none absolute -left-20 -top-24 size-60 rounded-full bg-[var(--cl-menthe-pale)] opacity-60" />
       <div className="relative grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
         <div>
-          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c2552f]">{X.surtitre}</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--cl-brique)]">{X.surtitre}</span>
           <h2 className="titre-client mt-2 !text-2xl sm:!text-3xl">{X.titre}</h2>
-          <p className="mt-2 max-w-md text-[#6b5d50]">{X.sous}</p>
+          <p className="mt-2 max-w-md text-[var(--cl-doux)]">{X.sous}</p>
           {messages.length > 0 && (
-            <ol ref={fil} className="mt-6 max-h-80 space-y-3 overflow-y-auto pr-1" aria-label={langue === 'fr' ? 'Vos échanges avec Tapora' : 'Your conversation with Tapora'}>
+            <ol ref={fil} data-lenis-prevent className="mt-6 max-h-80 space-y-3 overflow-y-auto pr-1" aria-label={langue === 'fr' ? 'Vos échanges avec Tapora' : 'Your conversation with Tapora'}>
               {messages.map((m) => (
-                <li key={m.id} className={`flex ${m.auteur === 'client' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${m.auteur === 'client' ? 'rounded-br-md bg-[#2a211a] text-[#fffaf2]' : 'rounded-bl-md bg-[#f3ebdf] text-[#2a211a]'}`}>
+                <li key={m.id} className={`bulle flex ${m.auteur === 'client' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${m.auteur === 'client' ? 'rounded-br-md bg-[var(--cl-nuit)] text-[var(--cl-sur-nuit)]' : 'rounded-bl-md bg-[var(--cl-sable)] text-[var(--cl-encre)]'}`}>
                     <p className="whitespace-pre-line leading-relaxed">{m.texte}</p>
-                    <p className={`mt-1 text-[11px] ${m.auteur === 'client' ? 'text-[#fffaf2]/60' : 'text-[#6b5d50]'}`}>
+                    <p className={`mt-1 text-[11px] ${m.auteur === 'client' ? 'text-[var(--cl-blanc)]/60' : 'text-[var(--cl-doux)]'}`}>
                       {m.auteur === 'client' ? X.vous : m.par_nom ? `${X.tapora} · ${m.par_nom}` : X.tapora} · {quand(m.cree_le)}
                     </p>
                   </div>
@@ -113,7 +113,7 @@ export default function MessagesTapora({
                   type="button"
                   onClick={() => setSujet(cle)}
                   aria-pressed={sujet === cle}
-                  className={`rounded-full px-3.5 py-2 text-sm font-medium transition ${sujet === cle ? 'bg-[#2a211a] text-[#fffaf2]' : 'bg-[#f3ebdf] text-[#2a211a] hover:bg-[#ede3d3]'}`}
+                  className={`rounded-full px-3.5 py-2 text-sm font-medium transition ${sujet === cle ? 'bg-[var(--cl-nuit)] text-[var(--cl-sur-nuit)]' : 'bg-[var(--cl-sable)] text-[var(--cl-encre)] hover:bg-[var(--cl-sable-2)]'}`}
                 >
                   {l[langue]}
                 </button>
@@ -133,17 +133,17 @@ export default function MessagesTapora({
               value={texte}
               onChange={(e) => setTexte(e.target.value)}
               placeholder={X.exemple}
-              className="mt-2 w-full resize-y rounded-2xl border border-[#e2d6c3] bg-[#fffaf2] px-4 py-3 text-base outline-none transition focus:border-[#c2552f] focus:ring-2 focus:ring-[#f6dccd]"
+              className="mt-2 w-full resize-y rounded-2xl border border-[var(--cl-ligne)] bg-[var(--cl-papier)] px-4 py-3 text-base outline-none transition focus:border-[var(--cl-brique)] focus:ring-2 focus:ring-[var(--cl-rose-pale)]"
             />
-            {texte.length > 1700 && <p className="mt-1 text-xs text-[#6b5d50]">{X.restant(2000 - texte.length)}</p>}
+            {texte.length > 1700 && <p className="mt-1 text-xs text-[var(--cl-doux)]">{X.restant(2000 - texte.length)}</p>}
           </div>
           <div aria-live="polite" className="min-h-5 text-sm">
-            {etat.ok && etat.envoye > 0 && <p className="font-medium text-[#2f6b4f]">{X.envoye}</p>}
-            {etat.erreur && <p className="font-medium text-[#b0402a]">{X[etat.erreur]}</p>}
+            {etat.ok && etat.envoye > 0 && <p className="font-medium text-[var(--cl-sapin)]">{X.envoye}</p>}
+            {etat.erreur && <p className="font-medium text-[var(--cl-rouge)]">{X[etat.erreur]}</p>}
           </div>
           <button
             disabled={enCours || !texte.trim()}
-            className="w-full rounded-full bg-[#c2552f] px-6 py-3.5 font-semibold text-[#fffaf2] transition hover:-translate-y-0.5 hover:bg-[#a8461f] disabled:translate-y-0 disabled:opacity-50 sm:w-auto"
+            className="w-full rounded-full bg-[var(--cl-brique)] px-6 py-3.5 font-semibold text-[var(--cl-blanc)] transition hover:-translate-y-0.5 hover:bg-[var(--cl-brique-fonce)] disabled:translate-y-0 disabled:opacity-50 sm:w-auto"
           >
             {enCours ? X.envoi : X.envoyer}
           </button>

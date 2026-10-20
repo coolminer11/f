@@ -59,7 +59,20 @@ type Resolu = { carte: Carte; le: number }
 // une carte froide font UNE requête à Supabase, pas cinquante.
 const memoire = new Map<string, { resolu: Resolu } | { enCours: Promise<Resolu> }>()
 
+/**
+ * Garde le serveur éveillé (Render gratuit s'endort après 15 minutes sans
+ * visite, et met près d'une minute à se réveiller : le premier client qui
+ * ouvrait sa page attendait). Cloudflare appelle ceci toutes les 10 minutes
+ * (voir [triggers] dans wrangler.toml) — gratuit, sans service externe. Le
+ * réveil réchauffe aussi les connexions à la base.
+ */
+const ADRESSE_REVEIL = 'https://go.taporacards.com/api/eveil'
+
 export default {
+  async scheduled(_evenement: ScheduledController, _env: Env, ctx: ExecutionContext): Promise<void> {
+    ctx.waitUntil(fetch(ADRESSE_REVEIL, { headers: { 'user-agent': 'Tapora-Reveil/1.0' }, signal: AbortSignal.timeout(90_000) }).then(() => undefined, () => undefined))
+  },
+
   async fetch(requete: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(requete.url)
     if (url.pathname.startsWith('/b/') && requete.method === 'GET') return badge(requete, ctx)

@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import { cache } from 'react'
-import { accesDossier, dossierDuJeton } from '@/lib/lien-stats'
+import { accesDossier, dossierDuJeton, idDuJeton } from '@/lib/lien-stats'
 import { dossier as lireDossier } from '@/lib/requetes/dossiers'
 import { listerCartes, tapsJourHeure, totaux } from '@/lib/requetes/cartes'
 import { cleAvis } from '@/lib/avis-manuels'
 import { requete, requeteUne } from '@/lib/db'
-import { rythmeAvis, resumeAvis } from '@/lib/avis-google'
+import { rythmeAvis, resumeAvis, serieAvis } from '@/lib/avis-google'
 import { direct, exploits } from '@/lib/requetes/exploits'
 import { cartesProfil, course, pointDeDepart, profil } from '@/lib/requetes/profil'
 import { classement } from '@/lib/requetes/classement'
@@ -39,11 +39,13 @@ import { baseCartesAffichee } from '@/lib/cartes-url'
 import { bilanParrain } from '@/lib/parrainage'
 import Logo from '@/components/client/logo'
 import Verrou from '@/components/client/verrou'
-import StatsTaps from '@/components/stats-taps'
+import SqueletteClient from '@/components/client/squelette-client'
+import StatsTaps, { chargerStatsTaps } from '@/components/stats-taps'
 import SectionAvis from '@/components/section-avis'
 import AnimationsClient from '@/components/animations-client'
 import { PERIODES, joursDepuis } from '@/components/selecteur-jours'
-import { fraunces, inter } from '@/app/stats/polices'
+import CadreClient from '@/components/client/cadre-client'
+import BasculeMode from '@/components/client/bascule-mode'
 
 export const dynamic = 'force-dynamic'
 
@@ -59,13 +61,24 @@ export const dynamic = 'force-dynamic'
  */
 type Props = {
   params: Promise<{ jeton: string }>
-  searchParams: Promise<{ p?: string; l?: string; desabonne?: string; approuvee?: string; sujet?: string }>
+  searchParams: Promise<{ p?: string; l?: string; desabonne?: string; approuvee?: string; sujet?: string; refus?: string }>
 }
 
 // Une seule lecture du dossier par affichage, partagée avec les métadonnées.
+// La vérification (signature, lien actif, mot de passe) et les lectures
+// partent ENSEMBLE : un aller-retour vers la base au lieu de trois. Les
+// lectures ne servent que si l'accès est accordé.
 const charger = cache(async (jeton: string) => {
-  const a = await accesDossier(jeton)
-  return { verrou: a.etat === 'verrouille' ? a : null, d: a.etat === 'ok' ? await lireDossier(a.id) : null }
+  const id = idDuJeton(jeton)
+  const [a, dossier, places] = await Promise.all([
+    accesDossier(jeton),
+    id ? lireDossier(id) : null,
+    id
+      ? requete<{ place_id: string }>(`select distinct place_id from cartes_nfc where dossier_id = $1::uuid and place_id is not null and actif`, [id])
+      : [],
+  ])
+  const ok = a.etat === 'ok' && dossier?.id === a.id
+  return { verrou: a.etat === 'verrouille' ? a : null, d: ok ? dossier : null, places: ok ? places.map((p) => p.place_id) : [] }
 })
 
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
@@ -84,7 +97,12 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   }
 }
 
-export const viewport: Viewport = { themeColor: '#f7f1e7' }
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f7f1e7' },
+    { media: '(prefers-color-scheme: dark)', color: '#15100c' },
+  ],
+}
 
 // Pose la classe « attente » avant le premier affichage (voir globals.css) ;
 // filet de sécurité : tout réapparaît au bout de 2,5 s quoi qu'il arrive.
@@ -93,13 +111,19 @@ const ANTI_ECLAIR = `(function(){try{if(matchMedia('(prefers-reduced-motion: red
 export default async function StatsClient({ params, searchParams }: Props) {
   const { jeton } = await params
   const sp = await searchParams
-  const { d, verrou } = await charger(jeton)
+  const { d, verrou, places } = await charger(jeton)
   if (verrou) {
     const l = langueValide(sp.l)
     return (
-      <div className={`${fraunces.variable} ${inter.variable} theme-client`} lang={(l ?? verrou.langue) === 'fr' ? 'fr-CA' : 'en-CA'}>
-        <Verrou jeton={jeton} nom={verrou.nom} langue={l ?? verrou.langue} l={l ?? undefined} />
-      </div>
+      <CadreClient lang={(l ?? verrou.langue) === 'fr' ? 'fr-CA' : 'en-CA'}>
+        <Verrou
+          jeton={jeton}
+          nom={verrou.nom}
+          langue={l ?? verrou.langue}
+          l={l ?? undefined}
+          refus={sp.refus === 'faux' || sp.refus === 'bloque' || sp.refus === 'invalide' ? sp.refus : undefined}
+        />
+      </CadreClient>
     )
   }
   if (!d) notFound()
@@ -115,13 +139,12 @@ export default async function StatsClient({ params, searchParams }: Props) {
   const ici = maintenantQuebec()
   const cleManuelle = cleAvis({ type: 'dossier', id: d.id })
 
-  const [cartes, t, places, maintenant, records, portrait, parCarte, lignesCourse, depart, grille, abonnes, detail, commandes, messages] = await Promise.all([
+  // Tout le reste en UNE vague (graphiques et avis compris) : chaque vague
+  // coûte un aller-retour Render ↔ Supabase.
+  const avisIds = [...places, cleManuelle]
+  const [cartes, t, maintenant, records, portrait, parCarte, lignesCourse, depart, grille, abonnes, detail, commandes, messages, avis, avis14, avisParJour, bilan, base, graphiques, serieAvisPeriode] = await Promise.all([
     listerCartes(d.id),
     totaux({ dossier: d.id }, jours),
-    requete<{ place_id: string }>(
-      `select distinct place_id from cartes_nfc where dossier_id = $1::uuid and place_id is not null and actif`,
-      [d.id],
-    ),
     direct(d.id),
     exploits(d.id),
     profil(d.id),
@@ -133,14 +156,13 @@ export default async function StatsClient({ params, searchParams }: Props) {
     classement(d.id, jours),
     commandesClient(d.id),
     filMessages(d.id),
-  ])
-  const avisIds = [...places.map((p) => p.place_id), cleManuelle]
-  const [avis, avis14, avisParJour, bilan, base] = await Promise.all([
     resumeAvis(avisIds, jours),
     resumeAvis(avisIds, 14),
     rythmeAvis(avisIds),
     bilanParrain(d.id),
     baseCartesAffichee(),
+    chargerStatsTaps({ dossier: d.id }, jours),
+    serieAvis(avisIds, jours),
   ])
   const actives = cartes.filter((c) => c.actif)
   const chemin = `/stats/${jeton}`
@@ -228,8 +250,12 @@ export default async function StatsClient({ params, searchParams }: Props) {
   }
 
   return (
-    <div className={`${fraunces.variable} ${inter.variable} theme-client`} lang={fr ? 'fr-CA' : 'en-CA'}>
+    <CadreClient lang={fr ? 'fr-CA' : 'en-CA'}>
       <script dangerouslySetInnerHTML={{ __html: ANTI_ECLAIR }} />
+      {/* Le squelette reste affiché le temps que les animations démarrent : jamais d'écran vide. */}
+      <div className="voile-client">
+        <SqueletteClient />
+      </div>
       <AnimationsClient langue={langue}>
         <div className="mx-auto max-w-5xl space-y-6 pb-10">
           {/* ---- Haut de page */}
@@ -240,31 +266,32 @@ export default async function StatsClient({ params, searchParams }: Props) {
                 <span className="titre-client text-xl font-semibold">Tapora</span>
               </a>
               <div className="flex items-center gap-2">
-                <nav className="flex rounded-full bg-[#ede3d3] p-1 text-sm" aria-label={fr ? 'Période' : 'Period'}>
+                <nav className="flex rounded-full bg-[var(--cl-sable-2)] p-1 text-sm" aria-label={fr ? 'Période' : 'Period'}>
                   {PERIODES.map((p) => (
                     <a
                       key={p}
                       href={`${chemin}?p=${p}${suffixeL}`}
                       aria-current={p === jours ? 'page' : undefined}
-                      className={`rounded-full px-4 py-1.5 font-medium transition ${
-                        p === jours ? 'bg-[#2a211a] text-[#fffaf2]' : 'text-[#6b5d50] hover:text-[#2a211a]'
+                      className={`whitespace-nowrap rounded-full px-3 py-1.5 font-medium transition sm:px-4 ${
+                        p === jours ? 'bg-[var(--cl-nuit)] text-[var(--cl-sur-nuit)]' : 'text-[var(--cl-doux)] hover:text-[var(--cl-encre)]'
                       }`}
                     >
                       {T.periode(p)}
                     </a>
                   ))}
                 </nav>
+                <BasculeMode langue={langue} />
                 <a
                   href={`${chemin}?p=${jours}&l=${fr ? 'en' : 'fr'}`}
                   hrefLang={fr ? 'en' : 'fr'}
-                  className="rounded-full bg-[#ede3d3] px-3.5 py-2.5 text-xs font-semibold uppercase tracking-wider text-[#6b5d50] transition hover:text-[#2a211a]"
+                  className="rounded-full bg-[var(--cl-sable-2)] px-3.5 py-2.5 text-xs font-semibold uppercase tracking-wider text-[var(--cl-doux)] transition hover:text-[var(--cl-encre)]"
                   aria-label={T.langueAutre}
                 >
                   {fr ? 'EN' : 'FR'}
                 </a>
               </div>
             </div>
-            <p className="mt-12 text-base font-medium text-[#6b5d50]" data-intro>
+            <p className="mt-12 text-base font-medium text-[var(--cl-doux)]" data-intro>
               <span className="salut-emoji mr-1.5 inline-block" aria-hidden>
                 {emoji}
               </span>
@@ -275,25 +302,25 @@ export default async function StatsClient({ params, searchParams }: Props) {
             </h1>
             {d.ambassadeur_le && (
               <p className="mt-4" data-intro>
-                <span className="pastille-ambassadeur relative inline-flex items-center gap-1.5 overflow-hidden rounded-full px-3.5 py-1.5 text-sm font-semibold text-[#5a3b05]">
+                <span className="pastille-ambassadeur relative inline-flex items-center gap-1.5 overflow-hidden rounded-full px-3.5 py-1.5 text-sm font-semibold text-[var(--cl-miel-texte)]">
                   🏅 {X.ambassadeur}
                 </span>
               </p>
             )}
-            <p className="mt-4 max-w-xl text-lg text-[#6b5d50]" data-intro>
+            <p className="mt-4 max-w-xl text-lg text-[var(--cl-doux)]" data-intro>
               {phraseDuJour} {T.sousTitre(actives.length)}
             </p>
           </header>
 
-          {sp.desabonne && <p className="rounded-2xl bg-[#e3efe7] px-5 py-4 text-sm font-medium text-[#2f6b4f]">{T.desabonne}</p>}
+          {sp.desabonne && <p className="rounded-2xl bg-[var(--cl-vert-pale)] px-5 py-4 text-sm font-medium text-[var(--cl-sapin)]">{T.desabonne}</p>}
 
           {anneeBilan && portrait.total > 0 && (
-            <a href={`${chemin}/annee${ql}`} className="banniere-annee group flex items-center justify-between gap-4 rounded-[1.5rem] p-5 text-[#fffaf2] sm:p-6" data-tuile>
+            <a href={`${chemin}/annee${ql}`} className="banniere-annee group flex items-center justify-between gap-4 rounded-[1.5rem] p-5 text-[var(--cl-blanc)] sm:p-6" data-tuile>
               <span>
                 <span className="block text-xs font-semibold uppercase tracking-[0.2em] text-[#f6c9a8]">✨ {X.anneePrete}</span>
                 <span className="titre-client mt-1 block text-2xl font-medium sm:text-3xl">{X.votreAnnee(anneeBilan)}</span>
               </span>
-              <span className="grid size-12 shrink-0 place-items-center rounded-full bg-[#fffaf2] text-xl text-[#2a211a] transition group-hover:translate-x-1" aria-hidden>
+              <span className="grid size-12 shrink-0 place-items-center rounded-full bg-[var(--cl-papier)] text-xl text-[var(--cl-encre)] transition group-hover:translate-x-1" aria-hidden>
                 →
               </span>
             </a>
@@ -327,39 +354,39 @@ export default async function StatsClient({ params, searchParams }: Props) {
           {/* ---- Les chiffres de la période */}
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             <div className="carte col-span-2 p-6" data-tuile>
-              <p className="text-sm text-[#6b5d50]">{T.tapsPeriode(jours)}</p>
+              <p className="text-sm text-[var(--cl-doux)]">{T.tapsPeriode(jours)}</p>
               <p className="titre-client mt-1 text-6xl font-medium sm:text-7xl">
                 <span data-compteur={t.courant}>{nombre.format(t.courant)}</span>
               </p>
-              <p className={`mt-2 text-sm font-medium ${ecart === null || ecart === 0 ? 'text-[#6b5d50]' : ecart > 0 ? 'text-[#2f6b4f]' : 'text-[#b0402a]'}`}>
+              <p className={`mt-2 text-sm font-medium ${ecart === null || ecart === 0 ? 'text-[var(--cl-doux)]' : ecart > 0 ? 'text-[var(--cl-sapin)]' : 'text-[var(--cl-rouge)]'}`}>
                 {ecart === null ? (t.courant > 0 ? T.premiersTaps : T.bientot) : ecart === 0 ? T.stable : T.ecart(ecart, jours)}
               </p>
             </div>
             <div className="carte p-5 sm:p-6" data-tuile>
-              <p className="text-sm text-[#6b5d50]">{T.parJour}</p>
+              <p className="text-sm text-[var(--cl-doux)]">{T.parJour}</p>
               <p className="titre-client mt-1 text-4xl font-medium">
                 <span data-compteur={moyenne}>{moyenne.toLocaleString(locale(langue))}</span>
               </p>
-              <p className="mt-2 text-sm text-[#6b5d50]">
+              <p className="mt-2 text-sm text-[var(--cl-doux)]">
                 {T.dernierTap} {depuisL(t.dernier_tap, langue)}
               </p>
             </div>
             {avecQr ? (
               <div className="carte p-5 sm:p-6" data-tuile>
-                <p className="text-sm text-[#6b5d50]">{T.parQr}</p>
+                <p className="text-sm text-[var(--cl-doux)]">{T.parQr}</p>
                 <p className="titre-client mt-1 text-4xl font-medium">
                   <span data-compteur={partQr}>{partQr}</span>
                   {fr ? ' %' : '%'}
                 </p>
-                <p className="mt-2 text-sm text-[#6b5d50]">{T.resteNfc}</p>
+                <p className="mt-2 text-sm text-[var(--cl-doux)]">{T.resteNfc}</p>
               </div>
             ) : (
               <div className="carte p-5 sm:p-6" data-tuile>
-                <p className="text-sm text-[#6b5d50]">{X.depuisPose}</p>
+                <p className="text-sm text-[var(--cl-doux)]">{X.depuisPose}</p>
                 <p className="titre-client mt-1 text-4xl font-medium">
                   <span data-compteur={records.total}>{nombre.format(records.total)}</span>
                 </p>
-                <p className="mt-2 text-sm text-[#6b5d50]">{X.tapsAuTotal}</p>
+                <p className="mt-2 text-sm text-[var(--cl-doux)]">{X.tapsAuTotal}</p>
               </div>
             )}
           </div>
@@ -385,12 +412,12 @@ export default async function StatsClient({ params, searchParams }: Props) {
           )}
 
           <div data-bloc>
-            <SectionAvis placeIds={avisIds} jours={jours} tapsPeriode={t.courant} pourClient langue={langue} />
+            <SectionAvis placeIds={avisIds} jours={jours} tapsPeriode={t.courant} pourClient langue={langue} donnees={{ r: avis, serie: serieAvisPeriode }} />
           </div>
 
           <Course lignes={lignesCourse} langue={langue} joursAvantLundi={joursAvantLundi} />
 
-          <StatsTaps portee={{ dossier: d.id }} jours={jours} totaux={t} langue={langue} sansQr={!avecQr} />
+          <StatsTaps portee={{ dossier: d.id }} jours={jours} totaux={t} langue={langue} sansQr={!avecQr} donnees={graphiques} />
 
           <DetailCartes lignes={detail} jours={jours} langue={langue} lienExport={`${chemin}/export?p=${jours}${suffixeL}`} />
 
@@ -400,9 +427,9 @@ export default async function StatsClient({ params, searchParams }: Props) {
           {/* ---- Le badge d'avis, pour le site du commerce */}
           {d.badge_actif && avis.nb_actuel !== null && (
             <section className="carte p-6 sm:p-8" id="badge">
-              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c2552f]">{X.badgeSurtitre}</span>
+              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--cl-brique)]">{X.badgeSurtitre}</span>
               <h2 className="titre-client mt-2 !text-2xl sm:!text-3xl">{X.badgeTitre}</h2>
-              <p className="mb-6 mt-2 max-w-2xl text-[#6b5d50]">{X.badgeSous}</p>
+              <p className="mb-6 mt-2 max-w-2xl text-[var(--cl-doux)]">{X.badgeSous}</p>
               <BadgeAvis base={base} cle={d.cle_badge} langue={langue} variante="client" />
             </section>
           )}
@@ -426,10 +453,10 @@ export default async function StatsClient({ params, searchParams }: Props) {
 
           <CommanderCartes jeton={jeton} langue={langue} />
 
-          <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-dashed border-[#e2d6c3] pt-6 text-sm text-[#6b5d50]">
+          <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-dashed border-[var(--cl-ligne)] pt-6 text-sm text-[var(--cl-doux)]">
             <span>
               {T.faitPar}{' '}
-              <a href="https://taporacards.com" className="titre-client font-semibold text-[#2a211a] hover:text-[#c2552f]">
+              <a href="https://taporacards.com" className="titre-client font-semibold text-[var(--cl-encre)] hover:text-[var(--cl-brique)]">
                 Tapora Cards
               </a>{' '}
               · {T.viePrivee}
@@ -437,7 +464,7 @@ export default async function StatsClient({ params, searchParams }: Props) {
             {d.rapport_mensuel && (
               <form action={desabonner}>
                 <input type="hidden" name="jeton" value={jeton} />
-                <button className="hover:text-[#2a211a] hover:underline">{T.desabonner}</button>
+                <button className="hover:text-[var(--cl-encre)] hover:underline">{T.desabonner}</button>
               </form>
             )}
           </footer>
@@ -447,7 +474,7 @@ export default async function StatsClient({ params, searchParams }: Props) {
       <div id="calque-client" />
       <PartagePalier nom={d.nom} langue={langue} />
       <AjouterEcran langue={langue} />
-    </div>
+    </CadreClient>
   )
 }
 

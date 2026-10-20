@@ -73,22 +73,22 @@ export default function SurpriseDuJour({
 
   return (
     <section className="carte relative flex min-h-[15rem] flex-col overflow-hidden p-6 sm:p-7">
-      <div aria-hidden className="pointer-events-none absolute -right-10 -top-10 size-40 rounded-full bg-[#f6dccd] opacity-60" />
+      <div aria-hidden className="pointer-events-none absolute -right-10 -top-10 size-40 rounded-full bg-[var(--cl-rose-pale)] opacity-60" />
       <div className="relative flex items-baseline justify-between gap-2">
         <h2>{T.titre}</h2>
-        <span className="text-xs text-[#6b5d50]">{T.numero(rang, total)}</span>
+        <span className="text-xs text-[var(--cl-doux)]">{T.numero(rang, total)}</span>
       </div>
 
       <div className="relative flex flex-1 items-center justify-center py-4">
         {ouverte ? (
           <div className="surprise-revele w-full">
             <div className="flex items-start gap-4">
-              <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-[#f6ecdf] text-3xl" aria-hidden>
+              <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-[var(--cl-creme)] text-3xl" aria-hidden>
                 {surprise.emoji}
               </span>
               <div className="min-w-0">
                 <p className="titre-client text-2xl font-medium leading-tight">{surprise.titre}</p>
-                <p className="mt-2 leading-relaxed text-[#6b5d50]">{surprise.texte}</p>
+                <p className="mt-2 leading-relaxed text-[var(--cl-doux)]">{surprise.texte}</p>
               </div>
             </div>
           </div>
@@ -105,13 +105,13 @@ export default function SurpriseDuJour({
               <rect x="54" y="56" width="12" height="50" fill="#eda100" />
               <rect x="20" y="56" width="80" height="6" fill="#000" opacity=".08" />
             </svg>
-            <span className="rounded-full bg-[#2a211a] px-4 py-1.5 text-sm font-medium text-[#fffaf2] transition group-hover:bg-[#c2552f]">{T.ouvrir}</span>
+            <span className="rounded-full bg-[var(--cl-nuit)] px-4 py-1.5 text-sm font-medium text-[var(--cl-sur-nuit)] transition group-hover:bg-[var(--cl-brique)]">{T.ouvrir}</span>
           </button>
         )}
       </div>
 
       {restant !== null && (
-        <p className="relative text-center text-xs text-[#6b5d50]">⏳ {T.prochaine(Math.floor(restant / 60), restant % 60)}</p>
+        <p className="relative text-center text-xs text-[var(--cl-doux)]">⏳ {T.prochaine(Math.floor(restant / 60), restant % 60)}</p>
       )}
     </section>
   )
