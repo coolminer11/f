@@ -482,6 +482,26 @@ modification de texte se fait dans les deux fichiers ; les balises
   après si le rythme d'avant est saisi. Il faut les avis du jour de la pose
   et un relevé récent. À publier avec l'accord du commerce.
 
+## 11. Associés : qui fait quoi et convention
+
+- **Qui fait quoi** (Associés → onglet « Qui fait quoi ») : le rôle de chacun,
+  ses responsabilités et ses objectifs de la semaine (du lundi au dimanche).
+  Chacun entre SES chiffres, depuis son compte ; personne n'écrit ceux de
+  l'autre. Les objectifs marqués « auto » sont comptés par l'app pour toute
+  l'équipe (nouveaux dossiers, cartes créées, recommandations traitées).
+  Les 8 dernières semaines restent consultables ; le score est la part des
+  objectifs atteints. Rôles et objectifs se modifient dans « Modifier le
+  rôle ».
+- **Convention** (onglet « Convention ») : « Commencer avec l'ébauche »
+  crée un texte rempli avec vos noms, le NEQ, les parts et les rôles. Les
+  chiffres entre crochets sont à discuter. Chaque modification crée une
+  nouvelle version et remet les approbations à zéro ; chacun approuve pour
+  lui-même. Le PDF signé se joint une fois les deux approbations données
+  (bucket privé, comme les reçus). « Imprimer / PDF » sort le document seul.
+  Les parts de la comptabilité ne changent pas toutes seules.
+- C'est une ébauche, pas un avis juridique : la faire valider par un
+  notaire ou un avocat avant de signer.
+
 ## Sauvegardes
 
 Le forfait gratuit de Supabase ne garde pas d'historique de sauvegardes long.

@@ -728,6 +728,8 @@ html[data-theme='tapora'] .document-neutre .bg-white { background-color: white; 
   html[data-theme='tapora'] body::before { display: none; }
   html[data-theme='tapora'] body { background: white !important; }
   .entete-bo, .bandeau-2fa { display: none !important; }
+  /* L'animation d'entrée ne doit jamais laisser une page à moitié transparente sur papier. */
+  html[data-theme='tapora'] main.bo-page > * > * { animation: none !important; opacity: 1 !important; transform: none !important; }
 }
 
 /* ---- App installée (PWA) ------------------------------------------------- */

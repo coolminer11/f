@@ -20,6 +20,7 @@ import FormulaireMouvement from '@/components/formulaire-mouvement'
 import FormulaireDecision from '@/components/formulaire-decision'
 import FiltresDecisions from '@/components/filtres-decisions'
 import { exigerEcriture, exigerSession } from '@/lib/auth'
+import OngletsAssocies from '@/components/onglets-associes'
 
 export const dynamic = 'force-dynamic'
 
@@ -148,6 +149,7 @@ export default async function PageAssocies({
 
   return (
     <div className="space-y-5">
+      <OngletsAssocies actif="/associes" />
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-lg font-bold tracking-tight">Associés</h1>

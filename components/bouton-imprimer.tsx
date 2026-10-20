@@ -1,9 +1,9 @@
 'use client'
 
-export default function BoutonImprimer() {
+export default function BoutonImprimer({ petit = false }: { petit?: boolean }) {
   return (
-    <button type="button" className="bouton" onClick={() => window.print()}>
-      Imprimer ou enregistrer en PDF
+    <button type="button" className={petit ? 'bouton bouton-secondaire text-xs print:hidden' : 'bouton'} onClick={() => window.print()}>
+      {petit ? 'Imprimer / PDF' : 'Imprimer ou enregistrer en PDF'}
     </button>
   )
 }

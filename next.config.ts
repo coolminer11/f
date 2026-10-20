@@ -26,6 +26,9 @@ const PRIVES = [
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ['pg', 'pdfkit'],
+  // Reçus et convention signée : jusqu'à 10 Mo (1 Mo par défaut, trop peu
+  // pour une photo de téléphone ou un PDF numérisé).
+  experimental: { serverActions: { bodySizeLimit: '10mb' } },
   poweredByHeader: false,
   async headers() {
     return [
