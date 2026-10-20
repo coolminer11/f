@@ -54,7 +54,8 @@ export default function FormulairePartage({ associes, aujourdhui, retourAssocie 
                 name={`part_${a.id}`}
                 inputMode="decimal"
                 required
-                className="champ pr-8 text-right tabular-nums"
+                className="champ text-right tabular-nums"
+                style={{ paddingRight: '2rem' }}
                 value={valeurs[a.id] ?? ''}
                 onChange={(e) => changer(a.id, e.target.value)}
               />

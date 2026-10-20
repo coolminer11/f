@@ -3,7 +3,7 @@ import { requete, requeteUne } from '@/lib/db'
 import { echapper, envoyerCourriel } from '@/lib/courriel'
 import { emetteur } from '@/lib/requetes/ventes'
 import { baseCartesConfiguree } from '@/lib/cartes-url'
-import { etatStock } from '@/lib/stock'
+import { alertesStock } from '@/lib/stock'
 
 /**
  * Les cartes qui dorment : actives, posées depuis au moins une semaine, et
@@ -86,8 +86,8 @@ export async function envoyerAlerteSommeil(baseRepli: string): Promise<void> {
   )
   if (!ici || ici.jour !== 1 || ici.h < 8 || ici.h >= 19) return
 
-  const [cartes, stock] = await Promise.all([cartesEndormies(), etatStock()])
-  const stockBas = !!stock.produit_id && (stock.quantite < 0 || stock.quantite < stock.seuil)
+  const [cartes, alertes] = await Promise.all([cartesEndormies(), alertesStock()])
+  const stockBas = alertes.length > 0
   const reservee = await requeteUne<{ semaine: string }>(
     `insert into alertes_sommeil (semaine, nb_cartes, statut) values ($1::date, $2, 'rien')
      on conflict (semaine) do nothing returning semaine`,
@@ -102,13 +102,12 @@ export async function envoyerAlerteSommeil(baseRepli: string): Promise<void> {
     cartes,
     `${base}/cartes#sommeil`,
     societe.nom_entreprise,
-    stockBas
-      ? {
-          quantite: stock.quantite,
-          semaines: stock.rythme_semaine > 0 && stock.quantite > 0 && stock.quantite / stock.rythme_semaine <= 52 ? Math.floor(stock.quantite / stock.rythme_semaine) : null,
-          lien: `${base}/cartes/stock`,
-        }
-      : null,
+    alertes.map((a) => ({
+      nom: a.nom ?? 'Cartes',
+      quantite: a.quantite,
+      semaines: a.rythme_semaine > 0 && a.quantite > 0 && a.quantite / a.rythme_semaine <= 52 ? Math.floor(a.quantite / a.rythme_semaine) : null,
+      lien: `${base}/cartes/stock`,
+    })),
   )
   const r = await envoyerCourriel({ destinataire: societe.courriel_contact, ...c })
   await requete(`update alertes_sommeil set statut = $2 where semaine = $1::date`, [ici.semaine, r.statut])
@@ -118,19 +117,19 @@ function depuisTexte(c: CarteEndormie): string {
   return c.total === 0 ? `jamais tapée (posée il y a ${c.jours} jours)` : `aucun tap depuis ${c.jours} jours`
 }
 
-export type AlerteStock = { quantite: number; semaines: number | null; lien: string }
+export type AlerteStock = { nom: string; quantite: number; semaines: number | null; lien: string }
 
 function texteStock(a: AlerteStock): string {
   return a.quantite < 0
-    ? `Stock négatif (${a.quantite}) : des cartes vendues n’ont pas de réception inscrite.`
-    : `Plus que ${a.quantite} carte${a.quantite > 1 ? 's' : ''} en stock${a.semaines !== null ? `, environ ${a.semaines} semaine${a.semaines > 1 ? 's' : ''} au rythme actuel` : ''} : pensez à commander.`
+    ? `${a.nom} : stock négatif (${a.quantite}), des cartes vendues n’ont pas de réception inscrite.`
+    : `${a.nom} : plus que ${a.quantite} carte${a.quantite > 1 ? 's' : ''} en stock${a.semaines !== null ? `, environ ${a.semaines} semaine${a.semaines > 1 ? 's' : ''} au rythme actuel` : ''} — pensez à commander.`
 }
 
-export function courrielSommeil(cartes: CarteEndormie[], lien: string, societe: string, stock: AlerteStock | null = null) {
+export function courrielSommeil(cartes: CarteEndormie[], lien: string, societe: string, stocks: AlerteStock[] = []) {
   const n = cartes.length
   const objet = n
-    ? `😴 ${n} carte${n > 1 ? 's' : ''} qui dor${n > 1 ? 'ment' : 't'} cette semaine${stock ? ' · stock bas' : ''}`
-    : `📦 ${stock && stock.quantite >= 0 ? `Plus que ${stock.quantite} carte${stock.quantite > 1 ? 's' : ''} en stock` : 'Stock de cartes à corriger'}`
+    ? `😴 ${n} carte${n > 1 ? 's' : ''} qui dor${n > 1 ? 'ment' : 't'} cette semaine${stocks.length ? ' · stock bas' : ''}`
+    : `📦 ${stocks.length === 1 && stocks[0].quantite >= 0 ? `${stocks[0].nom} : plus que ${stocks[0].quantite} carte${stocks[0].quantite > 1 ? 's' : ''} en stock` : 'Stock de cartes à surveiller'}`
   const lignes = cartes
     .slice(0, 25)
     .map((c) => {
@@ -167,9 +166,9 @@ export function courrielSommeil(cartes: CarteEndormie[], lien: string, societe: 
   <table role="presentation" cellpadding="0" cellspacing="0" style="margin:22px 0 0"><tr><td style="background:#c2552f;border-radius:999px">
     <a href="${echapper(lien)}" style="display:inline-block;padding:13px 24px;font-size:15px;font-weight:700;color:#fffaf2;text-decoration:none">Ouvrir la liste</a>
   </td></tr></table>` : ''}
-  ${stock ? `<div style="margin:${n ? '22px' : '0'} 0 0;padding:16px 18px;border-radius:14px;background:#fdf3dc;color:#6b4a05">
-    <p style="margin:0;font-size:15px;font-weight:700">📦 ${echapper(texteStock(stock))}</p>
-    <p style="margin:8px 0 0;font-size:14px"><a href="${echapper(stock.lien)}" style="color:#c2552f;font-weight:700">Voir le stock</a> — à la réception, deux chiffres suffisent : cartes reçues, total payé.</p>
+  ${stocks.length ? `<div style="margin:${n ? '22px' : '0'} 0 0;padding:16px 18px;border-radius:14px;background:#fdf3dc;color:#6b4a05">
+    ${stocks.map((a) => `<p style="margin:0 0 6px;font-size:15px;font-weight:700">📦 ${echapper(texteStock(a))}</p>`).join('')}
+    <p style="margin:8px 0 0;font-size:14px"><a href="${echapper(stocks[0].lien)}" style="color:#c2552f;font-weight:700">Voir le stock</a> — à la réception, deux chiffres suffisent : cartes reçues, total payé.</p>
   </div>` : ''}
 </td></tr>
 <tr><td style="padding:18px 6px 0;font-size:12px;line-height:1.5;color:#6b5d50;text-align:center">Courriel automatique du lundi · ${echapper(societe)}</td></tr>
@@ -184,7 +183,7 @@ export function courrielSommeil(cartes: CarteEndormie[], lien: string, societe: 
           lien,
         ]
       : []),
-    ...(stock ? ['', texteStock(stock), stock.lien] : []),
+    ...(stocks.length ? ['', ...stocks.map(texteStock), stocks[0].lien] : []),
   ].join('\n')
   return { objet, html, texte }
 }

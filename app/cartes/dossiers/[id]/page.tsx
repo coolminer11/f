@@ -19,7 +19,8 @@ import { enregistrerFiche, placesConfigure } from '@/lib/avis-google'
 import { cleAvis, suiviPour } from '@/lib/avis-manuels'
 import { LigneSuivi } from '@/components/suivi-avis'
 import { premierReleve } from '@/lib/saisie-carte'
-import { urlStats } from '@/lib/lien-stats'
+import { definirMotDePasse, jetonStats, urlStats } from '@/lib/lien-stats'
+import { changerGroupes, groupesDuDossier } from '@/lib/requetes/classement'
 import { baseCartesAffichee } from '@/lib/cartes-url'
 import { envoyerRapport, historiqueRapports, moisPrecedent, nomMois } from '@/lib/rapports'
 import { envoyerCourriel, messagerieConfiguree } from '@/lib/courriel'
@@ -99,15 +100,19 @@ export default async function FicheDossier({
     demandesCartes(id),
   ])
   const placeIds = [...new Set(cartes.map((c) => c.place_id).filter(Boolean) as string[])]
-  const [envois, parrainages, etude] = await Promise.all([
+  const [envois, parrainages, etude, rangement] = await Promise.all([
     historiqueEnvoisLien(d.id),
     listerParrainages(d.id),
     donneesEtude(d.id, d.nom, placeIds),
+    groupesDuDossier(d.id),
   ])
+  const nomsGroupes = [...new Set(rangement.map((c) => c.groupe).filter(Boolean) as string[])].sort((a, b) => a.localeCompare(b, 'fr'))
   const peutEcrire = moi.role !== 'lecture'
   const actives = cartes.filter((c) => c.actif)
   const avisIds = [...placeIds, cleAvis({ type: 'dossier', id: d.id })]
   const lien = urlStats(d.id, d.version_lien, base)
+  // Page protégée : l'aperçu passe par ce serveur-ci, où votre session ouvre la page sans le mot de passe.
+  const apercu = d.protege ? `/stats/${jetonStats(d.id, d.version_lien)}` : lien
   const courrielClient = clients.find((c) => c.id === d.client_id)?.courriel ?? null
   const destinataire = d.courriel_rapport ?? courrielClient
   const ici = `/cartes/dossiers/${d.id}`
@@ -173,6 +178,36 @@ export default async function FicheDossier({
     await basculerLien(id, !d!.lien_actif)
     revalidatePath(ici)
     redirect(`${ici}#lien`)
+  }
+
+  async function motDePasseAction(donnees: FormData) {
+    'use server'
+    await exigerEcriture()
+    const mdp = String(donnees.get('mot_de_passe') ?? '').trim()
+    if (mdp.length < 6 || mdp.length > 100) redirect(`${ici}?erreur=${encodeURIComponent('Le mot de passe doit faire de 6 à 100 caractères.')}#mot-de-passe`)
+    await definirMotDePasse(id, mdp)
+    revalidatePath(ici)
+    redirect(`${ici}?message=${encodeURIComponent('Mot de passe enregistré. Donnez-le au client : il ne sera plus jamais affiché.')}#mot-de-passe`)
+  }
+
+  async function retirerMotDePasseAction() {
+    'use server'
+    await exigerEcriture()
+    await definirMotDePasse(id, null)
+    revalidatePath(ici)
+    redirect(`${ici}?message=${encodeURIComponent('Mot de passe retiré : le lien seul ouvre de nouveau la page.')}#mot-de-passe`)
+  }
+
+  async function groupesAction(donnees: FormData) {
+    'use server'
+    await exigerEcriture()
+    const choix = donnees.getAll('carte').map(String).map((carteId) => {
+      const g = String(donnees.get(`groupe_${carteId}`) ?? '').trim().replace(/\s+/g, ' ').slice(0, 60)
+      return { id: carteId, groupe: g || null }
+    })
+    await changerGroupes(id, choix.filter((c) => /^[0-9a-f-]{36}$/i.test(c.id)))
+    revalidatePath(ici)
+    redirect(`${ici}?message=${encodeURIComponent('Groupes enregistrés : le client les voit dans « Carte par carte ».')}#groupes`)
   }
 
   async function basculerBadgeAction() {
@@ -246,8 +281,8 @@ export default async function FicheDossier({
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <a href={lien} target="_blank" rel="noreferrer" className="bouton bouton-secondaire">Vue du client ↗</a>
-          <a href={`${lien}/annee`} target="_blank" rel="noreferrer" className="bouton bouton-secondaire" title="Ouvert au client en décembre et en janvier ; ici, un aperçu.">
+          <a href={apercu} target="_blank" rel="noreferrer" className="bouton bouton-secondaire">Vue du client ↗</a>
+          <a href={`${apercu}/annee`} target="_blank" rel="noreferrer" className="bouton bouton-secondaire" title="Ouvert au client en décembre et en janvier ; ici, un aperçu.">
             Votre année ↗
           </a>
           {peutEcrire && <Link href={`/cartes/nouvelle?dossier=${d.id}`} className="bouton">Nouvelle carte</Link>}
@@ -319,6 +354,37 @@ export default async function FicheDossier({
         vide={peutEcrire ? 'Aucune carte encore : créez-les en lot ci-dessous, ou ajoutez des cartes existantes.' : 'Aucune carte.'}
       />
 
+      {peutEcrire && rangement.length >= 2 && (
+        <details id="groupes" className="carte scroll-mt-4 p-5">
+          <summary className="cursor-pointer">
+            <span className="text-sm font-semibold">Groupes de cartes</span>
+            <span className="ml-2 text-xs text-[var(--color-encre-doux)]">
+              {nomsGroupes.length ? nomsGroupes.join(' · ') : 'aucun — ex. « Chambres », « Bar », « Réception »'}
+            </span>
+          </summary>
+          <p className="mt-2 text-xs leading-relaxed text-[var(--color-encre-doux)]">
+            Le client voit le total de chaque groupe dans « Carte par carte », sur sa page, et dans son export. Laissez vide : la carte reste sans groupe.
+          </p>
+          <form action={groupesAction} className="mt-3">
+            <datalist id="noms-groupes">
+              {nomsGroupes.map((g) => (
+                <option key={g} value={g} />
+              ))}
+            </datalist>
+            <div className="grid gap-x-4 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
+              {rangement.map((c) => (
+                <label key={c.id} className={`flex items-center gap-2 text-sm ${c.actif ? '' : 'opacity-50'}`}>
+                  <input type="hidden" name="carte" value={c.id} />
+                  <span className="w-28 shrink-0 truncate" title={c.libelle}>{c.libelle}</span>
+                  <input name={`groupe_${c.id}`} defaultValue={c.groupe ?? ''} list="noms-groupes" maxLength={60} className="champ min-w-0 flex-1 py-1 text-sm" placeholder="—" />
+                </label>
+              ))}
+            </div>
+            <button className="bouton mt-4 text-sm">Enregistrer les groupes</button>
+          </form>
+        </details>
+      )}
+
       <StatsTaps portee={{ dossier: d.id }} jours={jours} totaux={t} />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -342,6 +408,32 @@ export default async function FicheDossier({
               <form action={basculer}><button className="bouton bouton-secondaire text-xs">{d.lien_actif ? 'Désactiver le lien' : 'Réactiver le lien'}</button></form>
             </div>
           )}
+          <div id="mot-de-passe" className="mt-4 scroll-mt-4 rounded-lg border border-[var(--color-ligne)] p-3">
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="text-xs font-semibold">Mot de passe de la page</h3>
+              <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${d.protege ? 'bg-[var(--color-accent)] text-white' : 'bg-[var(--color-fond)] text-[var(--color-encre-doux)]'}`}>
+                {d.protege ? '🔒 Activé' : 'Aucun'}
+              </span>
+            </div>
+            <p className="mt-1 text-xs leading-relaxed text-[var(--color-encre-doux)]">
+              {d.protege
+                ? 'Le client l’entre une fois par appareil ; il reste ouvert 30 jours. Le changer ferme la page sur tous les appareils. Vous, connecté, n’en avez pas besoin.'
+                : 'Facultatif : pour un hôtel ou un groupe qui fait circuler le lien dans son équipe. Le lien seul ne suffira plus.'}
+            </p>
+            {peutEcrire && (
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <form action={motDePasseAction} className="flex min-w-0 flex-1 gap-2">
+                  <input name="mot_de_passe" type="text" required minLength={6} maxLength={100} autoComplete="off" spellCheck={false} placeholder="6 caractères ou plus" className="champ min-w-0 flex-1 py-1.5 text-sm" aria-label="Nouveau mot de passe" />
+                  <button className="bouton bouton-secondaire shrink-0 text-xs">{d.protege ? 'Changer' : 'Protéger la page'}</button>
+                </form>
+                {d.protege && (
+                  <form action={retirerMotDePasseAction}>
+                    <button className="bouton bouton-secondaire text-xs">Retirer</button>
+                  </form>
+                )}
+              </div>
+            )}
+          </div>
           {peutEcrire && d.lien_actif && (
             <EnvoiLien
               action={envoyerLien}

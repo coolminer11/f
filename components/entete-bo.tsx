@@ -10,6 +10,7 @@ import { EVENEMENT_INSTALLER } from '@/components/installer-app'
 const LIENS = [
   ['/transactions', 'Transactions'],
   ['/ventes', 'Factures'],
+  ['/commandes', 'Commandes'],
   ['/cartes', 'Cartes'],
   ['/resultats', 'Résultats'],
   ['/taxes', 'Taxes'],

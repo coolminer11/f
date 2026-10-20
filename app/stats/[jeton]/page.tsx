@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import { cache } from 'react'
-import { dossierDuJeton } from '@/lib/lien-stats'
+import { accesDossier, dossierDuJeton } from '@/lib/lien-stats'
 import { dossier as lireDossier } from '@/lib/requetes/dossiers'
 import { listerCartes, tapsJourHeure, totaux } from '@/lib/requetes/cartes'
 import { cleAvis } from '@/lib/avis-manuels'
@@ -9,6 +9,7 @@ import { requete, requeteUne } from '@/lib/db'
 import { rythmeAvis, resumeAvis } from '@/lib/avis-google'
 import { direct, exploits } from '@/lib/requetes/exploits'
 import { cartesProfil, course, pointDeDepart, profil } from '@/lib/requetes/profil'
+import { classement } from '@/lib/requetes/classement'
 import { depuisL, langueValide, locale, textes } from '@/lib/langue'
 import { maintenantQuebec } from '@/lib/quebec'
 import { prochainesNotes } from '@/lib/note-google'
@@ -26,6 +27,7 @@ import Conseils from '@/components/client/conseils'
 import ProchaineEtoile from '@/components/client/prochaine-etoile'
 import AvantApres from '@/components/client/avant-apres'
 import Course from '@/components/client/course'
+import DetailCartes from '@/components/client/detail-cartes'
 import NotificationsDing from '@/components/client/notifications-ding'
 import PartagePalier from '@/components/client/partage-palier'
 import Parrainage from '@/components/client/parrainage'
@@ -33,6 +35,7 @@ import BadgeAvis from '@/components/badge-avis'
 import { baseCartesAffichee } from '@/lib/cartes-url'
 import { bilanParrain } from '@/lib/parrainage'
 import Logo from '@/components/client/logo'
+import Verrou from '@/components/client/verrou'
 import StatsTaps from '@/components/stats-taps'
 import SectionAvis from '@/components/section-avis'
 import AnimationsClient from '@/components/animations-client'
@@ -58,15 +61,15 @@ type Props = {
 
 // Une seule lecture du dossier par affichage, partagée avec les métadonnées.
 const charger = cache(async (jeton: string) => {
-  const id = await dossierDuJeton(jeton)
-  return id ? lireDossier(id) : null
+  const a = await accesDossier(jeton)
+  return { verrou: a.etat === 'verrouille' ? a : null, d: a.etat === 'ok' ? await lireDossier(a.id) : null }
 })
 
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { jeton } = await params
   const sp = await searchParams
-  const d = await charger(jeton)
-  const l = langueValide(sp.l) ?? d?.langue ?? 'fr'
+  const { d, verrou } = await charger(jeton)
+  const l = langueValide(sp.l) ?? d?.langue ?? verrou?.langue ?? 'fr'
   return {
     title: textes(l).titre,
     robots: { index: false, follow: false, nocache: true },
@@ -87,7 +90,15 @@ const ANTI_ECLAIR = `(function(){try{if(matchMedia('(prefers-reduced-motion: red
 export default async function StatsClient({ params, searchParams }: Props) {
   const { jeton } = await params
   const sp = await searchParams
-  const d = await charger(jeton)
+  const { d, verrou } = await charger(jeton)
+  if (verrou) {
+    const l = langueValide(sp.l)
+    return (
+      <div className={`${fraunces.variable} ${inter.variable} theme-client`} lang={(l ?? verrou.langue) === 'fr' ? 'fr-CA' : 'en-CA'}>
+        <Verrou jeton={jeton} nom={verrou.nom} langue={l ?? verrou.langue} l={l ?? undefined} />
+      </div>
+    )
+  }
   if (!d) notFound()
   const jours = joursDepuis(sp.p)
   const langue = langueValide(sp.l) ?? d.langue
@@ -101,7 +112,7 @@ export default async function StatsClient({ params, searchParams }: Props) {
   const ici = maintenantQuebec()
   const cleManuelle = cleAvis({ type: 'dossier', id: d.id })
 
-  const [cartes, t, places, maintenant, records, portrait, parCarte, lignesCourse, depart, grille, abonnes] = await Promise.all([
+  const [cartes, t, places, maintenant, records, portrait, parCarte, lignesCourse, depart, grille, abonnes, detail] = await Promise.all([
     listerCartes(d.id),
     totaux({ dossier: d.id }, jours),
     requete<{ place_id: string }>(
@@ -116,6 +127,7 @@ export default async function StatsClient({ params, searchParams }: Props) {
     pointDeDepart(d.id, cleManuelle),
     tapsJourHeure({ dossier: d.id }, 3650),
     requeteUne<{ n: number }>(`select count(*)::int as n from abonnements_push where dossier_id = $1::uuid`, [d.id]),
+    classement(d.id, jours),
   ])
   const avisIds = [...places.map((p) => p.place_id), cleManuelle]
   const [avis, avis14, avisParJour, bilan, base] = await Promise.all([
@@ -371,6 +383,8 @@ export default async function StatsClient({ params, searchParams }: Props) {
           <Course lignes={lignesCourse} langue={langue} joursAvantLundi={joursAvantLundi} />
 
           <StatsTaps portee={{ dossier: d.id }} jours={jours} totaux={t} langue={langue} sansQr={!avecQr} />
+
+          <DetailCartes lignes={detail} jours={jours} langue={langue} lienExport={`${chemin}/export?p=${jours}${suffixeL}`} />
 
           {/* ---- Le Ding (le mode comptoir n'est plus proposé ; sa page existe toujours) */}
           <NotificationsDing jeton={jeton} langue={langue} />

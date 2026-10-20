@@ -24,6 +24,8 @@ export type Dossier = {
   partenaire_public: boolean
   ambassadeur_le: string | null
   lancement: string[]
+  /** Page client protégée par un mot de passe (l'empreinte, elle, ne sort jamais de la base). */
+  protege: boolean
   cree_le: string
   nb_cartes: number
   nb_actives: number
@@ -38,7 +40,7 @@ export type DossierListe = Dossier & {
 const COLONNES = `d.id, d.nom, d.client_id, cl.nom as client_nom, d.courriel_rapport,
   d.rapport_mensuel, d.lien_actif, d.version_lien, d.note, d.langue, d.objectif_avis, d.avis_pose, d.avis_mois_avant::float8 as avis_mois_avant,
   to_char(d.date_pose, 'YYYY-MM-DD') as date_pose, d.cle_badge, d.badge_actif, d.site_web, d.partenaire_public, d.ambassadeur_le,
-  d.lancement, d.cree_le,
+  d.lancement, d.mot_de_passe is not null as protege, d.cree_le,
   (select count(*)::int from cartes_nfc c where c.dossier_id = d.id) as nb_cartes,
   (select count(*)::int from cartes_nfc c where c.dossier_id = d.id and c.actif) as nb_actives`
 

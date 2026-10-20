@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next'
-import { notFound } from 'next/navigation'
-import { dossierDuJeton } from '@/lib/lien-stats'
+import { notFound, redirect } from 'next/navigation'
+import { accesDossier } from '@/lib/lien-stats'
 import { dossier as lireDossier } from '@/lib/requetes/dossiers'
 import { direct, exploits } from '@/lib/requetes/exploits'
 import { profil } from '@/lib/requetes/profil'
@@ -41,7 +41,10 @@ export default async function PageComptoir({
 }) {
   const { jeton } = await params
   const sp = await searchParams
-  const id = await dossierDuJeton(jeton)
+  const acces = await accesDossier(jeton)
+  // Page protégée : le mot de passe s'entre sur la page principale.
+  if (acces.etat === 'verrouille') redirect(`/stats/${jeton}`)
+  const id = acces.etat === 'ok' ? acces.id : null
   const d = id ? await lireDossier(id) : null
   if (!d) notFound()
   const langue = langueValide(sp.l) ?? d.langue

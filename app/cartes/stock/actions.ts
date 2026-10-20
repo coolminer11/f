@@ -45,6 +45,7 @@ export async function recevoirAction(donnees: FormData): Promise<void> {
   }
   try {
     await recevoirCartes({
+      produitId: String(donnees.get('produit_id') ?? '') || null,
       date,
       quantite: quantite!,
       total: total!,
@@ -68,7 +69,7 @@ export async function convertirAction(donnees: FormData): Promise<void> {
   if (!quantite) aller('erreur', 'Le nombre de cartes reçues : un nombre entier plus grand que zéro.')
   if (!cartes) aller('erreur', 'La part « cartes » du montant : un montant comme 357,95.')
   try {
-    await convertirEnReception(String(donnees.get('id') ?? ''), quantite!, cartes!)
+    await convertirEnReception(String(donnees.get('id') ?? ''), quantite!, cartes!, String(donnees.get('produit_id') ?? '') || null)
   } catch (e) {
     aller('erreur', erreur(e))
   }
@@ -105,8 +106,12 @@ export async function supprimerAction(donnees: FormData): Promise<void> {
 export async function seuilAction(donnees: FormData): Promise<void> {
   await exigerEcriture()
   const v = String(donnees.get('seuil') ?? '').trim()
-  if (!/^\d{1,5}$/.test(v)) aller('erreur', 'Le seuil : un nombre entier.')
-  await changerSeuil(Number(v))
+  if (v !== '' && !/^\d{1,5}$/.test(v)) aller('erreur', 'Le seuil : un nombre entier (vide = pas d’alerte).')
+  try {
+    await changerSeuil(String(donnees.get('produit_id') ?? ''), v === '' ? null : Number(v))
+  } catch (e) {
+    aller('erreur', erreur(e))
+  }
   revalidatePath('/', 'layout')
-  aller('message', `Alerte quand il reste moins de ${v} cartes.`)
+  aller('message', v === '' ? 'Alerte retirée pour ce modèle.' : `Alerte quand il reste moins de ${v} cartes.`)
 }

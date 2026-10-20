@@ -553,6 +553,38 @@ modification de texte se fait dans les deux fichiers ; les balises
   `20261020000300`) : la dépense du 29 septembre (357,95 $) est devenue la
   réception de 50 cartes ; le reçu test R-2026-00009 est annulé.
 
+## 14. Catalogue, commandes Entreprise, mot de passe et statistiques détaillées
+
+- **Trois cartes** (Commandes → Catalogue) : **Carte Québec** (35 $, à
+  l'unité, français mis en valeur puis anglais, sans personnalisation),
+  **Entreprise — Québec** (30 $ la carte, 25 au minimum, personnalisée,
+  français d'abord) et **Entreprise — International** (30 $, 25 au minimum,
+  anglais d'abord, jamais posée au Québec). Prix, minimum et seuil d'alerte
+  se changent dans le catalogue. La migration `20261020000400` renomme la
+  carte existante en Carte Québec à 35 $ (son stock et son coût restent) et
+  ajoute les deux cartes Entreprise.
+- **Loi 96 / Charte de la langue française** : au Québec, le français doit
+  être nettement prédominant. Une commande « International » posée au
+  Québec est refusée à l'écran ET par la base ; idem sous le minimum.
+- **Commande Entreprise** (Commandes → + Nouvelle commande) : sept étapes,
+  un bouton chacune. Demande → devis prérempli ; maquette (fichier joint) ;
+  approuvée ; commandée au fournisseur ; **reçue** (le total payé : les
+  cartes entrent au stock de leur modèle, à leur coût réel) ; **posée** (les
+  cartes NFC sont créées dans le dossier du client, une par nom de la liste,
+  le dossier est créé au besoin) ; **facturée** (le devis devient la
+  facture, les cartes sortent du stock à leur coût : la marge est exacte).
+- **Mot de passe de la page client** (dossier → Lien privé du client) :
+  facultatif, pour un hôtel qui fait circuler le lien. Stocké en empreinte
+  scrypt, jamais réaffiché. Le client l'entre une fois par appareil
+  (30 jours) ; le changer ferme la page partout ; 8 essais ratés en
+  15 minutes bloquent l'adresse IP. Un associé connecté voit la page sans
+  le mot de passe (« Vue du client »). Rien d'autre à configurer.
+- **Statistiques détaillées** (page client, dès deux cartes) : classement
+  complet carte par carte avec l'évolution, cartes muettes depuis 14 jours
+  signalées, totaux par **groupe** (dossier → Groupes de cartes : « Chambres »,
+  « Bar »…), et export CSV (une ligne par carte et par jour ; point-virgule
+  en français, virgule en anglais).
+
 ## Sauvegardes
 
 Le forfait gratuit de Supabase ne garde pas d'historique de sauvegardes long.

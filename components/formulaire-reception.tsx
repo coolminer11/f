@@ -23,7 +23,17 @@ const nombre = (t: string) => {
  * Réception de cartes : combien de cartes, combien payé. L'app calcule le
  * coût par carte, les met au stock, et le coût de chaque vente suit tout seul.
  */
-export default function FormulaireReception({ aujourdhui, inscritTaxes }: { aujourdhui: string; inscritTaxes: boolean }) {
+export default function FormulaireReception({
+  aujourdhui,
+  inscritTaxes,
+  modeles,
+  modeleParDefaut,
+}: {
+  aujourdhui: string
+  inscritTaxes: boolean
+  modeles: { id: string; nom: string }[]
+  modeleParDefaut: string | null
+}) {
   const [quantite, setQuantite] = useState('')
   const [total, setTotal] = useState('')
   const [taxes, setTaxes] = useState('')
@@ -34,6 +44,16 @@ export default function FormulaireReception({ aujourdhui, inscritTaxes }: { aujo
 
   return (
     <form action={recevoirAction} className="space-y-3">
+      {modeles.length > 1 && (
+        <div>
+          <label className="etiquette" htmlFor="rp">Modèle</label>
+          <select id="rp" name="produit_id" defaultValue={modeleParDefaut ?? modeles[0]?.id} className="champ">
+            {modeles.map((m) => (
+              <option key={m.id} value={m.id}>{m.nom}</option>
+            ))}
+          </select>
+        </div>
+      )}
       <div className="grid gap-3 sm:grid-cols-3">
         <div>
           <label className="etiquette" htmlFor="rq">Cartes reçues</label>
@@ -42,7 +62,7 @@ export default function FormulaireReception({ aujourdhui, inscritTaxes }: { aujo
         <div>
           <label className="etiquette" htmlFor="rt">Total payé{inscritTaxes ? ' (taxes incluses)' : ''}</label>
           <div className="relative">
-            <input id="rt" name="total" inputMode="decimal" required className="champ pr-9 text-right tabular-nums" placeholder="250,00" value={total} onChange={(e) => setTotal(e.target.value)} />
+            <input id="rt" name="total" inputMode="decimal" required className="champ text-right tabular-nums" style={{ paddingRight: '2rem' }} placeholder="250,00" value={total} onChange={(e) => setTotal(e.target.value)} />
             <span className="pointer-events-none absolute inset-y-0 right-3 grid place-items-center text-sm text-[var(--color-encre-doux)]">$</span>
           </div>
         </div>

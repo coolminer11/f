@@ -12,7 +12,7 @@ import { demandesCartes } from '@/lib/requetes/dossiers'
 import CartesEndormies from '@/components/cartes-endormies'
 import { cartesEndormies } from '@/lib/sommeil'
 import { parrainagesOuverts } from '@/lib/parrainage'
-import { etatStock } from '@/lib/stock'
+import { alertesStock, etatStock } from '@/lib/stock'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,7 +20,7 @@ export default async function PageCartes({ searchParams }: { searchParams: Promi
   const moi = await exigerSession()
   const sp = await searchParams
   const jours = joursDepuis(sp.p)
-  const [cartes, t, parCarte, courbes, suivis, demandes, endormies, recos, stock] = await Promise.all([
+  const [cartes, t, parCarte, courbes, suivis, demandes, endormies, recos, stock, alertes] = await Promise.all([
     listerCartes(),
     totaux({}, jours),
     tapsParCarte(jours),
@@ -30,6 +30,7 @@ export default async function PageCartes({ searchParams }: { searchParams: Promi
     cartesEndormies(),
     parrainagesOuverts(),
     etatStock(),
+    alertesStock(),
   ])
 
   const actives = cartes.filter((c) => c.actif)
@@ -94,15 +95,15 @@ export default async function PageCartes({ searchParams }: { searchParams: Promi
           <Link href={`/cartes/dossiers/${demandes[0].dossier_id}#demandes`} className="bouton bouton-secondaire text-xs">Voir</Link>
         </div>
       )}
-      {stock.produit_id && (stock.quantite < 0 || stock.quantite < stock.seuil) && (
-        <div className="carte flex flex-wrap items-center justify-between gap-3 border-[var(--color-attention)] px-4 py-3">
+      {alertes.map((a) => (
+        <div key={a.produit_id} className="carte flex flex-wrap items-center justify-between gap-3 border-[var(--color-attention)] px-4 py-3">
           <p className="text-sm">
-            <strong>📦 {stock.quantite < 0 ? `Stock négatif (${stock.quantite})` : `Plus que ${stock.quantite} carte${stock.quantite > 1 ? 's' : ''} en stock`}</strong>{' '}
-            <span className="text-[var(--color-encre-doux)]">— {stock.quantite < 0 ? 'des cartes vendues n’ont pas de réception inscrite.' : 'pensez à commander.'}</span>
+            <strong>📦 {a.nom} : {a.quantite < 0 ? `stock négatif (${a.quantite})` : `plus que ${a.quantite} carte${a.quantite > 1 ? 's' : ''} en stock`}</strong>{' '}
+            <span className="text-[var(--color-encre-doux)]">— {a.quantite < 0 ? 'des cartes vendues n’ont pas de réception inscrite.' : 'pensez à commander.'}</span>
           </p>
-          <Link href="/cartes/stock" className="bouton bouton-secondaire text-xs">{stock.quantite < 0 ? 'Corriger' : 'Voir le stock'}</Link>
+          <Link href="/cartes/stock" className="bouton bouton-secondaire text-xs">{a.quantite < 0 ? 'Corriger' : 'Voir le stock'}</Link>
         </div>
-      )}
+      ))}
       {recos.n > 0 && (
         <div className="carte flex flex-wrap items-center justify-between gap-3 border-[var(--color-accent)] px-4 py-3">
           <p className="text-sm">

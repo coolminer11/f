@@ -1,8 +1,9 @@
 'use server'
 
 import { headers } from 'next/headers'
+import { redirect } from 'next/navigation'
 import { z } from 'zod'
-import { dossierDuJeton } from '@/lib/lien-stats'
+import { deverrouiller, dossierDuJeton } from '@/lib/lien-stats'
 import { requeteUne } from '@/lib/db'
 import { emetteur } from '@/lib/requetes/ventes'
 import { echapper, envoyerCourriel } from '@/lib/courriel'
@@ -13,6 +14,17 @@ import { accepterPartenaire, enregistrerRecommandation, RABAIS_FILLEUL } from '@
 import { baseLiens } from '@/lib/securite'
 
 export type EtatCommande = { ok: boolean; erreur: string | null }
+
+export type EtatVerrou = { erreur: 'faux' | 'bloque' | 'invalide' | null }
+
+/** Le mot de passe d'une page protégée : le bon ouvre la page 30 jours sur cet appareil. */
+export async function deverrouillerPage(_: EtatVerrou, donnees: FormData): Promise<EtatVerrou> {
+  const jeton = String(donnees.get('jeton') ?? '').slice(0, 80)
+  const r = await deverrouiller(jeton, String(donnees.get('mot_de_passe') ?? ''))
+  if (r !== 'ok') return { erreur: r }
+  const l = langueValide(String(donnees.get('l') ?? ''))
+  redirect(`/stats/${jeton}${l ? `?l=${l}` : ''}`)
+}
 
 const Saisie = z.object({
   jeton: z.string().max(80),
