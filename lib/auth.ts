@@ -6,6 +6,7 @@ import { promisify } from 'node:util'
 import { cache } from 'react'
 import { requete, requeteUne } from '@/lib/db'
 import { egal, type Contexte } from '@/lib/securite'
+import { faiblesse } from '@/lib/mots-de-passe'
 
 const chiffrer = promisify(scrypt) as (
   motDePasse: string,
@@ -49,12 +50,13 @@ export async function motDePasseCorrespond(
   return a.length === derive.length && timingSafeEqual(a, derive)
 }
 
-export function verifierForceMotDePasse(motDePasse: string): string | null {
+export function verifierForceMotDePasse(motDePasse: string, interdits: string[] = []): string | null {
   if (motDePasse.length < 10) return 'Le mot de passe doit compter au moins 10 caractères.'
   if (!/[a-zA-Z]/.test(motDePasse) || !/[0-9]/.test(motDePasse)) {
     return 'Le mot de passe doit mêler des lettres et des chiffres.'
   }
-  return null
+  const raison = faiblesse(motDePasse, interdits)
+  return raison ? `Mot de passe refusé — ${raison.charAt(0).toLowerCase()}${raison.slice(1)}` : null
 }
 
 // ---------------------------------------------------------------------------

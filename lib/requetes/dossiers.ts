@@ -145,11 +145,14 @@ export async function supprimerDossier(id: string): Promise<void> {
 }
 
 /** Nouveau lien : l'ancien cesse de fonctionner immédiatement. */
+/** Nouveau lien : l'ancien cesse de fonctionner, et les appareils inscrits aux notifications sont désinscrits. */
 export async function renouvelerLien(id: string): Promise<void> {
   await requete(
     `update dossiers_cartes set version_lien = version_lien + 1, lien_actif = true where id = $1::uuid`,
     [id],
   )
+  await requete(`delete from abonnements_push where dossier_id = $1::uuid`, [id])
+  await requete(`delete from essais_page_client where dossier_id = $1::uuid`, [id])
 }
 
 export async function basculerLien(id: string, actif: boolean): Promise<void> {

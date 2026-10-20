@@ -96,7 +96,7 @@ export default async function Connexion_({
       redirect(`/connexion?erreur=${encodeURIComponent(analyse.error.issues[0].message)}`)
     }
     const v = analyse.data
-    const faiblesse = verifierForceMotDePasse(v.mot_de_passe)
+    const faiblesse = verifierForceMotDePasse(v.mot_de_passe, [String(v.courriel ?? '').split('@')[0], String(v.nom ?? '')])
     if (faiblesse) redirect(`/connexion?erreur=${encodeURIComponent(faiblesse)}`)
 
     const id = await creerUtilisateur({

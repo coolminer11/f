@@ -55,7 +55,7 @@ export default async function PageCompte({
       redirect(`/compte?erreur=${encodeURIComponent(analyse.error.issues[0].message)}`)
     }
     const v = analyse.data
-    const faiblesse = verifierForceMotDePasse(v.mot_de_passe)
+    const faiblesse = verifierForceMotDePasse(v.mot_de_passe, [v.courriel.split('@')[0], v.nom])
     if (faiblesse) redirect(`/compte?erreur=${encodeURIComponent(faiblesse)}`)
 
     try {
@@ -88,7 +88,7 @@ export default async function PageCompte({
     if (v.nouveau !== v.confirmation) {
       redirect(`/compte?erreur=${encodeURIComponent('Les deux mots de passe ne correspondent pas.')}`)
     }
-    const faiblesse = verifierForceMotDePasse(v.nouveau)
+    const faiblesse = verifierForceMotDePasse(v.nouveau, [utilisateur.courriel.split('@')[0], utilisateur.nom])
     if (faiblesse) redirect(`/compte?erreur=${encodeURIComponent(faiblesse)}`)
 
     const ligne = await requeteUne<{ empreinte: string }>(

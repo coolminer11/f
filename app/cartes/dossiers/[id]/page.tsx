@@ -20,6 +20,8 @@ import { cleAvis, suiviPour } from '@/lib/avis-manuels'
 import { LigneSuivi } from '@/components/suivi-avis'
 import { premierReleve } from '@/lib/saisie-carte'
 import { definirMotDePasse, jetonStats, urlStats } from '@/lib/lien-stats'
+import { faiblesse } from '@/lib/mots-de-passe'
+import GenerateurMotDePasse from '@/components/generateur-mot-de-passe'
 import { changerGroupes, groupesDuDossier } from '@/lib/requetes/classement'
 import { baseCartesAffichee } from '@/lib/cartes-url'
 import { envoyerRapport, historiqueRapports, moisPrecedent, nomMois } from '@/lib/rapports'
@@ -184,7 +186,8 @@ export default async function FicheDossier({
     'use server'
     await exigerEcriture()
     const mdp = String(donnees.get('mot_de_passe') ?? '').trim()
-    if (mdp.length < 6 || mdp.length > 100) redirect(`${ici}?erreur=${encodeURIComponent('Le mot de passe doit faire de 6 à 100 caractères.')}#mot-de-passe`)
+    const raison = mdp.length > 100 ? '100 caractères au plus.' : faiblesse(mdp, [d!.nom])
+    if (raison) redirect(`${ici}?erreur=${encodeURIComponent(`Mot de passe refusé : ${raison}`)}#mot-de-passe`)
     await definirMotDePasse(id, mdp)
     revalidatePath(ici)
     redirect(`${ici}?message=${encodeURIComponent('Mot de passe enregistré. Donnez-le au client : il ne sera plus jamais affiché.')}#mot-de-passe`)
@@ -417,14 +420,14 @@ export default async function FicheDossier({
             </div>
             <p className="mt-1 text-xs leading-relaxed text-[var(--color-encre-doux)]">
               {d.protege
-                ? 'Le client l’entre une fois par appareil ; il reste ouvert 30 jours. Le changer ferme la page sur tous les appareils. Vous, connecté, n’en avez pas besoin.'
+                ? 'Le client l’entre une fois par appareil ; il reste ouvert 30 jours. Le changer ferme la page et coupe les notifications sur tous les appareils. Vous, connecté, n’en avez pas besoin. Au plus 40 essais par heure et 100 par jour sur cette page, et un courriel vous prévient si quelqu’un s’acharne.'
                 : 'Facultatif : pour un hôtel ou un groupe qui fait circuler le lien dans son équipe. Le lien seul ne suffira plus.'}
             </p>
             {peutEcrire && (
               <div className="mt-2 flex flex-wrap items-center gap-2">
-                <form action={motDePasseAction} className="flex min-w-0 flex-1 gap-2">
-                  <input name="mot_de_passe" type="text" required minLength={6} maxLength={100} autoComplete="off" spellCheck={false} placeholder="6 caractères ou plus" className="champ min-w-0 flex-1 py-1.5 text-sm" aria-label="Nouveau mot de passe" />
-                  <button className="bouton bouton-secondaire shrink-0 text-xs">{d.protege ? 'Changer' : 'Protéger la page'}</button>
+                <form action={motDePasseAction} className="flex min-w-0 flex-1 flex-wrap items-start gap-2">
+                  <GenerateurMotDePasse interdits={[d.nom]} />
+                  <button className="bouton shrink-0 py-1.5 text-xs">{d.protege ? 'Changer' : 'Protéger la page'}</button>
                 </form>
                 {d.protege && (
                   <form action={retirerMotDePasseAction}>
