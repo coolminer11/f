@@ -143,7 +143,7 @@ export default async function PageConvention({ searchParams }: { searchParams: P
           )}
 
           <section className="carte p-4">
-            <h2 className="text-sm font-semibold">Parts dans la comptabilité</h2>
+            <h2 className="text-sm font-semibold">Partage des profits</h2>
             <ul className="mt-2 space-y-1 text-sm">
               {associes.map((a) => (
                 <li key={a.id} className="flex justify-between gap-2">
@@ -152,7 +152,10 @@ export default async function PageConvention({ searchParams }: { searchParams: P
                 </li>
               ))}
             </ul>
-            <p className="mt-2 text-xs leading-relaxed text-[var(--color-encre-doux)]">C’est ce partage qui sert aux comptes d’associés. Si la convention signée le change, il faut aussi le changer ici.</p>
+            <p className="mt-2 text-xs leading-relaxed text-[var(--color-encre-doux)]">
+              Le partage en vigueur aujourd’hui. Si la convention signée le change, proposez le nouveau partage dans{' '}
+              <Link href="/associes/profits#partage" className="font-medium text-[var(--color-accent)] hover:underline">Vos profits</Link> : il s’applique dès que vous l’avez approuvé tous les deux.
+            </p>
           </section>
 
           <section className="carte p-4">

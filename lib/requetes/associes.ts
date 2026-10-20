@@ -80,7 +80,8 @@ export async function listerMouvements(filtres: {
 }
 
 export async function listerAssocies(): Promise<Associe[]> {
-  return requete<Associe>(`select id, nom, part from associes where actif order by ordre`)
+  // La part EN VIGUEUR aujourd'hui (le partage peut changer dans le temps).
+  return requete<Associe>(`select id, nom, part_en_vigueur(id, current_date)::float8 as part from associes where actif order by ordre`)
 }
 
 export async function ajouterMouvement(entree: {

@@ -100,7 +100,7 @@ export async function ebauche(): Promise<string> {
   const [societe, membres, parts] = await Promise.all([
     emetteur(),
     equipe(),
-    requete<{ nom: string; part: string }>(`select nom, part from associes where actif order by ordre`),
+    requete<{ nom: string; part: string }>(`select nom, part_en_vigueur(id, current_date) as part from associes where actif order by ordre`),
   ])
   const noms = membres.map((m) => m.nom)
   const liste = (n: string[]) => (n.length <= 1 ? n.join('') : `${n.slice(0, -1).join(', ')} et ${n[n.length - 1]}`)
@@ -142,6 +142,8 @@ Chaque associé s’engage à consacrer au moins [15] heures par semaine aux aff
 
 Les bénéfices et les pertes sont partagés ainsi :
 ${partage}
+
+Si le partage change, le nouveau s’applique à compter de la date convenue : les bénéfices et les pertes de chaque période se partagent selon le partage en vigueur à la date de chaque revenu et de chaque dépense. Chaque changement est approuvé par les deux associés et inscrit au registre des décisions.
 
 Sans convention, le Code civil du Québec prévoit un partage égal (art. 2202).
 

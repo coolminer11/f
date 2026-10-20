@@ -502,6 +502,30 @@ modification de texte se fait dans les deux fichiers ; les balises
 - C'est une ébauche, pas un avis juridique : la faire valider par un
   notaire ou un avocat avant de signer.
 
+## 12. Vos profits : le partage dans le temps et les impôts
+
+- **Le partage peut changer** (60/40, puis 50/50 à partir d'une date).
+  Chaque revenu et chaque dépense se partage selon le partage en vigueur à
+  SA date ; les profits d'avant gardent l'ancien partage. Tout est calculé
+  en base (`repartition_profits`), au cent près : par morceau (un mois × une
+  période), chacun reçoit sa part tronquée au cent et les cents restants
+  vont aux plus fortes fractions — la somme des parts égale toujours le
+  profit, et à 50/50 le cent d'écart ne va pas toujours au même.
+- **Changer le partage** : Associés → Vos profits → « Proposer un nouveau
+  partage » (date de début, part de chacun). Proposer, c'est approuver pour
+  soi ; il s'applique quand l'autre associé approuve, et s'inscrit tout seul
+  au registre des décisions (unanime). Une seule proposition à la fois ;
+  impossible de commencer dans un exercice clos. Une date passée répartit à
+  nouveau les profits depuis cette date (exercices ouverts seulement).
+- Les comptes d'associés (« Part de l'exercice en cours ») et la clôture
+  d'exercice utilisent le même calcul.
+- **Impôts** (même page) : une S.E.N.C. ne paie pas d'impôt sur le revenu ;
+  chaque associé déclare sa part (T2125 au fédéral, TP-80 au Québec), même
+  s'il ne l'a pas prélevée. Les repas et frais de représentation ne sont
+  déductibles qu'à 50 % : l'app l'ajoute au bénéfice imposable. Le bouton
+  « Télécharger le résumé pour le comptable » donne un CSV par associé et par
+  année. La réserve de 30 % est un repère, pas un calcul d'impôt.
+
 ## Sauvegardes
 
 Le forfait gratuit de Supabase ne garde pas d'historique de sauvegardes long.

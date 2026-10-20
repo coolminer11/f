@@ -7,6 +7,8 @@ import { exigerEcriture } from '@/lib/auth'
 import { associeDuCompte, enregistrerRole, enregistrerSemaine, estMesure, type SaisieRole } from '@/lib/equipe'
 import { approuver, ebauche, enregistrerTexte, joindrePdf, lireConvention } from '@/lib/convention'
 import { televerserRecu } from '@/lib/stockage'
+import { annulerPartage, approuverPartage, proposerPartage } from '@/lib/profits'
+import { listerAssocies } from '@/lib/requetes/associes'
 
 const ROLES = '/associes/roles'
 const CONVENTION = '/associes/convention'
@@ -153,4 +155,63 @@ export async function joindrePdfAction(donnees: FormData): Promise<void> {
   await joindrePdf(c.v.id, chemin)
   revalidatePath(CONVENTION)
   redirect(avec(CONVENTION, 'message', 'Convention signée jointe.'))
+}
+
+// ---------------------------------------------------------------------------
+// Partage des profits
+// ---------------------------------------------------------------------------
+const PROFITS = '/associes/profits'
+const messageErreur = (e: unknown) => (e instanceof Error ? e.message : 'Opération impossible.').replace(/^error:\s*/i, '')
+
+/** Proposer un nouveau partage, à partir d'une date. Proposer, c'est approuver pour soi. */
+export async function proposerPartageAction(donnees: FormData): Promise<void> {
+  const moi = await exigerEcriture()
+  const debut = String(donnees.get('debut') ?? '')
+  const retour = `${PROFITS}?associe=${encodeURIComponent(String(donnees.get('retour_associe') ?? ''))}`
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(debut) || Number.isNaN(Date.parse(debut))) redirect(avec(retour, 'erreur', 'Choisissez une date de début.', '#partage'))
+  const associes = await listerAssocies()
+  const parts: Record<string, string> = {}
+  let total = 0
+  for (const a of associes) {
+    const brut = String(donnees.get(`part_${a.id}`) ?? '').trim().replace(',', '.')
+    // En centièmes de pourcent entiers : 55,5 % → 5550 → 0,5550.
+    const centiemes = Math.round(Number(brut) * 100)
+    if (!/^\d{1,3}(\.\d{1,2})?$/.test(brut) || centiemes <= 0 || centiemes > 10000) {
+      redirect(avec(retour, 'erreur', `${a.nom} : un pourcentage entre 0 et 100, deux décimales au plus.`, '#partage'))
+    }
+    total += centiemes
+    parts[a.id] = (centiemes / 10000).toFixed(4)
+  }
+  if (total !== 10000) redirect(avec(retour, 'erreur', `Les parts doivent totaliser 100 % (total : ${(total / 100).toLocaleString('fr-CA')} %).`, '#partage'))
+  const motif = String(donnees.get('motif') ?? '').trim().slice(0, 300) || null
+  try {
+    await proposerPartage(debut, parts, motif, moi.id)
+  } catch (e) {
+    redirect(avec(retour, 'erreur', messageErreur(e), '#partage'))
+  }
+  revalidatePath('/associes', 'layout')
+  redirect(avec(retour, 'message', associes.length > 1 ? 'Changement proposé. Il s’applique dès que l’autre associé l’approuve.' : 'Nouveau partage appliqué.', '#partage'))
+}
+
+export async function approuverPartageAction(donnees: FormData): Promise<void> {
+  const moi = await exigerEcriture()
+  const retour = `${PROFITS}?associe=${encodeURIComponent(String(donnees.get('retour_associe') ?? ''))}`
+  const associeId = await associeDuCompte(moi.id)
+  if (!associeId) redirect(avec(retour, 'erreur', 'Votre compte n’est lié à aucun associé.', '#partage'))
+  let r: string
+  try {
+    r = await approuverPartage(String(donnees.get('id') ?? ''), associeId)
+  } catch (e) {
+    redirect(avec(retour, 'erreur', messageErreur(e), '#partage'))
+  }
+  revalidatePath('/associes', 'layout')
+  redirect(avec(retour, 'message', r === 'applique' ? 'Nouveau partage appliqué, et inscrit au registre des décisions.' : 'Approbation enregistrée.', '#partage'))
+}
+
+export async function annulerPartageAction(donnees: FormData): Promise<void> {
+  await exigerEcriture()
+  const retour = `${PROFITS}?associe=${encodeURIComponent(String(donnees.get('retour_associe') ?? ''))}`
+  await annulerPartage(String(donnees.get('id') ?? ''))
+  revalidatePath('/associes', 'layout')
+  redirect(avec(retour, 'message', 'Proposition annulée.', '#partage'))
 }

@@ -198,9 +198,9 @@ export default async function PageAssocies({
           <section key={s.associe_id} className="carte p-5">
             <div className="flex items-baseline justify-between">
               <h2 className="text-base font-bold">{s.nom}</h2>
-              <span className="text-xs font-semibold text-[var(--color-encre-doux)]">
-                {pourcent(s.part * 100)} des profits
-              </span>
+              <a href="/associes/profits" className="text-xs font-semibold text-[var(--color-encre-doux)] hover:text-[var(--color-accent)]">
+                {pourcent(s.part * 100)} des profits aujourd’hui →
+              </a>
             </div>
 
             <dl className="mt-4 space-y-1.5 text-sm">
@@ -209,7 +209,7 @@ export default async function PageAssocies({
               <Ligne
                 libelle="Part de l’exercice en cours"
                 valeur={argent(s.part_profit_exercice_courant)}
-                aide="non attribuée tant que l’exercice n’est pas clos"
+                aide="selon le partage de chaque période ; non attribuée tant que l’exercice n’est pas clos"
               />
               <Ligne libelle="Prélèvements" valeur={`− ${argent(s.prelevements)}`} />
               <div className="!mt-3 border-t border-[var(--color-ligne)] pt-2">
@@ -315,7 +315,7 @@ export default async function PageAssocies({
         />
       </div>
 
-      <section className="carte p-5">
+      <section id="registre" className="carte scroll-mt-4 p-5">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <div>
             <h2 className="text-sm font-bold">Registre des décisions unanimes</h2>

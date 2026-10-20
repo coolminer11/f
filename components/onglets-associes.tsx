@@ -2,11 +2,12 @@ import Link from 'next/link'
 
 const ONGLETS = [
   ['/associes', 'Comptes et décisions'],
+  ['/associes/profits', 'Vos profits'],
   ['/associes/roles', 'Qui fait quoi'],
   ['/associes/convention', 'Convention'],
 ] as const
 
-/** Les trois volets de la section Associés. */
+/** Les volets de la section Associés. */
 export default function OngletsAssocies({ actif }: { actif: (typeof ONGLETS)[number][0] }) {
   return (
     <nav className="-mx-1 flex gap-1 overflow-x-auto border-b border-[var(--color-ligne)] print:hidden" aria-label="Associés">
