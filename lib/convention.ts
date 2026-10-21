@@ -96,99 +96,12 @@ export async function joindrePdf(conventionId: string, chemin: string | null): P
 // ---------------------------------------------------------------------------
 // L'ébauche de départ, remplie avec les vrais noms, parts et rôles.
 // ---------------------------------------------------------------------------
-/** Le nom du propriétaire du logiciel (le compte qui l'a conçu), pour les articles qui le concernent. */
-async function nomProprietaire(): Promise<string> {
-  const l = await requeteUne<{ nom: string }>(
-    `select coalesce(a.nom, u.nom) as nom from utilisateurs u left join associes a on a.id = u.associe_id
-      where u.proprietaire_logiciel order by u.cree_le limit 1`,
-  )
-  return l?.nom ?? '[nom]'
-}
-
-/**
- * Les articles sur le logiciel et Tapora Services, écrits pour être lus et
- * compris par les deux associés : c'est ce qui leur donne leur force.
- */
-export function articlesLogiciel(proprio: string) {
-  // « d’Arthur », mais « de Julien » : l’élision devant une voyelle ou un h muet.
-  const de = /^[aeiouyhàâäéèêëîïôöûüù]/i.test(proprio) ? `d’${proprio}` : `de ${proprio}`
-  return {
-    objet: `La société exploite aussi Tapora Services (menus numériques, appel du personnel, concierge de chambre, demandes en un tap, et les services semblables qui s’y ajouteront), avec le logiciel ${de} (article 8).`,
-    propriete: [
-      '## 8. Propriété intellectuelle',
-      '',
-      'Appartiennent à la société, à parts égales entre les associés :',
-      '- le site taporacards.com, son nom de domaine, ses textes et ses visuels ;',
-      '- la marque « Tapora Cards » et son logo ;',
-      '- la clientèle des cartes et les données de la société (comptabilité, factures, clients, statistiques), dans le respect des lois sur la protection des renseignements personnels.',
-      '',
-      `Appartiennent à ${proprio}, qui les a conçus et développés, avant comme après la signature :`,
-      '- le logiciel Tapora : le back-office, son code source, la structure de ses bases de données, ses outils, et toutes leurs versions présentes et futures ;',
-      '- Tapora Services : son logiciel, son nom, ses clients et ses contrats.',
-      '',
-      `Tant que la société existe avec ses associés actuels, ${proprio} lui accorde une licence gratuite d’utiliser le back-office et d’exploiter Tapora Services. Les revenus et les dépenses de Tapora Services sont alors ceux de la société et sont inscrits dans sa comptabilité, que chaque associé peut consulter. La gestion de Tapora Services est confiée à ${proprio} ; dans le back-office, son accès est réservé au compte ${de}.`,
-      '',
-      `La licence prend fin, et le logiciel comme Tapora Services (ses clients et ses contrats compris) reviennent entièrement à ${proprio}, sans indemnité, dans chacun de ces cas :`,
-      '- la dissolution de la société ;',
-      '- la vente ou la cession, par l’un ou l’autre des associés, de ses parts dans la société ;',
-      '- le départ, le retrait, l’exclusion, le décès ou l’invalidité d’un associé.',
-      '',
-      'Pour une transition, la société peut continuer d’utiliser le back-office pendant [90] jours après la fin de la licence, et chaque associé reçoit dans les [30] jours une copie complète des données de la société (comptabilité, factures, clients, statistiques) dans des formats courants (CSV, PDF).',
-      '',
-      'Le logiciel et Tapora Services n’entrent ni dans le prix de rachat des parts (articles 10 et 11) ni dans le partage à la dissolution (article 14).',
-    ].join('\n'),
-    concurrence: `Après la fin de la licence (article 8), l’exploitation de Tapora Services par ${proprio} n’est ni une concurrence au sens du présent article, ni une sollicitation des clients de la société.`,
-    dissolution: `Le logiciel et Tapora Services reviennent à ${proprio} (article 8). Le site, le nom de domaine, la marque « Tapora Cards » et les autres biens de la société se partagent à parts égales.`,
-  }
-}
-
-/** Le début et la fin d'un article « ## N. … » (jusqu'au suivant), ou null. */
-function bornesArticle(texte: string, numero: number): [number, number] | null {
-  const debut = texte.search(new RegExp(`^## ${numero}\\. `, 'm'))
-  if (debut < 0) return null
-  const suivant = texte.slice(debut + 3).search(/^## /m)
-  return [debut, suivant < 0 ? texte.length : debut + 3 + suivant]
-}
-
-/**
- * Une version existante, avec les articles sur le logiciel : l'article 8 est
- * remplacé, un paragraphe s'ajoute aux articles 1, 9 et 14. Le reste du
- * texte (vos chiffres, vos modifications) ne bouge pas.
- */
-export function avecArticlesLogiciel(texte: string, proprio: string): string {
-  if (texte.includes('Tapora Services')) return texte
-  const a = articlesLogiciel(proprio)
-  let t = texte
-  const huit = bornesArticle(t, 8)
-  t = huit ? `${t.slice(0, huit[0])}${a.propriete}\n\n${t.slice(huit[1])}` : `${t.trimEnd()}\n\n${a.propriete}\n`
-  const ajouts: [number, string][] = [
-    [1, a.objet],
-    [9, a.concurrence],
-    [14, a.dissolution],
-  ]
-  for (const [numero, paragraphe] of ajouts) {
-    const b = bornesArticle(t, numero)
-    if (!b) continue
-    t = `${t.slice(0, b[0])}${t.slice(b[0], b[1]).trimEnd()}\n\n${paragraphe}\n\n${t.slice(b[1])}`
-  }
-  return t.replace(/\n{3,}/g, '\n\n')
-}
-
-/** La version courante, avec les articles sur le logiciel ; null si elle les a déjà (ou s'il n'y a pas de convention). */
-export async function texteAvecArticlesLogiciel(): Promise<string | null> {
-  const c = await lireConvention()
-  if (!c || c.v.texte.includes('Tapora Services')) return null
-  return avecArticlesLogiciel(c.v.texte, await nomProprietaire())
-}
-
 export async function ebauche(): Promise<string> {
-  const [societe, membres, parts, proprio] = await Promise.all([
+  const [societe, membres, parts] = await Promise.all([
     emetteur(),
     equipe(),
     requete<{ nom: string; part: string }>(`select nom, part_en_vigueur(id, current_date) as part from associes where actif order by ordre`),
-    nomProprietaire(),
   ])
-  const art = articlesLogiciel(proprio)
   const noms = membres.map((m) => m.nom)
   const liste = (n: string[]) => (n.length <= 1 ? n.join('') : `${n.slice(0, -1).join(', ')} et ${n[n.length - 1]}`)
   const pct = (p: string) => String(Math.round(Number(p) * 1000) / 10).replace('.', ',')
@@ -209,8 +122,6 @@ Entre ${liste(noms)} (les « associés »), seuls associés de ${societe.nom_ent
 ## 1. Objet de la société
 
 La société conçoit et vend des cartes NFC et des codes QR qui aident les commerces à obtenir des avis Google, ainsi que les services qui les accompagnent : page de statistiques, rapports, notifications.
-
-${art.objet}
 
 ## 2. Apports
 
@@ -261,15 +172,17 @@ Exigent l’accord des deux associés, inscrit au registre des décisions du bac
 - un changement du prix des cartes ;
 - toute modification de la présente convention.
 
-${art.propriete}
+## 8. Propriété intellectuelle
+
+Le logiciel (back-office, site web, services en ligne), la marque Tapora, le logo, les visuels, les textes, la liste des clients et les données créés pour la société lui appartiennent, quel que soit l’associé qui les a créés. Chaque associé cède à la société les droits qu’il pourrait détenir sur ces créations et renonce à exercer ses droits moraux à leur égard, dans la mesure permise par la loi.
+
+Leur valeur est prise en compte dans le prix de rachat des parts (article 10).
 
 ## 9. Confidentialité et non-concurrence
 
 Chaque associé garde confidentiels les renseignements de la société et de ses clients, pendant qu’il est associé et après son départ.
 
 Pendant qu’il est associé et [12] mois après son départ, un associé ne peut exploiter, au Québec, une entreprise de cartes ou de solutions d’avis en ligne qui fait concurrence à la société, ni en solliciter les clients.
-
-${art.concurrence}
 
 ## 10. Départ d’un associé
 
@@ -298,8 +211,6 @@ Les associés tentent d’abord de régler un différend entre eux. À défaut, 
 ## 14. Durée et dissolution
 
 La convention dure aussi longtemps que la société. En cas de dissolution, les dettes sont payées, les comptes courants remboursés, puis le reste est partagé selon les comptes de capital et le partage de l’article 4.
-
-${art.dissolution}
 
 ## 15. Signatures
 

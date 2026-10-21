@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import { exigerEcriture } from '@/lib/auth'
 import { associeDuCompte, enregistrerRole, enregistrerSemaine, estMesure, type SaisieRole } from '@/lib/equipe'
-import { approuver, ebauche, enregistrerTexte, joindrePdf, lireConvention, texteAvecArticlesLogiciel } from '@/lib/convention'
+import { approuver, ebauche, enregistrerTexte, joindrePdf, lireConvention } from '@/lib/convention'
 import { televerserRecu } from '@/lib/stockage'
 import { annulerPartage, approuverPartage, proposerPartage } from '@/lib/profits'
 import { listerAssocies } from '@/lib/requetes/associes'
@@ -101,21 +101,6 @@ export async function creerEbaucheAction(): Promise<void> {
   await enregistrerTexte(await ebauche(), moi.id)
   revalidatePath(CONVENTION)
   redirect(avec(CONVENTION, 'message', 'Ébauche créée. Discutez les chiffres entre crochets, puis approuvez chacun de votre côté.'))
-}
-
-/**
- * Les articles sur le logiciel et Tapora Services, ajoutés à la version
- * courante : c'est une NOUVELLE version, que chaque associé lit et approuve
- * depuis son propre compte, comme toute modification.
- */
-export async function articlesLogicielAction(): Promise<void> {
-  const moi = await exigerEcriture()
-  if (!moi.proprietaire_logiciel) redirect(avec(CONVENTION, 'erreur', 'Seul le propriétaire du logiciel propose ces articles.'))
-  const texte = await texteAvecArticlesLogiciel()
-  if (!texte) redirect(avec(CONVENTION, 'message', 'La convention contient déjà ces articles.'))
-  const version = await enregistrerTexte(texte!, moi.id)
-  revalidatePath(CONVENTION)
-  redirect(avec(CONVENTION, 'message', `Version ${version} créée : articles 1, 8, 9 et 14 sur le logiciel et Tapora Services. Les deux associés la lisent et l’approuvent, chacun de son côté.`))
 }
 
 export async function enregistrerTexteAction(donnees: FormData): Promise<void> {

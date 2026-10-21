@@ -651,14 +651,10 @@ modification de texte se fait dans les deux fichiers ; les balises
 
 ## 17. Tapora Services (menus vivants, appel du serveur, concierge de chambre)
 
-- **À qui :** le logiciel et Tapora Services appartiennent à Arthur
-  (convention d'associés, article 8, à faire approuver par les deux
-  associés). La société les utilise tant qu'elle existe avec ses associés
-  actuels ; les revenus de Services sont inscrits dans sa comptabilité. Dans
-  le back-office, **seul le compte d'Arthur** voit la section « ✦ Services »
-  (colonne `utilisateurs.proprietaire_logiciel`, réglée par la migration
-  `20261021000100`, jamais depuis l'app) ; pour tout autre compte, les pages
-  n'existent pas (404).
+- **Accès :** dans le back-office, **seul le compte d'Arthur** voit la
+  section « ✦ Services » (colonne `utilisateurs.proprietaire_logiciel`,
+  réglée par la migration `20261021000100`, jamais depuis l'app) ; pour tout
+  autre compte, les pages n'existent pas (404).
 - **Pour les clients d'un établissement** (`go.taporacards.com/s/<code>`) :
   chaque table ou chambre a son code (carte NFC ou QR). Menu dans toutes les
   langues de l'établissement (français d'abord), plat du jour, appel du

@@ -9,7 +9,7 @@ import OngletsAssocies from '@/components/onglets-associes'
 import DocumentConvention from '@/components/document-convention'
 import BoutonImprimer from '@/components/bouton-imprimer'
 import BoutonEnvoi from '@/components/bouton-envoi'
-import { approuverAction, articlesLogicielAction, creerEbaucheAction, enregistrerTexteAction, joindrePdfAction } from '@/app/associes/actions'
+import { approuverAction, creerEbaucheAction, enregistrerTexteAction, joindrePdfAction } from '@/app/associes/actions'
 
 export const dynamic = 'force-dynamic'
 export const metadata: Metadata = { title: 'Convention d’associés — Tapora' }
@@ -88,22 +88,6 @@ export default async function PageConvention({ searchParams }: { searchParams: P
           <BoutonImprimer petit />
         </div>
       </div>
-
-      {courante && ecriture && moi.proprietaire_logiciel && !v.texte.includes('Tapora Services') && (
-        <section className="carte flex flex-wrap items-center justify-between gap-3 border-[var(--color-accent)] bg-[var(--color-accent-doux)] px-5 py-4 print:hidden">
-          <div className="min-w-0 max-w-2xl">
-            <p className="font-semibold">Articles à ajouter : le logiciel et Tapora Services</p>
-            <p className="mt-0.5 text-sm text-[var(--color-encre-doux)]">
-              L’article 8 actuel donne le logiciel à la société. La mise à jour : le back-office et Tapora Services vous appartiennent, la société
-              les utilise tant qu’elle existe avec ses associés actuels, et ils vous reviennent à la dissolution ou si l’un de vous vend ses parts.
-              Le site, le domaine et la marque Tapora Cards restent à parts égales. Une nouvelle version : Julien la lit et l’approuve de son côté.
-            </p>
-          </div>
-          <form action={articlesLogicielAction}>
-            <BoutonEnvoi attente="Mise à jour…">Créer la nouvelle version</BoutonEnvoi>
-          </form>
-        </section>
-      )}
 
       {!courante && (
         <p className="carte flex flex-wrap items-center justify-between gap-2 px-4 py-3 text-sm print:hidden">
