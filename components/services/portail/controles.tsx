@@ -9,6 +9,8 @@ import { toast } from '@/components/effets/toasts'
 import { vibrer } from '@/components/effets/desintegration'
 import Fenetre from '@/components/effets/fenetre'
 import { TEXTES_PORTAIL, type LanguePortail } from '@/components/services/portail/textes'
+import type { EtatGerant } from '@/lib/services/acces'
+import Link from 'next/link'
 
 type Etat = 'repos' | 'envoi' | 'ok' | 'erreur'
 
@@ -45,6 +47,7 @@ export default function Controles({
   annonces,
   plats,
   accueil,
+  gerant = 'absent',
 }: {
   jeton: string
   l: LanguePortail
@@ -56,6 +59,8 @@ export default function Controles({
   annonces: Annonce[]
   plats: PlatDispo[]
   accueil: Texte
+  /** Avec un mode gérant, les annonces se créent et se modifient dans son onglet. */
+  gerant?: EtatGerant
 }) {
   // La langue principale d'abord, puis les autres.
   const ordre = useMemo(() => [langueDefaut, ...langues.filter((c) => c !== langueDefaut)], [langues, langueDefaut])
@@ -64,14 +69,14 @@ export default function Controles({
       <div className="cascade space-y-5">
         <PlatDuJour jeton={jeton} l={l} langues={ordre} aujourdhui={aujourdhui} plat={plat} />
         <Accueil jeton={jeton} l={l} langues={ordre} accueil={accueil} />
-        <Annonces jeton={jeton} l={l} langueDefaut={langueDefaut} annonces={annonces} />
+        <Annonces jeton={jeton} l={l} langueDefaut={langueDefaut} annonces={annonces} gerant={gerant} />
       </div>
       <Epuises jeton={jeton} l={l} langueDefaut={langueDefaut} plats={plats} />
     </div>
   )
 }
 
-function EnTete({ emoji, titre, sous, droite }: { emoji: string; titre: string; sous: string; droite?: React.ReactNode }) {
+export function EnTete({ emoji, titre, sous, droite }: { emoji: string; titre: string; sous: string; droite?: React.ReactNode }) {
   return (
     <div className="flex items-start justify-between gap-4">
       <div className="flex min-w-0 gap-3">
@@ -442,7 +447,7 @@ function EditeurPlat({
 // Message d'accueil
 // ---------------------------------------------------------------------------
 
-function Accueil({ jeton, l, langues, accueil }: { jeton: string; l: LanguePortail; langues: string[]; accueil: Texte }) {
+export function Accueil({ jeton, l, langues, accueil }: { jeton: string; l: LanguePortail; langues: string[]; accueil: Texte }) {
   const T = TEXTES_PORTAIL[l]
   const [champs, setChamps] = useState(() => versChamps(accueil, langues))
   const [langue, setLangue] = useState(langues[0])
@@ -499,7 +504,7 @@ function Accueil({ jeton, l, langues, accueil }: { jeton: string; l: LanguePorta
 // Annonces
 // ---------------------------------------------------------------------------
 
-function Annonces({ jeton, l, langueDefaut, annonces }: { jeton: string; l: LanguePortail; langueDefaut: string; annonces: Annonce[] }) {
+function Annonces({ jeton, l, langueDefaut, annonces, gerant }: { jeton: string; l: LanguePortail; langueDefaut: string; annonces: Annonce[]; gerant: EtatGerant }) {
   const T = TEXTES_PORTAIL[l]
   const [actifs, setActifs] = useState<Record<string, boolean>>(() => Object.fromEntries(annonces.map((a) => [a.id, a.actif])))
 
@@ -521,7 +526,18 @@ function Annonces({ jeton, l, langueDefaut, annonces }: { jeton: string; l: Lang
 
   return (
     <section className="pt-carte p-5 sm:p-6">
-      <EnTete emoji="📣" titre={T.autresAnnonces} sous={T.autresAnnoncesSous} />
+      <EnTete
+        emoji="📣"
+        titre={T.autresAnnonces}
+        sous={T.autresAnnoncesSous}
+        droite={
+          gerant !== 'absent' && (
+            <Link href={`/service/${jeton}?v=annonces`} prefetch={false} className="pt-bouton-fantome shrink-0 !py-2 text-xs text-[var(--p-or)]">
+              ✦ {T.gerant.gererAnnonces} →
+            </Link>
+          )
+        }
+      />
       {annonces.length === 0 ? (
         <p className="pt-carte-plate mt-5 px-4 py-5 text-center text-sm text-[var(--p-doux)]">{T.aucuneAnnonce}</p>
       ) : (

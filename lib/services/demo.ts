@@ -374,5 +374,101 @@ export async function creerDemo(type: TypeEtablissement): Promise<string> {
   for (const etage of [1, 2, 3]) await creerEmplacements(id, { prefixe: 'Chambre', de: etage * 100 + 1, a: etage * 100 + 5, type: 'chambre', groupe: `${etage}${etage === 1 ? 'er' : 'e'} étage` })
   await creerEmplacements(id, { prefixe: 'Lobby', de: 1, a: 1, type: 'zone', groupe: 'Rez-de-chaussée' })
   await semerActivite(id, type, plats, rubriqueIds)
+  await semerCommandes(id, rs)
   return id
+}
+
+/**
+ * Trente jours de service aux chambres : des commandes de 1 à 4 plats, aux
+ * heures des repas, livrées en 15 à 40 minutes ; quelques précisions, de
+ * rares annulations. Les noms sont gardés en français, et dans la langue du
+ * client quand il lisait en anglais ou en espagnol.
+ */
+async function semerCommandes(etabId: string, menuId: string): Promise<void> {
+  const plats = await requete<{ id: string; nom: Texte; prix: number | null; variantes: { nom: Texte; prix: number | null }[] }>(
+    `select i.id, i.nom, i.prix::float8 as prix, i.variantes from menu_items i join menu_sections s on s.id = i.section_id
+      where s.menu_id = $1::uuid and i.disponible`,
+    [menuId],
+  )
+  const chambres = await requete<{ id: string }>(`select id from emplacements where etablissement_id = $1::uuid and type = 'chambre'`, [etabId])
+  if (!plats.length || !chambres.length) return
+  const heures: [number, number][] = [[7, 8], [8, 9], [9, 4], [12, 4], [13, 2], [18, 4], [19, 6], [20, 7], [21, 6], [22, 4]]
+  const langues: ['fr' | 'en' | 'es', number][] = [['fr', 58], ['en', 34], ['es', 8]]
+  const NOTES_PLAT = ['Sans oignons', 'Sauce à part', 'Bien cuit', 'Sans glace', 'Lait d’avoine']
+  const NOTES = ['Deux ustensiles, svp', 'Frappez doucement, bébé qui dort', 'Avec du ketchup', 'Une bouteille d’eau en plus']
+  const PERSONNEL = ['Marie', 'Alex', 'Samuel', 'Léa', 'Karim']
+  const lignes: { e: string; l: string; statut: string; par: string | null; t: string; prise: number; faite: number; details: string; total: number; note: string | null }[] = []
+  for (let jour = 29; jour >= 0; jour--) {
+    const ymd = new Date(Date.now() - jour * 86_400_000).toLocaleDateString('en-CA', { timeZone: 'America/Toronto' })
+    const finSemaine = [0, 5, 6].includes(new Date(`${ymd}T12:00:00Z`).getUTCDay())
+    const n = 3 + hasard(5) + (finSemaine ? 3 : 0)
+    for (let k = 0; k < n; k++) {
+      const h = pondere(heures)
+      const t = instant(ymd, h, hasard(60), hasard(60))
+      if (t.getTime() > Date.now() - 3600_000) continue
+      const l = pondere(langues)
+      const choisis = new Map<string, { quantite: number; v: number | null; note: string | null }>()
+      for (let i = 0, nb = 1 + hasard(Math.random() < 0.7 ? 2 : 4); i < nb; i++) {
+        const p = choisir(plats)
+        const v = p.variantes?.length ? hasard(p.variantes.length) : null
+        const cle = `${p.id}:${v ?? ''}`
+        const avant = choisis.get(cle)
+        choisis.set(cle, { quantite: (avant?.quantite ?? 0) + (Math.random() < 0.8 ? 1 : 2), v, note: avant?.note ?? (Math.random() < 0.08 ? choisir(NOTES_PLAT) : null) })
+      }
+      const details = [...choisis.entries()].map(([cle, x]) => {
+        const p = plats.find((y) => y.id === cle.split(':')[0])!
+        const v = x.v !== null ? p.variantes[x.v] : null
+        const nom = p.nom.fr ?? ''
+        const nomClient = l !== 'fr' ? (p.nom[l] ?? null) : null
+        return {
+          plat_id: p.id,
+          nom,
+          nom_client: nomClient && nomClient !== nom ? nomClient : null,
+          variante: v ? (v.nom.fr ?? null) : null,
+          variante_client: v && l !== 'fr' && v.nom[l] && v.nom[l] !== v.nom.fr ? v.nom[l] : null,
+          prix: v?.prix ?? p.prix ?? null,
+          quantite: x.quantite,
+          note: x.note,
+        }
+      })
+      const total = Math.round(details.reduce((s2, d) => s2 + (d.prix ?? 0) * d.quantite, 0) * 100) / 100
+      const annulee = Math.random() < 0.03
+      const prise = 25 + hasard(240)
+      lignes.push({
+        e: choisir(chambres).id,
+        l,
+        statut: annulee ? 'annulee' : 'faite',
+        par: annulee ? null : choisir(PERSONNEL),
+        t: t.toISOString(),
+        prise: annulee ? 0 : prise,
+        faite: annulee ? 0 : prise + 900 + hasard(1500),
+        details: JSON.stringify(details),
+        total,
+        note: Math.random() < 0.12 ? choisir(NOTES) : null,
+      })
+    }
+  }
+  if (!lignes.length) return
+  await requete(
+    `insert into demandes_service (etablissement_id, emplacement_id, type_id, cle, libelle, note, langue, statut, prise_par, cree_le, prise_le, faite_le, details, total)
+     select $1::uuid, e, null, 'commande', 'Commande', n, l, s, par, t,
+            case when s = 'faite' then t + make_interval(secs => p) end,
+            case when s = 'faite' then t + make_interval(secs => f) end,
+            d::jsonb, tot
+       from unnest($2::uuid[], $3::text[], $4::text[], $5::text[], $6::timestamptz[], $7::int[], $8::int[], $9::text[], $10::numeric[], $11::text[])
+            as x(e, l, s, par, t, p, f, d, tot, n)`,
+    [
+      etabId,
+      lignes.map((x) => x.e),
+      lignes.map((x) => x.l),
+      lignes.map((x) => x.statut),
+      lignes.map((x) => x.par),
+      lignes.map((x) => x.t),
+      lignes.map((x) => x.prise),
+      lignes.map((x) => x.faite),
+      lignes.map((x) => x.details),
+      lignes.map((x) => x.total),
+      lignes.map((x) => x.note),
+    ],
+  )
 }

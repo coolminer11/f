@@ -24,7 +24,8 @@ export default function Confidentialite() {
       <p>
         « Tapora back-office » est l’outil de gestion interne de Tapora S.E.N.C. : comptabilité,
         facturation et reçus de vente. Il est réservé aux associés de la société et n’est pas
-        offert au public.
+        offert au public. Tapora Services, que la société offre aux restaurants et aux hôtels,
+        est décrit <a href="#services" className="underline">plus bas</a>.
       </p>
 
       <h2 className="pt-2 font-semibold">Accès au compte Gmail</h2>
@@ -41,6 +42,35 @@ export default function Confidentialite() {
         documents de vente, et à tenir les registres comptables que la loi impose. Ils ne sont ni
         vendus, ni partagés, ni utilisés à des fins publicitaires. Ils sont hébergés au Canada
         (Supabase, région ca-central-1) et conservés le temps exigé par les lois fiscales.
+      </p>
+
+      <h2 className="pt-4 font-semibold" id="services">Tapora Services : menus, appels et concierge</h2>
+      <p>
+        Tapora Services est la page qui s’ouvre quand vous touchez la carte ou scannez le code d’une
+        table ou d’une chambre, chez un restaurant ou un hôtel client de Tapora. Elle ne demande ni
+        compte, ni nom, ni courriel, ni téléphone, ni carte de paiement.
+      </p>
+      <p>Ce qui est enregistré :</p>
+      <ul className="list-disc space-y-1 pl-5">
+        <li>la table ou la chambre, la langue choisie et les pages consultées (menu, plats, concierge), pour les statistiques de l’établissement ;</li>
+        <li>vos demandes (par exemple « Appeler le serveur ») et vos commandes : leur contenu, la précision que vous écrivez, l’heure, et le prénom de la personne de l’équipe qui s’en est occupée ;</li>
+        <li>la note et le commentaire que vous choisissez de laisser ;</li>
+        <li>une empreinte chiffrée de votre adresse IP (jamais l’adresse elle-même), seulement pour freiner les abus, effacée après 30 jours.</li>
+      </ul>
+      <p>
+        Votre téléphone garde votre choix de langue et votre panier ; un témoin compte une visite au
+        plus toutes les 30 minutes. Si vous choisissez de laisser un avis sur Google, vous passez sur
+        le site de Google, sans que l’adresse de la page lui soit transmise.
+      </p>
+      <p>
+        Ces renseignements sont vus par l’établissement (son équipe, dans son portail) et par Tapora,
+        qui fait fonctionner le service. Ils ne sont ni vendus, ni partagés, ni utilisés à des fins
+        publicitaires. Les statistiques de visite sont effacées après 13 mois ; les demandes, les
+        commandes et les avis, après 25 mois.
+      </p>
+      <p>
+        Les données sont hébergées au Canada (Supabase, région ca-central-1). Le serveur de
+        l’application (Render, Ohio, États-Unis) traite chaque demande au passage, sans la conserver.
       </p>
 
       <h2 className="pt-2 font-semibold">Vos droits</h2>

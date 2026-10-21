@@ -32,10 +32,21 @@ export function toast(titre: string, options: { texte?: string; ton?: Ton; duree
 
 const ICONES: Record<Ton, string> = { succes: '✓', info: 'i', alerte: '!', erreur: '×' }
 
+// Le bouton « Fermer » parle la langue de la page : celle d'un client de
+// Tapora Services (attribut lang de son cadre), sinon le français.
+const FERMER: Record<string, string> = { fr: 'Fermer', en: 'Close', es: 'Cerrar', de: 'Schließen', it: 'Chiudi', pt: 'Fechar', zh: '关闭', ja: '閉じる', ko: '닫기', ar: 'إغلاق' }
+function libelleFermer(el: Element | null): string {
+  const langue = el?.closest('[lang]')?.getAttribute('lang') ?? document.querySelector('.theme-services[lang]')?.getAttribute('lang') ?? 'fr'
+  return FERMER[langue.slice(0, 2)] ?? FERMER.fr
+}
+
 function Un({ t, fermer }: { t: Toast; fermer: (id: number) => void }) {
   const ref = useRef<HTMLDivElement>(null)
   const [pause, setPause] = useState(false)
+  const [libelle, setLibelle] = useState('Fermer')
   const depart = useRef<number | null>(null)
+
+  useEffect(() => setLibelle(libelleFermer(ref.current)), [])
 
   useEffect(() => {
     if (pause) return
@@ -70,7 +81,7 @@ function Un({ t, fermer }: { t: Toast; fermer: (id: number) => void }) {
         <p className="toast-titre">{t.titre}</p>
         {t.texte && <p className="toast-texte">{t.texte}</p>}
       </div>
-      <button type="button" onClick={() => void chasser()} className="toast-fermer" aria-label="Fermer">
+      <button type="button" onClick={() => void chasser()} className="toast-fermer" aria-label={libelle}>
         ×
       </button>
       <span className="toast-temps" style={{ animationDuration: `${t.duree}ms`, animationPlayState: pause ? 'paused' : 'running' }} aria-hidden />

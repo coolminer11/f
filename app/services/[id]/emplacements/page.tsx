@@ -6,6 +6,7 @@ import { baseCartesAffichee } from '@/lib/cartes-url'
 import BoutonEnvoi from '@/components/bouton-envoi'
 import BoutonCopier from '@/components/bouton-copier'
 import Cache from '@/components/services/bo/cache'
+import Triable, { FlechesTri, PoigneeTri } from '@/components/services/bo/triable'
 import Confirmer from '@/components/services/bo/confirmer'
 import BoutonFenetre from '@/components/services/bo/bouton-fenetre'
 import Chiffre from '@/components/services/bo/chiffre'
@@ -14,7 +15,6 @@ import {
   basculerEmplacementAction,
   creerEmplacementAction,
   creerEmplacementsAction,
-  deplacerEmplacementAction,
   modifierEmplacementAction,
   supprimerEmplacementAction,
 } from '../../actions'
@@ -154,14 +154,14 @@ export default async function Emplacements({ params }: { params: Promise<{ id: s
                 ) : undefined
               }
             >
-              <ul className="divide-y divide-[var(--color-ligne)]">
-                {membres.map((l) => {
-                  const k = lieux.findIndex((x) => x.id === l.id)
+              <Triable quoi="emplacements" etab={e.id} as="ul" className="divide-y divide-[var(--color-ligne)]" libelle={`Emplacements · ${g || 'sans groupe'}`}>
+                {membres.map((l, k) => {
                   const url = `${base}/s/${l.code}`
                   return (
-                    <li key={l.id} data-ligne id={`lieu-${l.id}`} className={`scroll-mt-24 py-2 ${l.actif ? '' : 'opacity-60'}`}>
+                    <li key={l.id} data-ligne data-tri-id={l.id} id={`lieu-${l.id}`} className={`scroll-mt-24 py-2 ${l.actif ? '' : 'opacity-60'}`}>
                       <form action={modifierEmplacementAction} className="flex flex-wrap items-center gap-2">
                         <Cache etab={e.id} retour={ici} ancre={`lieu-${l.id}`} id={l.id} />
+                        <PoigneeTri libelle={`Déplacer « ${l.libelle} »`} className="-ml-1" />
                         <span className="w-6 text-center text-base" aria-hidden>
                           {TYPES.find(([v]) => v === l.type)?.[2]}
                         </span>
@@ -193,12 +193,8 @@ export default async function Emplacements({ params }: { params: Promise<{ id: s
                           >
                             {l.actif ? <span className="text-[var(--color-positif)]">● Actif</span> : <span className="text-[var(--color-encre-doux)]">○ Inactif</span>}
                           </button>
-                          <button formAction={deplacerEmplacementAction} name="sens" value="-1" disabled={k === 0} className={petitBouton} title="Monter">
-                            ↑
-                          </button>
-                          <button formAction={deplacerEmplacementAction} name="sens" value="1" disabled={k === lieux.length - 1} className={petitBouton} title="Descendre">
-                            ↓
-                          </button>
+                          {/* Dans son groupe : ↑ / ↓ ne sautent plus d'un groupe à l'autre. */}
+                          <FlechesTri premier={k === 0} dernier={k === membres.length - 1} className={petitBouton} />
                           <Confirmer
                             action={supprimerEmplacementAction}
                             poussiere
@@ -213,7 +209,7 @@ export default async function Emplacements({ params }: { params: Promise<{ id: s
                     </li>
                   )
                 })}
-              </ul>
+              </Triable>
               {!membres.some((x) => x.actif) && (
                 <p className="mt-2">
                   <Pastille>Tout le groupe est désactivé</Pastille>

@@ -15,6 +15,20 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://taporacards.com/"/>
   </url>
   <url>
+    <loc>https://taporacards.com/services</loc>
+    <lastmod>2026-10-21</lastmod><changefreq>weekly</changefreq><priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://taporacards.com/services"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://taporacards.com/en/services"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://taporacards.com/services"/>
+  </url>
+  <url>
+    <loc>https://taporacards.com/en/services</loc>
+    <lastmod>2026-10-21</lastmod><changefreq>weekly</changefreq><priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://taporacards.com/services"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://taporacards.com/en/services"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://taporacards.com/services"/>
+  </url>
+  <url>
     <loc>https://taporacards.com/guides/</loc>
     <lastmod>2026-10-20</lastmod><changefreq>weekly</changefreq><priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="fr-CA" href="https://taporacards.com/guides/"/>

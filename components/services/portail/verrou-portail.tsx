@@ -8,10 +8,27 @@ type Erreur = 'faux' | 'bloque' | 'invalide'
 
 /**
  * L'écran du portail protégé : un mauvais mot de passe secoue la carte, le
- * bon ouvre le cadenas, puis le portail apparaît.
+ * bon ouvre le cadenas, puis le portail apparaît. Le même écran ouvre le
+ * mode gérant (`mode="gerant"`), avec le mot de passe du gérant.
  */
-export default function VerrouPortail({ jeton, nom, l }: { jeton: string; nom: string; l: LanguePortail }) {
+export default function VerrouPortail({
+  jeton,
+  nom,
+  l,
+  mode = 'portail',
+  suite,
+}: {
+  jeton: string
+  nom: string
+  l: LanguePortail
+  mode?: 'portail' | 'gerant'
+  /** Où aller une fois ouvert (par défaut, la file). */
+  suite?: string
+}) {
   const T = TEXTES_PORTAIL[l]
+  const G = T.gerant
+  const gerant = mode === 'gerant'
+  const idChamp = gerant ? 'mdp-gerant' : 'mdp-portail'
   const [erreur, setErreur] = useState<Erreur | null>(null)
   const [enCours, setEnCours] = useState(false)
   const [ouvert, setOuvert] = useState(false)
@@ -24,7 +41,7 @@ export default function VerrouPortail({ jeton, nom, l }: { jeton: string; nom: s
     setEnCours(true)
     let etat = 'invalide'
     try {
-      const r = await fetch(`/service/${jeton}/deverrouiller`, { method: 'POST', body: new FormData(e.currentTarget) })
+      const r = await fetch(`/service/${jeton}/${gerant ? 'gerant' : 'deverrouiller'}`, { method: 'POST', body: new FormData(e.currentTarget) })
       etat = (await r.json()).etat
     } catch {
       etat = 'invalide'
@@ -34,9 +51,10 @@ export default function VerrouPortail({ jeton, nom, l }: { jeton: string; nom: s
       setErreur(null)
       setOuvert(true)
       vibrer(20)
-      setTimeout(() => window.location.replace(`/service/${jeton}`), matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 750)
+      setTimeout(() => window.location.replace(suite ?? `/service/${jeton}`), matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 750)
       return
     }
+    // « absent » (plus de mot de passe de gérant) se lit comme un lien qui ne sert plus.
     setErreur(etat === 'faux' || etat === 'bloque' ? etat : 'invalide')
     setSecousses((n) => n + 1)
     vibrer([30, 40, 30])
@@ -44,7 +62,7 @@ export default function VerrouPortail({ jeton, nom, l }: { jeton: string; nom: s
   }
 
   return (
-    <main className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center py-6">
+    <main className={`mx-auto flex max-w-md flex-col justify-center py-6 ${gerant ? 'min-h-[50vh]' : 'min-h-[70vh]'}`}>
       <div
         key={secousses}
         className={`pt-carte pt-verrou fond-maillage reflet-premium relative overflow-hidden p-7 sm:p-9 ${secousses ? 'pt-secoue' : ''} ${ouvert ? 'pt-ouvert' : ''}`}
@@ -60,17 +78,17 @@ export default function VerrouPortail({ jeton, nom, l }: { jeton: string; nom: s
             <path d="M12 15v2" />
           </svg>
         </span>
-        <p className="pt-surtitre mt-6">{T.verrouTitre}</p>
+        <p className="pt-surtitre mt-6">{gerant ? `✦ ${G.verrouTitre}` : T.verrouTitre}</p>
         <h1 className="titre-portail mt-2 text-3xl font-medium leading-tight">{nom}</h1>
-        <p className="mt-2 text-[var(--p-doux)]">{T.verrouSous}</p>
+        <p className="mt-2 text-[var(--p-doux)]">{gerant ? G.verrouSous : T.verrouSous}</p>
         <form onSubmit={envoyer} className="mt-6 space-y-3">
-          <label className="pt-etiquette" htmlFor="mdp-portail">
+          <label className="pt-etiquette" htmlFor={idChamp}>
             {T.motDePasse}
           </label>
           <div className="relative">
             <input
               ref={champ}
-              id="mdp-portail"
+              id={idChamp}
               name="mot_de_passe"
               type={visible ? 'text' : 'password'}
               required
@@ -79,7 +97,7 @@ export default function VerrouPortail({ jeton, nom, l }: { jeton: string; nom: s
               maxLength={200}
               disabled={ouvert}
               aria-invalid={erreur ? true : undefined}
-              aria-describedby={erreur ? 'mdp-portail-erreur' : undefined}
+              aria-describedby={erreur ? `${idChamp}-erreur` : undefined}
               className={`pt-champ !py-3 !pr-12 text-base tracking-wide ${erreur ? '!border-[var(--p-rouge)]' : ''}`}
             />
             <button
@@ -96,14 +114,14 @@ export default function VerrouPortail({ jeton, nom, l }: { jeton: string; nom: s
               </svg>
             </button>
           </div>
-          <p id="mdp-portail-erreur" role="alert" className={`min-h-5 text-sm font-medium text-[var(--p-rouge)] transition-opacity ${erreur ? 'opacity-100' : 'opacity-0'}`}>
+          <p id={`${idChamp}-erreur`} role="alert" className={`min-h-5 text-sm font-medium text-[var(--p-rouge)] transition-opacity ${erreur ? 'opacity-100' : 'opacity-0'}`}>
             {erreur ? T[erreur] : ''}
           </p>
           <button disabled={enCours || ouvert} className={`pt-bouton pt-bouton-grand w-full ${ouvert ? 'pt-bouton-vert' : ''}`}>
-            {ouvert ? `✓ ${T.ouvert}` : enCours ? T.verification : T.ouvrir}
+            {ouvert ? `✓ ${gerant ? G.ouvert : T.ouvert}` : enCours ? T.verification : gerant ? G.ouvrir : T.ouvrir}
           </button>
         </form>
-        <p className="mt-5 text-xs text-[var(--p-doux)]">{T.oubli}</p>
+        <p className="mt-5 text-xs text-[var(--p-doux)]">{gerant ? G.oubli : T.oubli}</p>
       </div>
     </main>
   )

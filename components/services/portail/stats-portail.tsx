@@ -5,6 +5,7 @@ import { CarteChaleur, GraphiqueColonnes, GraphiqueLignes } from '@/components/g
 import Inclinaison from '@/components/effets/inclinaison'
 import { TEXTES_PORTAIL, type LanguePortail } from '@/components/services/portail/textes'
 import Chiffre, { type GenreChiffre } from '@/components/services/portail/chiffre'
+import MontantAnime from '@/components/effets/montant'
 
 export const PERIODES = [7, 30, 90] as const
 export type Periode = (typeof PERIODES)[number]
@@ -189,6 +190,57 @@ export default function StatsPortail({
               </Carte>
             )}
           </div>
+
+          {/* ---- Les commandes (à la table, service aux chambres) */}
+          {(s.commandes > 0 || s.commandesPrec > 0) && (
+            <Carte
+              titre={l === 'fr' ? (type === 'hotel' ? 'Service aux chambres' : 'Commandes') : type === 'hotel' ? 'Room service' : 'Orders'}
+              sous={l === 'fr' ? 'Aux prix du menu, annulations exclues.' : 'At menu prices, cancellations excluded.'}
+            >
+              <div className="grid grid-cols-3 gap-3">
+                <div className="rounded-2xl bg-[var(--p-surface-2)] p-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--p-doux)]">{l === 'fr' ? 'Commandes' : 'Orders'}</p>
+                  <p className="pt-valeur mt-1 text-[1.9rem]">
+                    <Chiffre valeur={s.commandes} l={l} />
+                  </p>
+                  {(() => {
+                    const d = variation(s.commandes, s.commandesPrec)
+                    return typeof d === 'number' ? (
+                      <p className={`text-xs font-semibold ${d > 0 ? 'pt-hausse' : d < 0 ? 'pt-baisse' : 'text-[var(--p-faible)]'}`}>
+                        {d > 0 ? '↑ ' : d < 0 ? '↓ ' : ''}
+                        {d === 0 ? T.stable : T.vsAvant(d)}
+                      </p>
+                    ) : null
+                  })()}
+                </div>
+                <div className="reflet-premium rounded-2xl bg-[var(--p-surface-2)] p-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--p-doux)]">{l === 'fr' ? 'Ventes' : 'Sales'}</p>
+                  <p className="pt-valeur mt-1 text-[1.6rem] text-[var(--accent)]">
+                    <MontantAnime valeur={s.ventesCommandes} />
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-[var(--p-surface-2)] p-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--p-doux)]">{l === 'fr' ? 'Panier moyen' : 'Average order'}</p>
+                  <p className="pt-valeur mt-1 text-[1.6rem]">{s.panierMoyen === null ? '—' : <MontantAnime valeur={s.panierMoyen} />}</p>
+                </div>
+              </div>
+              {s.topCommandes.length > 0 && (
+                <ul className="mt-5 grid gap-x-8 gap-y-3 md:grid-cols-2">
+                  {s.topCommandes.map((x, i) => (
+                    <Ligne
+                      key={x.id}
+                      icone={String(i + 1)}
+                      libelle={x.nom}
+                      valeur={`${n.format(x.quantite)} ×`}
+                      sous={x.ventes ? new Intl.NumberFormat(locale(l), { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(x.ventes) : undefined}
+                      pct={x.quantite / Math.max(1, ...s.topCommandes.map((y) => y.quantite))}
+                      rang
+                    />
+                  ))}
+                </ul>
+              )}
+            </Carte>
+          )}
 
           {/* Un hôtel avec room service : les plats aussi. */}
           {type === 'hotel' && s.topRubriques.length > 0 && s.topPlats.length > 0 && (

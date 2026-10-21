@@ -61,6 +61,9 @@ function Pied({ langue }: { langue: string }) {
           {ui(langue, 'propulse')} <strong>Tapora</strong>
         </span>
       </a>
+      <a href="/confidentialite#services" target="_blank" rel="noopener noreferrer">
+        {ui(langue, 'confidentialite')}
+      </a>
     </footer>
   )
 }

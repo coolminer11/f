@@ -3,9 +3,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import Compteur from '@/components/effets/compteur'
+import { vibrer } from '@/components/effets/desintegration'
+import { toast } from '@/components/effets/toasts'
 import { useLieu } from './contexte'
 import Feuille from './feuille'
-import { balise, mouvementReduit, remplir, sansAccents } from './outils'
+import { SuiviEnCours } from './demande'
+import { BarrePanier, FeuillePanier, Quantite, useFormatPrix, usePanier } from './panier'
+import { balise, eclat, mouvementReduit, rebond, remplir, sansAccents } from './outils'
 
 export type PlatVivant = {
   id: string
@@ -14,8 +18,10 @@ export type PlatVivant = {
   /** Le prix affiché (déjà formaté), ou « à partir de » le plus petit format. */
   prix: string | null
   prixNombre: number | null
+  /** Le prix du plat lui-même (sans format) : celui que retient le serveur quand un format n'a pas de prix. */
+  prixBase: number | null
   aPartirDe: boolean
-  variantes: { nom: string; prix: string | null }[]
+  variantes: { nom: string; prix: string | null; prixNombre: number | null }[]
   photo: string | null
   allergenes: string[]
   etiquettes: string[]
@@ -24,6 +30,12 @@ export type PlatVivant = {
 export type SectionVivante = { id: string; nom: string; description: string; plats: PlatVivant[] }
 export type ChoixMenu = { id: string; nom: string; enService: boolean; href: string }
 export type Nommes = Record<string, { nom: string; icone: string }>
+/**
+ * Les commandes (option de l'établissement) : `ici`, ce menu se commande en ce
+ * moment (servi maintenant ; à l'hôtel, le service aux chambres). Sinon, le
+ * panier reste visible mais la fiche n'a pas de bouton « Ajouter ».
+ */
+export type CommandeMenu = { ici: boolean; hotel: boolean; merci: string | null }
 
 const CLE_ALLERGIES = 'tapora_allergies'
 
@@ -44,6 +56,7 @@ export default function MenuVivant({
   allergenes,
   monnaie,
   appel,
+  commande,
 }: {
   barre: React.ReactNode
   menu: { id: string; nom: string; description: string; enService: boolean; horaire: string | null; pdf: string | null }
@@ -56,8 +69,14 @@ export default function MenuVivant({
   monnaie: { locale: string; devise: string }
   /** Service aux chambres : appeler pour commander. */
   appel?: { tel: string } | null
+  /** Commander depuis le menu (null : l'option est coupée). */
+  commande?: CommandeMenu | null
 }) {
   const { code, langue, t } = useLieu()
+  const panier = usePanier(code)
+  const [feuillePanier, setFeuillePanier] = useState(false)
+  const formatTotal = useFormatPrix(monnaie)
+  const commandable = Boolean(commande?.ici)
   const [recherche, setRecherche] = useState('')
   const [filtres, setFiltres] = useState<string[]>([])
   const [exclus, setExclus] = useState<string[]>([])
@@ -216,7 +235,14 @@ export default function MenuVivant({
             </p>
           )}
           {menu.enService && menu.horaire && <p className="sv-doux mt-2 text-sm">{menu.horaire}</p>}
+          {commandable && sections.length > 0 && (
+            <p className="sv-commander-aide mt-4">
+              <span aria-hidden>🛎️</span>
+              {t.commanderAide}
+            </p>
+          )}
         </header>
+        {commande && <SuiviEnCours merci={commande.merci} className="mt-5" />}
 
         {(options.recherche || options.allergenes) && sections.length > 0 && (
           <div className="mt-6 space-y-3">
@@ -296,7 +322,7 @@ export default function MenuVivant({
               {s.description && <p className="sv-doux mt-1 text-sm leading-relaxed">{s.description}</p>}
               <div className="sv-carte mt-3 px-4">
                 {s.plats.map((p) => (
-                  <LignePlat key={p.id} p={p} photos={options.photos} prix={options.prix} etiquettes={etiquettes} onOuvrir={ouvrir} />
+                  <LignePlat key={p.id} p={p} photos={options.photos} prix={options.prix} etiquettes={etiquettes} onOuvrir={ouvrir} dansPanier={commande ? panier.quantites[p.id] : undefined} />
                 ))}
               </div>
             </section>
@@ -321,7 +347,24 @@ export default function MenuVivant({
         )}
 
         {options.allergenes && sections.length > 0 && <p className="sv-avertissement mt-8">{t.avertissementAllergies}</p>}
+        {/* La barre du panier ne cache jamais la fin du menu. */}
+        {commande && panier.nombre > 0 && <div className="h-24" aria-hidden />}
       </div>
+
+      {commande && (
+        <>
+          <BarrePanier panier={panier} montrerPrix={options.prix} formatPrix={formatTotal} onOuvrir={() => setFeuillePanier(true)} />
+          <FeuillePanier
+            ouverte={feuillePanier}
+            onFermer={() => setFeuillePanier(false)}
+            panier={panier}
+            hotel={commande.hotel}
+            montrerPrix={options.prix}
+            formatPrix={formatTotal}
+            merci={commande.merci}
+          />
+        </>
+      )}
 
       <Feuille
         ouverte={Boolean(plat)}
@@ -357,7 +400,7 @@ export default function MenuVivant({
               </p>
             )}
             {plat.description && <p className="sv-fiche-texte mt-4">{plat.description}</p>}
-            {plat.variantes.length > 0 && (
+            {plat.variantes.length > 0 && !(commandable && plat.disponible) && (
               <div className="mt-5">
                 <p className="sv-etiquette">{t.formats}</p>
                 <ul className="sv-variantes mt-2">
@@ -369,6 +412,24 @@ export default function MenuVivant({
                   ))}
                 </ul>
               </div>
+            )}
+            {commandable && plat.disponible && (
+              <AjoutPlat
+                key={plat.id}
+                plat={plat}
+                montrerPrix={options.prix}
+                formatPrix={formatTotal}
+                onAjouter={(l) => {
+                  if (!panier.place(plat.id, l.variante, l.note)) {
+                    toast(t.panierPlein, { ton: 'alerte' })
+                    return false
+                  }
+                  panier.ajouter({ plat_id: plat.id, nom: plat.nom, ...l })
+                  toast(t.ajoute, { texte: `${l.quantite} × ${plat.nom}${l.varianteNom ? ` · ${l.varianteNom}` : ''}`, ton: 'succes', duree: 2600 })
+                  setTimeout(() => setPlat(null), mouvementReduit() ? 0 : 380)
+                  return true
+                }}
+              />
             )}
             {options.allergenes && plat.allergenes.length > 0 && (
               <div className="mt-5">
@@ -425,12 +486,32 @@ export default function MenuVivant({
   )
 }
 
-function LignePlat({ p, photos, prix, etiquettes, onOuvrir }: { p: PlatVivant; photos: boolean; prix: boolean; etiquettes: Nommes; onOuvrir: (p: PlatVivant) => void }) {
+function LignePlat({
+  p,
+  photos,
+  prix,
+  etiquettes,
+  onOuvrir,
+  dansPanier,
+}: {
+  p: PlatVivant
+  photos: boolean
+  prix: boolean
+  etiquettes: Nommes
+  onOuvrir: (p: PlatVivant) => void
+  /** Combien de ce plat est déjà dans la commande. */
+  dansPanier?: number
+}) {
   const { t } = useLieu()
   return (
     <button type="button" className="sv-plat" data-epuise={!p.disponible} onClick={() => onOuvrir(p)}>
       <span className="min-w-0 flex-1">
         <span className="sv-plat-nom">
+          {dansPanier ? (
+            <span key={dansPanier} className="sv-plat-panier" aria-label={`${dansPanier} × ${t.commande}`}>
+              {dansPanier}×
+            </span>
+          ) : null}
           {p.nom}
           {p.etiquettes
             .filter((e) => etiquettes[e])
@@ -458,6 +539,101 @@ function LignePlat({ p, photos, prix, etiquettes, onOuvrir }: { p: PlatVivant; p
         </span>
       )}
     </button>
+  )
+}
+
+/**
+ * Ajouter un plat à la commande : le format (s'il y en a), la quantité, une
+ * précision facultative, puis « Ajouter · 24 $ » — le prix roule avec la
+ * quantité, et le bouton jaillit d'un éclat aux couleurs de l'établissement.
+ */
+function AjoutPlat({
+  plat,
+  montrerPrix,
+  formatPrix,
+  onAjouter,
+}: {
+  plat: PlatVivant
+  montrerPrix: boolean
+  formatPrix: (v: number) => string
+  onAjouter: (l: { variante: number | null; varianteNom: string | null; quantite: number; note: string | null; prix: number | null }) => boolean
+}) {
+  const { t } = useLieu()
+  const [variante, setVariante] = useState<number | null>(plat.variantes.length ? 0 : null)
+  const [quantite, setQuantite] = useState(1)
+  const [avecNote, setAvecNote] = useState(false)
+  const [note, setNote] = useState('')
+  const bouton = useRef<HTMLButtonElement>(null)
+  const v = variante !== null ? plat.variantes[variante] : null
+  // Le même calcul que le serveur : le prix du format, sinon celui du plat.
+  const unitaire = v ? (v.prixNombre ?? plat.prixBase) : plat.prixBase
+  const montant = unitaire !== null ? Math.round(unitaire * quantite * 100) / 100 : null
+
+  function ajouter() {
+    const ok = onAjouter({ variante, varianteNom: v?.nom ?? null, quantite, note: note.replace(/\s+/g, ' ').trim().slice(0, 140) || null, prix: unitaire })
+    if (!ok) return
+    rebond(bouton.current)
+    eclat(bouton.current)
+    vibrer([12, 40, 18])
+  }
+
+  return (
+    <div className="sv-ajout mt-6">
+      {plat.variantes.length > 0 && (
+        <fieldset>
+          <legend className="sv-etiquette">{t.choisirFormat}</legend>
+          <div className="sv-formats mt-2" role="radiogroup">
+            {plat.variantes.map((x, i) => (
+              <button key={i} type="button" role="radio" aria-checked={variante === i} className="sv-format" onClick={() => setVariante(i)}>
+                <span className="sv-format-rond" aria-hidden />
+                <span className="flex-1 text-start">{x.nom}</span>
+                {montrerPrix && x.prix && <strong>{x.prix}</strong>}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+      )}
+
+      <div className="mt-5 flex items-center justify-between gap-4">
+        <span className="sv-etiquette">{t.quantite}</span>
+        <Quantite valeur={quantite} onChanger={setQuantite} grand />
+      </div>
+
+      {avecNote ? (
+        <div className="mt-4">
+          <label className="sv-etiquette" htmlFor={`sv-note-${plat.id}`}>
+            {t.notePlat}
+          </label>
+          <input
+            id={`sv-note-${plat.id}`}
+            className="sv-champ mt-2"
+            maxLength={140}
+            placeholder={t.notePlatEx}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            autoFocus
+            enterKeyHint="done"
+          />
+        </div>
+      ) : (
+        <button type="button" className="sv-lien mt-4 text-[0.9rem]" onClick={() => setAvecNote(true)}>
+          ＋ {t.notePlat}
+        </button>
+      )}
+
+      <button ref={bouton} type="button" className="sv-bouton sv-bouton-plein mt-5" onClick={ajouter}>
+        <span aria-hidden>🛎️</span>
+        {montrerPrix && montant !== null ? (
+          <>
+            {t.ajouter}
+            <span aria-hidden>·</span>
+            <Compteur valeur={montant} format={formatPrix} duree={650} />
+          </>
+        ) : (
+          t.ajouter
+        )}
+      </button>
+    </div>
   )
 }
 

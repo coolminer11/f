@@ -11,7 +11,10 @@ import BoutonFenetre from '@/components/services/bo/bouton-fenetre'
 import Chiffre from '@/components/services/bo/chiffre'
 import Apparition from '@/components/services/bo/apparition'
 import { Courbe, ICONE_TYPE, NOM_TYPE, assombrir, joursEssai } from '@/components/services/bo/elements'
+import { Pastille } from '@/components/services/bo/elements'
+import { nomMois, regimeSociete, resumeFacturation, type ResumeFacturation } from '@/lib/services/facturation'
 import { creerDemoAction, creerEtablissementAction } from './actions'
+import { facturerTousAction } from './actions-facturation'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Tapora Services' }
@@ -32,7 +35,7 @@ function Formule({ e }: { e: { actif: boolean; formule: 'essai' | 'actif' | 'sus
             : `Essai · J-${j}`
   const alerte = !e.actif || e.formule === 'suspendu' || (j !== null && j <= 5)
   return (
-    <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold backdrop-blur ${alerte ? 'bg-[#ffd27a] text-[#2a1a00]' : 'bg-white/15 text-white'}`}>
+    <span className={`shrink-0 whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-semibold backdrop-blur ${alerte ? 'bg-[#ffd27a] text-[#2a1a00]' : 'bg-white/15 text-white'}`}>
       {texte}
     </span>
   )
@@ -125,9 +128,40 @@ function FormulaireNouveau() {
   )
 }
 
+function FormulaireFacturerTous({ f, taxes }: { f: ResumeFacturation; taxes: string }) {
+  const total = f.aFacturer.reduce((s, e) => s + e.prix_mensuel, 0)
+  return (
+    <form action={facturerTousAction} className="space-y-4">
+      <input type="hidden" name="mois" value={f.mois} />
+      <p className="text-sm text-[var(--color-encre-doux)]">
+        Une facture par abonnement actif pas encore facturé pour <strong className="text-[var(--color-encre)]">{nomMois(f.mois)}</strong>, dans le module Factures
+        de la société — chacune avec son numéro, ses taxes et son échéance.
+      </p>
+      <ul className="divide-y divide-[var(--color-ligne)] rounded-2xl border border-[var(--color-ligne)]">
+        {f.aFacturer.map((e) => (
+          <li key={e.id} className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm">
+            <span className="min-w-0 truncate font-medium">{e.nom}</span>
+            <span className="shrink-0 tabular-nums">{argent(e.prix_mensuel)}</span>
+          </li>
+        ))}
+        <li className="flex items-center justify-between gap-3 bg-[var(--color-fond)] px-4 py-2.5 text-sm font-semibold">
+          <span>Total avant taxes</span>
+          <span className="tabular-nums">{argent(total)}</span>
+        </li>
+      </ul>
+      <p className="text-xs text-[var(--color-encre-doux)]">{taxes}. Les essais, les établissements suspendus et ceux déjà facturés ne sont pas touchés.</p>
+      <div className="flex justify-end">
+        <BoutonEnvoi attente="Création des factures…">
+          Créer {f.aFacturer.length} facture{f.aFacturer.length > 1 ? 's' : ''}
+        </BoutonEnvoi>
+      </div>
+    </form>
+  )
+}
+
 export default async function Services() {
   await exigerProprietaire()
-  const [liste, ensemble] = await Promise.all([listerEtablissements(), apercuEnsemble()])
+  const [liste, ensemble, facturation, taxes] = await Promise.all([listerEtablissements(), apercuEnsemble(), resumeFacturation(), regimeSociete()])
 
   const payants = liste.filter((e) => e.actif && e.formule === 'actif')
   const revenu = payants.reduce((s, e) => s + (e.prix_mensuel ?? 0), 0)
@@ -144,8 +178,48 @@ export default async function Services() {
   const total14 = Array.from({ length: 14 }, (_, i) => Object.values(ensemble.tendances).reduce((s, t) => s + (t[i] ?? 0), 0))
   const aujourdhui = new Date().toLocaleDateString('fr-CA', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Toronto' })
 
+  // Ce qui demande un geste : essais qui finissent, factures impayées, établissements suspendus ou sans prix.
+  const alertes: { cle: string; icone: string; texte: React.ReactNode; href: string; ton: 'attention' | 'negatif' | 'neutre' }[] = [
+    ...liste
+      .filter((e) => e.actif && e.formule === 'essai')
+      .flatMap((e) => {
+        const j = joursEssai(e)
+        if (j === null || j > 7) return []
+        return [
+          {
+            cle: `essai-${e.id}`,
+            icone: '⏳',
+            texte: j < 0 ? <>Essai de <strong>{e.nom}</strong> échu depuis {-j} j</> : <>Essai de <strong>{e.nom}</strong> : {j === 0 ? 'finit aujourd’hui' : `finit dans ${j} j`}</>,
+            href: `/services/${e.id}/facturation`,
+            ton: (j < 0 ? 'negatif' : 'attention') as 'attention' | 'negatif',
+          },
+        ]
+      }),
+    ...facturation.impayees.map((f) => ({
+      cle: `impayee-${f.vente_id}`,
+      icone: '🧾',
+      texte: (
+        <>
+          <strong>{f.numero}</strong> · {f.nom ?? 'établissement supprimé'} : {argent(f.solde)} impayés depuis {f.jours} j
+        </>
+      ),
+      href: `/ventes/${f.vente_id}`,
+      ton: 'negatif' as const,
+    })),
+    ...liste
+      .filter((e) => e.formule === 'suspendu')
+      .map((e) => ({ cle: `suspendu-${e.id}`, icone: '⏸', texte: <><strong>{e.nom}</strong> est suspendu</>, href: `/services/${e.id}/reglages#abonnement`, ton: 'neutre' as const })),
+    ...liste
+      .filter((e) => e.actif && e.formule === 'actif' && !(e.prix_mensuel && e.prix_mensuel > 0))
+      .map((e) => ({ cle: `prix-${e.id}`, icone: '💲', texte: <><strong>{e.nom}</strong> est actif sans prix mensuel</>, href: `/services/${e.id}/reglages#abonnement`, ton: 'attention' as const })),
+  ]
+  const aFacturerTotal = facturation.aFacturer.reduce((s, e) => s + e.prix_mensuel, 0)
+
   const actions = (
     <div className="flex flex-wrap gap-2">
+      <Link href="/services/guide" className="bouton bouton-secondaire">
+        Guide de lancement
+      </Link>
       <BoutonFenetre titre="Créer une démo" libelle="✦ Créer une démo" className="bouton bouton-secondaire">
         <FormulaireDemo />
       </BoutonFenetre>
@@ -164,7 +238,7 @@ export default async function Services() {
             <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#e4a53a]">
               <span aria-hidden>🔒</span> Privé · propriétaire du logiciel
             </span>
-            <span className="text-xs capitalize text-white/50">{aujourdhui}</span>
+            <span className="text-xs text-white/50 first-letter:uppercase">{aujourdhui}</span>
           </div>
           <h1 className="mt-5 text-white">Tapora Services</h1>
           <div className="mt-6 grid items-end gap-6 lg:grid-cols-[1fr_22rem]">
@@ -213,6 +287,84 @@ export default async function Services() {
           <div className="mt-6">{actions}</div>
         </div>
       </section>
+
+      {liste.length > 0 && (
+        <div id="facturation" className="grid scroll-mt-24 gap-5 lg:grid-cols-[1.55fr_1fr]">
+          <section className="carte p-5">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h2 className="text-sm font-semibold">
+                  Facturation · {nomMois(facturation.mois)}
+                </h2>
+                <p className="mt-0.5 text-xs text-[var(--color-encre-doux)]">Les factures sont dans Factures, avec les autres ventes de la société.</p>
+              </div>
+              {facturation.aFacturer.length > 0 ? (
+                <BoutonFenetre titre={`Facturer ${nomMois(facturation.mois)}`} libelle={`🧾 Facturer le mois · ${facturation.aFacturer.length}`} largeur="max-w-lg">
+                  <FormulaireFacturerTous f={facturation} taxes={taxes.libelle} />
+                </BoutonFenetre>
+              ) : (
+                <Pastille ton="positif">✓ Tout est facturé</Pastille>
+              )}
+            </div>
+            <dl className="cascade mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+              {(
+                [
+                  ['À facturer', <Chiffre key="a" valeur={aFacturerTotal} genre="argent" />, `${facturation.aFacturer.length} abonnement${facturation.aFacturer.length > 1 ? 's' : ''}`, false],
+                  ['Facturé ce mois', <Chiffre key="b" valeur={facturation.factureMois} genre="argent" />, `${facturation.nbFacturesMois} facture${facturation.nbFacturesMois > 1 ? 's' : ''}`, false],
+                  ['Encaissé ce mois', <Chiffre key="c" valeur={facturation.encaisseMois} genre="argent" />, facturation.mrr ? `sur ${argent(facturation.mrr)} récurrents` : 'paiements reçus', false],
+                  ['En retard', <Chiffre key="d" valeur={facturation.enRetard} genre="argent" />, facturation.nbEnRetard ? `${facturation.nbEnRetard} facture${facturation.nbEnRetard > 1 ? 's' : ''} échue${facturation.nbEnRetard > 1 ? 's' : ''}` : 'aucune facture échue', facturation.nbEnRetard > 0],
+                ] as const
+              ).map(([libelle, valeur, sous, alerte]) => (
+                <div key={libelle} className="rounded-2xl border border-[var(--color-ligne)] bg-[var(--color-fond)] px-4 py-3">
+                  <dt className="text-[11px] font-medium text-[var(--color-encre-doux)]">{libelle}</dt>
+                  <dd className={`mt-1 text-xl font-semibold tracking-tight ${alerte ? 'text-[var(--color-negatif)]' : ''}`}>{valeur}</dd>
+                  <dd className="mt-0.5 text-[11px] text-[var(--color-encre-doux)]">{sous}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+
+          <section className="carte p-5" aria-labelledby="titre-alertes">
+            <div className="flex items-baseline justify-between gap-2">
+              <h2 id="titre-alertes" className="text-sm font-semibold">
+                À surveiller
+              </h2>
+              {alertes.length > 0 && <Pastille ton="attention">{alertes.length}</Pastille>}
+            </div>
+            {alertes.length === 0 ? (
+              <p className="mt-4 flex items-center gap-2 text-sm text-[var(--color-encre-doux)]">
+                <span className="grid size-7 place-items-center rounded-full bg-green-50 text-[var(--color-positif)]" aria-hidden>
+                  ✓
+                </span>
+                Rien à signaler : aucun essai ne finit cette semaine, aucune facture en souffrance.
+              </p>
+            ) : (
+              <ul className="cascade mt-3 space-y-1.5">
+                {alertes.map((a) => (
+                  <li key={a.cle}>
+                    <Link
+                      href={a.href}
+                      className={`flex items-center gap-2.5 rounded-xl border px-3 py-2 text-sm transition hover:-translate-y-px hover:shadow-sm ${
+                        a.ton === 'negatif'
+                          ? 'border-[color-mix(in_srgb,var(--color-negatif)_25%,transparent)] bg-red-50/60'
+                          : a.ton === 'attention'
+                            ? 'border-[color-mix(in_srgb,var(--color-attention)_25%,transparent)] bg-amber-50/60'
+                            : 'border-[var(--color-ligne)] bg-[var(--color-fond)]'
+                      }`}
+                    >
+                      <span aria-hidden>{a.icone}</span>
+                      <span className="min-w-0 flex-1">{a.texte}</span>
+                      <span aria-hidden className="text-[var(--color-encre-doux)]">
+                        →
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </div>
+      )}
 
       {liste.length === 0 ? (
         <div className="carte grid place-items-center gap-3 px-6 py-14 text-center">

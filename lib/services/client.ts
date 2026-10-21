@@ -42,10 +42,17 @@ export async function langueChoisie(demandee?: string | null): Promise<boolean> 
  * et par téléphone : revenir en arrière ou changer de langue ne gonfle pas
  * les statistiques. `cle` est courte : « o », « c », « d », « m-1a2b3c4d ».
  */
-export async function compterUneFois(lieu: { etab: Etablissement; emplacement: Emplacement }, type: TypeEvenement, cible: string | null, langue: string, cle: string): Promise<void> {
+export async function compterUneFois(
+  lieu: { etab: Etablissement; emplacement: Emplacement },
+  type: TypeEvenement,
+  cible: string | null,
+  langue: string,
+  cle: string,
+  source: 'nfc' | 'qr' | null = null,
+): Promise<void> {
   const vu = ((await cookies()).get(NOM_TEMOIN_VU)?.value ?? '').split('.')
   if (vu.includes(cle)) return
-  void noterEvenement(lieu.etab.id, lieu.emplacement.id, type, cible, langue)
+  void noterEvenement(lieu.etab.id, lieu.emplacement.id, type, cible, langue, source)
 }
 
 /** Les menus actifs, sans leurs plats : de quoi dessiner les tuiles de l'accueil. */

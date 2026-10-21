@@ -675,6 +675,20 @@ modification de texte se fait dans les deux fichiers ; les balises
   démonstrations toutes prêtes (restaurant, hôtel) pour les rendez-vous.
 - Les fichiers (photos, logos, menus PDF) sont redimensionnés en WebP et
   rangés sous `services/` du même bucket ; seul ce dossier est public.
+- **Impression :** Aperçu → Liens et accès → « Chevalets » (deux par feuille
+  Lettre, à plier en deux) ou la planche de QR. Les QR portent `?q` : un scan
+  se distingue d'un tap de carte NFC dans les statistiques.
+- **Rapport mensuel :** le 1er du mois (de 9 h à 19 h), le contact de chaque
+  établissement actif ou en essai reçoit le résumé du mois écoulé, par la
+  même messagerie que les factures. Plafond : `RAPPORTS_SERVICES_PAR_JOUR`
+  (25 par défaut), en plus des rapports des cartes. Aperçu, envoi et
+  désactivation dans la fiche de l'établissement.
+- **Effacement automatique** (promis par `/confidentialite#services`) :
+  l'empreinte de l'adresse IP après 30 jours, les statistiques de visite
+  après 13 mois, les demandes, commandes et avis après 25 mois. Fait par le
+  réveil, au plus toutes les six heures.
+- **Guide de lancement** d'un établissement, de la démo au premier rapport :
+  `/services/guide`.
 
 ## Sauvegardes
 

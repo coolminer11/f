@@ -214,6 +214,8 @@ export async function optionsAction(d: FormData): Promise<void> {
   await agir(d, async (e) => {
     const options: Options = { ...e.options, fuseau: parmi(champ(d, 'fuseau'), FUSEAUX, 'America/Toronto') }
     for (const o of OPTIONS_BOOL) options[o] = coche(d, o)
+    // Les commandes passent par le menu : sans menu, pas de commande.
+    options.commande = coche(d, 'commande') && options.menu
     await A.modifierOptions(e.id, options)
     return 'Options enregistrées : la page client change tout de suite.'
   })
@@ -695,4 +697,25 @@ export async function retablirDemandesAction(d: FormData): Promise<void> {
     await A.semerDemandes(e.id, e.type)
     return 'Demandes par défaut rétablies (celles qui existaient déjà sont gardées telles quelles).'
   })
+}
+
+// ---------------------------------------------------------------------------
+// Glisser-déposer (et ↑ / ↓) : appelée par le composant Triable, sans
+// redirection — la page ne remonte pas en haut, elle se met à jour en place.
+// ---------------------------------------------------------------------------
+
+export async function reordonnerAction(entree: { etab: string; quoi: string; parent: string; ids: string[] }): Promise<{ ok: boolean; message: string }> {
+  await exigerProprietaire()
+  try {
+    const e = await lireEtablissement(String(entree.etab))
+    if (!e) throw new Error('Établissement introuvable.')
+    const quoi = String(entree.quoi) as A.ListeTriable
+    const ids = Array.isArray(entree.ids) ? entree.ids.map(String) : []
+    const parent = quoi === 'sections' || quoi === 'plats' ? String(entree.parent) : e.id
+    await A.reordonnerListe(quoi, e.id, parent, ids)
+    revalidatePath(`/services/${e.id}`, 'layout')
+    return { ok: true, message: 'Nouvel ordre enregistré.' }
+  } catch (x) {
+    return { ok: false, message: raison(x) }
+  }
 }

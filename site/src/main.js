@@ -8,7 +8,7 @@
   if (annee) annee.textContent = String(new Date().getFullYear())
 
   const reduit = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  const fmt = new Intl.NumberFormat('fr-CA')
+  const fmt = new Intl.NumberFormat(document.documentElement.lang.startsWith('en') ? 'en-CA' : 'fr-CA')
   const ENTETE = 72
 
   // ---------------------------------------------------------------- entête
@@ -505,6 +505,101 @@
           if (texte) texte.textContent = ''
           ecrit.n = 0
         })
+    }
+
+    // ---- Tapora Services : la tablette de l'équipe et le téléphone du client.
+    // Le client touche « Appeler le serveur », la demande arrive sur la
+    // tablette, « J'arrive », il le voit, puis il donne son avis. En boucle.
+    // Sans animation, la scène montre directement la fin de l'histoire.
+    const sceneServices = document.getElementById('scene-services')
+    if (sceneServices) {
+      arrivee
+        .from('#sv-plan', { scale: 0.92, opacity: 0, duration: 1.1, ease: 'expo.out' }, 0.25)
+        .from('#sv-tablette', { x: -60, y: 20, rotation: -9, opacity: 0, duration: 1.1, ease: 'back.out(1.3)' }, 0.5)
+        .from('#sv-telephone', { x: 70, y: 30, rotation: 16, opacity: 0, duration: 1.1, ease: 'back.out(1.3)' }, 0.7)
+        .from('#sv-note', { opacity: 0, y: 10, duration: 0.8 }, 1.3)
+      const flecheSv = document.querySelector('#sv-note .trait')
+      if (flecheSv) {
+        const l = flecheSv.getTotalLength()
+        arrivee.fromTo(flecheSv, { strokeDasharray: l, strokeDashoffset: l }, { strokeDashoffset: 0, duration: 0.7, ease: 'power2.out' }, 1.4)
+      }
+      const parallaxeSv = { trigger: sceneServices, start: 'top 20%', end: 'bottom top', scrub: 0.6 }
+      gsap.to('#sv-plan', { y: 30, ease: 'none', scrollTrigger: parallaxeSv })
+      gsap.to('#sv-tablette', { y: -28, ease: 'none', scrollTrigger: parallaxeSv })
+
+      const compte = document.getElementById('sv-compte')
+      const etoilesSv = gsap.utils.toArray('#sv-avis .sv-etoile')
+      gsap.set('#sv-demande', { opacity: 0, y: -14 })
+      gsap.set(['#sv-suivi', '#sv-avis'], { opacity: 0, y: 8 })
+      gsap.set('#sv-envoye', { opacity: 1 })
+      gsap.set('#sv-arrive', { opacity: 0 })
+      gsap.set('#sv-jarrive', { backgroundColor: 'rgba(255,250,242,0.1)', color: '#fffaf2' })
+      gsap.set(etoilesSv, { color: '#e2d6c3' })
+      if (compte) compte.textContent = '0'
+      // Au recommencement, la frise revient à son début : chaque état repart de lui-même.
+      const boucle = gsap.timeline({ repeat: -1, repeatDelay: 1, delay: 2.4 })
+      boucle
+        .add(() => compte && (compte.textContent = '0'), 0)
+        .fromTo('#sv-doigt', { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.3, ease: 'power2.out' }, 0)
+        .to('#sv-appel', { scale: 0.92, duration: 0.12, ease: 'power2.in' }, 0.22)
+        .to('#sv-appel', { scale: 1, duration: 0.35, ease: 'back.out(3)' })
+        .to('#sv-doigt', { scale: 2, opacity: 0, duration: 0.55, ease: 'power2.out' }, '<')
+        .to('#sv-suivi', { opacity: 1, y: 0, duration: 0.45, ease: 'back.out(1.6)' }, '-=0.25')
+        .to('#sv-demande', { opacity: 1, y: 0, duration: 0.6, ease: 'back.out(1.7)' }, '+=0.35')
+        .add(() => compte && (compte.textContent = '1'), '<')
+        .to('#sv-tablette', { x: 3, duration: 0.06, yoyo: true, repeat: 5, ease: 'none' }, '<')
+        .to('#sv-jarrive', { backgroundColor: '#e4a53a', color: '#2a211a', scale: 1.1, duration: 0.22 }, '+=0.9')
+        .to('#sv-jarrive', { scale: 1, duration: 0.25, ease: 'back.out(3)' })
+        .to('#sv-envoye', { opacity: 0, duration: 0.25 }, '+=0.15')
+        .to('#sv-arrive', { opacity: 1, duration: 0.3 }, '<')
+        .to('#sv-avis', { opacity: 1, y: 0, duration: 0.45, ease: 'back.out(1.6)' }, '+=0.7')
+        .to(etoilesSv, { color: '#e4a53a', scale: 1.3, duration: 0.16, stagger: 0.11, ease: 'power2.out' }, '+=0.25')
+        .to(etoilesSv, { scale: 1, duration: 0.2, stagger: 0.11 }, '<0.16')
+        .to({}, { duration: 2.4 })
+        .to(['#sv-demande', '#sv-suivi', '#sv-avis'], { opacity: 0, duration: 0.45 })
+      // Hors de l'écran, la scène se repose.
+      ScrollTrigger.create({ trigger: sceneServices, start: 'top bottom', end: 'bottom top', onToggle: (st) => (st.isActive ? boucle.play() : boucle.pause()) })
+    }
+
+    // ---- Le menu vivant change de langue tout seul, tant qu'on le regarde.
+    const menuVivant = document.getElementById('menu-vivant')
+    if (menuVivant) {
+      const puces = [...menuVivant.querySelectorAll('.puce-langue')]
+      const ordre = puces.map((p) => p.dataset.langue)
+      const textes = [...menuVivant.querySelectorAll('[data-l-fr]')]
+      let i = Math.max(0, ordre.indexOf(document.documentElement.lang.slice(0, 2)))
+      let minuterie = null
+      const changer = () => {
+        i = (i + 1) % ordre.length
+        const l = ordre[i]
+        const cle = `l${l[0].toUpperCase()}${l.slice(1)}`
+        menuVivant.classList.add('change-langue')
+        setTimeout(() => {
+          for (const el of textes) if (el.dataset[cle]) el.textContent = el.dataset[cle]
+          puces.forEach((p) => p.setAttribute('aria-pressed', String(p.dataset.langue === l)))
+          menuVivant.classList.remove('change-langue')
+        }, 260)
+      }
+      ScrollTrigger.create({
+        trigger: menuVivant,
+        start: 'top 85%',
+        end: 'bottom 15%',
+        onToggle: (st) => {
+          clearInterval(minuterie)
+          if (st.isActive) minuterie = setInterval(changer, 2600)
+        },
+      })
+    }
+
+    // ---- Le chevalet de table se pose ; le bloc démo, comme le bloc final de l'accueil.
+    if (document.getElementById('chevalet')) {
+      gsap.from('#chevalet', { y: 60, rotation: 6, opacity: 0, duration: 1.1, ease: 'back.out(1.4)', scrollTrigger: { trigger: '#chevalet', start: 'top 85%', once: true } })
+    }
+    if (document.getElementById('ondes-demo')) {
+      gsap
+        .timeline({ scrollTrigger: { trigger: '#demo', start: 'top 80%', once: true } })
+        .from('#ondes-demo .carte-cta', { y: 40, rotation: -12, opacity: 0, svgOrigin: '40 62', duration: 1, ease: 'back.out(1.6)' })
+        .from('#ondes-demo .arc-cta', { scale: 0.3, opacity: 0, svgOrigin: '55 39', duration: 0.8, ease: 'power3.out', stagger: 0.14 }, '-=0.45')
     }
 
     // Les polices peuvent arriver après : on recalcule les positions.

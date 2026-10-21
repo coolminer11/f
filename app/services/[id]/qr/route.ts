@@ -2,6 +2,7 @@ import { exigerSession } from '@/lib/auth'
 import { emplacements, lireEtablissement } from '@/lib/services/donnees'
 import { baseCartesAffichee } from '@/lib/cartes-url'
 import { plancheQr } from '@/lib/planche-qr'
+import { chevaletsPdf } from '@/lib/services/chevalets'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -12,8 +13,9 @@ function nomFichier(nom: string): string {
 }
 
 /**
- * La planche de QR d'un établissement (PDF, 12 par page) : tous les
- * emplacements actifs, ceux d'un groupe (?groupe=Terrasse) ou un seul (?e=<id>).
+ * La planche de QR d'un établissement (PDF, 12 par page) — ou ses chevalets
+ * de table à plier (?format=chevalets, 2 par page) : tous les emplacements
+ * actifs, ceux d'un groupe (?groupe=Terrasse) ou un seul (?e=<id>).
  */
 export async function GET(requete: Request, { params }: { params: Promise<{ id: string }> }) {
   // La même porte que exigerProprietaire(), mais un 404 en texte : la réponse
@@ -32,14 +34,22 @@ export async function GET(requete: Request, { params }: { params: Promise<{ id: 
     .filter((l) => !groupe || (l.groupe ?? '') === groupe)
   if (!lieux.length) return new Response('Aucun emplacement à imprimer.', { status: 404 })
   const titre = groupe ? `${e.nom} — ${groupe}` : seul ? `${e.nom} — ${lieux[0].libelle}` : e.nom
-  const pdf = await plancheQr(
-    titre,
-    lieux.map((l) => ({ libelle: l.libelle, code: l.code, urlQr: `${base}/s/${l.code}` })),
-  )
+  // « ?q » : la visite vient d'un scan, pas d'un tap (statistiques NFC / QR).
+  const urlQr = (code: string) => `${base}/s/${code}?q`
+  const chevalets = q.get('format') === 'chevalets'
+  const pdf = chevalets
+    ? await chevaletsPdf(
+        { nom: e.nom, type: e.type, couleur: e.couleur, anglais: e.langues.includes('en'), appel: e.options.appel, concierge: e.options.concierge },
+        lieux.map((l) => ({ libelle: l.libelle, urlQr: urlQr(l.code) })),
+      )
+    : await plancheQr(
+        titre,
+        lieux.map((l) => ({ libelle: l.libelle, code: l.code, urlQr: urlQr(l.code) })),
+      )
   return new Response(new Uint8Array(pdf), {
     headers: {
       'content-type': 'application/pdf',
-      'content-disposition': `attachment; filename="${nomFichier(titre)}"`,
+      'content-disposition': `attachment; filename="${chevalets ? nomFichier(titre).replace(/^qr-/, 'chevalets-') : nomFichier(titre)}"`,
       'cache-control': 'private, no-store',
     },
   })

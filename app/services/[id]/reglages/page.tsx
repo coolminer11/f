@@ -45,6 +45,11 @@ const OPTIONS: [keyof Omit<Options, 'fuseau' | 'merci'>, string, string][] = [
   ['prix', 'Prix', 'Afficher les prix dans le menu.'],
   ['allergenes', 'Allergènes', 'Les 11 allergènes prioritaires, plat par plat.'],
   ['photos', 'Photos', 'Les photos des plats.'],
+  [
+    'commande',
+    'Commandes',
+    'Commander depuis le menu : à la table (restaurant), ou en chambre (menus « service aux chambres »). Paiement à l’addition ou porté à la chambre.',
+  ],
 ]
 
 const FUSEAUX = [

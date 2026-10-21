@@ -9,6 +9,8 @@ export type StatsService = {
   jours: number
   ouvertures: number
   ouverturesPrec: number
+  /** Visites venues d'un code QR (« ?q ») ; les autres, d'une carte NFC. */
+  ouverturesQr: number
   vuesMenu: number
   demandes: number
   demandesPrec: number
@@ -30,16 +32,24 @@ export type StatsService = {
   grille: { jour: number; heure: number; n: number }[]
   parEmplacement: { id: string; libelle: string; groupe: string | null; ouvertures: number; demandes: number; note: number | null }[]
   commentaires: { note: number; commentaire: string | null; emplacement: string | null; google: boolean; cree_le: string }[]
+  /** Les commandes (à la table, service aux chambres), annulées exclues. */
+  commandes: number
+  commandesPrec: number
+  /** La somme des commandes, aux prix du menu (le chiffre d'affaires passé par Tapora). */
+  ventesCommandes: number
+  panierMoyen: number | null
+  topCommandes: { id: string; nom: string; quantite: number; ventes: number }[]
 }
 
 export async function statsService(etabId: string, jours: number, fuseau = 'America/Toronto', langueDefaut = 'fr'): Promise<StatsService> {
   const p = [etabId, jours, fuseau]
   const periode = `cree_le >= now() - make_interval(days => $2::int)`
   const avant = `cree_le >= now() - make_interval(days => 2 * $2::int) and cree_le < now() - make_interval(days => $2::int)`
-  const [totaux, types, reponses, retours, plats, rubs, langues, parJour, parHeure, grille, lieux, commentaires] = await Promise.all([
-    requeteUne<{ ouvertures: number; ouvertures_prec: number; menu: number; demandes: number; demandes_prec: number; google: number; wifi: number; pdf: number }>(
+  const [totaux, types, reponses, retours, plats, rubs, langues, parJour, parHeure, grille, lieux, commentaires, cmd, topCmd] = await Promise.all([
+    requeteUne<{ ouvertures: number; ouvertures_prec: number; ouvertures_qr: number; menu: number; demandes: number; demandes_prec: number; google: number; wifi: number; pdf: number }>(
       `select (select count(*) from evenements_service where etablissement_id = $1::uuid and type = 'ouverture' and ${periode})::int as ouvertures,
               (select count(*) from evenements_service where etablissement_id = $1::uuid and type = 'ouverture' and ${avant})::int as ouvertures_prec,
+              (select count(*) from evenements_service where etablissement_id = $1::uuid and type = 'ouverture' and source = 'qr' and ${periode})::int as ouvertures_qr,
               (select count(*) from evenements_service where etablissement_id = $1::uuid and type = 'menu' and ${periode})::int as menu,
               (select count(*) from demandes_service where etablissement_id = $1::uuid and statut <> 'annulee' and ${periode})::int as demandes,
               (select count(*) from demandes_service where etablissement_id = $1::uuid and statut <> 'annulee' and ${avant})::int as demandes_prec,
@@ -49,7 +59,7 @@ export async function statsService(etabId: string, jours: number, fuseau = 'Amer
       p.slice(0, 2),
     ),
     requete<{ cle: string; libelle: string; icone: string | null; n: number }>(
-      `select d.cle, max(d.libelle) as libelle, max(t.icone) as icone, count(*)::int as n
+      `select d.cle, max(d.libelle) as libelle, coalesce(max(t.icone), case when d.cle = 'commande' then '🍽️' end) as icone, count(*)::int as n
          from demandes_service d left join types_demandes t on t.id = d.type_id
         where d.etablissement_id = $1::uuid and d.statut <> 'annulee' and d.${periode}
         group by d.cle order by n desc`,
@@ -129,11 +139,29 @@ export async function statsService(etabId: string, jours: number, fuseau = 'Amer
         where r.etablissement_id = $1::uuid and r.${periode} order by r.cree_le desc limit 25`,
       p.slice(0, 2),
     ),
+    requeteUne<{ n: number; prec: number; ventes: number }>(
+      `select count(*) filter (where ${periode})::int as n,
+              count(*) filter (where ${avant})::int as prec,
+              coalesce(sum(total) filter (where ${periode}), 0)::float8 as ventes
+         from demandes_service
+        where etablissement_id = $1::uuid and cle = 'commande' and statut <> 'annulee' and cree_le >= now() - make_interval(days => 2 * $2::int)`,
+      p.slice(0, 2),
+    ),
+    requete<{ id: string; nom: string; quantite: number; ventes: number }>(
+      `select l ->> 'plat_id' as id, max(l ->> 'nom') as nom, sum((l ->> 'quantite')::int)::int as quantite,
+              coalesce(sum((l ->> 'prix')::numeric * (l ->> 'quantite')::int), 0)::float8 as ventes
+         from demandes_service d
+              cross join lateral jsonb_array_elements(case when jsonb_typeof(d.details) = 'array' then d.details else '[]'::jsonb end) as l
+        where d.etablissement_id = $1::uuid and d.cle = 'commande' and d.statut <> 'annulee' and d.${periode}
+        group by 1 order by quantite desc, ventes desc limit 10`,
+      p.slice(0, 2),
+    ),
   ])
   return {
     jours,
     ouvertures: totaux?.ouvertures ?? 0,
     ouverturesPrec: totaux?.ouvertures_prec ?? 0,
+    ouverturesQr: totaux?.ouvertures_qr ?? 0,
     vuesMenu: totaux?.menu ?? 0,
     demandes: totaux?.demandes ?? 0,
     demandesPrec: totaux?.demandes_prec ?? 0,
@@ -155,6 +183,11 @@ export async function statsService(etabId: string, jours: number, fuseau = 'Amer
     grille,
     parEmplacement: lieux,
     commentaires,
+    commandes: cmd?.n ?? 0,
+    commandesPrec: cmd?.prec ?? 0,
+    ventesCommandes: cmd?.ventes ?? 0,
+    panierMoyen: cmd?.n ? Math.round((cmd.ventes / cmd.n) * 100) / 100 : null,
+    topCommandes: topCmd,
   }
 }
 

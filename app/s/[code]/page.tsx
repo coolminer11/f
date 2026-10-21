@@ -4,7 +4,7 @@ import { texte } from '@/lib/services/langues'
 import { dictionnaire } from '@/lib/services/ui'
 import { compterUneFois, langueChoisie, langueSuggeree, menusLegers } from '@/lib/services/client'
 import { Annonces, Cadre, Coordonnees, EnTete, Suggestion } from '@/components/services/client/cadre'
-import CentreDemandes, { type TypeDemandeUi } from '@/components/services/client/demande'
+import CentreDemandes, { SuiviEnCours, type TypeDemandeUi } from '@/components/services/client/demande'
 import { Tuile, TuileAvis, TuileWifi } from '@/components/services/client/tuiles'
 import { httpsSeulement } from '@/components/services/client/outils'
 import { lieuDeLaPage, titreLieu, type ParamsLieu } from './lieu'
@@ -22,7 +22,7 @@ export async function generateMetadata(p: ParamsLieu): Promise<Metadata> {
  * l'avis, le plat du jour.
  */
 export default async function AccueilService(p: ParamsLieu) {
-  const { code, l, lieu, lien } = await lieuDeLaPage(p)
+  const { code, l, lieu, lien, sp } = await lieuDeLaPage(p)
   const { etab, langue } = lieu
   const o = etab.options
   const hotel = etab.type === 'hotel'
@@ -36,7 +36,8 @@ export default async function AccueilService(p: ParamsLieu) {
     langueSuggeree(etab, langue),
     langueChoisie(l),
   ])
-  await compterUneFois(lieu, 'ouverture', null, langue, 'o')
+  // « ?q » vient des codes QR imprimés ; une carte NFC ouvre l'adresse nue.
+  await compterUneFois(lieu, 'ouverture', null, langue, 'o', sp.q !== undefined ? 'qr' : 'nfc')
 
   const typesUi: TypeDemandeUi[] = types.map((d) => ({ cle: d.cle, libelle: texte(d.libelle, langue, etab.langue_defaut) || d.cle, icone: d.icone, avec_note: d.avec_note }))
   const google = o.avis ? httpsSeulement(etab.avis_url) : null
@@ -71,6 +72,8 @@ export default async function AccueilService(p: ParamsLieu) {
       <div className="sv-colonne sv-pile">
         {!choisie && <Suggestion code={code} langue={langue} cible={suggeree} />}
         <Annonces annonces={enCours} etab={etab} langue={langue} />
+        {/* Sans demandes en un tap, les commandes envoyées se suivent quand même ici. */}
+        {o.commande && !(o.appel && typesUi.length > 0) && <SuiviEnCours merci={merci} className="sv-entre" />}
         {tuileMenu && <div className="sv-entre sv-entre-2">{tuileMenu}</div>}
 
         {o.appel && typesUi.length > 0 && (

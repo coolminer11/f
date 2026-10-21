@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { FileJson } from '@/lib/services/portail'
-import type { Demande } from '@/lib/services/types'
+import type { Demande, LigneCommande } from '@/lib/services/types'
 import { drapeau, nomLangue } from '@/lib/services/langues'
 import { prendreAction, rouvrirAction, terminerAction } from '@/app/service/[jeton]/actions'
 import { desintegrer, vibrer } from '@/components/effets/desintegration'
@@ -18,6 +18,106 @@ import { annoncerBadges } from '@/components/services/portail/badge-direct'
 const SONDAGE_MS = 4000
 /** Un geste local l'emporte sur un sondage parti avant lui, pendant ce délai. */
 const OPTIMISTE_MS = 10000
+
+// ---- Les commandes (à la table, service aux chambres) : textes, montants, bon de cuisine
+const TEXTES_COMMANDE = {
+  fr: {
+    total: 'Total',
+    bon: 'Bon',
+    imprimer: 'Imprimer le bon',
+    aConfirmer: 'prix à confirmer',
+    articles: (n: number) => `${n} article${n > 1 ? 's' : ''}`,
+    autres: (n: number) => `+ ${n} autre${n > 1 ? 's' : ''} ligne${n > 1 ? 's' : ''}`,
+    noteCuisine: 'Pour la cuisine',
+    paiement: (hotel: boolean) => (hotel ? 'Porté à la chambre' : 'À l’addition'),
+  },
+  en: {
+    total: 'Total',
+    bon: 'Ticket',
+    imprimer: 'Print ticket',
+    aConfirmer: 'price to confirm',
+    articles: (n: number) => `${n} item${n > 1 ? 's' : ''}`,
+    autres: (n: number) => `+ ${n} more line${n > 1 ? 's' : ''}`,
+    noteCuisine: 'For the kitchen',
+    paiement: (hotel: boolean) => (hotel ? 'Charged to the room' : 'On the bill'),
+  },
+} as const
+
+const estCommande = (d: Demande): d is Demande & { details: LigneCommande[] } => d.cle === 'commande' && Array.isArray(d.details) && d.details.length > 0
+const nbArticles = (lignes: LigneCommande[]) => lignes.reduce((n, x) => n + x.quantite, 0)
+function argent(v: number, l: LanguePortail): string {
+  return new Intl.NumberFormat(l === 'fr' ? 'fr-CA' : 'en-CA', { style: 'currency', currency: 'CAD' }).format(v)
+}
+/** « 2 × Club sandwich, 1 × Frites » : le pop-up et la notification d'une commande. */
+const resumeCommande = (lignes: LigneCommande[]) => lignes.map((x) => `${x.quantite} × ${x.nom}${x.variante ? ` (${x.variante})` : ''}`).join(', ')
+
+const echapper = (x: string) => x.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string)
+
+/**
+ * Le bon de cuisine : une page à part (80 mm, imprimante de comptoir ou
+ * feuille ordinaire), imprimée depuis un cadre invisible — la page du
+ * portail, elle, ne change pas.
+ */
+function imprimerBon(d: Demande & { details: LigneCommande[] }, l: LanguePortail, fuseau: string, hotel: boolean) {
+  const C = TEXTES_COMMANDE[l]
+  let quand = ''
+  try {
+    quand = new Date(d.cree_le).toLocaleString(l === 'fr' ? 'fr-CA' : 'en-CA', { timeZone: fuseau, day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+  } catch {
+    quand = new Date(d.cree_le).toLocaleString()
+  }
+  const lignes = d.details
+    .map(
+      (x) =>
+        `<tr><td class="q">${x.quantite}×</td><td>${echapper(x.nom)}${x.variante ? `<div class="v">${echapper(x.variante)}</div>` : ''}${
+          x.note ? `<div class="n">« ${echapper(x.note)} »</div>` : ''
+        }</td><td class="p">${x.prix !== null ? echapper(argent(x.prix * x.quantite, l)) : '—'}</td></tr>`,
+    )
+    .join('')
+  const html = `<!doctype html><html lang="${l}"><head><meta charset="utf-8"><title>${echapper(C.bon)} · ${echapper(d.emplacement ?? '')}</title><style>
+    @page { size: 80mm auto; margin: 4mm; }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: #000; font: 13px/1.35 ui-monospace, 'SF Mono', Menlo, Consolas, monospace; }
+    h1 { margin: 0; font: 800 26px/1.1 system-ui, sans-serif; letter-spacing: -0.02em; }
+    .haut { padding-bottom: 6px; border-bottom: 2px dashed #000; }
+    .meta { margin-top: 3px; font-size: 12px; }
+    table { width: 100%; margin-top: 8px; border-collapse: collapse; }
+    td { padding: 5px 0; vertical-align: top; border-bottom: 1px dotted #000; }
+    .q { width: 2.6em; font-size: 17px; font-weight: 800; }
+    .p { width: 6.5em; text-align: right; white-space: nowrap; }
+    .v { font-size: 12px; }
+    .n { font-size: 12px; font-style: italic; font-weight: 700; }
+    .note { margin-top: 8px; padding: 6px; border: 2px solid #000; font-weight: 700; }
+    .total { display: flex; justify-content: space-between; margin-top: 8px; padding-top: 6px; border-top: 2px solid #000; font-size: 16px; font-weight: 800; }
+    .pied { margin-top: 10px; font-size: 11px; text-align: center; }
+  </style></head><body>
+    <div class="haut"><h1>${echapper(d.emplacement ?? '—')}</h1><div class="meta">${echapper(d.libelle)} · ${echapper(quand)}${d.groupe ? ` · ${echapper(d.groupe)}` : ''}</div></div>
+    <table>${lignes}</table>
+    ${d.note ? `<div class="note">${echapper(C.noteCuisine)} : « ${echapper(d.note)} »</div>` : ''}
+    <div class="total"><span>${echapper(C.total)} · ${echapper(C.articles(nbArticles(d.details)))}</span><span>${d.total != null ? echapper(argent(d.total, l)) : '—'}</span></div>
+    <div class="pied">${echapper(C.paiement(hotel))}${d.prise_par ? ` · ${echapper(d.prise_par)}` : ''} · #${echapper(d.id.slice(0, 6).toUpperCase())}</div>
+  </body></html>`
+  const cadre = document.createElement('iframe')
+  cadre.setAttribute('aria-hidden', 'true')
+  cadre.style.cssText = 'position:fixed;inset-inline-end:0;bottom:0;width:0;height:0;border:0'
+  let fini = false
+  const retirer = () => {
+    if (fini) return
+    fini = true
+    cadre.remove()
+  }
+  cadre.onload = () => {
+    const w = cadre.contentWindow
+    if (!w) return retirer()
+    w.onafterprint = () => setTimeout(retirer, 100)
+    w.focus()
+    w.print()
+    // Un navigateur qui ne prévient pas après l'impression : le cadre part quand même.
+    setTimeout(retirer, 120_000)
+  }
+  cadre.srcdoc = html
+  document.body.append(cadre)
+}
 
 type Urgence = 'calme' | 'attention' | 'urgent'
 const urgence = (sec: number): Urgence => (sec < 120 ? 'calme' : sec < 300 ? 'attention' : 'urgent')
@@ -211,7 +311,11 @@ export default function FileLive({
         setArrivees(new Set(pourMoi.map((x) => x.id)))
         setTimeout(() => setArrivees(new Set()), 2600)
         for (const x of pourMoi.slice(0, 2)) {
-          toast(T.nouvelleDemande(x.emplacement ?? '—', x.libelle), { ton: 'info', texte: x.note ?? x.groupe ?? undefined, duree: 6500 })
+          toast(T.nouvelleDemande(x.emplacement ?? '—', x.libelle), {
+            ton: 'info',
+            texte: estCommande(x) ? resumeCommande(x.details).slice(0, 140) : (x.note ?? x.groupe ?? undefined),
+            duree: estCommande(x) ? 9000 : 6500,
+          })
         }
         if (pourMoi.length > 2) toast(T.plusQue(pourMoi.length - 2), { ton: 'info', duree: 6500 })
       }
@@ -343,6 +447,7 @@ export default function FileLive({
       l={l}
       maintenant={maintenant}
       langueDefaut={langueDefaut}
+      onImprimer={estCommande(d) ? () => imprimerBon(d, l, fuseau, type === 'hotel') : undefined}
       arrivee={arrivee}
       sortante={sortantes.has(d.id)}
       onPrendre={() => prendre(d)}
@@ -438,7 +543,11 @@ export default function FileLive({
                 </span>
                 <button type="button" onClick={() => setDetail(d.id)} className="min-w-0 flex-1 text-left">
                   <span className="font-semibold">{d.emplacement ?? '—'}</span>
-                  <span className="text-[var(--p-doux)]"> · {d.libelle}</span>
+                  <span className="text-[var(--p-doux)]">
+                    {' '}
+                    · {d.libelle}
+                    {estCommande(d) ? ` · ${TEXTES_COMMANDE[l].articles(nbArticles(d.details))}${d.total != null ? ` · ${argent(d.total, l)}` : ''}` : ''}
+                  </span>
                   <span className="block text-xs text-[var(--p-faible)]">
                     {d.statut === 'annulee'
                       ? T.annulee
@@ -461,6 +570,7 @@ export default function FileLive({
             d={enDetail}
             l={l}
             fuseau={fuseau}
+            onImprimer={estCommande(enDetail) ? () => imprimerBon(enDetail, l, fuseau, type === 'hotel') : undefined}
             maintenant={maintenant}
             langueDefaut={langueDefaut}
             onPrendre={() => prendre(enDetail)}
@@ -553,6 +663,7 @@ function CarteDemande({
   onPrendre,
   onTerminer,
   onDetail,
+  onImprimer,
 }: {
   d: Demande
   l: LanguePortail
@@ -563,6 +674,8 @@ function CarteDemande({
   onPrendre: () => void
   onTerminer: () => void
   onDetail: () => void
+  /** Une commande : le bon de cuisine. */
+  onImprimer?: () => void
 }) {
   const T = TEXTES_PORTAIL[l]
   const depuis = (maintenant - Date.parse(d.statut === 'prise' ? (d.prise_le ?? d.cree_le) : d.cree_le)) / 1000
@@ -600,10 +713,24 @@ function CarteDemande({
         <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-[var(--accent-pale)] text-2xl ring-1 ring-[var(--p-ligne)]" aria-hidden>
           {d.icone ?? '🔔'}
         </span>
-        <p className="text-lg font-semibold leading-snug">{d.libelle}</p>
+        <div className="min-w-0">
+          <p className="text-lg font-semibold leading-snug">{d.libelle}</p>
+          {estCommande(d) && (
+            <p className="text-sm tabular-nums text-[var(--p-doux)]">
+              {TEXTES_COMMANDE[l].articles(nbArticles(d.details))}
+              {d.total != null && <span className="font-semibold text-[var(--p-encre)]"> · {argent(d.total, l)}</span>}
+            </p>
+          )}
+        </div>
       </div>
 
-      {d.note && <p className="mt-3 rounded-2xl border border-[var(--p-ligne)] bg-[var(--p-surface-2)] px-4 py-3 text-[15px] leading-relaxed">« {d.note} »</p>}
+      {estCommande(d) && <LignesCommande lignes={d.details} l={l} max={8} />}
+
+      {d.note && (
+        <p className="mt-3 rounded-2xl border border-[var(--p-ligne)] bg-[var(--p-surface-2)] px-4 py-3 text-[15px] leading-relaxed">
+          {estCommande(d) && <span className="pt-etiquette mb-1 block">{TEXTES_COMMANDE[l].noteCuisine}</span>}« {d.note} »
+        </p>
+      )}
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <p className="text-xs text-[var(--p-doux)]">
@@ -615,7 +742,12 @@ function CarteDemande({
             <span className="font-semibold text-[var(--accent)]">{T.priseParVous(d.prise_par)}</span>
           ) : null}
         </p>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap justify-end gap-2">
+          {onImprimer && (
+            <button type="button" onClick={onImprimer} className="pt-bouton-fantome !py-3.5" title={TEXTES_COMMANDE[l].imprimer}>
+              🧾 {TEXTES_COMMANDE[l].bon}
+            </button>
+          )}
           {d.statut === 'nouvelle' && (
             <button type="button" onClick={onPrendre} disabled={sortante} className="pt-bouton-doux pt-bouton-grand !py-3.5">
               🏃 {T.jarrive}
@@ -639,6 +771,7 @@ function DetailDemande({
   onPrendre,
   onTerminer,
   onRouvrir,
+  onImprimer,
 }: {
   d: Demande
   l: LanguePortail
@@ -648,6 +781,7 @@ function DetailDemande({
   onPrendre: () => void
   onTerminer: () => void
   onRouvrir: () => void
+  onImprimer?: () => void
 }) {
   const T = TEXTES_PORTAIL[l]
   const heure = (iso: string) => {
@@ -683,9 +817,22 @@ function DetailDemande({
         </div>
       </div>
 
+      {estCommande(d) && (
+        <div className="mt-4">
+          <LignesCommande lignes={d.details} l={l} prix complet />
+          <div className="mt-3 flex items-baseline justify-between gap-3 border-t pt-sep pt-3">
+            <span className="text-sm font-semibold">
+              {TEXTES_COMMANDE[l].total} · {TEXTES_COMMANDE[l].articles(nbArticles(d.details))}
+            </span>
+            <span className="pt-valeur text-2xl">{d.total != null ? argent(d.total, l) : '—'}</span>
+          </div>
+          {d.details.some((x) => x.prix === null) && <p className="mt-1 text-right text-xs text-[var(--p-faible)]">+ {TEXTES_COMMANDE[l].aConfirmer}</p>}
+        </div>
+      )}
+
       {d.note && (
         <div className="mt-4">
-          <p className="pt-etiquette">{T.noteClient}</p>
+          <p className="pt-etiquette">{estCommande(d) ? TEXTES_COMMANDE[l].noteCuisine : T.noteClient}</p>
           <p className="rounded-2xl border border-[var(--p-ligne)] bg-[var(--p-surface-2)] px-4 py-3 text-[15px] leading-relaxed">« {d.note} »</p>
         </div>
       )}
@@ -712,6 +859,11 @@ function DetailDemande({
       </ol>
 
       <div className="mt-6 flex flex-wrap justify-end gap-2">
+        {onImprimer && (
+          <button type="button" onClick={onImprimer} className="pt-bouton-fantome me-auto">
+            🧾 {TEXTES_COMMANDE[l].imprimer}
+          </button>
+        )}
         {d.statut === 'nouvelle' && (
           <button type="button" onClick={onPrendre} className="pt-bouton-doux">
             🏃 {T.jarrive}
@@ -728,5 +880,33 @@ function DetailDemande({
         )}
       </div>
     </div>
+  )
+}
+
+/**
+ * Les lignes d'une commande, lisibles d'un coup d'œil en cuisine : la quantité
+ * en gros, le plat, son format, la précision du client (et le nom qu'il a lu,
+ * s'il commandait dans une autre langue).
+ */
+function LignesCommande({ lignes, l, max, prix = false, complet = false }: { lignes: LigneCommande[]; l: LanguePortail; max?: number; prix?: boolean; complet?: boolean }) {
+  const C = TEXTES_COMMANDE[l]
+  const visibles = max ? lignes.slice(0, max) : lignes
+  const reste = lignes.length - visibles.length
+  return (
+    <ul className={`${complet ? '' : 'mt-3'} divide-y divide-[var(--p-ligne)] rounded-2xl border border-[var(--p-ligne)] bg-[var(--p-surface-2)] px-4`}>
+      {visibles.map((x, i) => (
+        <li key={`${x.plat_id}-${i}`} className="flex items-start gap-3 py-2.5">
+          <span className="w-9 shrink-0 text-lg font-bold tabular-nums leading-tight text-[var(--accent)]">{x.quantite}×</span>
+          <span className="min-w-0 flex-1 leading-snug">
+            <span className="font-semibold">{x.nom}</span>
+            {x.variante && <span className="text-[var(--p-doux)]"> · {x.variante}</span>}
+            {x.note && <span className="mt-0.5 block text-sm font-medium italic text-[var(--p-ambre)]">« {x.note} »</span>}
+            {complet && x.nom_client && <span className="mt-0.5 block text-xs text-[var(--p-faible)]">{x.nom_client}</span>}
+          </span>
+          {prix && <span className="shrink-0 text-sm tabular-nums text-[var(--p-doux)]">{x.prix !== null ? argent(x.prix * x.quantite, l) : '—'}</span>}
+        </li>
+      ))}
+      {reste > 0 && <li className="py-2 text-sm text-[var(--p-faible)]">{C.autres(reste)}</li>}
+    </ul>
   )
 }

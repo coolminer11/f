@@ -2,10 +2,13 @@ import { notFound } from 'next/navigation'
 import { exigerProprietaire } from '@/lib/services/proprietaire'
 import { emplacements, lireEtablissement, typesDemandes } from '@/lib/services/donnees'
 import { historiqueDemandes } from '@/lib/services/admin'
+import { detailsCommandes } from '@/lib/services/demandes'
+import { argent } from '@/lib/format'
 import { drapeau, texte } from '@/lib/services/langues'
 import type { Etablissement, StatutDemande, TypeDemande } from '@/lib/services/types'
 import BoutonEnvoi from '@/components/bouton-envoi'
 import Cache from '@/components/services/bo/cache'
+import Triable, { FlechesTri, PoigneeTri } from '@/components/services/bo/triable'
 import Confirmer from '@/components/services/bo/confirmer'
 import BoutonFenetre from '@/components/services/bo/bouton-fenetre'
 import Chiffre from '@/components/services/bo/chiffre'
@@ -13,7 +16,6 @@ import ChampsLangues, { ATraduire } from '@/components/services/bo/champs-langue
 import { Bloc, Pastille, TuileChiffre, duree } from '@/components/services/bo/elements'
 import {
   creerTypeDemandeAction,
-  deplacerTypeDemandeAction,
   modifierTypeDemandeAction,
   retablirDemandesAction,
   supprimerTypeDemandeAction,
@@ -90,6 +92,13 @@ export default async function Demandes({
     emplacements(e.id),
     historiqueDemandes(e.id, { cle: sp.cle || null, statut: sp.statut && sp.statut in STATUTS ? sp.statut : null, emplacement: sp.lieu || null, jours }),
   ])
+  // Les commandes : leurs lignes et leur total, lus à part (l'historique ne les porte pas).
+  const commandes = await detailsCommandes(
+    e.id,
+    lignes.filter((l) => l.cle === 'commande').map((l) => l.id),
+  )
+  const valides = lignes.filter((l) => l.cle === 'commande' && l.statut !== 'annulee' && commandes.has(l.id))
+  const ventes = valides.reduce((t, l) => t + (commandes.get(l.id)?.total ?? 0), 0)
   const ici = `/services/${e.id}/demandes`
   const D = e.langue_defaut
   const attentes = lignes.map((l) => l.attente_sec).filter((x): x is number => x !== null)
@@ -122,10 +131,11 @@ export default async function Demandes({
         {types.length === 0 ? (
           <p className="text-sm text-[var(--color-encre-doux)]">Aucune demande : la page client n’affiche pas de boutons d’appel.</p>
         ) : (
-          <ul className="cascade grid gap-2 md:grid-cols-2">
+          <Triable quoi="types" etab={e.id} as="ul" className="cascade grid gap-2 md:grid-cols-2" libelle="Demandes">
             {types.map((t, i) => (
-              <li key={t.id} data-ligne id={`type-${t.id}`} className={`scroll-mt-24 rounded-2xl border border-[var(--color-ligne)] p-3 ${t.actif ? '' : 'opacity-60'}`}>
+              <li key={t.id} data-ligne data-tri-id={t.id} id={`type-${t.id}`} className={`scroll-mt-24 rounded-2xl border border-[var(--color-ligne)] bg-white p-3 ${t.actif ? '' : 'opacity-60'}`}>
                 <div className="flex items-start gap-3">
+                  <PoigneeTri libelle={`Déplacer « ${texte(t.libelle, D)} »`} className="mt-1.5 -ml-1" />
                   <span className="grid size-10 shrink-0 place-items-center rounded-xl text-xl text-white shadow-sm" style={{ background: e.couleur }} aria-hidden>
                     {t.icone ?? '•'}
                   </span>
@@ -142,12 +152,7 @@ export default async function Demandes({
                   </div>
                   <form className="flex shrink-0 items-center gap-0.5">
                     <Cache etab={e.id} retour={ici} ancre={`type-${t.id}`} id={t.id} />
-                    <button formAction={deplacerTypeDemandeAction} name="sens" value="-1" disabled={i === 0} className={petitBouton} title="Monter">
-                      ↑
-                    </button>
-                    <button formAction={deplacerTypeDemandeAction} name="sens" value="1" disabled={i === types.length - 1} className={petitBouton} title="Descendre">
-                      ↓
-                    </button>
+                    <FlechesTri premier={i === 0} dernier={i === types.length - 1} className={petitBouton} />
                     <Confirmer
                       action={supprimerTypeDemandeAction}
                       poussiere
@@ -170,7 +175,7 @@ export default async function Demandes({
                 </details>
               </li>
             ))}
-          </ul>
+          </Triable>
         )}
       </Bloc>
 
@@ -181,6 +186,12 @@ export default async function Demandes({
         <TuileChiffre libelle="Prises en moins de 2 min" valeur={<Chiffre valeur={rapides} genre="pourcent" />} />
         <TuileChiffre libelle="Réglées (médiane)" valeur={<Chiffre valeur={mediane(durees)} genre="duree" />} />
       </div>
+      {valides.length > 0 && (
+        <p className="-mt-2 text-sm text-[var(--color-encre-doux)]">
+          Dont <strong className="text-[var(--color-encre)]">{valides.length}</strong> commande{valides.length > 1 ? 's' : ''} pour{' '}
+          <strong className="text-[var(--color-encre)] tabular-nums">{argent(ventes)}</strong> aux prix du menu.
+        </p>
+      )}
 
       <Bloc titre="Historique" sous="Chaque demande, de l’appel à la fin, à l’heure de l’établissement.">
         <form className="mb-4 grid gap-2 sm:grid-cols-[1fr_1fr_1fr_8rem_auto] sm:items-end">
@@ -193,6 +204,7 @@ export default async function Demandes({
                   {t.icone} {texte(t.libelle, D)}
                 </option>
               ))}
+              {(e.options.commande || sp.cle === 'commande') && <option value="commande">🍽️ Commandes</option>}
             </select>
           </label>
           <label>
@@ -262,6 +274,22 @@ export default async function Demandes({
                       <span className="ml-1.5 text-xs" title={`Langue du client : ${l.langue}`}>
                         {drapeau(l.langue)}
                       </span>
+                      {commandes.get(l.id) && (
+                        <div className="mt-1 text-xs">
+                          <ul className="space-y-0.5">
+                            {commandes.get(l.id)!.details.map((x, i) => (
+                              <li key={i}>
+                                <span className="font-semibold tabular-nums">{x.quantite}×</span> {x.nom}
+                                {x.variante && <span className="text-[var(--color-encre-doux)]"> · {x.variante}</span>}
+                                {x.note && <span className="italic text-[var(--color-encre-doux)]"> « {x.note} »</span>}
+                              </li>
+                            ))}
+                          </ul>
+                          {commandes.get(l.id)!.total !== null && (
+                            <p className="mt-0.5 font-semibold tabular-nums">Total : {argent(commandes.get(l.id)!.total!)}</p>
+                          )}
+                        </div>
+                      )}
                       {l.note && <p className="text-xs italic text-[var(--color-encre-doux)]">« {l.note} »</p>}
                     </td>
                     <td className="py-1.5 pr-3">

@@ -325,3 +325,21 @@ details .reponse { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .merci-coche { animation: none; }
 }
+
+/* ---- Page Tapora Services ------------------------------------------------- */
+.attente #scene-services { visibility: hidden; }
+/* Le point « en direct » du portail respire. */
+.point-vivant::after { content: ''; position: absolute; inset: 0; border-radius: 9999px; background: #4ade80; animation: respire 2.2s ease-out infinite; }
+/* Le plat du jour : un reflet doré qui passe. */
+.reflet-or { position: relative; overflow: hidden; background: linear-gradient(110deg, #f7d27a, #e9a83c 55%, #f3c25a); }
+.reflet-or::after { content: ''; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.55) 50%, transparent 65%); transform: translateX(-120%); animation: pastille-reflet 3.4s ease-in-out 1.2s infinite; }
+.reflet-or > * { position: relative; z-index: 1; }
+/* Les langues du menu : la puce choisie, et un fondu court au changement. */
+.puce-langue { background: var(--color-sable); color: var(--color-encre-doux); transition: background-color 0.35s, color 0.35s; }
+.puce-langue[aria-pressed='true'] { background: var(--color-encre); color: var(--color-creme); }
+#menu-vivant [data-l-fr] { transition: opacity 0.25s ease; }
+#menu-vivant.change-langue [data-l-fr] { opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .point-vivant::after, .reflet-or::after { animation: none; }
+  #menu-vivant [data-l-fr] { transition: none; }
+}

@@ -3,7 +3,17 @@
 import { contexteRequete } from '@/lib/securite'
 import { estLangue } from '@/lib/services/langues'
 import { CODE_EMPLACEMENT } from '@/lib/services/donnees'
-import { annulerParClient, creerDemande, enregistrerRetour, retourVersGoogle, type ResultatDemande } from '@/lib/services/demandes'
+import {
+  annulerParClient,
+  creerCommande,
+  creerDemande,
+  enregistrerRetour,
+  MAX_LIGNES,
+  retourVersGoogle,
+  type ResultatCommande,
+  type ResultatDemande,
+  type SaisieCommande,
+} from '@/lib/services/demandes'
 import { ajouterCommentaire } from '@/lib/services/client'
 
 /**
@@ -20,6 +30,31 @@ export async function demander(code: string, cle: string, note: string | null, l
   const texte = typeof note === 'string' ? note.slice(0, 500) : null
   try {
     return await creerDemande(code, cle, texte, langueValide(langue), await contexteRequete())
+  } catch {
+    return { etat: 'invalide' }
+  }
+}
+
+/**
+ * Une commande depuis le menu. Le téléphone n'envoie que les plats, les
+ * formats, les quantités et les précisions : les noms et les prix sont
+ * relus dans le menu (lib/services/demandes.ts, creerCommande).
+ */
+export async function commander(code: string, lignes: SaisieCommande[], note: string | null, langue: string): Promise<ResultatCommande> {
+  if (!codeValide(code) || !Array.isArray(lignes) || lignes.length < 1 || lignes.length > MAX_LIGNES) return { etat: 'invalide' }
+  const propres: SaisieCommande[] = []
+  for (const l of lignes) {
+    if (!l || typeof l !== 'object' || typeof l.plat_id !== 'string' || !UUID.test(l.plat_id)) return { etat: 'invalide' }
+    propres.push({
+      plat_id: l.plat_id,
+      variante: typeof l.variante === 'number' ? l.variante : null,
+      quantite: typeof l.quantite === 'number' ? l.quantite : 0,
+      note: typeof l.note === 'string' ? l.note.slice(0, 140) : null,
+    })
+  }
+  const texte = typeof note === 'string' ? note.slice(0, 500) : null
+  try {
+    return await creerCommande(code, propres, texte, langueValide(langue), await contexteRequete())
   } catch {
     return { etat: 'invalide' }
   }

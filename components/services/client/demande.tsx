@@ -13,11 +13,14 @@ import { Tuile } from './tuiles'
 import { eclat, rebond, remplir } from './outils'
 
 export type TypeDemandeUi = { cle: string; libelle: string; icone: string | null; avec_note: boolean }
-type Suivie = { id: string; cle: string; libelle: string; icone: string | null; cree: number }
+/** Une demande suivie sur ce téléphone ; `resume` pour une commande (« 3 articles · 42,50 $ »). */
+export type Suivie = { id: string; cle: string; libelle: string; icone: string | null; cree: number; resume?: string }
 type Etat = { statut: StatutDemande; prise_par: string | null; cree_le: string }
 
 const CLE = (code: string) => `tapora_suivi_${code}`
 const OUVERTES: StatutDemande[] = ['nouvelle', 'prise']
+/** Une demande envoyée ailleurs sur la page (la commande du panier) : le suivi la prend tout de suite. */
+const EVENEMENT_SUIVI = 'tapora:suivi'
 
 function lireSuivies(code: string): Suivie[] {
   try {
@@ -37,48 +40,56 @@ function ecrireSuivies(code: string, l: Suivie[]) {
 }
 
 /**
- * Les demandes en un tap, et leur suivi en direct.
- *
- * Toucher une demande sans précision l'envoie tout de suite (la tuile
- * rebondit, un éclat, une vibration, un pop-up) ; avec précision, une
- * feuille demande le mot. Le suivi apparaît en haut — envoyée, prise (par
- * qui), faite — interrogé toutes les 3 s tant que la page est visible ;
- * « Annuler » tant que personne ne l'a prise, et la carte se désintègre.
- * Après « Appeler le serveur » ou « L'addition », la note est demandée
- * aussitôt.
+ * Suivre une demande envoyée hors du centre des demandes (une commande) :
+ * gardée sur le téléphone — l'accueil la montrera aussi — et annoncée au
+ * suivi déjà affiché sur la page.
  */
-export default function CentreDemandes({
-  types,
-  limite,
-  lienTout,
-  avis,
-  merci,
-  accentPremier = false,
-}: {
-  types: TypeDemandeUi[]
-  /** Sur l'accueil d'un hôtel : les premières seulement, puis « Toutes les demandes ». */
-  limite?: number
-  lienTout?: string
-  /** null : les avis sont désactivés. Sinon le lien Google (https) s'il existe. */
-  avis: { google: string | null } | null
-  /** Le message de l'établissement après une demande. */
-  merci?: string | null
-  /** Restaurant : « Appeler le serveur » en couleur. */
-  accentPremier?: boolean
-}) {
-  const { code, langue, t } = useLieu()
+export function ajouterSuivi(code: string, s: Suivie, nouvelle: boolean): void {
+  const l = lireSuivies(code)
+  if (!l.some((x) => x.id === s.id)) ecrireSuivies(code, [...l, s].slice(-6))
+  window.dispatchEvent(new CustomEvent(EVENEMENT_SUIVI, { detail: { code, s, nouvelle } }))
+}
+
+/**
+ * Le suivi en direct, partagé par le centre des demandes et par le menu (les
+ * commandes) : ce qui est retenu sur le téléphone, interrogé toutes les 3 s
+ * tant que c'est ouvert et que la page est visible ; une demande réglée part
+ * en poussière.
+ */
+function useSuivi() {
+  const { code, t } = useLieu()
   const [suivies, setSuivies] = useState<Suivie[]>([])
   const [etats, setEtats] = useState<Record<string, Etat>>({})
-  const [envoi, setEnvoi] = useState<string | null>(null)
-  const [avecNote, setAvecNote] = useState<TypeDemandeUi | null>(null)
-  const [note, setNote] = useState('')
-  const [avisPour, setAvisPour] = useState<{ demandeId: string; cle: number } | null>(null)
-  const tuiles = useRef(new Map<string, HTMLElement>())
   const cartes = useRef(new Map<string, HTMLElement>())
   const precedents = useRef<Record<string, StatutDemande>>({})
   const partantes = useRef(new Set<string>())
 
   useEffect(() => setSuivies(lireSuivies(code)), [code])
+
+  const suivre = useCallback(
+    (s: Suivie, nouvelle: boolean) => {
+      setSuivies((l) => {
+        if (l.some((x) => x.id === s.id)) return l
+        const n = [...l, s].slice(-6)
+        ecrireSuivies(code, n)
+        return n
+      })
+      if (nouvelle) {
+        precedents.current[s.id] = 'nouvelle'
+        setEtats((x) => ({ ...x, [s.id]: { statut: 'nouvelle', prise_par: null, cree_le: new Date().toISOString() } }))
+      }
+    },
+    [code],
+  )
+
+  useEffect(() => {
+    const recevoir = (e: Event) => {
+      const d = (e as CustomEvent<{ code: string; s: Suivie; nouvelle: boolean }>).detail
+      if (d?.code === code) suivre(d.s, d.nouvelle)
+    }
+    window.addEventListener(EVENEMENT_SUIVI, recevoir)
+    return () => window.removeEventListener(EVENEMENT_SUIVI, recevoir)
+  }, [code, suivre])
 
   const retirer = useCallback(
     (id: string) => {
@@ -156,6 +167,58 @@ export default function CentreDemandes({
     }
   }, [cleOuvertes, code, retirer, dissoudre, t])
 
+  async function annuler(id: string) {
+    const ok = await annulerDemande(code, id).catch(() => false)
+    if (!ok) return toast(t.etatPris, { texte: t.etatPrisSous, ton: 'info' })
+    precedents.current[id] = 'annulee'
+    vibrer(10)
+    toast(t.etatAnnule, { ton: 'info' })
+    await dissoudre(id)
+  }
+
+  // Une demande retrouvée dans le téléphone n'apparaît qu'une fois son état connu (pas d'éclair d'une demande déjà réglée).
+  const affichees = suivies.filter((s) => etats[s.id])
+  return { affichees, etats, cartes, suivre, annuler, dissoudre }
+}
+
+/**
+ * Les demandes en un tap, et leur suivi en direct.
+ *
+ * Toucher une demande sans précision l'envoie tout de suite (la tuile
+ * rebondit, un éclat, une vibration, un pop-up) ; avec précision, une
+ * feuille demande le mot. Le suivi apparaît en haut — envoyée, prise (par
+ * qui), faite — interrogé toutes les 3 s tant que la page est visible ;
+ * « Annuler » tant que personne ne l'a prise, et la carte se désintègre.
+ * Après « Appeler le serveur » ou « L'addition », la note est demandée
+ * aussitôt.
+ */
+export default function CentreDemandes({
+  types,
+  limite,
+  lienTout,
+  avis,
+  merci,
+  accentPremier = false,
+}: {
+  types: TypeDemandeUi[]
+  /** Sur l'accueil d'un hôtel : les premières seulement, puis « Toutes les demandes ». */
+  limite?: number
+  lienTout?: string
+  /** null : les avis sont désactivés. Sinon le lien Google (https) s'il existe. */
+  avis: { google: string | null } | null
+  /** Le message de l'établissement après une demande. */
+  merci?: string | null
+  /** Restaurant : « Appeler le serveur » en couleur. */
+  accentPremier?: boolean
+}) {
+  const { code, langue, t } = useLieu()
+  const suivi = useSuivi()
+  const [envoi, setEnvoi] = useState<string | null>(null)
+  const [avecNote, setAvecNote] = useState<TypeDemandeUi | null>(null)
+  const [note, setNote] = useState('')
+  const [avisPour, setAvisPour] = useState<{ demandeId: string; cle: number } | null>(null)
+  const tuiles = useRef(new Map<string, HTMLElement>())
+
   async function envoyer(type: TypeDemandeUi, precision: string | null) {
     if (envoi) return
     setEnvoi(type.cle)
@@ -174,54 +237,17 @@ export default function CentreDemandes({
     if (!deja) eclat(tuile)
     vibrer(deja ? 10 : [14, 60, 22])
     toast(deja ? t.dejaEnvoye : t.etatEnvoye, { texte: deja ? undefined : merci || t.etatEnvoyeSous, ton: deja ? 'info' : 'succes' })
-    setSuivies((l) => {
-      if (l.some((s) => s.id === id)) return l
-      const n = [...l, { id, cle: type.cle, libelle: type.libelle, icone: type.icone, cree: Date.now() }].slice(-6)
-      ecrireSuivies(code, n)
-      return n
-    })
-    if (!deja) {
-      precedents.current[id] = 'nouvelle'
-      setEtats((x) => ({ ...x, [id]: { statut: 'nouvelle', prise_par: null, cree_le: new Date().toISOString() } }))
-    }
+    suivi.suivre({ id, cle: type.cle, libelle: type.libelle, icone: type.icone, cree: Date.now() }, !deja)
     // La note, juste après — sauf si elle vient d'être donnée (on ne harcèle pas).
     if (r.avis && avis && !avisRecent(code)) setTimeout(() => setAvisPour({ demandeId: id, cle: Date.now() }), 1100)
   }
 
-  async function annuler(id: string) {
-    const ok = await annulerDemande(code, id).catch(() => false)
-    if (!ok) return toast(t.etatPris, { texte: t.etatPrisSous, ton: 'info' })
-    precedents.current[id] = 'annulee'
-    vibrer(10)
-    toast(t.etatAnnule, { ton: 'info' })
-    await dissoudre(id)
-  }
-
-  // Une demande retrouvée dans le téléphone n'apparaît qu'une fois son état connu (pas d'éclair d'une demande déjà réglée).
-  const affichees = suivies.filter((s) => etats[s.id])
   const visibles = limite ? types.slice(0, limite) : types
   const reste = limite ? types.length - visibles.length : 0
 
   return (
     <div className="space-y-4">
-      {affichees.length > 0 && (
-        <section aria-label={t.enCours} className="space-y-3">
-          {affichees.map((s) => (
-            <CarteSuivi
-              key={s.id}
-              ref={(el) => {
-                if (el) cartes.current.set(s.id, el)
-                else cartes.current.delete(s.id)
-              }}
-              suivie={s}
-              etat={etats[s.id]}
-              merci={merci}
-              onAnnuler={() => void annuler(s.id)}
-              onFermer={() => void dissoudre(s.id)}
-            />
-          ))}
-        </section>
-      )}
+      <ListeSuivi suivi={suivi} merci={merci} />
 
       <div className="sv-grille sv-cascade">
         {visibles.map((type, i) => (
@@ -286,6 +312,40 @@ export default function CentreDemandes({
   )
 }
 
+/** Seulement le suivi (sur le menu : les commandes envoyées, et le reste) — rien si rien n'est en cours. */
+export function SuiviEnCours({ merci, className = '' }: { merci?: string | null; className?: string }) {
+  const suivi = useSuivi()
+  if (!suivi.affichees.length) return null
+  return (
+    <div className={className}>
+      <ListeSuivi suivi={suivi} merci={merci} />
+    </div>
+  )
+}
+
+function ListeSuivi({ suivi, merci }: { suivi: ReturnType<typeof useSuivi>; merci?: string | null }) {
+  const { t } = useLieu()
+  if (!suivi.affichees.length) return null
+  return (
+    <section aria-label={t.enCours} className="space-y-3">
+      {suivi.affichees.map((s) => (
+        <CarteSuivi
+          key={s.id}
+          ref={(el) => {
+            if (el) suivi.cartes.current.set(s.id, el)
+            else suivi.cartes.current.delete(s.id)
+          }}
+          suivie={s}
+          etat={suivi.etats[s.id]}
+          merci={merci}
+          onAnnuler={() => void suivi.annuler(s.id)}
+          onFermer={() => void suivi.dissoudre(s.id)}
+        />
+      ))}
+    </section>
+  )
+}
+
 /** Une demande en cours : où elle en est, depuis quand, et « Annuler » tant que personne ne l'a prise. */
 const CarteSuivi = function CarteSuivi({
   ref,
@@ -327,7 +387,10 @@ const CarteSuivi = function CarteSuivi({
           {statut === 'faite' ? '✓' : (suivie.icone ?? '🔔')}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="sv-suivi-quoi">{suivie.libelle}</p>
+          <p className="sv-suivi-quoi">
+            {suivie.libelle}
+            {suivie.resume ? <span className="sv-suivi-resume"> · {suivie.resume}</span> : null}
+          </p>
           <p className="sv-suivi-titre">{titre}</p>
           <p className="sv-suivi-sous">
             {sous}

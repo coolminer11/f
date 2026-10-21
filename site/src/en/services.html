@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Digital Menu, Call the Server and Hotel Room Concierge | Tapora Services</title>
+  <meta name="description" content="Tapora Services: the menu in each guest’s language, “Call the server” and “The bill” in one tap, an in-room concierge for hotels, a staff portal and real statistics. Done for you by Tapora, a Québec business.">
+  <link rel="canonical" href="https://taporacards.com/en/services">
+  <link rel="alternate" hreflang="fr-CA" href="https://taporacards.com/services">
+  <link rel="alternate" hreflang="en-CA" href="https://taporacards.com/en/services">
+  <link rel="alternate" hreflang="x-default" href="https://taporacards.com/services">
+  <meta name="theme-color" content="#f7f1e7">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="preload" href="/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/fraunces-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/js/pret.js"></script>
+
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_CA">
+  <meta property="og:site_name" content="Tapora Cards">
+  <meta property="og:url" content="https://taporacards.com/en/services">
+  <meta property="og:title" content="Tapora Services — a service counter on every table">
+  <meta property="og:description" content="The menu in each guest’s language, “Call the server” and “The bill” in one tap, an in-room concierge for hotels. Done for you by Tapora.">
+  <meta property="og:image" content="https://taporacards.com/og-en.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Service",
+        "@id": "https://taporacards.com/en/services#service",
+        "name": "Tapora Services",
+        "serviceType": "Digital menu, staff call and concierge for restaurants and hotels",
+        "provider": { "@type": "Organization", "@id": "https://taporacards.com/#organisation", "name": "Tapora Cards", "legalName": "Tapora S.E.N.C.", "url": "https://taporacards.com/" },
+        "areaServed": [{ "@type": "AdministrativeArea", "name": "Québec" }, { "@type": "Country", "name": "Canada" }],
+        "audience": { "@type": "BusinessAudience", "audienceType": "Restaurants, bistros, cafés, bars, hotels, inns, B&Bs, motels" },
+        "availableLanguage": ["fr-CA", "en-CA"],
+        "url": "https://taporacards.com/en/services",
+        "description": "An NFC card and a QR code on every table or in every room: the menu opens in the guest’s language (10 languages), they call the server or ask for the bill in one tap, make room requests, and leave a review right after. Staff get every request live in their portal, the manager edits their own menu, and the business gets real statistics and a monthly report. Tapora builds the menu and prepares the cards and table tents."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          { "@type": "Question", "name": "Do my guests need to install an app?", "acceptedAnswer": { "@type": "Answer", "text": "No. They tap the card on their table or in their room with their phone, or scan the code with the camera: the page opens in the browser, with no app, no account and no password." } },
+          { "@type": "Question", "name": "Does it work with every phone?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Every iPhone since the XR and the vast majority of Android phones read the NFC card without an app. For the others, the QR code printed on the table tent opens with any phone’s camera." } },
+          { "@type": "Question", "name": "Which languages can the menu show?", "acceptedAnswer": { "@type": "Answer", "text": "Up to ten: French, English, Spanish, German, Italian, Portuguese, Chinese, Japanese, Korean and Arabic. In Québec, French comes first, as the Charter of the French Language requires; guests pick their own, and their phone’s language is suggested." } },
+          { "@type": "Question", "name": "How do Google reviews work?", "acceptedAnswer": { "@type": "Answer", "text": "Right after their request, guests are asked how their visit is going. The Google link is offered to every guest, whatever their rating. Guests can also write a private note to the team, who reads it in their portal." } },
+          { "@type": "Question", "name": "What do you do with my guests’ data?", "acceptedAnswer": { "@type": "Answer", "text": "The page never asks for a name, email, phone number or payment card. We keep the table or room, the language, requests and reviews, for you and your statistics, plus an encrypted fingerprint of the IP address (never the address itself), erased after 30 days, to curb abuse. Nothing is sold or used for advertising, and the data is hosted in Canada." } },
+          { "@type": "Question", "name": "Can guests order?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, if you want: ordering from the table, or room service at a hotel. The kitchen gets the ticket in the portal, and payment works as usual, with the bill or charged to the room." } },
+          { "@type": "Question", "name": "Can I cancel?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Monthly, you can stop whenever you like. Yearly, the service runs to the end of the paid year." } },
+          { "@type": "Question", "name": "What do I need to get started?", "acceptedAnswer": { "@type": "Answer", "text": "Nothing. Tapora builds your menu, prepares the cards and table tents, and trains your team in ten minutes. Staff use the phone or tablet they already have." } },
+          { "@type": "Question", "name": "Can I edit my menu myself?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Manager mode, protected by a password, lets you change your dishes, prices, photos, announcements and Wi-Fi in seconds. The daily special takes ten seconds from the staff portal." } }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="papier overflow-x-hidden">
+  <div id="progression" class="fixed inset-x-0 top-0 z-50 h-[3px] origin-left scale-x-0 bg-brique" aria-hidden="true"></div>
+  <a href="#contenu" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-encre focus:px-4 focus:py-2 focus:text-creme">Skip to content</a>
+
+  <!-- Navigation -->
+  <header id="entete" class="fixed inset-x-0 top-0 z-40 transition-[background-color,box-shadow,backdrop-filter] duration-300">
+    <nav class="mx-auto flex max-w-6xl items-center justify-between px-5 py-4" aria-label="Main">
+      <a href="/en/" class="flex items-center gap-2.5" aria-label="Tapora Cards, home">
+        <img src="/favicon.svg" alt="" width="30" height="30" class="size-[30px]">
+        <span class="titre text-xl font-semibold">Tapora <span class="font-normal italic text-brique">Services</span></span>
+      </a>
+      <div class="hidden items-center gap-6 text-[15px] text-encre-doux lg:flex xl:gap-8">
+        <a href="#fonctionnement" class="lien-nav transition hover:text-encre">How it works</a>
+        <a href="#restaurants" class="lien-nav transition hover:text-encre">Restaurants</a>
+        <a href="#hotels" class="lien-nav transition hover:text-encre">Hotels</a>
+        <a href="#prix" class="lien-nav transition hover:text-encre">Pricing</a>
+        <a href="#faq" class="lien-nav transition hover:text-encre max-xl:hidden">FAQ</a>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="/en/" class="lien-nav hidden text-sm font-medium text-encre-doux transition hover:text-encre sm:inline">Review cards</a>
+        <a href="/services" hreflang="fr" lang="fr" class="lien-nav text-sm font-medium text-encre-doux transition hover:text-encre" title="Version française">FR</a>
+        <a href="#demo" class="rounded-full bg-encre px-5 py-2.5 text-sm font-medium text-creme transition hover:bg-brique"><span class="sm:hidden">Demo</span><span class="max-sm:hidden">Book a demo</span></a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="contenu">
+    <!-- ============================== HERO ============================== -->
+    <section class="relative overflow-hidden pt-32 pb-24 sm:pt-40">
+      <div class="mx-auto grid max-w-6xl items-center gap-14 px-5 lg:grid-cols-[1.05fr_1fr]">
+        <div>
+          <div class="flex flex-wrap items-center gap-2" data-apparait>
+            <p class="inline-flex items-center gap-2 rounded-full bg-sable px-3.5 py-1.5 text-[13px] font-medium text-encre-doux">
+              <span class="text-brique">✦</span> New · for restaurants and hotels
+            </p>
+          </div>
+          <h1 class="titre mt-6 text-[2.75rem] leading-[1.04] font-medium sm:text-6xl lg:text-[3.7rem]">
+            <span class="titre-ligne block">Your service,</span>
+            <span class="titre-ligne block">on every
+              <span class="souligne italic text-brique">table<svg viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path class="trait" d="M3 14 C 40 4, 90 3, 120 9 S 175 16, 197 6" fill="none" stroke="#e4a53a" stroke-width="5" stroke-linecap="round"/></svg></span>.</span>
+          </h1>
+          <p class="mt-7 max-w-xl text-lg leading-relaxed text-encre-doux" data-apparait>
+            Guests tap the card on their table — or scan the code. The menu opens in their language,
+            they call the server or ask for the bill in one tap, and leave a review right after.
+          </p>
+          <div class="mt-9 flex flex-wrap items-center gap-4" data-apparait>
+            <a href="#demo" class="bouton-fleche group inline-flex items-center gap-2 rounded-full bg-brique px-7 py-4 text-[15px] font-semibold text-creme shadow-[0_10px_24px_-10px_rgb(158_65_34_/_0.7)] transition hover:-translate-y-0.5 hover:bg-brique-fonce">Book a demo <span class="fleche" aria-hidden="true">→</span></a>
+            <a href="#fonctionnement" class="group inline-flex items-center gap-2 px-2 py-4 text-[15px] font-medium underline decoration-ligne decoration-2 underline-offset-[6px] transition hover:decoration-brique">
+              See how it works
+            </a>
+          </div>
+          <ul class="mt-10 flex flex-wrap gap-x-7 gap-y-2 text-[15px] text-encre-doux" data-apparait>
+            <li class="flex items-center gap-2"><svg viewBox="0 0 20 20" class="size-4 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 10.5 4 4 8-9"/></svg>No app</li>
+            <li class="flex items-center gap-2"><svg viewBox="0 0 20 20" class="size-4 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 10.5 4 4 8-9"/></svg>10 languages</li>
+            <li class="flex items-center gap-2"><svg viewBox="0 0 20 20" class="size-4 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 10.5 4 4 8-9"/></svg>Set up for you by Tapora</li>
+          </ul>
+        </div>
+
+        <!-- The service: the staff tablet and the guest’s phone -->
+        <div id="scene-services" class="relative mx-auto h-[31rem] w-full max-w-[31rem]" aria-hidden="true">
+          <div id="sv-plan" class="absolute inset-x-0 bottom-4 top-14 rounded-[2.5rem] bg-sable"></div>
+          <div class="absolute inset-x-6 bottom-4 h-24 rounded-b-[2.5rem] bg-gradient-to-t from-[#e2d3bd] to-transparent"></div>
+
+          <!-- staff tablet -->
+          <div id="sv-tablette" class="absolute left-0 top-6 z-10 w-[84%] -rotate-2 rounded-[1.7rem] bg-encre p-2 shadow-[0_30px_50px_-22px_rgb(40_25_15_/_0.65)] sm:left-2 sm:w-[78%]">
+            <div class="rounded-[1.25rem] bg-[#16110d] p-3.5 text-creme sm:p-4">
+              <div class="flex items-center justify-between gap-2">
+                <p class="text-[11px] font-semibold">Harbour Bistro <span class="font-normal text-creme/50">· staff portal</span></p>
+                <span class="flex shrink-0 items-center gap-1.5 text-[10px] text-creme/70"><span class="point-vivant relative size-1.5 rounded-full bg-[#4ade80]"></span>Live</span>
+              </div>
+              <p class="mt-3.5 text-[9.5px] font-semibold uppercase tracking-[0.16em] text-creme/45">To do · <span id="sv-compte">1</span></p>
+              <div class="mt-2 min-h-[7.4rem] space-y-2">
+                <div id="sv-demande" class="rounded-xl bg-creme/[0.09] p-2.5 ring-1 ring-creme/10">
+                  <div class="flex items-center justify-between gap-2">
+                    <p class="text-[12px] font-semibold"><span class="text-miel">Table 4</span> · Call the server</p>
+                    <span class="shrink-0 text-[9px] text-creme/55">just now</span>
+                  </div>
+                  <div class="mt-2 flex gap-1.5">
+                    <span id="sv-jarrive" class="rounded-lg bg-miel px-2.5 py-1 text-[10px] font-semibold text-encre">On my way</span>
+                    <span class="rounded-lg bg-brique px-2.5 py-1 text-[10px] font-semibold">✓ Done</span>
+                  </div>
+                </div>
+                <div class="rounded-xl bg-creme/[0.04] p-2.5">
+                  <p class="text-[11px] text-creme/80"><span class="font-semibold">Patio 2</span> · The bill</p>
+                  <p class="mt-0.5 text-[9px] text-creme/45">Taken by Julie · 1 min ago</p>
+                </div>
+              </div>
+              <div class="mt-3 border-t border-creme/10 pt-3">
+                <div class="grid max-w-[62%] grid-cols-2 gap-2 text-[9px] leading-tight text-creme/55">
+                <div><p class="titre text-[15px] text-creme">1 min 53</p>median response</div>
+                <div><p class="titre text-[15px] text-creme">4.6 <span class="text-miel">★</span></p>this month’s rating</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- guest’s phone -->
+          <div id="sv-telephone" class="absolute bottom-3 right-1 z-20 h-[22.5rem] w-[10.25rem] rotate-3 rounded-[1.9rem] bg-encre p-1.5 shadow-[0_30px_50px_-20px_rgb(40_25_15_/_0.6)] sm:right-3">
+            <div class="relative h-full overflow-hidden rounded-[1.5rem] bg-creme">
+              <div class="absolute left-1/2 top-1.5 h-4 w-14 -translate-x-1/2 rounded-full bg-encre"></div>
+              <div class="px-2.5 pt-7">
+                <p class="flex items-center justify-between text-[7.5px] font-semibold uppercase tracking-[0.16em] text-brique"><span>Table 4</span><span class="rounded-full bg-sable px-1.5 py-0.5 tracking-normal text-encre-doux">EN ▾</span></p>
+                <p class="titre mt-1 text-[15px] font-semibold leading-tight">Harbour Bistro</p>
+                <p class="text-[8.5px] text-encre-doux">What can we do for you?</p>
+                <div class="mt-2.5 grid gap-1.5">
+                  <div class="rounded-xl bg-encre px-2.5 py-1.5 text-creme">
+                    <p class="text-[10px] font-semibold">Menu</p>
+                    <p class="text-[7.5px] text-creme/65">Dishes, prices and allergens</p>
+                  </div>
+                  <div id="sv-appel" class="relative flex items-center justify-between rounded-xl bg-brique px-2.5 py-2 text-creme">
+                    <p class="text-[9.5px] font-semibold leading-tight">Call the server</p><span class="text-[9px]" aria-hidden="true">→</span>
+                    <span id="sv-doigt" class="pointer-events-none absolute left-1/2 top-1/2 size-7 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-creme/90 opacity-0"></span>
+                  </div>
+                  <div class="flex items-center justify-between rounded-xl bg-sable px-2.5 py-2">
+                    <p class="text-[9.5px] font-semibold leading-tight">The bill, please</p><span class="text-[9px] text-encre-doux" aria-hidden="true">→</span>
+                  </div>
+                </div>
+                <div id="sv-suivi" class="mt-2 rounded-xl bg-white px-2 py-1.5 ring-1 ring-ligne">
+                  <div class="relative h-[24px]">
+                    <p id="sv-envoye" class="absolute inset-0 text-[9px] leading-tight opacity-0"><strong class="font-semibold">Request sent</strong><br><span class="text-[7.5px] text-encre-doux">The team has been notified.</span></p>
+                    <p id="sv-arrive" class="absolute inset-0 text-[9px] leading-tight"><strong class="font-semibold text-sapin">Mary is on her way</strong><br><span class="text-[7.5px] text-encre-doux">She saw your request.</span></p>
+                  </div>
+                </div>
+                <div id="sv-avis" class="mt-1.5 rounded-xl bg-white px-2 py-1.5 ring-1 ring-ligne">
+                  <p class="text-[8px] font-semibold">How is your visit going?</p>
+                  <div class="mt-0.5 flex gap-0.5 text-[13px] leading-none"><span class="sv-etoile text-miel">★</span><span class="sv-etoile text-miel">★</span><span class="sv-etoile text-miel">★</span><span class="sv-etoile text-miel">★</span><span class="sv-etoile text-miel">★</span></div>
+                  <p class="mt-1 rounded-full bg-[#1a73e8] px-2 py-0.5 text-center text-[7px] font-medium text-white">Leave a Google review</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- handwritten note -->
+          <div id="sv-note" class="pointer-events-none absolute bottom-1 left-2 z-20 flex items-end gap-1 max-sm:hidden">
+            <p class="titre -rotate-3 text-lg italic text-encre-doux">one tap, and Mary’s on her way.</p>
+            <svg viewBox="0 0 70 50" class="mb-4 w-12 -scale-x-100 text-encre-doux" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path class="trait" d="M64 44 C 48 44, 30 36, 20 14"/><path d="M14 22 L20 13 L27 20"/></svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== RIBBON ============================== -->
+    <section class="bandeau border-y border-ligne bg-creme/60 py-5" aria-label="Who it’s for">
+      <div class="overflow-hidden">
+        <ul class="defile titre flex w-max gap-10 whitespace-nowrap text-2xl italic text-encre-doux">
+          <li>restaurants</li><li class="text-brique" aria-hidden="true">•</li><li>bistros</li><li class="text-brique" aria-hidden="true">•</li><li>brewpubs</li><li class="text-brique" aria-hidden="true">•</li><li>cafés</li><li class="text-brique" aria-hidden="true">•</li><li>bars</li><li class="text-brique" aria-hidden="true">•</li><li>hotels</li><li class="text-brique" aria-hidden="true">•</li><li>inns</li><li class="text-brique" aria-hidden="true">•</li><li>B&amp;Bs</li><li class="text-brique" aria-hidden="true">•</li><li>motels</li><li class="text-brique" aria-hidden="true">•</li><li>sugar shacks</li><li class="text-brique" aria-hidden="true">•</li>
+          <li aria-hidden="true">restaurants</li><li class="text-brique" aria-hidden="true">•</li><li aria-hidden="true">bistros</li><li class="text-brique" aria-hidden="true">•</li><li aria-hidden="true">brewpubs</li><li class="text-brique" aria-hidden="true">•</li><li aria-hidden="true">cafés</li><li class="text-brique" aria-hidden="true">•</li><li aria-hidden="true">bars</li><li class="text-brique" aria-hidden="true">•</li><li aria-hidden="true">hotels</li><li class="text-brique" aria-hidden="true">•</li><li aria-hidden="true">inns</li><li class="text-brique" aria-hidden="true">•</li><li aria-hidden="true">B&amp;Bs</li><li class="text-brique" aria-hidden="true">•</li><li aria-hidden="true">motels</li><li class="text-brique" aria-hidden="true">•</li><li aria-hidden="true">sugar shacks</li><li class="text-brique" aria-hidden="true">•</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============================== HOW IT WORKS ============================== -->
+    <section id="fonctionnement" class="mx-auto max-w-6xl scroll-mt-20 px-5 py-28">
+      <div class="max-w-2xl">
+        <h2 data-mots class="titre text-4xl font-medium leading-tight sm:text-5xl">Less waiting for your guests. Fewer steps for your team.</h2>
+      </div>
+      <ol class="mt-16 grid gap-6 md:grid-cols-3">
+        <li class="etape soulevable carte-papier rounded-3xl p-7 md:-rotate-1 [--penche:-1deg]">
+          <span class="titre text-5xl text-brique">1</span>
+          <h3 class="mt-4 text-xl font-semibold">The guest taps the card</h3>
+          <p class="mt-2 leading-relaxed text-encre-doux">A card on every table, a tent in every room. They tap it with their phone, or scan the code: their table’s page opens, in their language.</p>
+        </li>
+        <li class="etape soulevable carte-papier rounded-3xl p-7 md:translate-y-6 md:rotate-1 [--penche:1deg]">
+          <span class="titre text-5xl text-sapin">2</span>
+          <h3 class="mt-4 text-xl font-semibold">One tap to ask</h3>
+          <p class="mt-2 leading-relaxed text-encre-doux">The menu, “Call the server”, “The bill”, towels, housekeeping: one tap, and the request goes out with the right table or room number.</p>
+        </li>
+        <li class="etape soulevable carte-papier rounded-3xl p-7 md:-rotate-1 [--penche:-1deg]">
+          <span class="titre text-5xl text-miel">3</span>
+          <h3 class="mt-4 text-xl font-semibold">The team is on its way</h3>
+          <p class="mt-2 leading-relaxed text-encre-doux">The request chimes on the team’s tablet or phone. “On my way”: the guest sees it right away. You see response times and reviews.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ============================== RESTAURANTS ============================== -->
+    <section id="restaurants" class="scroll-mt-20 bg-sable/70 py-28">
+      <div class="mx-auto grid max-w-6xl items-center gap-14 px-5 lg:grid-cols-[1fr_1.05fr]">
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-[0.2em] text-brique" data-apparait>Restaurants</p>
+          <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">A <span class="souligne italic text-brique">living<svg viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path class="trait" d="M3 12 C 50 5, 110 4, 150 10 S 185 13, 197 8" fill="none" stroke="#e4a53a" stroke-width="4" stroke-linecap="round"/></svg></span> menu, in every guest’s language.</h2>
+          <p class="mt-5 max-w-xl text-lg leading-relaxed text-encre-doux" data-apparait>No more laminated menus to reprint. Your dishes, prices and photos are always up to date, and tourists read the menu in their own language.</p>
+          <ul class="mt-8 space-y-4 text-[15px] leading-snug">
+            <li class="flex gap-3" data-apparait><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span><strong class="font-semibold">Up to 10 languages</strong> — French and English, then Spanish, Chinese and more. The phone’s language is suggested to the guest.</span></li>
+            <li class="flex gap-3" data-apparait><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span><strong class="font-semibold">Allergens and filters</strong> — Health Canada’s priority allergens on every dish, plus vegetarian, vegan and gluten-free filters.</span></li>
+            <li class="flex gap-3" data-apparait><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span><strong class="font-semibold">The daily special in 10 seconds</strong> — and a dish marked “sold out” in one move, mid-service.</span></li>
+            <li class="flex gap-3" data-apparait><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span><strong class="font-semibold">“Call the server” and “The bill”</strong> — no hand-waving, no waiting for someone to walk by.</span></li>
+            <li class="flex gap-3" data-apparait><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span><strong class="font-semibold">Ordering from the table, if you want it</strong> — the guest picks, the kitchen gets the ticket, and payment happens as usual, with the bill.</span></li>
+          </ul>
+        </div>
+
+        <!-- The menu (example) -->
+        <figure id="menu-vivant" class="carte-papier relative rounded-[2rem] p-5 sm:p-7" data-apparait aria-hidden="true">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <p class="titre text-xl font-medium">Harbour Bistro</p>
+            <div class="flex flex-wrap gap-1 text-[11px] font-semibold">
+              <span class="puce-langue rounded-full px-2.5 py-1" data-langue="fr" aria-pressed="false">FR</span>
+              <span class="puce-langue rounded-full px-2.5 py-1" data-langue="en" aria-pressed="true">EN</span>
+              <span class="puce-langue rounded-full px-2.5 py-1" data-langue="es" aria-pressed="false">ES</span>
+              <span class="puce-langue rounded-full px-2.5 py-1" data-langue="zh" aria-pressed="false">中文</span>
+            </div>
+          </div>
+          <div class="reflet-or mt-5 rounded-2xl px-4 py-3 text-encre">
+            <p class="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-75" data-l-fr="Plat du jour" data-l-en="Today’s special" data-l-es="Plato del día" data-l-zh="今日特色菜">Today’s special</p>
+            <div class="mt-0.5 flex items-baseline justify-between gap-3">
+              <p class="titre text-lg font-medium" data-l-fr="Poutine au canard confit" data-l-en="Duck confit poutine" data-l-es="Poutine de pato confitado" data-l-zh="油封鸭肉肉汁薯条">Duck confit poutine</p>
+              <p class="titre text-lg font-medium tabular-nums">$24</p>
+            </div>
+          </div>
+          <p class="titre mt-6 text-2xl font-medium" data-l-fr="Entrées" data-l-en="Starters" data-l-es="Entrantes" data-l-zh="前菜">Starters</p>
+          <ul class="mt-3 divide-y divide-dashed divide-ligne">
+            <li class="py-3">
+              <div class="flex items-baseline justify-between gap-3">
+                <p class="font-semibold" data-l-fr="Soupe à l’oignon gratinée" data-l-en="French onion soup" data-l-es="Sopa de cebolla gratinada" data-l-zh="焗烤洋葱汤">French onion soup</p>
+                <p class="font-semibold tabular-nums">$11</p>
+              </div>
+              <p class="mt-0.5 text-sm text-encre-doux" data-l-fr="Bouillon de bœuf, croûton et cheddar de l’Île-aux-Grues." data-l-en="Beef broth, crouton and Île-aux-Grues cheddar." data-l-es="Caldo de res, picatoste y cheddar de Île-aux-Grues." data-l-zh="牛肉高汤、面包丁与格吕岛切达干酪。">Beef broth, crouton and Île-aux-Grues cheddar.</p>
+              <div class="mt-2 flex flex-wrap gap-1.5 text-[11px]">
+                <span class="rounded-full bg-sable px-2 py-0.5" data-l-fr="Lait" data-l-en="Milk" data-l-es="Leche" data-l-zh="乳制品">Milk</span>
+                <span class="rounded-full bg-sable px-2 py-0.5" data-l-fr="Gluten" data-l-en="Gluten" data-l-es="Gluten" data-l-zh="麸质">Gluten</span>
+                <span class="rounded-full bg-miel/25 px-2 py-0.5 text-[#8a5a10]" data-l-fr="Populaire" data-l-en="Popular" data-l-es="Popular" data-l-zh="人气">Popular</span>
+              </div>
+            </li>
+            <li class="py-3">
+              <div class="flex items-baseline justify-between gap-3">
+                <p class="font-semibold" data-l-fr="Tartare de saumon" data-l-en="Salmon tartare" data-l-es="Tartar de salmón" data-l-zh="三文鱼塔塔">Salmon tartare</p>
+                <p class="font-semibold tabular-nums">$17</p>
+              </div>
+              <div class="mt-2 flex flex-wrap gap-1.5 text-[11px]">
+                <span class="rounded-full bg-sable px-2 py-0.5" data-l-fr="Poisson" data-l-en="Fish" data-l-es="Pescado" data-l-zh="鱼类">Fish</span>
+                <span class="rounded-full bg-sapin/15 px-2 py-0.5 text-sapin" data-l-fr="Sans gluten" data-l-en="Gluten-free" data-l-es="Sin gluten" data-l-zh="无麸质">Gluten-free</span>
+              </div>
+            </li>
+            <li class="py-3 opacity-55">
+              <div class="flex items-baseline justify-between gap-3">
+                <p class="font-semibold line-through decoration-encre-doux/60" data-l-fr="Ailes de poulet BBQ" data-l-en="BBQ chicken wings" data-l-es="Alitas de pollo BBQ" data-l-zh="烧烤鸡翅">BBQ chicken wings</p>
+                <p class="rounded-full bg-encre px-2 py-0.5 text-[11px] font-semibold text-creme" data-l-fr="Épuisé" data-l-en="Sold out" data-l-es="Agotado" data-l-zh="已售完">Sold out</p>
+              </div>
+            </li>
+          </ul>
+          <div class="mt-4 grid grid-cols-2 gap-2 text-sm font-semibold">
+            <p class="rounded-2xl bg-brique px-3 py-2.5 text-center text-creme" data-l-fr="Appeler le serveur" data-l-en="Call the server" data-l-es="Llamar al camarero" data-l-zh="呼叫服务员">Call the server</p>
+            <p class="rounded-2xl bg-sable px-3 py-2.5 text-center" data-l-fr="L’addition" data-l-en="The bill" data-l-es="La cuenta" data-l-zh="结账">The bill</p>
+          </div>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ============================== HOTELS ============================== -->
+    <section id="hotels" class="mx-auto max-w-6xl scroll-mt-20 px-5 py-28">
+      <div class="grid items-center gap-14 lg:grid-cols-[1.05fr_1fr]">
+        <!-- The room (example) -->
+        <figure class="carte-papier order-2 rounded-[2rem] p-5 sm:p-7 lg:order-1" data-apparait aria-hidden="true">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-sapin">Room 204</p>
+              <p class="titre mt-0.5 text-xl font-medium">Old Port Hotel</p>
+            </div>
+            <span class="rounded-full bg-sable px-2.5 py-1 text-[11px] font-semibold text-encre-doux">EN ▾</span>
+          </div>
+          <div class="mt-5 flex items-center justify-between gap-4 rounded-2xl bg-sapin px-4 py-3.5 text-creme">
+            <div class="min-w-0">
+              <p class="text-[11px] text-creme/70">Wi-Fi · OldPort-Guests</p>
+              <p class="mt-0.5 font-mono text-[15px] tracking-wide">maple-2026</p>
+            </div>
+            <span class="shrink-0 rounded-full bg-creme px-3 py-1.5 text-xs font-semibold text-sapin">Copy</span>
+          </div>
+          <p class="mt-6 text-sm font-semibold">Requests, in one tap</p>
+          <div class="mt-2.5 grid grid-cols-2 gap-2 text-sm">
+            <p class="rounded-2xl bg-sable px-3 py-3 font-medium">Towels</p>
+            <p class="relative rounded-2xl bg-sapin/15 px-3 py-3 font-medium text-sapin ring-1 ring-sapin/30">Housekeeping <span class="absolute right-3 top-3 text-xs">✓ sent</span></p>
+            <p class="rounded-2xl bg-sable px-3 py-3 font-medium">Pillows</p>
+            <p class="rounded-2xl bg-sable px-3 py-3 font-medium">Late checkout</p>
+          </div>
+          <p class="mt-6 text-sm font-semibold">Concierge</p>
+          <ul class="mt-2 divide-y divide-dashed divide-ligne text-sm">
+            <li class="flex justify-between gap-3 py-2.5"><span>Breakfast</span><span class="text-encre-doux">7–10:30 a.m.</span></li>
+            <li class="flex justify-between gap-3 py-2.5"><span>Room service</span><span class="text-encre-doux">until 10 p.m.</span></li>
+            <li class="flex justify-between gap-3 py-2.5"><span>Taxi, shuttle</span><span class="text-encre-doux">we’ll call it for you</span></li>
+            <li class="flex justify-between gap-3 py-2.5"><span>Our favourite spots</span><span class="text-encre-doux">Old Québec</span></li>
+          </ul>
+        </figure>
+        <div class="order-1 lg:order-2">
+          <p class="text-sm font-semibold uppercase tracking-[0.2em] text-sapin" data-apparait>Hotels</p>
+          <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">The room concierge, right on your guests’ phones.</h2>
+          <p class="mt-5 max-w-xl text-lg leading-relaxed text-encre-doux" data-apparait>The printed binder in the room, only better: always up to date, translated, and connected to your team. Guests have everything at hand — and the front desk gets a breather.</p>
+          <ul class="mt-8 space-y-4 text-[15px] leading-snug">
+            <li class="flex gap-3" data-apparait><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span><strong class="font-semibold">One-tap requests</strong> — towels, housekeeping, pillows, late checkout: the request arrives with the room number.</span></li>
+            <li class="flex gap-3" data-apparait><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span><strong class="font-semibold">The concierge</strong> — breakfast hours, spa, parking, transport, your favourite spots, useful numbers.</span></li>
+            <li class="flex gap-3" data-apparait><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span><strong class="font-semibold">Room service</strong> — an up-to-date menu, and orders charged to the room if you turn it on.</span></li>
+            <li class="flex gap-3" data-apparait><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span><strong class="font-semibold">Wi-Fi without asking</strong> — the network and password, copied in one tap.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== REVIEWS ============================== -->
+    <section id="avis" class="mx-auto max-w-6xl scroll-mt-20 px-5 pb-28">
+      <div class="relative overflow-hidden rounded-[2.5rem] bg-encre px-6 py-14 text-creme sm:px-14 sm:py-16" data-apparait>
+        <svg viewBox="0 0 100 100" class="pointer-events-none absolute -right-10 -top-10 w-64 opacity-[0.14]" aria-hidden="true"><g fill="none" stroke-width="6" stroke-linecap="round"><path d="M30 70A20 20 0 0 1 70 70" stroke="#f2d3c4"/><path d="M20 70A30 30 0 0 1 80 70" stroke="#e4a53a"/><path d="M10 70A40 40 0 0 1 90 70" stroke="#c2552f"/></g></svg>
+        <div class="relative grid gap-10 lg:grid-cols-[1.2fr_1fr] lg:items-center">
+          <div>
+            <p class="text-sm font-semibold uppercase tracking-[0.2em] text-miel">Reviews</p>
+            <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">The review, at just the right moment.</h2>
+            <p class="mt-5 max-w-xl text-lg leading-relaxed text-creme/80">Right after their request — “Call the server”, “The bill”, fresh towels —, guests are asked how their visit is going. The Google link is offered to every guest, whatever their rating.</p>
+            <p class="mt-4 max-w-xl leading-relaxed text-creme/70">Guests can also write a private note to the team: you read it in your portal, and fix the problem before they leave.</p>
+          </div>
+          <div class="rounded-3xl bg-creme p-6 text-encre shadow-[0_30px_50px_-28px_rgb(0_0_0_/_0.7)]" aria-hidden="true">
+            <p class="text-sm font-semibold">How is your visit going?</p>
+            <p class="mt-2 flex gap-1 text-3xl leading-none text-miel">★★★★★</p>
+            <p class="mt-4 rounded-full bg-[#1a73e8] px-4 py-2.5 text-center text-sm font-medium text-white">Leave a Google review</p>
+            <p class="mt-3 rounded-2xl border border-ligne px-4 py-3 text-sm text-encre-doux">A note for the team? (optional)</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== STAFF PORTAL ============================== -->
+    <section id="portail" class="scroll-mt-20 bg-sable/70 py-28">
+      <div class="mx-auto max-w-6xl px-5">
+        <div class="grid items-end gap-8 lg:grid-cols-[1fr_auto]">
+          <h2 data-mots class="titre max-w-2xl text-4xl font-medium leading-tight sm:text-5xl">The staff portal. Nothing to install.</h2>
+          <p class="max-w-sm leading-relaxed text-encre-doux" data-apparait>One link, one password, and the service tablet — or everyone’s phone — becomes the dashboard of the dining room.</p>
+        </div>
+        <div class="mt-14 grid gap-x-12 gap-y-12 md:grid-cols-2">
+          <div class="flex gap-5" data-apparait>
+            <svg viewBox="0 0 48 48" class="size-12 shrink-0 text-brique" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="32" height="32" rx="6"/><path d="M15 18h18M15 25h12M15 32h8"/></svg>
+            <div><h3 class="text-xl font-semibold">The live queue</h3><p class="mt-2 leading-relaxed text-encre-doux">Every request arrives within a second, with the table or room and how long it’s been waiting. “On my way”, then “Done”: guests follow their request on their phone.</p></div>
+          </div>
+          <div class="flex gap-5" data-apparait>
+            <svg viewBox="0 0 48 48" class="size-12 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M24 7a11 11 0 0 0-11 11v7l-4 7h30l-4-7v-7A11 11 0 0 0 24 7ZM19 36a5 5 0 0 0 10 0"/></svg>
+            <div><h3 class="text-xl font-semibold">A notification, a chime</h3><p class="mt-2 leading-relaxed text-encre-doux">On the service tablet or each person’s phone. By section if you like: the patio only gets the patio.</p></div>
+          </div>
+          <div class="flex gap-5" data-apparait>
+            <svg viewBox="0 0 48 48" class="size-12 shrink-0 text-miel" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 38 31 17l5 5-21 21H10v-5ZM28 20l5 5M33 9l6 6-3 3-6-6 3-3Z"/></svg>
+            <div><h3 class="text-xl font-semibold">The manager edits it all</h3><p class="mt-2 leading-relaxed text-encre-doux">With their own password, the manager changes dishes, prices, photos, announcements and Wi-Fi — in seconds, without calling anyone.</p></div>
+          </div>
+          <div class="flex gap-5" data-apparait>
+            <svg viewBox="0 0 48 48" class="size-12 shrink-0 text-brique" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="12" y="21" width="24" height="18" rx="4"/><path d="M17 21v-5a7 7 0 0 1 14 0v5M24 29v4"/></svg>
+            <div><h3 class="text-xl font-semibold">Under lock and key</h3><p class="mt-2 leading-relaxed text-encre-doux">The portal is protected by a password, and manager mode by another. Lost a link? We create a new one and the old one stops working.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== STATISTICS ============================== -->
+    <section id="statistiques" class="mx-auto max-w-6xl scroll-mt-20 px-5 py-28">
+      <div class="grid items-end gap-8 lg:grid-cols-[1fr_auto]">
+        <h2 data-mots class="titre max-w-2xl text-4xl font-medium leading-tight sm:text-5xl">Real numbers, and a report on <span class="souligne italic text-brique">the 1<sup>st</sup><svg viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path class="trait" d="M3 12 C 50 5, 110 4, 150 10 S 185 13, 197 8" fill="none" stroke="#e4a53a" stroke-width="4" stroke-linecap="round"/></svg></span> of the month.</h2>
+        <p class="max-w-sm leading-relaxed text-encre-doux" data-apparait>How many visits, which requests, how fast the team responds, which dishes get looked at, when the rush hits. On the 1<sup>st</sup> of each month, the summary lands in your inbox.</p>
+      </div>
+
+      <!-- Statistics notebook (example) -->
+      <figure id="carnet" class="carte-papier relative mt-14 rounded-[2rem] p-5 sm:p-8">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-dashed border-ligne pb-4">
+          <p class="titre text-xl font-medium">Harbour Bistro <span class="text-base text-encre-doux">· 24 tables</span></p>
+          <span class="titre rotate-2 rounded-md bg-miel/25 px-2.5 py-1 text-sm italic text-[#8a5a10]">example, made-up numbers</span>
+        </div>
+        <div id="tuiles" class="mt-6 grid grid-cols-2 gap-5 lg:grid-cols-4">
+          <div>
+            <p class="text-sm text-encre-doux">Visits this month</p>
+            <p class="titre mt-1 text-4xl font-medium sm:text-5xl"><span class="compteur" data-valeur="1306">1,306</span></p>
+            <p class="mt-1 text-sm font-medium text-sapin">▲ 21% more than September</p>
+          </div>
+          <div>
+            <p class="text-sm text-encre-doux">Requests</p>
+            <p class="titre mt-1 text-4xl font-medium sm:text-5xl"><span class="compteur" data-valeur="421">421</span></p>
+            <p class="mt-1 text-sm text-encre-doux">server, bill, orders</p>
+          </div>
+          <div>
+            <p class="text-sm text-encre-doux">Median response</p>
+            <p class="titre mt-1 text-4xl font-medium sm:text-5xl">1&nbsp;min&nbsp;53</p>
+            <p class="mt-1 text-sm text-encre-doux">until “On my way”</p>
+          </div>
+          <div>
+            <p class="text-sm text-encre-doux">Guest rating</p>
+            <p class="titre mt-1 text-4xl font-medium sm:text-5xl">4.5 <span class="text-3xl text-miel">★</span></p>
+            <p class="mt-1 text-sm text-encre-doux">118 reviews this month</p>
+          </div>
+        </div>
+        <div class="mt-8 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+          <div class="rounded-2xl bg-papier p-5">
+            <p class="text-sm font-semibold">Visits per day</p>
+            <div id="barres" class="mt-4 flex h-36 items-end gap-[3px]" aria-hidden="true"></div>
+          </div>
+          <div class="rounded-2xl bg-papier p-5">
+            <p class="text-sm font-semibold">Most viewed dishes</p>
+            <ul class="mt-3 space-y-2.5 text-sm">
+              <li><div class="flex justify-between"><span>Flank steak</span><span class="font-semibold tabular-nums">68</span></div><div class="mt-1 h-1.5 rounded-full bg-sable"><div class="h-full w-full rounded-full bg-brique"></div></div></li>
+              <li><div class="flex justify-between"><span>Shepherd’s pie, reinvented</span><span class="font-semibold tabular-nums">66</span></div><div class="mt-1 h-1.5 rounded-full bg-sable"><div class="h-full w-[97%] rounded-full bg-brique"></div></div></li>
+              <li><div class="flex justify-between"><span>Duck poutine</span><span class="font-semibold tabular-nums">60</span></div><div class="mt-1 h-1.5 rounded-full bg-sable"><div class="h-full w-[88%] rounded-full bg-brique"></div></div></li>
+              <li><div class="flex justify-between"><span>Salmon tartare</span><span class="font-semibold tabular-nums">47</span></div><div class="mt-1 h-1.5 rounded-full bg-sable"><div class="h-full w-[69%] rounded-full bg-brique"></div></div></li>
+            </ul>
+          </div>
+        </div>
+        <figcaption class="sr-only">Example statistics: 1,306 visits in the month, 421 requests, a median response time of 1 minute 53 seconds and a 4.5 out of 5 rating.</figcaption>
+      </figure>
+
+      <ul class="mt-12 grid gap-x-10 gap-y-4 text-[15px] sm:grid-cols-2 lg:grid-cols-3">
+        <li class="flex gap-3" data-apparait><span class="titre text-xl text-brique">~</span><span><strong class="font-semibold">Response times</strong> — the median, and the share handled within 2 minutes.</span></li>
+        <li class="flex gap-3" data-apparait><span class="titre text-xl text-brique">~</span><span><strong class="font-semibold">Table by table</strong> — patio versus dining room, room by room.</span></li>
+        <li class="flex gap-3" data-apparait><span class="titre text-xl text-brique">~</span><span><strong class="font-semibold">Your rush hours</strong> — day by day, hour by hour.</span></li>
+        <li class="flex gap-3" data-apparait><span class="titre text-xl text-brique">~</span><span><strong class="font-semibold">Your guests’ languages</strong> — how many read in English, in Spanish…</span></li>
+        <li class="flex gap-3" data-apparait><span class="titre text-xl text-brique">~</span><span><strong class="font-semibold">Reviews and comments</strong> — the rating, and the private notes to read.</span></li>
+        <li class="flex gap-3" data-apparait><span class="titre text-xl text-brique">~</span><span><strong class="font-semibold">A report on the 1<sup>st</sup></strong> — the past month, in your inbox.</span></li>
+      </ul>
+    </section>
+
+    <!-- ============================== DONE BY TAPORA ============================== -->
+    <section id="fait-par-tapora" class="scroll-mt-20 bg-sable/70 py-28">
+      <div class="mx-auto grid max-w-6xl items-center gap-14 px-5 lg:grid-cols-[1fr_auto]">
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-[0.2em] text-brique" data-apparait>Done by Tapora</p>
+          <h2 data-mots class="titre mt-3 max-w-2xl text-4xl font-medium leading-tight sm:text-5xl">Nothing for you to set up. We take care of it all.</h2>
+          <ol class="mt-12 grid gap-5 sm:grid-cols-2">
+            <li class="carte-papier rounded-3xl p-6" data-apparait>
+              <span class="titre text-3xl text-brique">1</span>
+              <h3 class="mt-2 text-lg font-semibold">We build your menu</h3>
+              <p class="mt-1.5 leading-relaxed text-encre-doux">Your dishes, prices, allergens and photos, translated into your guests’ languages.</p>
+            </li>
+            <li class="carte-papier rounded-3xl p-6" data-apparait>
+              <span class="titre text-3xl text-sapin">2</span>
+              <h3 class="mt-2 text-lg font-semibold">We prepare the cards and tents</h3>
+              <p class="mt-1.5 leading-relaxed text-encre-doux">An NFC card and a QR code for every table or room, on table tents in your colours.</p>
+            </li>
+            <li class="carte-papier rounded-3xl p-6" data-apparait>
+              <span class="titre text-3xl text-miel">3</span>
+              <h3 class="mt-2 text-lg font-semibold">We train your team</h3>
+              <p class="mt-1.5 leading-relaxed text-encre-doux">Ten minutes, on the tablet or phones you already have.</p>
+            </li>
+            <li class="carte-papier rounded-3xl p-6" data-apparait>
+              <span class="titre text-3xl text-brique">4</span>
+              <h3 class="mt-2 text-lg font-semibold">We stick around</h3>
+              <p class="mt-1.5 leading-relaxed text-encre-doux">A report every month, and someone who answers, in English and in French.</p>
+            </li>
+          </ol>
+        </div>
+        <!-- The table tent (illustration) -->
+        <div id="chevalet" class="relative mx-auto hidden w-60 lg:block" aria-hidden="true">
+          <svg viewBox="0 0 240 310" class="w-full drop-shadow-[0_28px_30px_rgb(60_40_20_/_0.28)]">
+            <!-- l'arête et la face arrière, vues de trois quarts -->
+            <path d="M196 30 L214 40 L230 292 L210 296 Z" fill="#e3d6c1"/>
+            <!-- la face avant -->
+            <path d="M44 30 L196 30 L210 296 L30 296 Z" fill="#fffaf2"/>
+            <path d="M44 30 L196 30 L197.6 56 L42.4 56 Z" fill="#c2552f"/>
+            <path d="M42.4 56 L197.6 56 L197.7 58 L42.3 58 Z" fill="#e4a53a"/>
+            <text x="120" y="88" text-anchor="middle" font-family="Fraunces, serif" font-size="15" fill="#2a211a">Harbour Bistro</text>
+            <text x="120" y="105" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" letter-spacing="1.8" fill="#c2552f">TABLE 4</text>
+            <g transform="translate(82 118)" fill="#2a211a">
+              <rect x="-6" y="-6" width="88" height="88" rx="10" fill="#fff" stroke="#e4e0d8"/>
+              <rect x="2" y="2" width="20" height="20" rx="3"/><rect x="6" y="6" width="12" height="12" rx="1.5" fill="#fff"/><rect x="9" y="9" width="6" height="6"/>
+              <rect x="54" y="2" width="20" height="20" rx="3"/><rect x="58" y="6" width="12" height="12" rx="1.5" fill="#fff"/><rect x="61" y="9" width="6" height="6"/>
+              <rect x="2" y="54" width="20" height="20" rx="3"/><rect x="6" y="58" width="12" height="12" rx="1.5" fill="#fff"/><rect x="9" y="61" width="6" height="6"/>
+              <rect x="28" y="4" width="5" height="5"/><rect x="37" y="10" width="5" height="5"/><rect x="28" y="16" width="5" height="5"/><rect x="44" y="22" width="5" height="5"/><rect x="30" y="28" width="5" height="5"/><rect x="40" y="32" width="5" height="5"/><rect x="52" y="30" width="5" height="5"/><rect x="62" y="36" width="5" height="5"/><rect x="26" y="42" width="5" height="5"/><rect x="36" y="48" width="5" height="5"/><rect x="48" y="44" width="5" height="5"/><rect x="66" y="50" width="5" height="5"/><rect x="30" y="60" width="5" height="5"/><rect x="44" y="64" width="5" height="5"/><rect x="56" y="58" width="5" height="5"/><rect x="68" y="66" width="5" height="5"/><rect x="10" y="32" width="5" height="5"/><rect x="4" y="40" width="5" height="5"/><rect x="16" y="44" width="5" height="5"/>
+            </g>
+            <g transform="translate(70 226)" fill="none" stroke="#c2552f" stroke-width="2" stroke-linecap="round"><rect x="0" y="0" width="11" height="18" rx="2.5"/><path d="M15 5a6 6 0 0 1 0 8"/><path d="M19 2a10 10 0 0 1 0 14"/></g>
+            <text x="96" y="239" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#2a211a">Tap here or scan</text>
+            <text x="120" y="282" text-anchor="middle" font-family="Inter, sans-serif" font-size="6.5" letter-spacing="0.8" fill="#a0a4ab">Tapora</text>
+          </svg>
+          <p class="titre absolute -bottom-6 left-1/2 -translate-x-1/2 -rotate-3 whitespace-nowrap text-lg italic text-encre-doux">in your colours.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== PRICING ============================== -->
+    <!--
+      PRICING — DRAFT, TO BE CONFIRMED BY ARTHUR BEFORE PUBLISHING.
+      Every price on the page is here, and only here (none in the JSON-LD or
+      the FAQ). Same block in ../services.html.
+    -->
+    <section id="prix" class="mx-auto max-w-6xl scroll-mt-20 px-5 py-28">
+      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-brique" data-apparait>Pricing</p>
+      <h2 data-mots class="titre mt-3 max-w-3xl text-4xl font-medium leading-tight sm:text-5xl">One monthly price. The first month is on us.</h2>
+      <p class="mt-5 max-w-2xl text-lg leading-relaxed text-encre-doux" data-apparait>Everything is included: the multilingual menu, requests, the staff portal, manager mode, statistics and the monthly report. Billed monthly or yearly.</p>
+      <div class="mt-14 grid gap-5 lg:grid-cols-2">
+        <article class="carte-prix relative flex flex-col rounded-3xl p-7 carte-papier sm:p-9" data-apparait>
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <h3 class="titre text-2xl font-medium">Tapora Table</h3>
+            <span class="rounded-full bg-sable px-3 py-1 text-xs font-semibold text-encre-doux">Restaurants</span>
+          </div>
+          <p class="mt-1 text-sm text-encre-doux">Restaurants, bistros, cafés, bars · all your tables</p>
+          <p class="titre mt-7 text-7xl font-medium tabular-nums">$25&nbsp;<span class="text-2xl">/ month</span></p>
+          <p class="mt-2 text-sm text-encre-doux">+ $99 one time, to build your menu</p>
+          <ul class="mt-6 space-y-3 text-[15px] leading-snug">
+            <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>The living menu, multilingual, with allergens</span></li>
+            <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>“Call the server”, “The bill” and the review right after</span></li>
+            <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>The staff portal and manager mode</span></li>
+            <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>The cards and table tents for your tables</span></li>
+          </ul>
+          <div class="mt-auto pt-8"><a href="#demo" class="bouton-fleche group inline-flex w-fit items-center gap-2 rounded-full bg-encre px-6 py-3.5 text-[15px] font-semibold text-creme transition hover:-translate-y-0.5 hover:bg-brique">Book a demo <span class="fleche" aria-hidden="true">→</span></a></div>
+        </article>
+        <article class="carte-prix relative flex flex-col overflow-hidden rounded-3xl bg-encre p-7 text-creme sm:p-9" data-apparait>
+          <svg viewBox="0 0 100 100" class="pointer-events-none absolute -right-10 -top-10 w-56 opacity-[0.16]" aria-hidden="true"><g fill="none" stroke-width="6" stroke-linecap="round"><path d="M30 70A20 20 0 0 1 70 70" stroke="#f2d3c4"/><path d="M20 70A30 30 0 0 1 80 70" stroke="#e4a53a"/><path d="M10 70A40 40 0 0 1 90 70" stroke="#c2552f"/></g></svg>
+          <div class="relative flex flex-wrap items-center justify-between gap-3">
+            <h3 class="titre text-2xl font-medium">Tapora Room</h3>
+            <span class="rounded-full bg-brique px-3 py-1 text-xs font-semibold text-creme">Hotels</span>
+          </div>
+          <p class="relative mt-1 text-sm text-creme/70">Hotels, inns, B&amp;Bs, motels</p>
+          <p class="titre relative mt-7 text-7xl font-medium tabular-nums">$1.50&nbsp;<span class="text-2xl">/ room / month</span></p>
+          <p class="relative mt-2 text-sm text-creme/70">$29 per month minimum · 40 rooms: $60 per month</p>
+          <ul class="relative mt-6 space-y-3 text-[15px] leading-snug">
+            <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-miel" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>The room concierge, translated and always up to date</span></li>
+            <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-miel" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>One-tap requests and room service</span></li>
+            <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-miel" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>Wi-Fi, the staff portal and manager mode</span></li>
+            <li class="flex gap-3"><svg viewBox="0 0 20 20" class="mt-0.5 size-5 shrink-0 text-miel" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 8 14.5 16 5.5"/></svg><span>Room tents, and the menu built for you</span></li>
+          </ul>
+          <a href="#demo" class="bouton-fleche group relative mt-auto inline-flex w-fit items-center gap-2 rounded-full bg-creme px-6 py-3.5 text-[15px] font-semibold text-encre transition hover:-translate-y-0.5 hover:bg-white">Book a demo <span class="fleche" aria-hidden="true">→</span></a>
+        </article>
+      </div>
+      <p class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-encre-doux" data-apparait>
+        <span>✦ The first month is free, to try it with your team.</span>
+        <span>✦ Monthly, no commitment.</span>
+        <span>✦ Tapora review cards stay subscription-free.</span>
+      </p>
+    </section>
+    <!-- END OF PRICING BLOCK -->
+
+    <!-- ============================== FAQ ============================== -->
+    <section id="faq" class="mx-auto max-w-3xl scroll-mt-20 px-5 pb-28">
+      <h2 data-mots class="titre text-center text-4xl font-medium sm:text-5xl">Your questions</h2>
+      <div class="mt-12 divide-y divide-dashed divide-ligne border-y border-dashed border-ligne">
+        <details class="group py-5" data-apparait>
+          <summary class="flex items-center justify-between gap-6 text-lg font-medium">Do my guests need to install an app?<span class="plus titre text-3xl text-brique transition">+</span></summary>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">No. They tap the card on their table or in their room with their phone, or scan the code with the camera: the page opens in the browser, with no app, no account and no password.</p></div>
+        </details>
+        <details class="group py-5" data-apparait>
+          <summary class="flex items-center justify-between gap-6 text-lg font-medium">Does it work with every phone?<span class="plus titre text-3xl text-brique transition">+</span></summary>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Yes. Every iPhone since the XR and the vast majority of Android phones read the NFC card without an app. For the others, the QR code printed on the table tent opens with any phone’s camera.</p></div>
+        </details>
+        <details class="group py-5" data-apparait>
+          <summary class="flex items-center justify-between gap-6 text-lg font-medium">Which languages can the menu show?<span class="plus titre text-3xl text-brique transition">+</span></summary>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Up to ten: French, English, Spanish, German, Italian, Portuguese, Chinese, Japanese, Korean and Arabic. In Québec, French comes first, as the Charter of the French Language requires; guests pick their own, and their phone’s language is suggested.</p></div>
+        </details>
+        <details class="group py-5" data-apparait>
+          <summary class="flex items-center justify-between gap-6 text-lg font-medium">How do Google reviews work?<span class="plus titre text-3xl text-brique transition">+</span></summary>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Right after their request, guests are asked how their visit is going. The Google link is offered to every guest, whatever their rating. Guests can also write a private note to the team, who reads it in their portal.</p></div>
+        </details>
+        <details class="group py-5" data-apparait>
+          <summary class="flex items-center justify-between gap-6 text-lg font-medium">What do you do with my guests’ data?<span class="plus titre text-3xl text-brique transition">+</span></summary>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">The page never asks for a name, email, phone number or payment card. We keep the table or room, the language, requests and reviews, for you and your statistics, plus an encrypted fingerprint of the IP address (never the address itself), erased after 30 days, to curb abuse. Nothing is sold or used for advertising, and the data is hosted in Canada. All the details: <a href="https://go.taporacards.com/confidentialite#services" class="text-brique underline underline-offset-4">our privacy rules</a> (in French).</p></div>
+        </details>
+        <details class="group py-5" data-apparait>
+          <summary class="flex items-center justify-between gap-6 text-lg font-medium">Can guests order?<span class="plus titre text-3xl text-brique transition">+</span></summary>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Yes, if you want: ordering from the table, or room service at a hotel. The kitchen gets the ticket in the portal, and payment works as usual — with the bill, or charged to the room.</p></div>
+        </details>
+        <details class="group py-5" data-apparait>
+          <summary class="flex items-center justify-between gap-6 text-lg font-medium">Can I edit my menu myself?<span class="plus titre text-3xl text-brique transition">+</span></summary>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Yes. Manager mode, protected by a password, lets you change your dishes, prices, photos, announcements and Wi-Fi in seconds. The daily special takes ten seconds from the staff portal.</p></div>
+        </details>
+        <details class="group py-5" data-apparait>
+          <summary class="flex items-center justify-between gap-6 text-lg font-medium">What do I need to get started?<span class="plus titre text-3xl text-brique transition">+</span></summary>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Nothing. Tapora builds your menu, prepares the cards and table tents, and trains your team in ten minutes. Staff use the phone or tablet they already have.</p></div>
+        </details>
+        <details class="group py-5" data-apparait>
+          <summary class="flex items-center justify-between gap-6 text-lg font-medium">Can I cancel?<span class="plus titre text-3xl text-brique transition">+</span></summary>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Yes. Monthly, you can stop whenever you like. Yearly, the service runs to the end of the paid year.</p></div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ============================== DEMO ============================== -->
+    <section id="demo" class="mx-auto max-w-6xl scroll-mt-20 px-5 pb-24">
+      <div class="relative overflow-hidden rounded-[2.5rem] bg-sapin px-6 py-16 text-creme sm:px-16 sm:py-20" data-apparait>
+        <svg id="ondes-demo" viewBox="0 0 100 100" class="pointer-events-none absolute right-12 top-1/2 hidden w-72 -translate-y-1/2 lg:block xl:right-16 xl:w-80" aria-hidden="true"><g class="carte-cta" transform="rotate(-13 40 62)"><rect x="20" y="34" width="40" height="56" rx="8.5" fill="#c2552f"/><rect x="27" y="42" width="14" height="3.6" rx="1.8" fill="#fffaf2" opacity=".45"/><polygon points="40,57.5 42.72,64.26 49.99,64.76 44.39,69.43 46.17,76.49 40,72.62 33.83,76.49 35.61,69.43 30.01,64.76 37.28,64.26" fill="#fffaf2" stroke="#fffaf2" stroke-width="3.2" stroke-linejoin="round"/></g><g fill="none" stroke-width="6.2" stroke-linecap="round"><path class="arc-cta" d="M54.62 28.01A11 11 0 0 1 65.99 38.62" stroke="#f2d3c4"/><path class="arc-cta" d="M54.32 19.51A19.5 19.5 0 0 1 74.49 38.32" stroke="#e4a53a"/><path class="arc-cta" d="M54.02 11.02A28 28 0 0 1 82.98 38.02" stroke="#c2552f"/></g></svg>
+        <div class="relative max-w-2xl">
+          <h2 data-mots class="titre text-4xl font-medium leading-tight sm:text-6xl">Want to see it?</h2>
+          <p class="mt-5 text-lg leading-relaxed text-creme/80">Fifteen minutes, at your place or on video: you tap the card, the team gets the request, and you see a real month of statistics. In English or French, and fast.</p>
+          <div class="mt-9 flex flex-wrap gap-3">
+            <a href="mailto:contact@taporacards.com?subject=Tapora%20Services%20demo&amp;body=Hi%2C%0A%0ABusiness%20name%3A%20%0AType%20(restaurant%2C%20hotel%E2%80%A6)%3A%20%0ANumber%20of%20tables%20or%20rooms%3A%20%0ACity%3A%20%0A%0AThanks!" class="rounded-full bg-creme px-7 py-4 text-[15px] font-semibold text-sapin transition hover:-translate-y-0.5 hover:bg-white">Book a demo</a>
+            <a href="mailto:contact@taporacards.com" class="rounded-full border border-creme/30 px-7 py-4 text-[15px] font-medium transition hover:bg-creme/10">contact@taporacards.com</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-ligne">
+    <div class="mx-auto flex max-w-6xl flex-col gap-5 px-5 py-10 text-sm text-encre-doux sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex items-center gap-2.5">
+        <img src="/marque/sceau-en.svg" alt="" width="56" height="56" class="sceau-pied size-14">
+        <span><strong class="font-semibold text-encre">Tapora S.E.N.C.</strong> · NEQ 3382462367 · a Québec business</span>
+      </div>
+      <nav class="flex flex-wrap gap-6" aria-label="Footer">
+        <a href="/en/" class="hover:text-encre">Review cards</a>
+        <a href="/en/guides/" class="hover:text-encre">Guides</a>
+        <a href="https://go.taporacards.com/confidentialite#services" class="hover:text-encre">Privacy</a>
+        <a href="/en/terms" class="hover:text-encre">Terms</a>
+        <a href="/services" hreflang="fr" lang="fr" class="hover:text-encre">Français</a>
+        <a href="mailto:contact@taporacards.com" class="hover:text-encre">Contact</a>
+        <span>© <span id="annee">2026</span> Tapora</span>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="/js/gsap.min.js" defer></script>
+  <script src="/js/ScrollTrigger.min.js" defer></script>
+  <script src="/js/lenis.min.js" defer></script>
+  <script src="/js/main.js" defer></script>
+</body>
+</html>

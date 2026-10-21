@@ -35,6 +35,7 @@ export default async function ConsoleEtablissement({ children, params }: { child
     ...(e.type === 'hotel' || e.options.concierge ? [{ href: `${base}/concierge`, libelle: 'Concierge' }] : []),
     { href: `${base}/demandes`, libelle: 'Demandes', compte: p.ouvertes, alerte: p.ouvertes > 0 },
     { href: `${base}/emplacements`, libelle: e.type === 'hotel' ? 'Chambres et zones' : 'Emplacements', compte: lieux.filter((l) => l.actif).length },
+    { href: `${base}/facturation`, libelle: 'Facturation' },
     { href: `${base}/reglages`, libelle: 'Réglages' },
   ]
 

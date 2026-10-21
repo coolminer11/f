@@ -11,7 +11,8 @@ import Confirmer from '@/components/services/bo/confirmer'
 import BoutonFenetre from '@/components/services/bo/bouton-fenetre'
 import ChampsLangues, { ATraduire } from '@/components/services/bo/champs-langues'
 import { Bloc, Pastille } from '@/components/services/bo/elements'
-import { creerAnnonceAction, deplacerAnnonceAction, modifierAnnonceAction, supprimerAnnonceAction } from '../../actions'
+import { creerAnnonceAction, modifierAnnonceAction, supprimerAnnonceAction } from '../../actions'
+import Triable, { FlechesTri, PoigneeTri } from '@/components/services/bo/triable'
 
 export const dynamic = 'force-dynamic'
 
@@ -120,12 +121,13 @@ export default async function Annonces({ params }: { params: Promise<{ id: strin
             </p>
           </div>
         ) : (
-          <ul className="cascade space-y-3">
+          <Triable quoi="annonces" etab={e.id} as="ul" className="cascade space-y-3" libelle="Annonces">
             {liste.map((a, i) => {
               const st = statut(a, auj)
               return (
-                <li key={a.id} data-ligne id={`annonce-${a.id}`} className={`carte scroll-mt-24 p-4 ${st.ton === 'neutre' ? 'opacity-75' : ''}`}>
-                  <div className="flex items-start gap-3">
+                <li key={a.id} data-ligne data-tri-id={a.id} id={`annonce-${a.id}`} className={`carte scroll-mt-24 p-4 ${st.ton === 'neutre' ? 'opacity-75' : ''}`}>
+                  <div className="flex items-start gap-2">
+                    <PoigneeTri libelle={`Déplacer « ${texte(a.titre, D)} »`} className="mt-1.5 -ml-1" />
                     <span className="grid size-10 shrink-0 place-items-center rounded-xl text-xl" style={{ background: `${e.couleur}1a` }} aria-hidden>
                       {TYPES[a.type].icone}
                     </span>
@@ -149,12 +151,7 @@ export default async function Annonces({ params }: { params: Promise<{ id: strin
                     </div>
                     <form className="flex shrink-0 items-center gap-0.5">
                       <Cache etab={e.id} retour={ici} ancre={`annonce-${a.id}`} id={a.id} />
-                      <button formAction={deplacerAnnonceAction} name="sens" value="-1" disabled={i === 0} className="grid size-7 place-items-center rounded-lg text-xs hover:bg-[var(--color-fond)] disabled:opacity-30" title="Monter">
-                        ↑
-                      </button>
-                      <button formAction={deplacerAnnonceAction} name="sens" value="1" disabled={i === liste.length - 1} className="grid size-7 place-items-center rounded-lg text-xs hover:bg-[var(--color-fond)] disabled:opacity-30" title="Descendre">
-                        ↓
-                      </button>
+                      <FlechesTri premier={i === 0} dernier={i === liste.length - 1} className="grid size-7 place-items-center rounded-lg text-xs hover:bg-[var(--color-fond)] disabled:opacity-30" />
                       <Confirmer
                         action={supprimerAnnonceAction}
                         poussiere
@@ -167,7 +164,7 @@ export default async function Annonces({ params }: { params: Promise<{ id: strin
                     </form>
                   </div>
                   <details className="group mt-2">
-                    <summary className="ml-[3.25rem] inline-flex cursor-pointer list-none items-center gap-1 text-xs font-semibold text-[var(--color-accent)] hover:underline">
+                    <summary className="ml-[5rem] inline-flex cursor-pointer list-none items-center gap-1 text-xs font-semibold text-[var(--color-accent)] hover:underline">
                       <span className="transition group-open:rotate-90">›</span> Modifier
                     </summary>
                     <div className="mt-3 border-t border-[var(--color-ligne)] pt-4">
@@ -177,7 +174,7 @@ export default async function Annonces({ params }: { params: Promise<{ id: strin
                 </li>
               )
             })}
-          </ul>
+          </Triable>
         )}
       </div>
 

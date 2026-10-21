@@ -19,6 +19,12 @@ export type Options = {
   prix: boolean
   allergenes: boolean
   photos: boolean
+  /**
+   * Commander depuis le menu : à la table (restaurant, tous les menus servis
+   * en ce moment) ou en chambre (hôtel, menus « service aux chambres »). Le
+   * paiement reste à l'addition ou porté à la chambre.
+   */
+  commande: boolean
   /** Fuseau des heures de service des menus. */
   fuseau: string
   /** Message affiché après une demande, par langue (sinon le message par défaut). */
@@ -36,6 +42,7 @@ export function optionsParDefaut(type: TypeEtablissement): Options {
     prix: true,
     allergenes: true,
     photos: true,
+    commande: type === 'hotel',
     fuseau: 'America/Toronto',
   }
 }
@@ -152,6 +159,24 @@ export type TypeDemande = {
 
 export type StatutDemande = 'nouvelle' | 'prise' | 'faite' | 'annulee'
 
+/**
+ * Une ligne de commande, telle que gardée avec la demande : les noms dans la
+ * langue de l'établissement (pour la cuisine) et, s'il lisait une autre
+ * langue, dans celle du client ; le prix est celui du menu au moment de la
+ * commande, recalculé par le serveur (null : prix à confirmer).
+ */
+export type LigneCommande = {
+  plat_id: string
+  nom: string
+  nom_client?: string | null
+  variante?: string | null
+  variante_client?: string | null
+  prix: number | null
+  quantite: number
+  /** La précision du client pour ce plat (« bien cuit », « sans oignons »). */
+  note?: string | null
+}
+
 export type Demande = {
   id: string
   emplacement_id: string | null
@@ -167,6 +192,9 @@ export type Demande = {
   cree_le: string
   prise_le: string | null
   faite_le: string | null
+  /** Une commande (cle = 'commande') : ses lignes et son total. */
+  details?: LigneCommande[] | null
+  total?: number | null
 }
 
 /** Les demandes proposées à la création d'un établissement (modifiables ensuite). */

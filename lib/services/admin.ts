@@ -771,3 +771,49 @@ export async function compteContenu(etabId: string): Promise<Contenu> {
   )
   return l ?? { menus: 0, plats: 0, epuises: 0, sans_photo: 0, rubriques: 0, annonces: 0, emplacements: 0, types: 0 }
 }
+
+// ---------------------------------------------------------------------------
+// Glisser-déposer : le nouvel ordre d'une liste entière (ou d'une partie)
+// ---------------------------------------------------------------------------
+
+export type ListeTriable = 'menus' | 'sections' | 'plats' | 'emplacements' | 'annonces' | 'rubriques' | 'types'
+const TABLE_LISTE: Record<ListeTriable, TableOrdonnee> = {
+  menus: 'menus',
+  sections: 'menu_sections',
+  plats: 'menu_items',
+  emplacements: 'emplacements',
+  annonces: 'annonces_service',
+  rubriques: 'rubriques_concierge',
+  types: 'types_demandes',
+}
+
+/**
+ * Les éléments déplacés reprennent, dans leur nouvel ordre, les places
+ * qu'ils occupaient parmi leurs frères : on peut donc réordonner une partie
+ * de la liste (les tables d'un seul groupe) sans toucher au reste. Toute la
+ * fratrie est renumérotée en UNE requête — une seule transaction — et rien
+ * ne bouge si un seul identifiant n'appartient pas à cet établissement.
+ */
+export async function reordonnerListe(quoi: ListeTriable, etabId: string, parentId: string, ids: string[]): Promise<void> {
+  const table = TABLE_LISTE[quoi]
+  if (!table) throw new Error('Liste inconnue.')
+  verifierId(etabId)
+  const liste = ids.map((id) => verifierId(id))
+  if (liste.length < 2 || liste.length > 500 || new Set(liste).size !== liste.length) throw new Error('Ordre invalide.')
+  // Le parent (menu d'une section, section d'un plat) doit appartenir à l'établissement.
+  if (table === 'menu_sections') await menuDe(etabId, parentId)
+  else if (table === 'menu_items') await sectionDe(etabId, parentId)
+  else if (parentId !== etabId) throw new Error('Ordre invalide.')
+  const col = PARENT[table]
+  const r = await requete<{ id: string }>(
+    `with l as (select x.id, x.n from unnest($2::uuid[]) with ordinality as x(id, n)),
+          freres as (select t.id, row_number() over (order by t.ordre, t.id) as pos from ${table} t where t.${col} = $1::uuid),
+          valide as (select (select count(*) from freres f join l on l.id = f.id) = cardinality($2::uuid[]) as ok),
+          places as (select f.pos, row_number() over (order by f.pos) as k from freres f join l on l.id = f.id),
+          final as (select f.id, coalesce(p.pos, f.pos) as pos from freres f left join l on l.id = f.id left join places p on p.k = l.n)
+     update ${table} t set ordre = final.pos from final, valide where valide.ok and t.id = final.id
+     returning t.id`,
+    [parentId, liste],
+  )
+  if (!r.length) throw new Error('Cette liste a changé entre-temps : rechargez la page, puis recommencez.')
+}

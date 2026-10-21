@@ -22,10 +22,12 @@ export default function Horloge({ fuseau, l }: { fuseau: string; l: LanguePortai
     heure = maintenant.toLocaleTimeString(loc, { hour: '2-digit', minute: '2-digit' })
     jour = maintenant.toLocaleDateString(loc, { weekday: 'long', day: 'numeric', month: 'long' })
   }
+  // « Mercredi 21 octobre » : seule la première lettre prend la majuscule.
+  jour = jour.charAt(0).toUpperCase() + jour.slice(1)
   return (
     <span className="hidden text-right leading-tight sm:block">
       <span className="pt-valeur block text-[1.7rem]">{heure}</span>
-      <span className="block text-[11px] font-medium capitalize text-[var(--p-doux)]">{jour}</span>
+      <span className="block text-[11px] font-medium text-[var(--p-doux)]">{jour}</span>
     </span>
   )
 }

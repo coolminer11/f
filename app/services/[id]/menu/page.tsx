@@ -14,14 +14,12 @@ import Confirmer from '@/components/services/bo/confirmer'
 import BoutonFenetre from '@/components/services/bo/bouton-fenetre'
 import ChampsLangues, { ATraduire } from '@/components/services/bo/champs-langues'
 import { Bloc, Pastille } from '@/components/services/bo/elements'
+import Triable, { FlechesTri, PoigneeTri } from '@/components/services/bo/triable'
 import {
   basculerPlatAction,
   creerMenuAction,
   creerPlatAction,
   creerSectionAction,
-  deplacerMenuAction,
-  deplacerPlatAction,
-  deplacerSectionAction,
   dupliquerPlatAction,
   importerMenuAction,
   modifierMenuAction,
@@ -213,8 +211,9 @@ function LignePlat({
         ? argent(plat.prix)
         : '—'
   return (
-    <li data-ligne id={`plat-${plat.id}`} className="scroll-mt-28 py-2.5">
-      <div className="flex items-start gap-3">
+    <li data-ligne data-tri-id={plat.id} id={`plat-${plat.id}`} className="scroll-mt-28 py-2.5">
+      <div className="flex items-start gap-2">
+        <PoigneeTri libelle={`Déplacer « ${nom} »`} className="mt-2.5 -ml-1" />
         <span className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-xl bg-[var(--color-fond)] text-lg text-[var(--color-encre-doux)]">
           {photo ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -261,12 +260,7 @@ function LignePlat({
           >
             {plat.disponible ? '● En stock' : '○ Épuisé'}
           </button>
-          <button formAction={deplacerPlatAction} name="sens" value="-1" disabled={premier} className={petitBouton} title="Monter">
-            ↑
-          </button>
-          <button formAction={deplacerPlatAction} name="sens" value="1" disabled={dernier} className={petitBouton} title="Descendre">
-            ↓
-          </button>
+          <FlechesTri premier={premier} dernier={dernier} className={petitBouton} />
           <button formAction={dupliquerPlatAction} className={petitBouton} title="Dupliquer">
             ⧉
           </button>
@@ -282,7 +276,7 @@ function LignePlat({
         </form>
       </div>
       <details className="group mt-1">
-        <summary className="ml-[3.75rem] inline-flex cursor-pointer list-none items-center gap-1 text-xs font-semibold text-[var(--color-accent)] hover:underline">
+        <summary className="ml-[5.5rem] inline-flex cursor-pointer list-none items-center gap-1 text-xs font-semibold text-[var(--color-accent)] hover:underline">
           <span className="transition group-open:rotate-90">›</span> Modifier
         </summary>
         <div className="mt-2">
@@ -344,9 +338,10 @@ export default async function EditeurMenu({ params, searchParams }: { params: Pr
           {liste.length === 0 ? (
             <p className="px-1 pb-1 text-xs text-[var(--color-encre-doux)]">Aucun menu.</p>
           ) : (
-            <ul className="cascade space-y-1">
+            <Triable quoi="menus" etab={e.id} as="ul" className="cascade space-y-1" libelle="Menus">
               {liste.map((m, i) => (
-                <li key={m.id} className="group flex items-center gap-1">
+                <li key={m.id} data-tri-id={m.id} className="group flex items-center gap-1">
+                  <PoigneeTri libelle={`Déplacer « ${texte(m.nom, D) || 'Sans nom'} »`} className="!w-5 opacity-40 group-hover:opacity-100 focus-visible:opacity-100" />
                   <Link
                     href={`${ici}?m=${m.id}`}
                     aria-current={m.id === menu?.id ? 'page' : undefined}
@@ -363,18 +358,12 @@ export default async function EditeurMenu({ params, searchParams }: { params: Pr
                       {m.actif ? '' : ' · masqué'}
                     </span>
                   </Link>
-                  <form className="flex flex-col opacity-0 transition group-hover:opacity-100 focus-within:opacity-100">
-                    <Cache etab={e.id} retour={`${ici}?m=${m.id}`} id={m.id} />
-                    <button formAction={deplacerMenuAction} name="sens" value="-1" disabled={i === 0} className="text-[10px] leading-none text-[var(--color-encre-doux)] disabled:opacity-20" title="Monter">
-                      ▲
-                    </button>
-                    <button formAction={deplacerMenuAction} name="sens" value="1" disabled={i === liste.length - 1} className="text-[10px] leading-none text-[var(--color-encre-doux)] disabled:opacity-20" title="Descendre">
-                      ▼
-                    </button>
-                  </form>
+                  <span className="flex flex-col opacity-0 transition group-hover:opacity-100 focus-within:opacity-100">
+                    <FlechesTri premier={i === 0} dernier={i === liste.length - 1} symboles={['▲', '▼']} className="text-[10px] leading-none text-[var(--color-encre-doux)] disabled:opacity-20" />
+                  </span>
                 </li>
               ))}
-            </ul>
+            </Triable>
           )}
         </div>
 
@@ -585,14 +574,16 @@ export default async function EditeurMenu({ params, searchParams }: { params: Pr
               </p>
             )}
 
+            <Triable quoi="sections" etab={e.id} parent={menu.id} as="div" className="space-y-4" libelle="Sections du menu">
             {menu.sections.map((s, i) => {
               const plats = trad ? s.plats.filter((p) => aTraduire(p.nom, e.langues, D) || aTraduire(p.description, e.langues, D)) : s.plats
               if (trad && !plats.length && !aTraduire(s.nom, e.langues, D)) return null
               return (
-                <section key={s.id} data-ligne id={`section-${s.id}`} className="carte scroll-mt-24 p-5">
+                <section key={s.id} data-ligne data-tri-id={s.id} id={`section-${s.id}`} className="carte scroll-mt-24 p-5">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
+                        <PoigneeTri libelle={`Déplacer la section « ${texte(s.nom, D)} »`} className="-ml-2" />
                         <h2 className="text-sm font-semibold">{texte(s.nom, D)}</h2>
                         <ATraduire textes={[s.nom, s.description]} langues={e.langues} defaut={D} />
                         <span className="text-xs text-[var(--color-encre-doux)]">
@@ -603,12 +594,7 @@ export default async function EditeurMenu({ params, searchParams }: { params: Pr
                     </div>
                     <form className="flex items-center gap-0.5">
                       <Cache etab={e.id} retour={retour} ancre={`section-${s.id}`} id={s.id} />
-                      <button formAction={deplacerSectionAction} name="sens" value="-1" disabled={i === 0} className={petitBouton} title="Monter la section">
-                        ↑
-                      </button>
-                      <button formAction={deplacerSectionAction} name="sens" value="1" disabled={i === menu.sections.length - 1} className={petitBouton} title="Descendre la section">
-                        ↓
-                      </button>
+                      <FlechesTri premier={i === 0} dernier={i === menu.sections.length - 1} className={petitBouton} />
                       <Confirmer
                         action={supprimerSectionAction}
                         poussiere
@@ -633,11 +619,11 @@ export default async function EditeurMenu({ params, searchParams }: { params: Pr
                   </details>
 
                   {plats.length > 0 && (
-                    <ul className="mt-3 divide-y divide-[var(--color-ligne)]">
+                    <Triable quoi="plats" etab={e.id} parent={s.id} as="ul" className="mt-3 divide-y divide-[var(--color-ligne)]" libelle={`Plats de la section ${texte(s.nom, D)}`}>
                       {plats.map((p, k) => (
                         <LignePlat key={p.id} e={e} plat={p} sections={menu.sections} retour={retour} premier={k === 0} dernier={k === plats.length - 1} />
                       ))}
-                    </ul>
+                    </Triable>
                   )}
 
                   {!trad && (
@@ -655,6 +641,7 @@ export default async function EditeurMenu({ params, searchParams }: { params: Pr
                 </section>
               )
             })}
+            </Triable>
 
             {!trad && (
               <form action={creerSectionAction} className="carte grid gap-3 p-5 md:grid-cols-[1fr_auto] md:items-end">

@@ -6,6 +6,7 @@ import { urlFichier } from '@/lib/services/fichiers'
 import { ALLERGENES, ETIQUETTES } from '@/lib/services/types'
 import { formaterHeure, formaterPrix, locale, nomListe, ui } from '@/lib/services/ui'
 import { compterUneFois } from '@/lib/services/client'
+import { menusCommandables } from '@/lib/services/demandes'
 import { BarreHaut, Cadre } from '@/components/services/client/cadre'
 import MenuVivant, { type Nommes, type SectionVivante } from '@/components/services/client/menu-vivant'
 import { numeroTel } from '@/components/services/client/outils'
@@ -38,7 +39,8 @@ export default async function PageMenu(p: ParamsLieu) {
       description: texte(s.description, langue, d),
       plats: s.plats
         .map((pl) => {
-          const variantes = (pl.variantes ?? []).map((v) => ({ nom: texte(v.nom, langue, d), n: v.prix }))
+          // L'indice du format compte (le serveur le relit) : on garde tous les formats, même sans nom traduit.
+          const variantes = (pl.variantes ?? []).map((v) => ({ nom: texte(v.nom, langue, d) || texte(v.nom, d, d), n: v.prix }))
           const prixFormats = variantes.map((v) => v.n).filter((n): n is number => n != null)
           const base = pl.prix ?? (prixFormats.length ? Math.min(...prixFormats) : null)
           return {
@@ -47,8 +49,9 @@ export default async function PageMenu(p: ParamsLieu) {
             description: texte(pl.description, langue, d),
             prix: prix(base),
             prixNombre: base,
+            prixBase: pl.prix,
             aPartirDe: pl.prix == null && new Set(prixFormats).size > 1,
-            variantes: variantes.filter((v) => v.nom).map((v) => ({ nom: v.nom, prix: prix(v.n) })),
+            variantes: variantes.map((v, i) => ({ nom: v.nom || `#${i + 1}`, prix: prix(v.n), prixNombre: v.n })),
             photo: o.photos ? urlFichier(pl.photo) : null,
             allergenes: o.allergenes ? pl.allergenes : [],
             etiquettes: pl.etiquettes ?? [],
@@ -65,6 +68,12 @@ export default async function PageMenu(p: ParamsLieu) {
   const etiquettes: Nommes = Object.fromEntries(ETIQUETTES.map((e) => [e.cle, { nom: nomListe('etiquette', ETIQUETTES, e.cle, langue), icone: e.icone }]))
   const allergenes: Nommes = Object.fromEntries(ALLERGENES.map((a) => [a.cle, { nom: nomListe('allergene', ALLERGENES, a.cle, langue), icone: a.icone }]))
   const tel = menu?.type === 'room_service' ? numeroTel(etab.telephone) : null
+  // Commander : l'option de l'établissement ; « ici » si CE menu se commande en ce moment.
+  const commandables = menusCommandables(etab, tous)
+  const commande =
+    o.commande && (etab.type === 'restaurant' || tous.some((m) => m.type === 'room_service'))
+      ? { ici: Boolean(menu && commandables.some((m) => m.id === menu.id)), hotel: etab.type === 'hotel', merci: o.merci ? texte(o.merci, langue, d) || null : null }
+      : null
 
   return (
     <Cadre etab={etab} code={code} langue={langue} memoriserLangue={l === langue ? langue : null} vu={cle}>
@@ -78,6 +87,7 @@ export default async function PageMenu(p: ParamsLieu) {
         allergenes={allergenes}
         monnaie={{ locale: locale(langue), devise: etab.devise }}
         appel={tel ? { tel } : null}
+        commande={commande}
       />
     </Cadre>
   )

@@ -21,6 +21,8 @@ import Chiffre from '@/components/services/bo/chiffre'
 import Apparition from '@/components/services/bo/apparition'
 import { Bloc, ListeBarres, Pastille, TuileChiffre } from '@/components/services/bo/elements'
 import { motDePassePortailAction, renouvelerLienPortailAction, retirerMotDePassePortailAction } from '../actions'
+import AccesGerantBo from '@/components/services/portail/gerant-bo'
+import BlocRapport from '@/components/services/bo/bloc-rapport'
 
 export const dynamic = 'force-dynamic'
 
@@ -110,7 +112,21 @@ export default async function Apercu({
       </div>
 
       <div className="cascade grid grid-cols-2 gap-3 md:grid-cols-4">
-        <TuileChiffre libelle="Visites" icone="👁" valeur={<Chiffre valeur={s.ouvertures} />} sous={<Evolution courant={s.ouvertures} precedent={s.ouverturesPrec} libelle="vs période d’avant" />} />
+        <TuileChiffre
+          libelle="Visites"
+          icone="👁"
+          valeur={<Chiffre valeur={s.ouvertures} />}
+          sous={
+            <>
+              <Evolution courant={s.ouvertures} precedent={s.ouverturesPrec} libelle="vs période d’avant" />
+              {s.ouverturesQr > 0 && (
+                <span className="block text-xs text-[var(--color-encre-doux)]">
+                  {Math.round((s.ouverturesQr / Math.max(1, s.ouvertures)) * 100)} % par code QR, le reste par la carte
+                </span>
+              )}
+            </>
+          }
+        />
         <TuileChiffre libelle="Demandes" icone="🙋" valeur={<Chiffre valeur={s.demandes} />} sous={<Evolution courant={s.demandes} precedent={s.demandesPrec} libelle="vs période d’avant" />} />
         <TuileChiffre
           libelle="Temps de réponse médian"
@@ -143,6 +159,27 @@ export default async function Apercu({
         <TuileChiffre libelle="Wi-Fi copié" icone="📶" valeur={<Chiffre valeur={s.wifi} />} />
         <TuileChiffre libelle="Menus PDF ouverts" icone="📄" valeur={<Chiffre valeur={s.pdf} />} />
       </div>
+
+      {(e.options.commande || s.commandes > 0) && (
+        <Bloc
+          titre={hotel ? 'Service aux chambres' : 'Commandes'}
+          sous="Commandé depuis le menu, aux prix du menu, annulations exclues. Le paiement se fait à l’addition ou sur la chambre."
+          actions={!e.options.commande ? <Pastille ton="attention">option coupée</Pastille> : undefined}
+        >
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
+            <div className="cascade grid grid-cols-3 gap-3">
+              <TuileChiffre libelle="Commandes" icone="🍽️" valeur={<Chiffre valeur={s.commandes} />} sous={<Evolution courant={s.commandes} precedent={s.commandesPrec} libelle="vs période d’avant" />} />
+              <TuileChiffre libelle="Ventes" icone="$" valeur={<Chiffre valeur={s.ventesCommandes} genre="argent" />} />
+              <TuileChiffre libelle="Panier moyen" icone="🧾" valeur={<Chiffre valeur={s.panierMoyen} genre="argent" />} />
+            </div>
+            <ListeBarres
+              lignes={s.topCommandes.map((p) => ({ cle: p.id, libelle: p.nom, valeur: p.quantite }))}
+              unite="commandés"
+              vide="Aucune commande pour cette période."
+            />
+          </div>
+        </Bloc>
+      )}
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Bloc titre="Visites et demandes, jour par jour" sous="Une visite = une page ouverte depuis une carte ou un QR." className="lg:col-span-2">
@@ -345,10 +382,13 @@ export default async function Apercu({
               <p className="mt-1 text-xs text-[var(--color-encre-doux)]">Chaque table ou chambre a sa propre adresse : la demande arrive au personnel avec le bon numéro.</p>
             </div>
             <div>
-              <span className="etiquette">Codes QR à imprimer</span>
+              <span className="etiquette">À imprimer</span>
               <div className="flex flex-wrap gap-2">
+                <a href={`${ici}/qr?format=chevalets`} className="bouton text-xs">
+                  ⬇ Chevalets de table (PDF, {lieux.filter((l) => l.actif).length})
+                </a>
                 <a href={`${ici}/qr`} className="bouton bouton-secondaire text-xs">
-                  ⬇ Planche de QR (PDF, {lieux.filter((l) => l.actif).length})
+                  ⬇ Planche de QR
                 </a>
                 <Link href={`${ici}/emplacements`} className="bouton bouton-secondaire text-xs">
                   Gérer les emplacements
@@ -379,7 +419,7 @@ export default async function Apercu({
                 />
               </div>
             </div>
-            <form action={motDePassePortailAction} className="space-y-2">
+            <form action={motDePassePortailAction} className="space-y-2" data-formulaire="portail">
               <Cache etab={e.id} retour={ici} ancre="acces" />
               <span className="etiquette">{e.protege ? 'Changer le mot de passe du portail' : 'Protéger le portail par un mot de passe'}</span>
               <div className="flex flex-wrap items-start gap-2">
@@ -397,9 +437,12 @@ export default async function Apercu({
                 libelle="Retirer le mot de passe"
               />
             )}
+            <AccesGerantBo etab={e.id} nom={e.nom} retour={ici} />
           </div>
         </div>
       </Bloc>
+
+      <BlocRapport etab={e.id} retour={ici} />
     </div>
   )
 }
