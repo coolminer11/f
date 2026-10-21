@@ -868,7 +868,7 @@ html[data-theme='tapora'] body:not(:has(.theme-client)) tbody tr { transition: b
 html[data-theme='tapora'] body:not(:has(.theme-client)) tbody tr:hover { background-color: rgb(248 227 214 / 0.35); }
 
 /* ---- Titres : la Fraunces du site ---------------------------------------- */
-html[data-theme='tapora'] main h1:not(.document-neutre h1):not(.theme-client h1) {
+html[data-theme='tapora'] main h1:not(.document-neutre h1):not(.theme-client h1):not(.theme-services h1):not(.theme-portail h1) {
   font-family: var(--police-fraunces), ui-serif, Georgia, serif;
   font-variation-settings: 'opsz' 144, 'SOFT' 50, 'WONK' 1;
   font-weight: 600;
@@ -876,7 +876,7 @@ html[data-theme='tapora'] main h1:not(.document-neutre h1):not(.theme-client h1)
   line-height: 1.1;
   letter-spacing: -0.02em;
 }
-html[data-theme='tapora'] main .carte h2:not(.document-neutre h2):not(.theme-client h2) {
+html[data-theme='tapora'] main .carte h2:not(.document-neutre h2):not(.theme-client h2):not(.theme-services h2):not(.theme-portail h2) {
   font-family: var(--police-fraunces), ui-serif, Georgia, serif;
   font-variation-settings: 'opsz' 72, 'SOFT' 50;
   font-weight: 600;
@@ -922,11 +922,11 @@ html[data-theme='tapora'] .bouton-danger { background: linear-gradient(180deg, #
 
 /* ---- Apparition douce des blocs de chaque page --------------------------- */
 @keyframes bo-monte { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-html[data-theme='tapora'] main.bo-page:not(:has(.theme-client, .document-neutre)) > * > * { animation: bo-monte 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
-html[data-theme='tapora'] main.bo-page:not(:has(.theme-client, .document-neutre)) > * > *:nth-child(2) { animation-delay: 0.05s; }
-html[data-theme='tapora'] main.bo-page:not(:has(.theme-client, .document-neutre)) > * > *:nth-child(3) { animation-delay: 0.1s; }
-html[data-theme='tapora'] main.bo-page:not(:has(.theme-client, .document-neutre)) > * > *:nth-child(4) { animation-delay: 0.15s; }
-html[data-theme='tapora'] main.bo-page:not(:has(.theme-client, .document-neutre)) > * > *:nth-child(n + 5) { animation-delay: 0.2s; }
+html[data-theme='tapora'] main.bo-page:not(:has(.theme-client, .document-neutre, .theme-services, .theme-portail)) > * > * { animation: bo-monte 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+html[data-theme='tapora'] main.bo-page:not(:has(.theme-client, .document-neutre, .theme-services, .theme-portail)) > * > *:nth-child(2) { animation-delay: 0.05s; }
+html[data-theme='tapora'] main.bo-page:not(:has(.theme-client, .document-neutre, .theme-services, .theme-portail)) > * > *:nth-child(3) { animation-delay: 0.1s; }
+html[data-theme='tapora'] main.bo-page:not(:has(.theme-client, .document-neutre, .theme-services, .theme-portail)) > * > *:nth-child(4) { animation-delay: 0.15s; }
+html[data-theme='tapora'] main.bo-page:not(:has(.theme-client, .document-neutre, .theme-services, .theme-portail)) > * > *:nth-child(n + 5) { animation-delay: 0.2s; }
 
 /* ---- En-tête ------------------------------------------------------------- */
 .entete-bo { position: sticky; top: 0; z-index: 30; }
@@ -975,7 +975,7 @@ html[data-theme='tapora'] .document-neutre.bg-white,
 html[data-theme='tapora'] .document-neutre .bg-white { background-color: white; }
 
 @media (prefers-reduced-motion: reduce) {
-  html[data-theme='tapora'] main.bo-page:not(:has(.theme-client, .document-neutre)) > * > *,
+  html[data-theme='tapora'] main.bo-page:not(:has(.theme-client, .document-neutre, .theme-services, .theme-portail)) > * > *,
   .connexion-carte,
   .connexion-sceau,
   .connexion-arcs path { animation: none !important; stroke-dashoffset: 0; }
@@ -1040,3 +1040,109 @@ html[data-installable] .bouton-installer { display: grid; }
 .visuel-carte img { transition: transform 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2), box-shadow 0.45s; }
 .visuel-carte:hover img { transform: translateY(-4px) rotate(-1.2deg) scale(1.02); }
 @media (prefers-reduced-motion: reduce) { .visuel-carte:hover img { transform: none; } }
+
+/* ---- En-tête : l'entrée de Tapora Services (propriétaire seulement) ------- */
+.lien-services {
+  background: linear-gradient(120deg, #2a211a, #7e3a1d 60%, #c2552f);
+  color: #fffaf2;
+  box-shadow: 0 6px 16px -10px rgb(126 58 29 / 0.8);
+  transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.3), box-shadow 0.25s;
+}
+.lien-services:hover { transform: translateY(-1px); box-shadow: 0 10px 22px -12px rgb(126 58 29 / 0.9); }
+.lien-services[aria-current='page'] { outline: 2px solid #e4a53a; outline-offset: 2px; }
+
+/* ========================================================================== */
+/* Effets Tapora (components/effets) : compteurs, pop-ups, fenêtres,          */
+/* inclinaison, reflets. Partagés par le back-office, Services et les pages.  */
+/* Tout s'éteint avec « réduire les animations ».                             */
+/* ========================================================================== */
+.compteur-chiffre { display: inline-block; height: 1em; line-height: 1; overflow: hidden; vertical-align: -0.12em; }
+.compteur-colonne { display: flex; flex-direction: column; transition-property: transform; transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
+.compteur-colonne > span { height: 1em; line-height: 1; }
+.compteur-signe { display: inline-block; }
+
+.toasts-tapora {
+  position: fixed; z-index: 95; right: max(1rem, env(safe-area-inset-right)); bottom: max(1rem, env(safe-area-inset-bottom));
+  display: flex; flex-direction: column; gap: 0.6rem; width: min(24rem, calc(100vw - 2rem)); pointer-events: none;
+}
+.toast-tapora {
+  position: relative; overflow: hidden; pointer-events: auto; display: flex; align-items: flex-start; gap: 0.75rem;
+  padding: 0.9rem 1rem 1.05rem; border-radius: 1.1rem; color: #f8f3ea;
+  background: linear-gradient(140deg, rgb(30 25 21 / 0.92), rgb(46 36 28 / 0.92));
+  backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.08) inset, 0 24px 48px -20px rgb(0 0 0 / 0.55), 0 0 0 1px rgb(255 255 255 / 0.06);
+  animation: toast-arrive 0.6s cubic-bezier(0.18, 1.25, 0.4, 1) both; touch-action: pan-y;
+}
+.toast-icone { display: grid; place-items: center; flex-shrink: 0; width: 1.65rem; height: 1.65rem; border-radius: 999px; font-weight: 800; font-size: 0.85rem; }
+.toast-succes .toast-icone { background: linear-gradient(140deg, #5fd39b, #2f9e6a); color: #06140d; box-shadow: 0 0 18px rgb(95 211 155 / 0.45); }
+.toast-info .toast-icone { background: linear-gradient(140deg, #9ec5ff, #4f7fd9); color: #071226; }
+.toast-alerte .toast-icone { background: linear-gradient(140deg, #ffd27a, #e4a53a); color: #2a1a00; }
+.toast-erreur .toast-icone { background: linear-gradient(140deg, #ff9b85, #d9573c); color: #2a0800; }
+.toast-titre { font-weight: 650; font-size: 0.92rem; line-height: 1.3; }
+.toast-texte { margin-top: 0.15rem; font-size: 0.82rem; line-height: 1.4; color: rgb(248 243 234 / 0.72); }
+.toast-fermer { flex-shrink: 0; margin: -0.2rem -0.2rem 0 0; width: 1.6rem; height: 1.6rem; border-radius: 999px; font-size: 1.1rem; color: rgb(248 243 234 / 0.6); }
+.toast-fermer:hover { background: rgb(255 255 255 / 0.1); color: #fff; }
+.toast-temps { position: absolute; left: 0; bottom: 0; height: 2px; width: 100%; transform-origin: left; background: linear-gradient(90deg, #e4a53a, #c2552f); animation: toast-temps linear forwards; }
+@keyframes toast-arrive { from { opacity: 0; transform: translateY(22px) scale(0.94); filter: blur(4px); } }
+@keyframes toast-temps { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+.fenetre-fond {
+  position: fixed; inset: 0; z-index: 94; display: flex; align-items: flex-end; justify-content: center; padding: 1rem;
+  background: rgb(15 12 10 / 0.45); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  animation: fenetre-fondu 0.25s ease-out both;
+}
+@media (min-width: 640px) { .fenetre-fond { align-items: center; } }
+.fenetre-carte {
+  width: 100%; max-height: min(88vh, 46rem); overflow: auto; padding: 1.4rem; border-radius: 1.5rem;
+  background: var(--color-surface, #fffaf2); color: var(--color-encre, #2a211a);
+  box-shadow: 0 40px 80px -30px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(0 0 0 / 0.05);
+  animation: fenetre-ressort 0.55s cubic-bezier(0.18, 1.2, 0.4, 1) both;
+}
+.fenetre-titre { font-family: var(--police-fraunces), ui-serif, Georgia, serif; font-size: 1.35rem; font-weight: 600; letter-spacing: -0.01em; }
+.fenetre-fermer { width: 2rem; height: 2rem; border-radius: 999px; font-size: 1.3rem; opacity: 0.6; }
+.fenetre-fermer:hover { opacity: 1; background: rgb(0 0 0 / 0.06); }
+@keyframes fenetre-fondu { from { opacity: 0; } }
+@keyframes fenetre-ressort { from { opacity: 0; transform: translateY(40px) scale(0.96); } }
+
+.inclinaison { position: relative; transform: perspective(900px) rotateX(var(--incl-x, 0deg)) rotateY(var(--incl-y, 0deg)); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); transform-style: preserve-3d; }
+.inclinaison[data-actif] { transition-duration: 0.08s; }
+.inclinaison-reflet {
+  position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity 0.4s;
+  background: radial-gradient(circle at var(--reflet-x, 50%) var(--reflet-y, 50%), rgb(255 255 255 / 0.35), transparent 55%);
+  mix-blend-mode: soft-light;
+}
+.inclinaison[data-actif] .inclinaison-reflet { opacity: 1; }
+
+/* Le reflet doré qui passe lentement sur une carte « premium ». */
+.reflet-premium { position: relative; overflow: hidden; isolation: isolate; }
+.reflet-premium::after {
+  content: ''; position: absolute; inset: -40% -60%; z-index: 1; pointer-events: none;
+  background: linear-gradient(115deg, transparent 42%, rgb(255 236 200 / 0.28) 50%, transparent 58%);
+  transform: translateX(-60%); animation: reflet-premium 6s ease-in-out 1.2s infinite;
+}
+@keyframes reflet-premium { 0%, 70% { transform: translateX(-60%); } 100% { transform: translateX(60%); } }
+
+/* Fond « maillage » : des halos lents qui dérivent derrière un en-tête. */
+.fond-maillage { position: relative; isolation: isolate; }
+.fond-maillage::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit;
+  background:
+    radial-gradient(40rem 22rem at 10% 0%, rgb(228 165 58 / 0.22), transparent 60%),
+    radial-gradient(36rem 24rem at 90% 10%, rgb(194 85 47 / 0.24), transparent 60%),
+    radial-gradient(30rem 20rem at 50% 120%, rgb(0 138 126 / 0.16), transparent 60%);
+  background-size: 140% 140%; animation: maillage 18s ease-in-out infinite alternate;
+}
+@keyframes maillage { from { background-position: 0% 0%, 100% 0%, 50% 100%; } to { background-position: 30% 20%, 70% 30%, 40% 80%; } }
+
+/* Apparition en cascade des enfants (listes, tuiles). */
+.cascade > * { animation: cascade 0.65s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.cascade > *:nth-child(2) { animation-delay: 0.05s; } .cascade > *:nth-child(3) { animation-delay: 0.1s; } .cascade > *:nth-child(4) { animation-delay: 0.15s; }
+.cascade > *:nth-child(5) { animation-delay: 0.2s; } .cascade > *:nth-child(6) { animation-delay: 0.25s; } .cascade > *:nth-child(n + 7) { animation-delay: 0.3s; }
+@keyframes cascade { from { opacity: 0; transform: translateY(14px); filter: blur(3px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .toast-tapora, .fenetre-fond, .fenetre-carte, .cascade > * { animation: none !important; }
+  .reflet-premium::after, .fond-maillage::before { animation: none; }
+  .inclinaison { transform: none !important; }
+  .compteur-colonne { transition: none !important; }
+}

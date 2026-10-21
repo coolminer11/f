@@ -649,6 +649,33 @@ modification de texte se fait dans les deux fichiers ; les balises
   messages, confettis à l'approbation d'une maquette, défilement Lenis plus
   doux. « Réduire les animations » sur le téléphone : tout reste immobile.
 
+## 17. Tapora Services (menus vivants, appel du serveur, concierge de chambre)
+
+- **À qui :** le logiciel et Tapora Services appartiennent à Arthur
+  (convention d'associés, article 8, à faire approuver par les deux
+  associés). La société les utilise tant qu'elle existe avec ses associés
+  actuels ; les revenus de Services sont inscrits dans sa comptabilité. Dans
+  le back-office, **seul le compte d'Arthur** voit la section « ✦ Services »
+  (colonne `utilisateurs.proprietaire_logiciel`, réglée par la migration
+  `20261021000100`, jamais depuis l'app) ; pour tout autre compte, les pages
+  n'existent pas (404).
+- **Pour les clients d'un établissement** (`go.taporacards.com/s/<code>`) :
+  chaque table ou chambre a son code (carte NFC ou QR). Menu dans toutes les
+  langues de l'établissement (français d'abord), plat du jour, appel du
+  serveur ou de l'addition — suivi en direct de la demande, puis la note et
+  le lien d'avis Google offert à tous —, concierge de chambre, demandes en
+  un tap, Wi-Fi.
+- **Pour le personnel** (`go.taporacards.com/service/<lien>`) : la file des
+  demandes en direct, « J'arrive » / « Fait », notifications sur les
+  tablettes et téléphones, plat du jour et plats épuisés, statistiques.
+  Lien signé, mot de passe facultatif, mêmes freins que les pages client.
+- **Dans le back-office (Arthur)** : établissements, menus (traductions,
+  photos, PDF par langue, import en texte), annonces, concierge, types de
+  demandes, emplacements et planche de QR, réglages et apparence, et des
+  démonstrations toutes prêtes (restaurant, hôtel) pour les rendez-vous.
+- Les fichiers (photos, logos, menus PDF) sont redimensionnés en WebP et
+  rangés sous `services/` du même bucket ; seul ce dossier est public.
+
 ## Sauvegardes
 
 Le forfait gratuit de Supabase ne garde pas d'historique de sauvegardes long.

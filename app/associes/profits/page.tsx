@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import MontantAnime from '@/components/effets/montant'
 import type { Metadata } from 'next'
 import { exigerSession } from '@/lib/auth'
 import { exercicesConnus, listerAssocies } from '@/lib/requetes/associes'
@@ -100,13 +101,15 @@ export default async function PageProfits({
         <>
           {/* ---- L'essentiel */}
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-start">
-            <section className="carte relative overflow-hidden p-6">
+            <section className="carte fond-maillage reflet-premium relative overflow-hidden p-6">
               <div aria-hidden className="pointer-events-none absolute -right-12 -top-12 size-44 rounded-full bg-[var(--color-accent-doux)] opacity-70" />
               <p className="relative text-sm font-medium text-[var(--color-encre-doux)]">
                 {mien ? 'Votre part' : `Part de ${prenom(choisi.nom)}`} du {r.societe.benefice < 0 ? 'résultat' : 'profit'} {annee}
                 {annee === anneeCourante && ' · à ce jour'}
               </p>
-              <p className={`relative mt-1 font-[family-name:var(--police-fraunces)] text-5xl font-semibold tracking-tight tabular-nums ${signe(choisi.comptable)}`}>{argent(choisi.comptable)}</p>
+              <p className={`relative mt-1 font-[family-name:var(--police-fraunces)] text-5xl font-semibold tracking-tight tabular-nums ${signe(choisi.comptable)}`}>
+                <MontantAnime valeur={choisi.comptable} />
+              </p>
               <p className="relative mt-2 text-sm text-[var(--color-encre-doux)]">
                 sur un {r.societe.benefice < 0 ? 'résultat (perte)' : 'profit'} de la société de <strong className="text-[var(--color-encre)]">{argent(r.societe.benefice)}</strong>
                 {partMoyenne !== null && <> · part moyenne {pct(partMoyenne)}</>}

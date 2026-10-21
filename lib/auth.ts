@@ -25,6 +25,8 @@ export type Utilisateur = {
   associe_id: string | null
   actif: boolean
   totp_actif: boolean
+  /** Le compte qui possède le logiciel (Arthur) : seul à voir Tapora Services. */
+  proprietaire_logiciel: boolean
 }
 
 // ---------------------------------------------------------------------------
@@ -158,7 +160,7 @@ const lireSession = cache(async (brut: string): Promise<Utilisateur | null> => {
   if (!egal(signature, await signer(jeton))) return null
 
   const utilisateur = await requeteUne<Utilisateur>(
-    `select u.id, u.courriel, u.nom, u.role, u.associe_id, u.actif, u.totp_actif
+    `select u.id, u.courriel, u.nom, u.role, u.associe_id, u.actif, u.totp_actif, u.proprietaire_logiciel
        from sessions s
        join utilisateurs u on u.id = s.utilisateur_id
       where s.empreinte = $1 and s.expire_le > now() and u.actif`,

@@ -3,6 +3,8 @@ import { cookies } from 'next/headers'
 import EnteteBo, { type Theme } from '@/components/entete-bo'
 import InstallerApp from '@/components/installer-app'
 import BarreChargement from '@/components/barre-chargement'
+import Toasts from '@/components/effets/toasts'
+import ChromeBo from '@/components/chrome-bo'
 import { Suspense } from 'react'
 import { utilisateurCourant } from '@/lib/auth'
 import { nombreATraiter } from '@/lib/portail'
@@ -44,15 +46,20 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {/* Sans double authentification, aucun menu : seule la page Sécurité
             s'ouvre (voir exigerSession), le temps de l'activer. */}
         {utilisateur?.totp_actif && (
-          <Suspense>
-            <BarreChargement />
-          </Suspense>
-        )}
-        {utilisateur?.totp_actif && (
-          <EnteteBo nom={utilisateur.nom} lecture={utilisateur.role === 'lecture'} theme={theme} doubleAuth={utilisateur.totp_actif} aTraiter={aTraiter} />
+          <ChromeBo>
+            <Suspense>
+              <BarreChargement />
+            </Suspense>
+            <EnteteBo nom={utilisateur.nom} lecture={utilisateur.role === 'lecture'} theme={theme} doubleAuth={utilisateur.totp_actif} aTraiter={aTraiter} proprietaire={utilisateur.proprietaire_logiciel} />
+          </ChromeBo>
         )}
         <main className={`mx-auto max-w-6xl px-4 py-6 ${utilisateur ? 'bo-page' : ''}`}>{children}</main>
-        {utilisateur?.totp_actif && <InstallerApp />}
+        {utilisateur?.totp_actif && (
+          <ChromeBo>
+            <InstallerApp />
+            <Toasts />
+          </ChromeBo>
+        )}
       </body>
     </html>
   )

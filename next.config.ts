@@ -6,8 +6,8 @@ import type { NextConfig } from 'next'
  * - Aucune page ne peut être affichée dans un cadre d'un autre site
  *   (clickjacking : un faux bouton posé par-dessus un vrai).
  * - HTTPS imposé au navigateur pour un an.
- * - Les pages publiques d'un client (document, statistiques) ne sont jamais
- *   indexées et ne transmettent pas leur adresse — qui contient le jeton —
+ * - Les pages publiques d'un client (document, statistiques, Tapora
+ *   Services) ne sont jamais indexées et ne transmettent pas leur adresse — qui contient le jeton —
  *   aux sites vers lesquels elles pointent.
  */
 const COMMUNS = [
@@ -38,6 +38,18 @@ const nextConfig: NextConfig = {
       { source: '/securite/:chemin*', headers: PRIVES },
       { source: '/connexion/:chemin*', headers: PRIVES },
       { source: '/compte/:chemin*', headers: PRIVES },
+      // Tapora Services : le portail du personnel est privé ; les pages des
+      // clients ne sont jamais indexées, mais leurs photos (/s/f/…) gardent
+      // leur cache.
+      { source: '/service/:chemin*', headers: PRIVES },
+      { source: '/api/service/:chemin*', headers: PRIVES },
+      {
+        source: '/s/:chemin*',
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' },
+          { key: 'Referrer-Policy', value: 'no-referrer' },
+        ],
+      },
     ]
   },
 }

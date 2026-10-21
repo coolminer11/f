@@ -34,6 +34,7 @@ export default function EnteteBo({
   theme: initial,
   doubleAuth,
   aTraiter = 0,
+  proprietaire = false,
 }: {
   nom: string
   lecture: boolean
@@ -41,6 +42,8 @@ export default function EnteteBo({
   doubleAuth: boolean
   /** Messages, demandes Entreprise et demandes de cartes qui attendent : la pastille de « Messages ». */
   aTraiter?: number
+  /** Le propriétaire du logiciel voit Tapora Services ; personne d'autre. */
+  proprietaire?: boolean
 }) {
   const chemin = usePathname()
   const [theme, setTheme] = useState<Theme>(initial)
@@ -81,7 +84,7 @@ export default function EnteteBo({
                 key={href}
                 href={href}
                 aria-current={actif ? 'page' : undefined}
-                className="lien-bo shrink-0 whitespace-nowrap rounded-md px-2 py-1.5 text-sm font-medium 2xl:px-2.5 text-[var(--color-encre-doux)] hover:text-[var(--color-encre)]"
+                className="lien-bo shrink-0 whitespace-nowrap rounded-md px-2 py-1.5 text-sm font-medium xl:max-2xl:px-1.5 text-[var(--color-encre-doux)] hover:text-[var(--color-encre)]"
               >
                 {libelle}
                 {href === '/messages' && aTraiter > 0 && (
@@ -98,6 +101,18 @@ export default function EnteteBo({
           <span className="hidden sm:inline-flex">
             <RafraichissementAuto />
           </span>
+          {proprietaire && (
+            <Link
+              href="/services"
+              aria-current={chemin.startsWith('/services') ? 'page' : undefined}
+              className="lien-services shrink-0 rounded-full px-3 py-1 text-xs font-semibold xl:px-2"
+              title="Tapora Services — visible pour vous seul"
+            >
+              {/* Dès 1280 px, le menu tient sur une seule ligne : l'étoile seule (le nom reste dans l'infobulle et pour les lecteurs d'écran). */}
+              <span aria-hidden>✦</span>
+              <span className="xl:sr-only"> Services</span>
+            </Link>
+          )}
           <Link href="/etat" className="lien-bo hidden rounded-md px-2 py-1 text-xs font-medium text-[var(--color-encre-doux)] sm:inline-block">
             État
           </Link>

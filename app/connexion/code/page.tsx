@@ -47,7 +47,7 @@ export default async function PageCode({ searchParams }: { searchParams: Promise
 
     await fermerDefi(d)
     const u = await requeteUne<Utilisateur>(
-      `select id, courriel, nom, role, associe_id, actif, totp_actif from utilisateurs where id = $1::uuid and actif`,
+      `select id, courriel, nom, role, associe_id, actif, totp_actif, proprietaire_logiciel from utilisateurs where id = $1::uuid and actif`,
       [d.utilisateurId],
     )
     if (!u) redirect('/connexion')
