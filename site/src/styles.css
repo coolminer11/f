@@ -543,3 +543,10 @@ details .reponse { overflow: hidden; }
   .ep-fonction, .ep-option, .ep-puce, .ep-jalon, .ep-etape-frise { transition: none; }
   .ep-fonction:hover, .ep-option:hover, .ep-puce:hover { translate: none; }
 }
+
+/* Entreprise — la section Sécurité : les cartes reprennent le style de la plateforme. */
+.ep-securite { position: relative; border-radius: 1.4rem; background: var(--color-creme); padding: 1.3rem 1.25rem 1.35rem; box-shadow: 0 1px 0 rgb(255 255 255 / 0.8) inset, 0 2px 4px rgb(60 40 20 / 0.05), 0 14px 30px -22px rgb(60 40 20 / 0.45); }
+.ep-securite > .ep-badge { margin-bottom: 0.75rem; }
+.ep-securite-icone { display: grid; place-items: center; width: 2.6rem; height: 2.6rem; margin-bottom: 0.9rem; border-radius: 0.9rem; background: var(--color-sable); font-size: 1.25rem; }
+.ep-securite strong { display: block; font-weight: 600; }
+.ep-securite > span:not(.ep-badge):not(.ep-securite-icone) { display: block; margin-top: 0.3rem; font-size: 0.95rem; line-height: 1.45; color: var(--color-encre-doux); }

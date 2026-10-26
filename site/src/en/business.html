@@ -85,10 +85,10 @@
       "mainEntity": [
         {
           "@type": "Question",
-          "name": "Is the 25-card minimum per order or per area?",
+          "name": "What does the 25-card minimum apply to?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Per order. One order can be split across your rooms, your restaurant and your front desk, as long as the total reaches 25 cards. For just a few cards, individual cards are $35 each, with no minimum."
+            "text": "<strong>Per design.</strong> Each design needs at least 25 cards: a business that wants 100 cards can have up to 4 different designs (4 × 25). The destination, on the other hand, is chosen card by card, with no minimum: two cards with the same design can open two different pages. For just a few cards, individual cards are $35 each, with no minimum."
           }
         },
         {
@@ -96,7 +96,7 @@
           "name": "Can one order have several designs?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes: one design for the rooms and another for the restaurant, for example. We work it out together at the mockup stage, which you approve before production."
+            "text": "Yes, as many as you like, as long as each design has at least 25 cards: for example 100 cards for the rooms and 25 for the restaurant and front desk, so 2 designs. You approve each mockup before production."
           }
         },
         {
@@ -128,7 +128,7 @@
           "name": "What data do you keep about my customers?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "For card statistics, no IP address and no identifier: only the time of the tap, the channel (NFC or QR code) and the device type. In line with Québec’s Law 25, nothing is sold or shared."
+            "text": "Stats are always included free, for every Business order and for orders of more than 4 individual cards. They keep no IP address and no identifier: only the time of the tap, the channel (NFC or QR code) and the device type. In line with Québec’s Law 25, nothing is sold or shared."
           }
         },
         {
@@ -442,11 +442,11 @@
           <div class="max-w-2xl">
             <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brique" data-apparait>What a card can open</p>
             <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">One card. Endless possibilities.</h2>
-            <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>“Available”: it works today — the card opens your existing page, or a Tapora module that’s already live. “Coming soon”: being built at Tapora, not sold yet.</p>
+            <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>“Available”: it works today — the card opens your existing page, or a Tapora module that’s already live. “Coming soon”: being built at Tapora, not sold yet. And for anything that isn’t here, we build it for you: the price depends on what you ask for.</p>
           </div>
           <p class="flex gap-5 text-sm text-encre-doux" data-apparait>
             <span><strong id="ep-total-disponible" class="titre inline-block min-w-[2ch] text-3xl text-sapin">47</strong> available</span>
-            <span><strong id="ep-total-bientot" class="titre inline-block min-w-[2ch] text-3xl text-brique">18</strong> coming soon</span>
+            <span><strong id="ep-total-bientot" class="titre inline-block min-w-[2ch] text-3xl text-brique">15</strong> coming soon</span>
           </p>
         </div>
 
@@ -490,7 +490,6 @@
           <li class="ep-fonction" data-cat="resto" data-etat="disponible"><span class="ep-icone"><svg aria-hidden="true"><use href="#i-resto"/></svg></span><span class="ep-badge"></span><span class="ep-texte"><span class="ep-cat">Restaurants, cafés and bars</span><strong>Ordering at the table</strong>Order from the phone, pay with the bill.</span></li>
           <li class="ep-fonction" data-cat="resto" data-etat="bientot"><span class="ep-icone"><svg aria-hidden="true"><use href="#i-resto"/></svg></span><span class="ep-badge"></span><span class="ep-texte"><span class="ep-cat">Restaurants, cafés and bars</span><strong>Payment</strong>Secure payment through Stripe, on your account.</span></li>
           <li class="ep-fonction" data-cat="resto" data-etat="bientot"><span class="ep-icone"><svg aria-hidden="true"><use href="#i-resto"/></svg></span><span class="ep-badge"></span><span class="ep-texte"><span class="ep-cat">Restaurants, cafés and bars</span><strong>Tips</strong>A tipping screen, with the payment.</span></li>
-          <li class="ep-fonction" data-cat="resto" data-etat="bientot"><span class="ep-icone"><svg aria-hidden="true"><use href="#i-resto"/></svg></span><span class="ep-badge"></span><span class="ep-texte"><span class="ep-cat">Restaurants, cafés and bars</span><strong>Loyalty program</strong>Collect points or stamps.</span></li>
           <li class="ep-fonction" data-cat="resto" data-etat="disponible"><span class="ep-icone"><svg aria-hidden="true"><use href="#i-resto"/></svg></span><span class="ep-badge"></span><span class="ep-texte"><span class="ep-cat">Restaurants, cafés and bars</span><strong>Promotions</strong>See the current offers.</span></li>
           <li class="ep-fonction" data-cat="resto" data-etat="disponible"><span class="ep-icone"><svg aria-hidden="true"><use href="#i-resto"/></svg></span><span class="ep-badge"></span><span class="ep-texte"><span class="ep-cat">Restaurants, cafés and bars</span><strong>Events</strong>Special nights and shows.</span></li>
           <li class="ep-fonction" data-cat="resto" data-etat="bientot"><span class="ep-icone"><svg aria-hidden="true"><use href="#i-resto"/></svg></span><span class="ep-badge"></span><span class="ep-texte"><span class="ep-cat">Restaurants, cafés and bars</span><strong>Takeout orders</strong>Ordered and paid online.</span></li>
@@ -512,9 +511,7 @@
           <li class="ep-fonction" data-cat="hotel" data-etat="disponible"><span class="ep-icone"><svg aria-hidden="true"><use href="#i-hotel"/></svg></span><span class="ep-badge"></span><span class="ep-texte"><span class="ep-cat">Hotels and lodging</span><strong>Local attractions</strong>Discover things to do nearby.</span></li>
           <li class="ep-fonction" data-cat="hotel" data-etat="disponible"><span class="ep-icone"><svg aria-hidden="true"><use href="#i-hotel"/></svg></span><span class="ep-badge"></span><span class="ep-texte"><span class="ep-cat">Hotels and lodging</span><strong>Transportation</strong>Transportation information.</span></li>
           <li class="ep-fonction" data-cat="hotel" data-etat="disponible"><span class="ep-icone"><svg aria-hidden="true"><use href="#i-hotel"/></svg></span><span class="ep-badge"></span><span class="ep-texte"><span class="ep-cat">Hotels and lodging</span><strong>Late check-out</strong>Request a late check-out in one tap.</span></li>
-          <li class="ep-fonction" data-cat="hotel" data-etat="bientot"><span class="ep-icone"><svg aria-hidden="true"><use href="#i-hotel"/></svg></span><span class="ep-badge"></span><span class="ep-texte"><span class="ep-cat">Hotels and lodging</span><strong>Upgrades</strong>See the available options.</span></li>
           <li class="ep-fonction" data-cat="hotel" data-etat="disponible"><span class="ep-icone"><svg aria-hidden="true"><use href="#i-hotel"/></svg></span><span class="ep-badge"></span><span class="ep-texte"><span class="ep-cat">Hotels and lodging</span><strong>Stay rating</strong>Share the experience; the Google link is offered to everyone.</span></li>
-          <li class="ep-fonction" data-cat="hotel" data-etat="bientot"><span class="ep-icone"><svg aria-hidden="true"><use href="#i-hotel"/></svg></span><span class="ep-badge"></span><span class="ep-texte"><span class="ep-cat">Hotels and lodging</span><strong>Loyalty program</strong>Join the rewards.</span></li>
           <li class="ep-fonction" data-cat="hotel" data-etat="disponible"><span class="ep-icone"><svg aria-hidden="true"><use href="#i-hotel"/></svg></span><span class="ep-badge"></span><span class="ep-texte"><span class="ep-cat">Hotels and lodging</span><strong>Events</strong>Discover the hotel’s activities.</span></li>
           <li class="ep-fonction" data-cat="hotel" data-etat="disponible"><span class="ep-icone"><svg aria-hidden="true"><use href="#i-hotel"/></svg></span><span class="ep-badge"></span><span class="ep-texte"><span class="ep-cat">Hotels and lodging</span><strong>Room service ordering</strong>The cart, a note for the kitchen, and the team sees it live.<span class="ep-ajout">✦ Tapora extra</span></span></li>
           <li class="ep-fonction" data-cat="cartes" data-etat="disponible"><span class="ep-icone"><svg aria-hidden="true"><use href="#i-cartes"/></svg></span><span class="ep-badge"></span><span class="ep-texte"><span class="ep-cat">Cards and tracking</span><strong>Permanent chip</strong>The code on the chip never changes: the card lasts for years.</span></li>
@@ -562,10 +559,11 @@
                 <p class="mt-6 text-[12px] font-semibold uppercase tracking-[0.16em] text-encre-doux">Sample order</p>
                 <ul class="ep-emplacements mt-2"><li><span>Rooms</span><strong>100</strong></li><li><span>Restaurant</span><strong>12</strong></li><li><span>Front desk</span><strong>5</strong></li><li><span>Spa</span><strong>4</strong></li><li><span>Elevators and common areas</span><strong>4</strong></li></ul>
                 <p class="ep-exemple"><span>125 cards × $30</span><strong>$3,750</strong></p>
+                <p class="mt-2 text-sm text-encre-doux">Up to 5 designs for 125 cards: 25 cards minimum per design.</p>
               </div>
               <div>
                 <p class="text-[12px] font-semibold uppercase tracking-[0.16em] text-encre-doux">What the cards open</p>
-                <ul class="ep-liste mt-2"><li class="ep-ligne" data-etat="disponible"><span>Room services and room service</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="disponible"><span>Housekeeping, late check-out, problems</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="disponible"><span>Wi-Fi, room guide, pool and gym</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="disponible"><span>Concierge, attractions and transportation</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="disponible"><span>Hotel restaurant and events</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="disponible"><span>Stay rating</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Online check-in and check-out</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Spa, upgrades, loyalty</span><span class="ep-badge"></span></li></ul>
+                <ul class="ep-liste mt-2"><li class="ep-ligne" data-etat="disponible"><span>Room services and room service</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="disponible"><span>Housekeeping, late check-out, problems</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="disponible"><span>Wi-Fi, room guide, pool and gym</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="disponible"><span>Concierge, attractions and transportation</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="disponible"><span>Hotel restaurant and events</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="disponible"><span>Stay rating</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Online check-in and check-out</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Spa booking</span><span class="ep-badge"></span></li></ul>
               </div>
             </div>
           </div>
@@ -577,10 +575,11 @@
                 <p class="mt-6 text-[12px] font-semibold uppercase tracking-[0.16em] text-encre-doux">Sample order</p>
                 <ul class="ep-emplacements mt-2"><li><span>Dining-room tables</span><strong>30</strong></li><li><span>Patio</span><strong>8</strong></li><li><span>Bar</span><strong>2</strong></li></ul>
                 <p class="ep-exemple"><span>40 cards × $30</span><strong>$1,200</strong></p>
+                <p class="mt-2 text-sm text-encre-doux">Up to 1 design for 40 cards: 25 cards minimum per design.</p>
               </div>
               <div>
                 <p class="text-[12px] font-semibold uppercase tracking-[0.16em] text-encre-doux">What the cards open</p>
-                <ul class="ep-liste mt-2"><li class="ep-ligne" data-etat="disponible"><span>Menu in 10 languages, with allergens</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="disponible"><span>Daily specials and drinks menu</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="disponible"><span>Call the server and the bill</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="disponible"><span>Ordering at the table</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="disponible"><span>Promotions, events, feedback</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Reservations and waitlist</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Payment and tips</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Takeout and loyalty</span><span class="ep-badge"></span></li></ul>
+                <ul class="ep-liste mt-2"><li class="ep-ligne" data-etat="disponible"><span>Menu in 10 languages, with allergens</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="disponible"><span>Daily specials and drinks menu</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="disponible"><span>Call the server and the bill</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="disponible"><span>Ordering at the table</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="disponible"><span>Promotions, events, feedback</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Reservations and waitlist</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Payment and tips</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Takeout</span><span class="ep-badge"></span></li></ul>
               </div>
             </div>
           </div>
@@ -592,10 +591,11 @@
                 <p class="mt-6 text-[12px] font-semibold uppercase tracking-[0.16em] text-encre-doux">Sample order</p>
                 <ul class="ep-emplacements mt-2"><li><span>Styling stations</span><strong>10</strong></li><li><span>Treatment rooms</span><strong>6</strong></li><li><span>Waiting area</span><strong>5</strong></li><li><span>Front desk</span><strong>4</strong></li></ul>
                 <p class="ep-exemple"><span>25 cards × $30</span><strong>$750</strong></p>
+                <p class="mt-2 text-sm text-encre-doux">Up to 1 design for 25 cards: 25 cards minimum per design.</p>
               </div>
               <div>
                 <p class="text-[12px] font-semibold uppercase tracking-[0.16em] text-encre-doux">What the cards open</p>
-                <ul class="ep-liste mt-2"><li class="ep-ligne" data-etat="disponible"><span>Google reviews, offered to everyone</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="disponible"><span>Your current booking tool, in one tap</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Appointment booking through Tapora</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Service catalogue and prices</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Style lookbook</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Recommended products</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Gift cards</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Loyalty program</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Satisfaction form</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Aftercare advice</span><span class="ep-badge"></span></li></ul>
+                <ul class="ep-liste mt-2"><li class="ep-ligne" data-etat="disponible"><span>Google reviews, offered to everyone</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="disponible"><span>Your current booking tool, in one tap</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Appointment booking through Tapora</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Service catalogue and prices</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Style lookbook</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Recommended products</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Gift cards</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Satisfaction form</span><span class="ep-badge"></span></li><li class="ep-ligne" data-etat="bientot"><span>Aftercare advice</span><span class="ep-badge"></span></li></ul>
               </div>
             </div>
           </div>
@@ -607,6 +607,7 @@
                 <p class="mt-6 text-[12px] font-semibold uppercase tracking-[0.16em] text-encre-doux">Sample order</p>
                 <ul class="ep-emplacements mt-2"><li><span>Exam rooms</span><strong>12</strong></li><li><span>Waiting room</span><strong>10</strong></li><li><span>Front desk</span><strong>3</strong></li></ul>
                 <p class="ep-exemple"><span>25 cards × $30</span><strong>$750</strong></p>
+                <p class="mt-2 text-sm text-encre-doux">Up to 1 design for 25 cards: 25 cards minimum per design.</p>
               </div>
               <div>
                 <p class="text-[12px] font-semibold uppercase tracking-[0.16em] text-encre-doux">What the cards open</p>
@@ -622,6 +623,7 @@
                 <p class="mt-6 text-[12px] font-semibold uppercase tracking-[0.16em] text-encre-doux">Sample order</p>
                 <ul class="ep-emplacements mt-2"><li><span>“For sale” signs</span><strong>20</strong></li><li><span>Window</span><strong>3</strong></li><li><span>Office</span><strong>2</strong></li></ul>
                 <p class="ep-exemple"><span>25 cards × $30</span><strong>$750</strong></p>
+                <p class="mt-2 text-sm text-encre-doux">Up to 1 design for 25 cards: 25 cards minimum per design.</p>
               </div>
               <div>
                 <p class="text-[12px] font-semibold uppercase tracking-[0.16em] text-encre-doux">What the cards open</p>
@@ -637,6 +639,7 @@
                 <p class="mt-6 text-[12px] font-semibold uppercase tracking-[0.16em] text-encre-doux">Sample order</p>
                 <ul class="ep-emplacements mt-2"><li><span>Showroom vehicles</span><strong>18</strong></li><li><span>Service department</span><strong>4</strong></li><li><span>Front desk</span><strong>3</strong></li></ul>
                 <p class="ep-exemple"><span>25 cards × $30</span><strong>$750</strong></p>
+                <p class="mt-2 text-sm text-encre-doux">Up to 1 design for 25 cards: 25 cards minimum per design.</p>
               </div>
               <div>
                 <p class="text-[12px] font-semibold uppercase tracking-[0.16em] text-encre-doux">What the cards open</p>
@@ -652,6 +655,7 @@
                 <p class="mt-6 text-[12px] font-semibold uppercase tracking-[0.16em] text-encre-doux">Sample order</p>
                 <ul class="ep-emplacements mt-2"><li><span>Machines</span><strong>18</strong></li><li><span>Locker rooms</span><strong>4</strong></li><li><span>Front desk</span><strong>3</strong></li></ul>
                 <p class="ep-exemple"><span>25 cards × $30</span><strong>$750</strong></p>
+                <p class="mt-2 text-sm text-encre-doux">Up to 1 design for 25 cards: 25 cards minimum per design.</p>
               </div>
               <div>
                 <p class="text-[12px] font-semibold uppercase tracking-[0.16em] text-encre-doux">What the cards open</p>
@@ -667,6 +671,7 @@
                 <p class="mt-6 text-[12px] font-semibold uppercase tracking-[0.16em] text-encre-doux">Sample order</p>
                 <ul class="ep-emplacements mt-2"><li><span>Tables</span><strong>20</strong></li><li><span>Room entrances</span><strong>4</strong></li><li><span>Welcome desk</span><strong>1</strong></li></ul>
                 <p class="ep-exemple"><span>25 cards × $30</span><strong>$750</strong></p>
+                <p class="mt-2 text-sm text-encre-doux">Up to 1 design for 25 cards: 25 cards minimum per design.</p>
               </div>
               <div>
                 <p class="text-[12px] font-semibold uppercase tracking-[0.16em] text-encre-doux">What the cards open</p>
@@ -685,11 +690,11 @@
       <div class="max-w-2xl">
         <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brique" data-apparait>One order</p>
         <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">Different cards for different places.</h2>
-        <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>Each area of the venue gets its own design, message and destination. The 25-card minimum counts for the whole order.</p>
+        <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>Each area of the venue can have its own design, message and destination. The rule: <strong class="font-semibold text-encre">25 cards minimum per design</strong>. The destination, on the other hand, is chosen card by card: 100 cards means up to 4 designs.</p>
       </div>
 
       <div class="mt-12 grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
-        <div id="ep-repartition" class="carte-papier rounded-[2rem] p-7 sm:p-9" data-apparait data-scenarios='[{&quot;id&quot;: &quot;hotel100&quot;, &quot;nom&quot;: &quot;100-room hotel&quot;, &quot;seg&quot;: [{&quot;nom&quot;: &quot;Rooms&quot;, &quot;dest&quot;: &quot;room service&quot;, &quot;n&quot;: 100, &quot;couleur&quot;: &quot;#c2552f&quot;}, {&quot;nom&quot;: &quot;Restaurant&quot;, &quot;dest&quot;: &quot;menu&quot;, &quot;n&quot;: 12, &quot;couleur&quot;: &quot;#2f5c47&quot;}, {&quot;nom&quot;: &quot;Front desk&quot;, &quot;dest&quot;: &quot;Google reviews&quot;, &quot;n&quot;: 5, &quot;couleur&quot;: &quot;#e4a53a&quot;}, {&quot;nom&quot;: &quot;Spa&quot;, &quot;dest&quot;: &quot;your booking tool&quot;, &quot;n&quot;: 4, &quot;couleur&quot;: &quot;#2a211a&quot;}, {&quot;nom&quot;: &quot;Other areas&quot;, &quot;dest&quot;: &quot;concierge&quot;, &quot;n&quot;: 4, &quot;couleur&quot;: &quot;#d89a83&quot;}]}, {&quot;id&quot;: &quot;hotel120&quot;, &quot;nom&quot;: &quot;120-room hotel&quot;, &quot;seg&quot;: [{&quot;nom&quot;: &quot;Rooms&quot;, &quot;dest&quot;: &quot;hotel services&quot;, &quot;n&quot;: 120, &quot;couleur&quot;: &quot;#c2552f&quot;}, {&quot;nom&quot;: &quot;Common areas&quot;, &quot;dest&quot;: &quot;guide and concierge&quot;, &quot;n&quot;: 15, &quot;couleur&quot;: &quot;#2f5c47&quot;}]}, {&quot;id&quot;: &quot;resto40&quot;, &quot;nom&quot;: &quot;40-table restaurant&quot;, &quot;seg&quot;: [{&quot;nom&quot;: &quot;Tables&quot;, &quot;dest&quot;: &quot;menu and call the server&quot;, &quot;n&quot;: 40, &quot;couleur&quot;: &quot;#c2552f&quot;}]}, {&quot;id&quot;: &quot;resto50&quot;, &quot;nom&quot;: &quot;“50 cards for our tables”&quot;, &quot;seg&quot;: [{&quot;nom&quot;: &quot;Tables&quot;, &quot;dest&quot;: &quot;menu, with your logo and colours&quot;, &quot;n&quot;: 50, &quot;couleur&quot;: &quot;#2f5c47&quot;}]}]'>
+        <div id="ep-repartition" class="carte-papier rounded-[2rem] p-7 sm:p-9" data-apparait data-scenarios='[{&quot;id&quot;: &quot;hotel100&quot;, &quot;nom&quot;: &quot;100-room hotel&quot;, &quot;designs&quot;: &quot;2 designs: one for the 100 rooms, one for the 25 common-area cards (restaurant, front desk, spa, other). Each card keeps its own destination.&quot;, &quot;seg&quot;: [{&quot;nom&quot;: &quot;Rooms&quot;, &quot;dest&quot;: &quot;room service&quot;, &quot;n&quot;: 100, &quot;couleur&quot;: &quot;#c2552f&quot;}, {&quot;nom&quot;: &quot;Restaurant&quot;, &quot;dest&quot;: &quot;menu&quot;, &quot;n&quot;: 12, &quot;couleur&quot;: &quot;#2f5c47&quot;}, {&quot;nom&quot;: &quot;Front desk&quot;, &quot;dest&quot;: &quot;Google reviews&quot;, &quot;n&quot;: 5, &quot;couleur&quot;: &quot;#e4a53a&quot;}, {&quot;nom&quot;: &quot;Spa&quot;, &quot;dest&quot;: &quot;your booking tool&quot;, &quot;n&quot;: 4, &quot;couleur&quot;: &quot;#2a211a&quot;}, {&quot;nom&quot;: &quot;Other areas&quot;, &quot;dest&quot;: &quot;concierge&quot;, &quot;n&quot;: 4, &quot;couleur&quot;: &quot;#d89a83&quot;}]}, {&quot;id&quot;: &quot;hotel120&quot;, &quot;nom&quot;: &quot;120-room hotel&quot;, &quot;designs&quot;: &quot;1 design for all 135 cards. A 2nd design just for the common areas would need 25 cards (10 more).&quot;, &quot;seg&quot;: [{&quot;nom&quot;: &quot;Rooms&quot;, &quot;dest&quot;: &quot;hotel services&quot;, &quot;n&quot;: 120, &quot;couleur&quot;: &quot;#c2552f&quot;}, {&quot;nom&quot;: &quot;Common areas&quot;, &quot;dest&quot;: &quot;guide and concierge&quot;, &quot;n&quot;: 15, &quot;couleur&quot;: &quot;#2f5c47&quot;}]}, {&quot;id&quot;: &quot;resto40&quot;, &quot;nom&quot;: &quot;40-table restaurant&quot;, &quot;designs&quot;: &quot;1 design for the 40 tables. 2 designs would need 50 cards (25 + 25).&quot;, &quot;seg&quot;: [{&quot;nom&quot;: &quot;Tables&quot;, &quot;dest&quot;: &quot;menu and call the server&quot;, &quot;n&quot;: 40, &quot;couleur&quot;: &quot;#c2552f&quot;}]}, {&quot;id&quot;: &quot;resto50&quot;, &quot;nom&quot;: &quot;“50 cards for our tables”&quot;, &quot;designs&quot;: &quot;1 design with your logo — or 2 designs of 25 cards each.&quot;, &quot;seg&quot;: [{&quot;nom&quot;: &quot;Tables&quot;, &quot;dest&quot;: &quot;menu, with your logo and colours&quot;, &quot;n&quot;: 50, &quot;couleur&quot;: &quot;#2f5c47&quot;}]}]'>
           <div class="flex flex-wrap gap-2" role="group" aria-label="Examples"><button type="button" class="ep-puce" data-scenario="hotel100" aria-pressed="true">100-room hotel</button><button type="button" class="ep-puce" data-scenario="hotel120" aria-pressed="false">120-room hotel</button><button type="button" class="ep-puce" data-scenario="resto40" aria-pressed="false">40-table restaurant</button><button type="button" class="ep-puce" data-scenario="resto50" aria-pressed="false">“50 cards for our tables”</button></div>
           <div class="mt-8 flex flex-wrap items-end justify-between gap-4">
             <p><span id="ep-repartition-cartes" class="titre text-5xl font-medium">125</span> <span class="text-encre-doux">cards</span></p>
@@ -697,6 +702,7 @@
           </div>
           <div id="ep-barre" class="mt-6 flex h-14 w-full overflow-hidden rounded-2xl bg-sable" aria-hidden="true"><span class="ep-segment" style="flex-grow:100;background:#c2552f"></span><span class="ep-segment" style="flex-grow:12;background:#2f5c47"></span><span class="ep-segment" style="flex-grow:5;background:#e4a53a"></span><span class="ep-segment" style="flex-grow:4;background:#2a211a"></span><span class="ep-segment" style="flex-grow:4;background:#d89a83"></span></div>
           <ul id="ep-legende" class="mt-6 grid gap-x-6 gap-y-3 text-[15px] sm:grid-cols-2"><li class="flex items-center justify-between gap-3"><span class="flex min-w-0 items-center gap-2.5"><span class="size-3 shrink-0 rounded-full" style="background:#c2552f"></span><span>Rooms <span class="text-encre-doux">· room service</span></span></span><strong>100</strong></li><li class="flex items-center justify-between gap-3"><span class="flex min-w-0 items-center gap-2.5"><span class="size-3 shrink-0 rounded-full" style="background:#2f5c47"></span><span>Restaurant <span class="text-encre-doux">· menu</span></span></span><strong>12</strong></li><li class="flex items-center justify-between gap-3"><span class="flex min-w-0 items-center gap-2.5"><span class="size-3 shrink-0 rounded-full" style="background:#e4a53a"></span><span>Front desk <span class="text-encre-doux">· Google reviews</span></span></span><strong>5</strong></li><li class="flex items-center justify-between gap-3"><span class="flex min-w-0 items-center gap-2.5"><span class="size-3 shrink-0 rounded-full" style="background:#2a211a"></span><span>Spa <span class="text-encre-doux">· your booking tool</span></span></span><strong>4</strong></li><li class="flex items-center justify-between gap-3"><span class="flex min-w-0 items-center gap-2.5"><span class="size-3 shrink-0 rounded-full" style="background:#d89a83"></span><span>Other areas <span class="text-encre-doux">· concierge</span></span></span><strong>4</strong></li></ul>
+          <p class="mt-6 flex gap-3 rounded-2xl bg-sable px-4 py-3 text-[15px] leading-relaxed"><span class="font-semibold text-brique" aria-hidden="true">✦</span><span id="ep-designs-note">2 designs: one for the 100 rooms, one for the 25 common-area cards (restaurant, front desk, spa, other). Each card keeps its own destination.</span></p>
         </div>
 
         <div id="ep-calcul" class="relative overflow-hidden rounded-[2rem] bg-encre p-7 text-creme sm:p-9" data-apparait>
@@ -707,6 +713,12 @@
             <button type="button" data-ep-moins class="grid size-12 shrink-0 place-items-center rounded-full bg-creme/10 text-2xl transition hover:bg-creme/20" aria-label="One card fewer">−</button>
             <input id="ep-nb" type="number" inputmode="numeric" min="1" max="5000" value="25" class="ep-nombre-champ h-12 w-full min-w-0 rounded-2xl bg-creme/10 text-center text-2xl font-semibold text-creme">
             <button type="button" data-ep-plus class="grid size-12 shrink-0 place-items-center rounded-full bg-creme/10 text-2xl transition hover:bg-creme/20" aria-label="One more card">+</button>
+          </div>
+          <label for="ep-designs" class="relative mt-6 block text-sm text-creme/70">Number of designs (25 cards minimum each)</label>
+          <div class="relative mt-2 flex items-center gap-2">
+            <button type="button" data-ep-designs-moins class="grid size-12 shrink-0 place-items-center rounded-full bg-creme/10 text-2xl transition hover:bg-creme/20" aria-label="One design fewer">−</button>
+            <input id="ep-designs" type="number" inputmode="numeric" min="1" max="40" value="1" class="ep-nombre-champ h-12 w-full min-w-0 rounded-2xl bg-creme/10 text-center text-2xl font-semibold text-creme">
+            <button type="button" data-ep-designs-plus class="grid size-12 shrink-0 place-items-center rounded-full bg-creme/10 text-2xl transition hover:bg-creme/20" aria-label="One more design">+</button>
           </div>
           <div class="relative mt-4 flex flex-wrap gap-2">
             <button type="button" class="ep-puce-sombre" data-ep-nb="25">25</button>
@@ -719,7 +731,8 @@
               <p class="text-sm text-creme/70" id="ep-detail">25 cards × $30</p>
               <p id="ep-total" class="titre mt-1 text-5xl font-medium text-miel">$750</p>
             </div>
-            <p id="ep-minimum" class="hidden rounded-2xl bg-creme/10 px-4 py-3 text-[15px] leading-relaxed">Minimum 25 cards per order — individual cards: $35, no minimum. <a href="/en/#prix" class="font-semibold text-miel underline underline-offset-4">See individual cards</a></p>
+            <p id="ep-minimum" class="hidden rounded-2xl bg-creme/10 px-4 py-3 text-[15px] leading-relaxed">Minimum 25 cards per design — individual cards: $35, no minimum. <a href="/en/#prix" class="font-semibold text-miel underline underline-offset-4">See individual cards</a></p>
+            <p id="ep-minimum-designs" class="hidden rounded-2xl bg-creme/10 px-4 py-3 text-[15px] leading-relaxed" data-modele="25 cards minimum per design: {d} designs need at least {n} cards."></p>
           </div>
           <p class="relative mt-4 text-xs text-creme/55">Card pricing, custom design included. Software modules are quoted to your needs.</p>
         </div>
@@ -834,7 +847,7 @@
               <tr class="border-t border-ligne"><th scope="row" class="p-4 font-semibold">Destination</th><td class="p-4 text-encre-doux">Mainly Google reviews</td><td class="ep-colonne-vedette p-4 font-medium">Menus, forms, bookings, portals…</td></tr>
               <tr class="border-t border-ligne"><th scope="row" class="p-4 font-semibold">Customization</th><td class="p-4 text-encre-doux">Standard Tapora design</td><td class="ep-colonne-vedette p-4 font-medium">Full: logo, colours, a name on every card</td></tr>
               <tr class="border-t border-ligne"><th scope="row" class="p-4 font-semibold">Who it’s for</th><td class="p-4 text-encre-doux">Small businesses</td><td class="ep-colonne-vedette p-4 font-medium">Hotels, groups, restaurants, businesses</td></tr>
-              <tr class="border-t border-ligne"><th scope="row" class="p-4 font-semibold">Quantity</th><td class="p-4 text-encre-doux">No minimum</td><td class="ep-colonne-vedette p-4 font-medium">Minimum 25 cards</td></tr>
+              <tr class="border-t border-ligne"><th scope="row" class="p-4 font-semibold">Quantity</th><td class="p-4 text-encre-doux">No minimum</td><td class="ep-colonne-vedette p-4 font-medium">Minimum 25 cards per design</td></tr>
               <tr class="border-t border-ligne"><th scope="row" class="p-4 font-semibold">Price</th><td class="p-4 text-encre-doux">$35 per card</td><td class="ep-colonne-vedette p-4 font-medium">$30 per card</td></tr>
               <tr class="border-t border-ligne"><th scope="row" class="p-4 font-semibold">What’s next</th><td class="p-4 text-encre-doux">A physical product</td><td class="ep-colonne-vedette p-4 font-medium">The card, plus digital services</td></tr>
             </tbody>
@@ -916,8 +929,18 @@
       </div>
       <ol id="ep-route" class="relative mt-14 space-y-10 pl-10">
         <span id="ep-route-ligne" class="absolute bottom-2 left-[11px] top-2 w-0.5 origin-top rounded-full bg-brique/70" aria-hidden="true"></span>
-        <li class="ep-phase" data-etat="bientot"><span class="ep-phase-point" aria-hidden="true"></span><p class="text-sm font-semibold uppercase tracking-[0.16em] text-brique">Phase 1</p><span class="ep-badge"></span><p class="mt-1.5 leading-relaxed">The multi-action page for every sector, forms and surveys, scheduled destinations and batch changes.</p></li><li class="ep-phase" data-etat="bientot"><span class="ep-phase-point" aria-hidden="true"></span><p class="text-sm font-semibold uppercase tracking-[0.16em] text-brique">Phase 2</p><span class="ep-badge"></span><p class="mt-1.5 leading-relaxed">Reservations and appointments, the waitlist, online check-in and check-out.</p></li><li class="ep-phase" data-etat="bientot"><span class="ep-phase-point" aria-hidden="true"></span><p class="text-sm font-semibold uppercase tracking-[0.16em] text-brique">Phase 3</p><span class="ep-badge"></span><p class="mt-1.5 leading-relaxed">Multi-location accounts, roles and permissions, self-service.</p></li><li class="ep-phase" data-etat="bientot"><span class="ep-phase-point" aria-hidden="true"></span><p class="text-sm font-semibold uppercase tracking-[0.16em] text-brique">Phase 4</p><span class="ep-badge"></span><p class="mt-1.5 leading-relaxed">Payments, tips and gift cards through your business’s own Stripe account, and the loyalty program.</p></li><li class="ep-phase" data-etat="bientot"><span class="ep-phase-point" aria-hidden="true"></span><p class="text-sm font-semibold uppercase tracking-[0.16em] text-brique">Phase 5</p><span class="ep-badge"></span><p class="mt-1.5 leading-relaxed">Integrations: webhooks and CSV export first, then the hotel system and the point of sale.</p></li>
+        <li class="ep-phase" data-etat="bientot"><span class="ep-phase-point" aria-hidden="true"></span><p class="text-sm font-semibold uppercase tracking-[0.16em] text-brique">Phase 1</p><span class="ep-badge"></span><p class="mt-1.5 leading-relaxed">The multi-action page for every sector, forms and surveys, scheduled destinations and batch changes.</p></li><li class="ep-phase" data-etat="bientot"><span class="ep-phase-point" aria-hidden="true"></span><p class="text-sm font-semibold uppercase tracking-[0.16em] text-brique">Phase 2</p><span class="ep-badge"></span><p class="mt-1.5 leading-relaxed">Reservations and appointments, the waitlist, online check-in and check-out.</p></li><li class="ep-phase" data-etat="bientot"><span class="ep-phase-point" aria-hidden="true"></span><p class="text-sm font-semibold uppercase tracking-[0.16em] text-brique">Phase 3</p><span class="ep-badge"></span><p class="mt-1.5 leading-relaxed">Multi-location accounts, roles and permissions, self-service.</p></li><li class="ep-phase" data-etat="bientot"><span class="ep-phase-point" aria-hidden="true"></span><p class="text-sm font-semibold uppercase tracking-[0.16em] text-brique">Phase 4</p><span class="ep-badge"></span><p class="mt-1.5 leading-relaxed">Payments, tips and gift cards, through your business’s own Stripe account.</p></li><li class="ep-phase" data-etat="bientot"><span class="ep-phase-point" aria-hidden="true"></span><p class="text-sm font-semibold uppercase tracking-[0.16em] text-brique">Phase 5</p><span class="ep-badge"></span><p class="mt-1.5 leading-relaxed">Integrations: webhooks and CSV export first, then the hotel system and the point of sale.</p></li>
       </ol>
+    </section>
+
+    <!-- ============================== SÉCURITÉ ============================== -->
+    <section id="securite" class="mx-auto max-w-6xl scroll-mt-20 px-5 py-28">
+      <div class="max-w-2xl">
+        <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brique" data-apparait>Security</p>
+        <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">Your data and your customers’ data, protected.</h2>
+        <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>Everything below works today.</p>
+      </div>
+      <ul class="cascade-securite mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><li class="ep-securite" data-etat="disponible" data-incline data-apparait><span class="ep-securite-icone" aria-hidden="true">🔒</span><span class="ep-badge"></span><strong>Password-protected private pages</strong><span>The stats page and the staff portal lock with a password. It is hashed (scrypt): no one, not even Tapora, can read it.</span></li><li class="ep-securite" data-etat="disponible" data-incline data-apparait><span class="ep-securite-icone" aria-hidden="true">🔗</span><span class="ep-badge"></span><strong>Signed, renewable links</strong><span>Every private link is signed: impossible to guess or forge. A new link makes the old one stop working instantly.</span></li><li class="ep-securite" data-etat="disponible" data-incline data-apparait><span class="ep-securite-icone" aria-hidden="true">🛡️</span><span class="ep-badge"></span><strong>Brakes against intruders</strong><span>Password attempts are limited, per device and per hour, and Tapora is alerted to repeated attempts.</span></li><li class="ep-securite" data-etat="disponible" data-incline data-apparait><span class="ep-securite-icone" aria-hidden="true">🔑</span><span class="ep-badge"></span><strong>A separate password for the manager</strong><span>Changing the menu, prices or announcements takes the manager’s password, which expires after 12 hours on each device.</span></li><li class="ep-securite" data-etat="disponible" data-incline data-apparait><span class="ep-securite-icone" aria-hidden="true">👤</span><span class="ep-badge"></span><strong>No personal data in the stats</strong><span>No IP address, no identifier: only the time, the channel (NFC or QR code) and the device type.</span></li><li class="ep-securite" data-etat="disponible" data-incline data-apparait><span class="ep-securite-icone" aria-hidden="true">🧹</span><span class="ep-badge"></span><strong>Automatic deletion</strong><span>On the service pages (menus, requests, concierge): the anti-abuse trace is deleted after 30 days, visits after 13 months, requests and reviews after 25 months.</span></li><li class="ep-securite" data-etat="disponible" data-incline data-apparait><span class="ep-securite-icone" aria-hidden="true">🇨🇦</span><span class="ep-badge"></span><strong>Hosted in Canada, encrypted everywhere</strong><span>Data is hosted in Canada. Everything goes over an encrypted connection (HTTPS), and private pages are never indexed by search engines.</span></li><li class="ep-securite" data-etat="disponible" data-incline data-apparait><span class="ep-securite-icone" aria-hidden="true">🧾</span><span class="ep-badge"></span><strong>Protected from abuse</strong><span>Requests are capped, order prices are always recalculated by our servers, and the Tapora team signs in with mandatory two-factor authentication.</span></li></ul>
     </section>
 
     <!-- ============================== PRIX ============================== -->
@@ -926,7 +949,7 @@
         <div class="max-w-2xl">
           <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brique" data-apparait>Pricing</p>
           <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">One price per card. Software, to your needs.</h2>
-          <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>Enterprise pricing starts at $30 per card, with a minimum order of 25 cards. Every card can be customized to reflect your brand and connect your customers to the digital destination of your choice.</p>
+          <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>Enterprise pricing starts at $30 per card, with a minimum of 25 cards per design. Every card can be customized to reflect your brand and connect your customers to the digital destination of your choice. Stats are always included, free: for every Business order, and for orders of more than 4 individual cards.</p>
         </div>
         <div class="mt-14 grid gap-6 lg:grid-cols-[1.15fr_1fr_1fr]">
           <article data-incline class="relative overflow-hidden rounded-[2rem] bg-encre p-8 text-creme shadow-[0_40px_70px_-30px_rgb(40_25_15_/_0.75)]" data-apparait>
@@ -934,7 +957,7 @@
             <div class="ep-halo-sombre pointer-events-none absolute -right-24 -top-24 size-72 rounded-full" aria-hidden="true"></div>
             <p class="relative text-sm font-semibold uppercase tracking-[0.18em] text-miel">Business</p>
             <p class="relative mt-4"><span class="titre text-6xl font-medium">$30</span> <span class="text-creme/70">/ card</span></p>
-            <p class="relative mt-1 text-creme/70">from 25 cards · custom design included</p>
+            <p class="relative mt-1 text-creme/70">25 cards minimum per design · custom design and stats included</p>
             <ul class="relative mt-6 space-y-2 text-[15px]">
               <li class="flex justify-between border-b border-creme/10 pb-2"><span>25 cards</span><strong>$750</strong></li>
               <li class="flex justify-between border-b border-creme/10 pb-2"><span>40 cards</span><strong>$1,200</strong></li>
@@ -948,14 +971,14 @@
             <div class="ep-reflet" aria-hidden="true"></div>
             <p class="text-sm font-semibold uppercase tracking-[0.18em] text-sapin">Software modules</p>
             <p class="titre mt-4 text-3xl font-medium leading-tight">To your needs — on quote</p>
-            <p class="mt-3 leading-relaxed text-encre-doux">Live menu, requests, room service, staff portal, and the modules on the way: we price together what your venue needs. A simple form and a hotel-system integration don’t cost the same at all.</p>
+            <p class="mt-3 leading-relaxed text-encre-doux">Live menu, requests, room service, staff portal, and the modules on the way: we price together what your venue needs. A simple form and a hotel-system integration don’t cost the same at all. For everything else, we build it for you: the price depends on what you ask for.</p>
           </article>
           <article data-incline class="carte-papier relative overflow-hidden rounded-[2rem] p-8" data-apparait>
             <div class="ep-reflet" aria-hidden="true"></div>
             <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brique">Individual cards</p>
             <p class="mt-4"><span class="titre text-5xl font-medium">$35</span> <span class="text-encre-doux">/ card</span></p>
             <p class="mt-1 text-encre-doux">no minimum · ready to install</p>
-            <p class="mt-4 leading-relaxed text-encre-doux">For just a few cards: the standard bilingual Tapora design, with stats included.</p>
+            <p class="mt-4 leading-relaxed text-encre-doux">For just a few cards: the standard bilingual Tapora design. Stats included free from 5 cards.</p>
             <a href="/en/#prix" class="bouton-fleche group mt-6 inline-flex items-center gap-2 font-semibold text-brique">See individual cards <span class="fleche" aria-hidden="true">→</span></a>
           </article>
         </div>
@@ -967,12 +990,12 @@
       <h2 data-mots class="titre text-4xl font-medium leading-tight sm:text-5xl">Frequently asked questions</h2>
       <div class="mt-10 divide-y divide-ligne border-y border-ligne">
         <details class="group py-5" data-apparait>
-          <summary class="flex items-center justify-between gap-6 text-lg font-medium">Is the 25-card minimum per order or per area?<span class="plus grid size-8 shrink-0 place-items-center rounded-full bg-sable text-xl leading-none">+</span></summary>
-          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Per order. One order can be split across your rooms, your restaurant and your front desk, as long as the total reaches 25 cards. For just a few cards, individual cards are $35 each, with no minimum.</p></div>
+          <summary class="flex items-center justify-between gap-6 text-lg font-medium">What does the 25-card minimum apply to?<span class="plus grid size-8 shrink-0 place-items-center rounded-full bg-sable text-xl leading-none">+</span></summary>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux"><strong>Per design.</strong> Each design needs at least 25 cards: a business that wants 100 cards can have up to 4 different designs (4 × 25). The destination, on the other hand, is chosen card by card, with no minimum: two cards with the same design can open two different pages. For just a few cards, individual cards are $35 each, with no minimum.</p></div>
         </details>
         <details class="group py-5" data-apparait>
           <summary class="flex items-center justify-between gap-6 text-lg font-medium">Can one order have several designs?<span class="plus grid size-8 shrink-0 place-items-center rounded-full bg-sable text-xl leading-none">+</span></summary>
-          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Yes: one design for the rooms and another for the restaurant, for example. We work it out together at the mockup stage, which you approve before production.</p></div>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Yes, as many as you like, as long as each design has at least 25 cards: for example 100 cards for the rooms and 25 for the restaurant and front desk, so 2 designs. You approve each mockup before production.</p></div>
         </details>
         <details class="group py-5" data-apparait>
           <summary class="flex items-center justify-between gap-6 text-lg font-medium">How do you change where a card leads?<span class="plus grid size-8 shrink-0 place-items-center rounded-full bg-sable text-xl leading-none">+</span></summary>
@@ -988,7 +1011,7 @@
         </details>
         <details class="group py-5" data-apparait>
           <summary class="flex items-center justify-between gap-6 text-lg font-medium">What data do you keep about my customers?<span class="plus grid size-8 shrink-0 place-items-center rounded-full bg-sable text-xl leading-none">+</span></summary>
-          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">For card statistics, no IP address and no identifier: only the time of the tap, the channel (NFC or QR code) and the device type. In line with Québec’s Law 25, nothing is sold or shared.</p></div>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Stats are always included free, for every Business order and for orders of more than 4 individual cards. They keep no IP address and no identifier: only the time of the tap, the channel (NFC or QR code) and the device type. In line with Québec’s Law 25, nothing is sold or shared.</p></div>
         </details>
         <details class="group py-5" data-apparait>
           <summary class="flex items-center justify-between gap-6 text-lg font-medium">In which languages?<span class="plus grid size-8 shrink-0 place-items-center rounded-full bg-sable text-xl leading-none">+</span></summary>

@@ -39,7 +39,6 @@ FONCTIONS = [
   ('resto', D, 'Commande à table', 'Commander depuis son téléphone, payer à l’addition.', 'Ordering at the table', 'Order from the phone, pay with the bill.', False),
   ('resto', B, 'Paiement', 'Un paiement sécurisé par Stripe, sur votre compte.', 'Payment', 'Secure payment through Stripe, on your account.', False),
   ('resto', B, 'Pourboire', 'Une interface de pourboire, avec le paiement.', 'Tips', 'A tipping screen, with the payment.', False),
-  ('resto', B, 'Programme de fidélité', 'Accumuler des points ou des tampons.', 'Loyalty program', 'Collect points or stamps.', False),
   ('resto', D, 'Promotions', 'Voir les offres du moment.', 'Promotions', 'See the current offers.', False),
   ('resto', D, 'Événements', 'Les soirées spéciales et les spectacles.', 'Events', 'Special nights and shows.', False),
   ('resto', B, 'Commandes à emporter', 'Commandées et payées en ligne.', 'Takeout orders', 'Ordered and paid online.', False),
@@ -62,9 +61,7 @@ FONCTIONS = [
   ('hotel', D, 'Attractions locales', 'Découvrir les activités du coin.', 'Local attractions', 'Discover things to do nearby.', False),
   ('hotel', D, 'Transport', 'Les informations de transport.', 'Transportation', 'Transportation information.', False),
   ('hotel', D, 'Départ tardif', 'Demander un départ tardif en un tap.', 'Late check-out', 'Request a late check-out in one tap.', False),
-  ('hotel', B, 'Surclassement', 'Consulter les options offertes.', 'Upgrades', 'See the available options.', False),
   ('hotel', D, 'Évaluation du séjour', 'Partager son expérience&nbsp;; le lien Google est offert à tous.', 'Stay rating', 'Share the experience; the Google link is offered to everyone.', False),
-  ('hotel', B, 'Programme de fidélité', 'S’inscrire aux avantages.', 'Loyalty program', 'Join the rewards.', False),
   ('hotel', D, 'Événements', 'Découvrir les activités de l’hôtel.', 'Events', 'Discover the hotel’s activities.', False),
   ('hotel', D, 'La commande au service aux chambres', 'Le panier, le mot pour la cuisine, et l’équipe la voit en direct.', 'Room service ordering', 'The cart, a note for the kitchen, and the team sees it live.', True),
   # Cartes et suivi
@@ -106,23 +103,44 @@ PLATEFORME = [
   (B, 'Intégrations', 'Relier vos formulaires et vos pages aux logiciels que vous utilisez déjà.', 'Integrations', 'Connect your forms and pages to the software you already use.'),
 ]
 
+# ---------------------------------------------------------------- sécurité
+# Seulement ce qui existe et fonctionne aujourd'hui (vérifié dans le code).
+SECURITE = [
+  ('🔒', 'Pages privées protégées par mot de passe', 'La page de statistiques et le portail de l’équipe se ferment par un mot de passe. Il est chiffré (scrypt)&nbsp;: personne, même chez Tapora, ne peut le lire.',
+   'Password-protected private pages', 'The stats page and the staff portal lock with a password. It is hashed (scrypt): no one, not even Tapora, can read it.'),
+  ('🔗', 'Liens signés, renouvelables', 'Chaque lien privé est signé&nbsp;: impossible à deviner ou à fabriquer. Un nouveau lien rend l’ancien inutilisable sur-le-champ.',
+   'Signed, renewable links', 'Every private link is signed: impossible to guess or forge. A new link makes the old one stop working instantly.'),
+  ('🛡️', 'Freins contre les intrus', 'Le nombre d’essais de mot de passe est limité, par appareil et par heure, et Tapora est alertée en cas d’essais répétés.',
+   'Brakes against intruders', 'Password attempts are limited, per device and per hour, and Tapora is alerted to repeated attempts.'),
+  ('🔑', 'Un mot de passe à part pour le gérant', 'Modifier le menu, les prix ou les annonces demande le mot de passe du gérant, qui expire après 12&nbsp;heures sur chaque appareil.',
+   'A separate password for the manager', 'Changing the menu, prices or announcements takes the manager’s password, which expires after 12 hours on each device.'),
+  ('👤', 'Aucune donnée personnelle dans les statistiques', 'Ni adresse IP ni identifiant&nbsp;: seulement l’heure, le canal (NFC ou code QR) et le type d’appareil.',
+   'No personal data in the stats', 'No IP address, no identifier: only the time, the channel (NFC or QR code) and the device type.'),
+  ('🧹', 'Effacement automatique', 'Sur les pages de services (menus, demandes, concierge)&nbsp;: la trace anti-abus est effacée après 30&nbsp;jours, les visites après 13&nbsp;mois, les demandes et les avis après 25&nbsp;mois.',
+   'Automatic deletion', 'On the service pages (menus, requests, concierge): the anti-abuse trace is deleted after 30 days, visits after 13 months, requests and reviews after 25 months.'),
+  ('🇨🇦', 'Hébergé au Canada, chiffré partout', 'Les données sont hébergées au Canada. Tout passe par une connexion chiffrée (HTTPS), et les pages privées ne sont jamais indexées par les moteurs de recherche.',
+   'Hosted in Canada, encrypted everywhere', 'Data is hosted in Canada. Everything goes over an encrypted connection (HTTPS), and private pages are never indexed by search engines.'),
+  ('🧾', 'À l’abri des abus', 'Les demandes sont plafonnées, les prix d’une commande sont toujours recalculés par nos serveurs, et l’équipe Tapora se connecte avec une double authentification obligatoire.',
+   'Protected from abuse', 'Requests are capped, order prices are always recalculated by our servers, and the Tapora team signs in with mandatory two-factor authentication.'),
+]
+
 # ---------------------------------------------------------------- secteurs
 SECTEURS = [
   dict(id='hotel', fr='Hôtels', en='Hotels', titre_fr='Hôtels et hébergements', titre_en='Hotels and lodging',
        intro_fr='Une carte dans chaque chambre, et la réception n’a plus à répondre dix fois à «' + NB + 'c’est quoi, le Wi-Fi' + NB + '?' + NB + '».',
        intro_en='A card in every room, and the front desk stops answering “what’s the Wi-Fi?” ten times a day.',
        lieux=[('Chambres', 'Rooms', 100), ('Restaurant', 'Restaurant', 12), ('Réception', 'Front desk', 5), ('Spa', 'Spa', 4), ('Ascenseurs et espaces communs', 'Elevators and common areas', 4)],
-       f=[(D, 'Services de chambre et service aux chambres', 'Room services and room service'), (D, 'Entretien ménager, départ tardif, problème', 'Housekeeping, late check-out, problems'), (D, 'Wi-Fi, guide de la chambre, piscine et gym', 'Wi-Fi, room guide, pool and gym'), (D, 'Conciergerie, attractions et transport', 'Concierge, attractions and transportation'), (D, 'Restaurant de l’hôtel et événements', 'Hotel restaurant and events'), (D, 'Évaluation du séjour', 'Stay rating'), (B, 'Enregistrement et départ en ligne', 'Online check-in and check-out'), (B, 'Spa, surclassement, fidélité', 'Spa, upgrades, loyalty')]),
+       f=[(D, 'Services de chambre et service aux chambres', 'Room services and room service'), (D, 'Entretien ménager, départ tardif, problème', 'Housekeeping, late check-out, problems'), (D, 'Wi-Fi, guide de la chambre, piscine et gym', 'Wi-Fi, room guide, pool and gym'), (D, 'Conciergerie, attractions et transport', 'Concierge, attractions and transportation'), (D, 'Restaurant de l’hôtel et événements', 'Hotel restaurant and events'), (D, 'Évaluation du séjour', 'Stay rating'), (B, 'Enregistrement et départ en ligne', 'Online check-in and check-out'), (B, 'Réservation au spa', 'Spa booking')]),
   dict(id='resto', fr='Restaurants et bars', en='Restaurants and bars', titre_fr='Restaurants, cafés et bars', titre_en='Restaurants, cafés and bars',
        intro_fr='Le menu dans la langue du client, le serveur appelé au bon moment, l’addition sans attendre — et l’avis juste après.',
        intro_en='The menu in the guest’s language, the server called at the right time, the bill without waiting — and the review right after.',
        lieux=[('Tables de la salle', 'Dining-room tables', 30), ('Terrasse', 'Patio', 8), ('Bar', 'Bar', 2)],
-       f=[(D, 'Menu en 10 langues, avec les allergènes', 'Menu in 10 languages, with allergens'), (D, 'Menu du jour et menu des boissons', 'Daily specials and drinks menu'), (D, 'Appeler le serveur et l’addition', 'Call the server and the bill'), (D, 'Commande à table', 'Ordering at the table'), (D, 'Promotions, événements, commentaires', 'Promotions, events, feedback'), (B, 'Réservation et liste d’attente', 'Reservations and waitlist'), (B, 'Paiement et pourboire', 'Payment and tips'), (B, 'Commandes à emporter et fidélité', 'Takeout and loyalty')]),
+       f=[(D, 'Menu en 10 langues, avec les allergènes', 'Menu in 10 languages, with allergens'), (D, 'Menu du jour et menu des boissons', 'Daily specials and drinks menu'), (D, 'Appeler le serveur et l’addition', 'Call the server and the bill'), (D, 'Commande à table', 'Ordering at the table'), (D, 'Promotions, événements, commentaires', 'Promotions, events, feedback'), (B, 'Réservation et liste d’attente', 'Reservations and waitlist'), (B, 'Paiement et pourboire', 'Payment and tips'), (B, 'Commandes à emporter', 'Takeout')]),
   dict(id='spa', fr='Salons et spas', en='Salons and spas', titre_fr='Salons de coiffure, spas et beauté', titre_en='Hair salons, spas and beauty',
        intro_fr='Une carte à chaque poste et dans chaque salle de soins&nbsp;: le prochain rendez-vous, les produits, l’avis — pendant que le client est encore là.',
        intro_en='A card at every station and in every treatment room: the next appointment, the products, the review — while the client is still there.',
        lieux=[('Postes de coiffure', 'Styling stations', 10), ('Salles de soins', 'Treatment rooms', 6), ('Salle d’attente', 'Waiting area', 5), ('Réception', 'Front desk', 4)],
-       f=[(D, 'Avis Google, offert à tous', 'Google reviews, offered to everyone'), (D, 'Votre outil de rendez-vous actuel, en un tap', 'Your current booking tool, in one tap'), (B, 'Réservation de rendez-vous avec Tapora', 'Appointment booking through Tapora'), (B, 'Catalogue des services et tarifs', 'Service catalogue and prices'), (B, 'Consultation de styles', 'Style lookbook'), (B, 'Produits recommandés', 'Recommended products'), (B, 'Cartes-cadeaux', 'Gift cards'), (B, 'Programme de fidélité', 'Loyalty program'), (B, 'Formulaire de satisfaction', 'Satisfaction form'), (B, 'Conseils après le traitement', 'Aftercare advice')]),
+       f=[(D, 'Avis Google, offert à tous', 'Google reviews, offered to everyone'), (D, 'Votre outil de rendez-vous actuel, en un tap', 'Your current booking tool, in one tap'), (B, 'Réservation de rendez-vous avec Tapora', 'Appointment booking through Tapora'), (B, 'Catalogue des services et tarifs', 'Service catalogue and prices'), (B, 'Consultation de styles', 'Style lookbook'), (B, 'Produits recommandés', 'Recommended products'), (B, 'Cartes-cadeaux', 'Gift cards'), (B, 'Formulaire de satisfaction', 'Satisfaction form'), (B, 'Conseils après le traitement', 'Aftercare advice')]),
   dict(id='clinique', fr='Cliniques', en='Clinics', titre_fr='Cliniques dentaires et professionnelles', titre_en='Dental and professional clinics',
        intro_fr='Dans la salle d’attente et dans chaque salle d’examen&nbsp;: les consignes, les formulaires, le prochain rendez-vous.',
        intro_en='In the waiting room and every exam room: instructions, forms, the next appointment.',
@@ -152,18 +170,26 @@ SECTEURS = [
 
 # ---------------------------------------------------------------- exemples de commande
 SCENARIOS = [
-  dict(id='hotel100', fr='Hôtel de 100 chambres', en='100-room hotel', seg=[
+  dict(id='hotel100', fr='Hôtel de 100 chambres', en='100-room hotel',
+       designs_fr='2 designs&nbsp;: un pour les 100 chambres, un pour les 25 cartes des espaces communs (restaurant, réception, spa, autres). Chaque carte garde sa propre destination.',
+       designs_en='2 designs: one for the 100 rooms, one for the 25 common-area cards (restaurant, front desk, spa, other). Each card keeps its own destination.', seg=[
     ('Chambres', 'Rooms', 'service aux chambres', 'room service', 100, '#c2552f'),
     ('Restaurant', 'Restaurant', 'menu', 'menu', 12, '#2f5c47'),
     ('Réception', 'Front desk', 'avis Google', 'Google reviews', 5, '#e4a53a'),
     ('Spa', 'Spa', 'votre outil de rendez-vous', 'your booking tool', 4, '#2a211a'),
     ('Autres espaces', 'Other areas', 'conciergerie', 'concierge', 4, '#d89a83')]),
-  dict(id='hotel120', fr='Hôtel de 120 chambres', en='120-room hotel', seg=[
+  dict(id='hotel120', fr='Hôtel de 120 chambres', en='120-room hotel',
+       designs_fr='1 design pour les 135 cartes. Un 2ᵉ design juste pour les espaces communs demanderait 25 cartes (10 de plus).',
+       designs_en='1 design for all 135 cards. A 2nd design just for the common areas would need 25 cards (10 more).', seg=[
     ('Chambres', 'Rooms', 'services de l’hôtel', 'hotel services', 120, '#c2552f'),
     ('Espaces communs', 'Common areas', 'guide et conciergerie', 'guide and concierge', 15, '#2f5c47')]),
-  dict(id='resto40', fr='Restaurant de 40 tables', en='40-table restaurant', seg=[
+  dict(id='resto40', fr='Restaurant de 40 tables', en='40-table restaurant',
+       designs_fr='1 design pour les 40 tables. Pour 2 designs, il faudrait 50 cartes (25 + 25).',
+       designs_en='1 design for the 40 tables. 2 designs would need 50 cards (25 + 25).', seg=[
     ('Tables', 'Tables', 'menu et appel du serveur', 'menu and call the server', 40, '#c2552f')]),
-  dict(id='resto50', fr='«' + NB + '50 cartes pour nos tables' + NB + '»', en='“50 cards for our tables”', seg=[
+  dict(id='resto50', fr='«' + NB + '50 cartes pour nos tables' + NB + '»', en='“50 cards for our tables”',
+       designs_fr='1 design à votre logo — ou 2 designs de 25 cartes chacun.',
+       designs_en='1 design with your logo — or 2 designs of 25 cards each.', seg=[
     ('Tables', 'Tables', 'menu, à votre logo et à vos couleurs', 'menu, with your logo and colours', 50, '#2f5c47')]),
 ]
 
@@ -171,23 +197,23 @@ FEUILLE = [
   ('Phase 1', 'Phase 1', 'La page multi-actions pour tous les secteurs, les formulaires et sondages, les destinations programmées et les changements en lot.', 'The multi-action page for every sector, forms and surveys, scheduled destinations and batch changes.'),
   ('Phase 2', 'Phase 2', 'Les réservations et rendez-vous, la liste d’attente, l’enregistrement et le départ en ligne.', 'Reservations and appointments, the waitlist, online check-in and check-out.'),
   ('Phase 3', 'Phase 3', 'Les comptes à plusieurs succursales, les rôles et permissions, le libre-service.', 'Multi-location accounts, roles and permissions, self-service.'),
-  ('Phase 4', 'Phase 4', 'Les paiements, les pourboires et les cartes-cadeaux par le compte Stripe de votre entreprise, et le programme de fidélité.', 'Payments, tips and gift cards through your business’s own Stripe account, and the loyalty program.'),
+  ('Phase 4', 'Phase 4', 'Les paiements, les pourboires et les cartes-cadeaux, par le compte Stripe de votre entreprise.', 'Payments, tips and gift cards, through your business’s own Stripe account.'),
   ('Phase 5', 'Phase 5', 'Les intégrations&nbsp;: webhooks et export CSV d’abord, puis le système de l’hôtel et la caisse.', 'Integrations: webhooks and CSV export first, then the hotel system and the point of sale.'),
 ]
 
 FAQ = [
-  ('Le minimum de 25 cartes, c’est par commande ou par zone&nbsp;?', 'Par commande. Une même commande peut se répartir entre vos chambres, votre restaurant et votre réception, tant que le total atteint 25 cartes. Pour quelques cartes seulement, les cartes à l’unité sont à 35&nbsp;$, sans minimum.',
-   'Is the 25-card minimum per order or per area?', 'Per order. One order can be split across your rooms, your restaurant and your front desk, as long as the total reaches 25 cards. For just a few cards, individual cards are $35 each, with no minimum.'),
-  ('Peut-on avoir plusieurs designs dans une même commande&nbsp;?', 'Oui&nbsp;: un design pour les chambres et un autre pour le restaurant, par exemple. On en discute ensemble au moment de la maquette, que vous approuvez avant la fabrication.',
-   'Can one order have several designs?', 'Yes: one design for the rooms and another for the restaurant, for example. We work it out together at the mockup stage, which you approve before production.'),
+  ('Le minimum de 25 cartes, c’est par quoi&nbsp;?', '<strong>Par design.</strong> Chaque design compte au moins 25 cartes&nbsp;: une entreprise qui veut 100 cartes peut avoir jusqu’à 4 designs différents (4 × 25). La destination, elle, se choisit carte par carte, sans minimum&nbsp;: deux cartes du même design peuvent ouvrir deux pages différentes. Pour quelques cartes seulement, les cartes à l’unité sont à 35&nbsp;$, sans minimum.',
+   'What does the 25-card minimum apply to?', '<strong>Per design.</strong> Each design needs at least 25 cards: a business that wants 100 cards can have up to 4 different designs (4 × 25). The destination, on the other hand, is chosen card by card, with no minimum: two cards with the same design can open two different pages. For just a few cards, individual cards are $35 each, with no minimum.'),
+  ('Peut-on avoir plusieurs designs dans une même commande&nbsp;?', 'Oui, autant que vous voulez, tant que chaque design compte au moins 25 cartes&nbsp;: par exemple 100 cartes pour les chambres et 25 pour le restaurant et la réception, soit 2 designs. Vous approuvez chaque maquette avant la fabrication.',
+   'Can one order have several designs?', 'Yes, as many as you like, as long as each design has at least 25 cards: for example 100 cards for the rooms and 25 for the restaurant and front desk, so 2 designs. You approve each mockup before production.'),
   ('Comment change-t-on la destination d’une carte&nbsp;?', 'Vous nous écrivez, et c’est fait, sans toucher à la carte&nbsp;: la puce mène à une adresse Tapora, et c’est nous qui redirigeons. Les changements en lot, les destinations programmées et le libre-service arrivent bientôt.',
    'How do you change where a card leads?', 'You write to us and it’s done, without touching the card: the chip points to a Tapora address and we handle the redirect. Batch changes, scheduled destinations and self-service are coming soon.'),
   ('Que veut dire «&nbsp;Bientôt&nbsp;»&nbsp;?', 'Ces fonctions sont en construction chez Tapora. Elles ne sont pas encore vendues&nbsp;: elles passeront à «&nbsp;Disponible&nbsp;» sur cette page le jour où elles fonctionneront pour de vrai. Seules les fonctions «&nbsp;Disponible&nbsp;» font partie d’une commande.',
    'What does “Coming soon” mean?', 'These features are being built at Tapora. They aren’t sold yet: they’ll switch to “Available” on this page the day they really work. Only “Available” features are part of an order.'),
   ('NFC ou code QR&nbsp;?', 'Les deux, sur la même carte. Le client approche son téléphone — tous les iPhone depuis le XR et la grande majorité des Android — ou scanne le code avec l’appareil photo. Aucune application à installer.',
    'NFC or QR code?', 'Both, on the same card. Guests tap their phone — every iPhone since the XR and the vast majority of Android phones — or scan the code with the camera. No app to install.'),
-  ('Quelles données gardez-vous sur mes clients&nbsp;?', 'Pour les statistiques des cartes, aucune adresse IP et aucun identifiant&nbsp;: seulement l’heure du tap, le canal (NFC ou code QR) et le type d’appareil. Conformément à la Loi&nbsp;25, rien n’est vendu ni partagé.',
-   'What data do you keep about my customers?', 'For card statistics, no IP address and no identifier: only the time of the tap, the channel (NFC or QR code) and the device type. In line with Québec’s Law 25, nothing is sold or shared.'),
+  ('Quelles données gardez-vous sur mes clients&nbsp;?', 'Les statistiques sont toujours incluses gratuitement, pour toutes les commandes Entreprise et pour les commandes de plus de 4 cartes à l’unité. Elles ne gardent aucune adresse IP et aucun identifiant&nbsp;: seulement l’heure du tap, le canal (NFC ou code QR) et le type d’appareil. Conformément à la Loi&nbsp;25, rien n’est vendu ni partagé.',
+   'What data do you keep about my customers?', 'Stats are always included free, for every Business order and for orders of more than 4 individual cards. They keep no IP address and no identifier: only the time of the tap, the channel (NFC or QR code) and the device type. In line with Québec’s Law 25, nothing is sold or shared.'),
   ('Dans quelles langues&nbsp;?', 'Les cartes&nbsp;: le français d’abord au Québec, l’anglais d’abord ailleurs. Le menu et les pages de services s’affichent dans 10 langues, au choix du client.',
    'In which languages?', 'Cards: French first in Québec, English first elsewhere. Menus and service pages are shown in 10 languages, chosen by the guest.'),
   ('Quels sont les délais&nbsp;?', 'Plus longs qu’une carte standard&nbsp;: la maquette à approuver, puis la fabrication sur mesure. La date exacte vous est confirmée avec la maquette.',
@@ -256,6 +282,7 @@ def page(l):
                 <p class="mt-6 text-[12px] font-semibold uppercase tracking-[0.16em] text-encre-doux">{t("Exemple de commande", "Sample order")}</p>
                 <ul class="ep-emplacements mt-2">{lieux}</ul>
                 <p class="ep-exemple"><span>{total} {t("cartes", "cards")} × {argent(30, l)}</span><strong>{argent(total * 30, l)}</strong></p>
+                <p class="mt-2 text-sm text-encre-doux">{t(f"Jusqu’à {total // 25} design{'s' if total // 25 > 1 else ''} pour {total} cartes&nbsp;: 25 cartes minimum par design.", f"Up to {total // 25} design{'s' if total // 25 > 1 else ''} for {total} cards: 25 cards minimum per design.")}</p>
               </div>
               <div>
                 <p class="text-[12px] font-semibold uppercase tracking-[0.16em] text-encre-doux">{t("Ce que les cartes ouvrent", "What the cards open")}</p>
@@ -265,7 +292,7 @@ def page(l):
           </div>''')
 
     # ---- scénarios
-    sc_json = json.dumps([dict(id=s['id'], nom=t(s['fr'], s['en']), seg=[dict(nom=t(a, b), dest=t(c, d), n=n, couleur=col) for a, b, c, d, n, col in s['seg']]) for s in SCENARIOS], ensure_ascii=False)
+    sc_json = json.dumps([dict(id=s['id'], nom=t(s['fr'], s['en']), designs=t(s['designs_fr'], s['designs_en']), seg=[dict(nom=t(a, b), dest=t(c, d), n=n, couleur=col) for a, b, c, d, n, col in s['seg']]) for s in SCENARIOS], ensure_ascii=False)
     s0 = SCENARIOS[0]
     sc_boutons = ''.join(f'<button type="button" class="ep-puce" data-scenario="{s["id"]}" aria-pressed="{"true" if i == 0 else "false"}">{t(s["fr"], s["en"])}</button>' for i, s in enumerate(SCENARIOS))
     seg0 = ''.join(f'<span class="ep-segment" style="flex-grow:{n};background:{col}"></span>' for *_, n, col in s0['seg'])
@@ -273,6 +300,7 @@ def page(l):
     tot0 = sum(x[4] for x in s0['seg'])
 
     # ---- plateforme
+    securite_html = ''.join(f'<li class="ep-securite" data-etat="disponible" data-incline data-apparait><span class="ep-securite-icone" aria-hidden="true">{i}</span>{badge()}<strong>{t(a, c)}</strong><span>{t(b, d)}</span></li>' for i, a, b, c, d in SECURITE)
     plat = ''.join(f'<li class="ep-plateforme" data-etat="{e}">{badge()}<strong>{t(a, c)}</strong><span>{t(b, d)}</span></li>' for e, a, b, c, d in PLATEFORME)
 
     # ---- démo
@@ -650,7 +678,7 @@ def page(l):
           <div class="max-w-2xl">
             <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brique" data-apparait>{t("Ce qu’une carte peut ouvrir", "What a card can open")}</p>
             <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("Une carte. Des possibilités infinies.", "One card. Endless possibilities.")}</h2>
-            <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>{t("«&nbsp;Disponible&nbsp;»&nbsp;: ça fonctionne aujourd’hui — la carte ouvre votre page existante, ou un module Tapora déjà en place. «&nbsp;Bientôt&nbsp;»&nbsp;: en construction chez Tapora, pas encore vendu.", "“Available”: it works today — the card opens your existing page, or a Tapora module that’s already live. “Coming soon”: being built at Tapora, not sold yet.")}</p>
+            <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>{t("«&nbsp;Disponible&nbsp;»&nbsp;: ça fonctionne aujourd’hui — la carte ouvre votre page existante, ou un module Tapora déjà en place. «&nbsp;Bientôt&nbsp;»&nbsp;: en construction chez Tapora, pas encore vendu. Et pour tout ce qui n’est pas ici, on le construit pour vous&nbsp;: le prix dépend de ce que vous demandez.", "“Available”: it works today — the card opens your existing page, or a Tapora module that’s already live. “Coming soon”: being built at Tapora, not sold yet. And for anything that isn’t here, we build it for you: the price depends on what you ask for.")}</p>
           </div>
           <p class="flex gap-5 text-sm text-encre-doux" data-apparait>
             <span><strong id="ep-total-disponible" class="titre inline-block min-w-[2ch] text-3xl text-sapin">{nb_d}</strong> {t("disponibles", "available")}</span>
@@ -708,7 +736,7 @@ def page(l):
       <div class="max-w-2xl">
         <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brique" data-apparait>{t("Une commande", "One order")}</p>
         <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("Des cartes différentes selon les emplacements.", "Different cards for different places.")}</h2>
-        <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>{t("Chaque zone de l’établissement a son design, son message et sa destination. Le minimum de 25 cartes compte pour la commande entière.", "Each area of the venue gets its own design, message and destination. The 25-card minimum counts for the whole order.")}</p>
+        <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>{t("Chaque zone de l’établissement peut avoir son design, son message et sa destination. La règle&nbsp;: <strong class=\"font-semibold text-encre\">25 cartes minimum par design</strong>. La destination, elle, se choisit carte par carte&nbsp;: 100 cartes, c’est jusqu’à 4 designs.", "Each area of the venue can have its own design, message and destination. The rule: <strong class=\"font-semibold text-encre\">25 cards minimum per design</strong>. The destination, on the other hand, is chosen card by card: 100 cards means up to 4 designs.")}</p>
       </div>
 
       <div class="mt-12 grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
@@ -720,6 +748,7 @@ def page(l):
           </div>
           <div id="ep-barre" class="mt-6 flex h-14 w-full overflow-hidden rounded-2xl bg-sable" aria-hidden="true">{seg0}</div>
           <ul id="ep-legende" class="mt-6 grid gap-x-6 gap-y-3 text-[15px] sm:grid-cols-2">{leg0}</ul>
+          <p class="mt-6 flex gap-3 rounded-2xl bg-sable px-4 py-3 text-[15px] leading-relaxed"><span class="font-semibold text-brique" aria-hidden="true">✦</span><span id="ep-designs-note">{t(SCENARIOS[0]['designs_fr'], SCENARIOS[0]['designs_en'])}</span></p>
         </div>
 
         <div id="ep-calcul" class="relative overflow-hidden rounded-[2rem] bg-encre p-7 text-creme sm:p-9" data-apparait>
@@ -730,6 +759,12 @@ def page(l):
             <button type="button" data-ep-moins class="grid size-12 shrink-0 place-items-center rounded-full bg-creme/10 text-2xl transition hover:bg-creme/20" aria-label="{t("Une carte de moins", "One card fewer")}">−</button>
             <input id="ep-nb" type="number" inputmode="numeric" min="1" max="5000" value="25" class="ep-nombre-champ h-12 w-full min-w-0 rounded-2xl bg-creme/10 text-center text-2xl font-semibold text-creme">
             <button type="button" data-ep-plus class="grid size-12 shrink-0 place-items-center rounded-full bg-creme/10 text-2xl transition hover:bg-creme/20" aria-label="{t("Une carte de plus", "One more card")}">+</button>
+          </div>
+          <label for="ep-designs" class="relative mt-6 block text-sm text-creme/70">{t("Nombre de designs (25 cartes minimum chacun)", "Number of designs (25 cards minimum each)")}</label>
+          <div class="relative mt-2 flex items-center gap-2">
+            <button type="button" data-ep-designs-moins class="grid size-12 shrink-0 place-items-center rounded-full bg-creme/10 text-2xl transition hover:bg-creme/20" aria-label="{t("Un design de moins", "One design fewer")}">−</button>
+            <input id="ep-designs" type="number" inputmode="numeric" min="1" max="40" value="1" class="ep-nombre-champ h-12 w-full min-w-0 rounded-2xl bg-creme/10 text-center text-2xl font-semibold text-creme">
+            <button type="button" data-ep-designs-plus class="grid size-12 shrink-0 place-items-center rounded-full bg-creme/10 text-2xl transition hover:bg-creme/20" aria-label="{t("Un design de plus", "One more design")}">+</button>
           </div>
           <div class="relative mt-4 flex flex-wrap gap-2">
             <button type="button" class="ep-puce-sombre" data-ep-nb="25">25</button>
@@ -742,7 +777,8 @@ def page(l):
               <p class="text-sm text-creme/70" id="ep-detail">{t("25 cartes × 30&nbsp;$", "25 cards × $30")}</p>
               <p id="ep-total" class="titre mt-1 text-5xl font-medium text-miel">{argent(750, l)}</p>
             </div>
-            <p id="ep-minimum" class="hidden rounded-2xl bg-creme/10 px-4 py-3 text-[15px] leading-relaxed">{t("Minimum 25 cartes par commande — à l’unité&nbsp;: 35&nbsp;$, sans minimum.", "Minimum 25 cards per order — individual cards: $35, no minimum.")} <a href="{prix_unite}" class="font-semibold text-miel underline underline-offset-4">{t("Voir les cartes à l’unité", "See individual cards")}</a></p>
+            <p id="ep-minimum" class="hidden rounded-2xl bg-creme/10 px-4 py-3 text-[15px] leading-relaxed">{t("Minimum 25 cartes par design — à l’unité&nbsp;: 35&nbsp;$, sans minimum.", "Minimum 25 cards per design — individual cards: $35, no minimum.")} <a href="{prix_unite}" class="font-semibold text-miel underline underline-offset-4">{t("Voir les cartes à l’unité", "See individual cards")}</a></p>
+            <p id="ep-minimum-designs" class="hidden rounded-2xl bg-creme/10 px-4 py-3 text-[15px] leading-relaxed" data-modele="{t("25 cartes minimum par design&nbsp;: pour {d} designs, il faut au moins {n} cartes.", "25 cards minimum per design: {d} designs need at least {n} cards.")}"></p>
           </div>
           <p class="relative mt-4 text-xs text-creme/55">{t("Prix des cartes, design sur mesure inclus. Les modules logiciels se chiffrent selon vos besoins.", "Card pricing, custom design included. Software modules are quoted to your needs.")}</p>
         </div>
@@ -927,13 +963,23 @@ def page(l):
       </ol>
     </section>
 
+    <!-- ============================== SÉCURITÉ ============================== -->
+    <section id="securite" class="mx-auto max-w-6xl scroll-mt-20 px-5 py-28">
+      <div class="max-w-2xl">
+        <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brique" data-apparait>{t("Sécurité", "Security")}</p>
+        <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("Vos données et celles de vos clients, protégées.", "Your data and your customers’ data, protected.")}</h2>
+        <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>{t("Tout ce qui suit fonctionne aujourd’hui.", "Everything below works today.")}</p>
+      </div>
+      <ul class="cascade-securite mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{securite_html}</ul>
+    </section>
+
     <!-- ============================== PRIX ============================== -->
     <section id="prix" class="scroll-mt-20 bg-sable/70 py-28">
       <div class="mx-auto max-w-6xl px-5">
         <div class="max-w-2xl">
           <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brique" data-apparait>{t("Prix", "Pricing")}</p>
           <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("Un prix par carte. Les logiciels, selon vos besoins.", "One price per card. Software, to your needs.")}</h2>
-          <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>{t("Le prix Entreprise commence à 30&nbsp;$ la carte, avec une commande minimale de 25 cartes. Chaque carte est à votre image et mène à la destination numérique de votre choix.", "Enterprise pricing starts at $30 per card, with a minimum order of 25 cards. Every card can be customized to reflect your brand and connect your customers to the digital destination of your choice.")}</p>
+          <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>{t("Le prix Entreprise commence à 30&nbsp;$ la carte, avec un minimum de 25 cartes par design. Chaque carte est à votre image et mène à la destination numérique de votre choix. Les statistiques sont toujours incluses, gratuitement&nbsp;: pour toutes les commandes Entreprise, et pour les commandes de plus de 4 cartes à l’unité.", "Enterprise pricing starts at $30 per card, with a minimum of 25 cards per design. Every card can be customized to reflect your brand and connect your customers to the digital destination of your choice. Stats are always included, free: for every Business order, and for orders of more than 4 individual cards.")}</p>
         </div>
         <div class="mt-14 grid gap-6 lg:grid-cols-[1.15fr_1fr_1fr]">
           <article data-incline class="relative overflow-hidden rounded-[2rem] bg-encre p-8 text-creme shadow-[0_40px_70px_-30px_rgb(40_25_15_/_0.75)]" data-apparait>
@@ -941,7 +987,7 @@ def page(l):
             <div class="ep-halo-sombre pointer-events-none absolute -right-24 -top-24 size-72 rounded-full" aria-hidden="true"></div>
             <p class="relative text-sm font-semibold uppercase tracking-[0.18em] text-miel">{t("Entreprise", "Business")}</p>
             <p class="relative mt-4"><span class="titre text-6xl font-medium">{argent(30, l)}</span> <span class="text-creme/70">/ {t("carte", "card")}</span></p>
-            <p class="relative mt-1 text-creme/70">{t("dès 25 cartes · design sur mesure inclus", "from 25 cards · custom design included")}</p>
+            <p class="relative mt-1 text-creme/70">{t("25 cartes minimum par design · design sur mesure et statistiques inclus", "25 cards minimum per design · custom design and stats included")}</p>
             <ul class="relative mt-6 space-y-2 text-[15px]">
               <li class="flex justify-between border-b border-creme/10 pb-2"><span>25 {t("cartes", "cards")}</span><strong>{argent(750, l)}</strong></li>
               <li class="flex justify-between border-b border-creme/10 pb-2"><span>40 {t("cartes", "cards")}</span><strong>{argent(1200, l)}</strong></li>
@@ -955,14 +1001,14 @@ def page(l):
             <div class="ep-reflet" aria-hidden="true"></div>
             <p class="text-sm font-semibold uppercase tracking-[0.18em] text-sapin">{t("Modules logiciels", "Software modules")}</p>
             <p class="titre mt-4 text-3xl font-medium leading-tight">{t("Selon vos besoins — sur soumission", "To your needs — on quote")}</p>
-            <p class="mt-3 leading-relaxed text-encre-doux">{t("Menu vivant, demandes, service aux chambres, portail de l’équipe, et les modules qui arrivent&nbsp;: on chiffre ensemble ce dont votre établissement a besoin. Un formulaire simple et une intégration au système d’un hôtel n’ont pas du tout le même coût.", "Live menu, requests, room service, staff portal, and the modules on the way: we price together what your venue needs. A simple form and a hotel-system integration don’t cost the same at all.")}</p>
+            <p class="mt-3 leading-relaxed text-encre-doux">{t("Menu vivant, demandes, service aux chambres, portail de l’équipe, et les modules qui arrivent&nbsp;: on chiffre ensemble ce dont votre établissement a besoin. Un formulaire simple et une intégration au système d’un hôtel n’ont pas du tout le même coût. Pour tout le reste, on le construit pour vous&nbsp;: le prix dépend de ce que vous demandez.", "Live menu, requests, room service, staff portal, and the modules on the way: we price together what your venue needs. A simple form and a hotel-system integration don’t cost the same at all. For everything else, we build it for you: the price depends on what you ask for.")}</p>
           </article>
           <article data-incline class="carte-papier relative overflow-hidden rounded-[2rem] p-8" data-apparait>
             <div class="ep-reflet" aria-hidden="true"></div>
             <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brique">{t("À l’unité", "Individual cards")}</p>
             <p class="mt-4"><span class="titre text-5xl font-medium">{argent(35, l)}</span> <span class="text-encre-doux">/ {t("carte", "card")}</span></p>
             <p class="mt-1 text-encre-doux">{t("sans minimum · prête à poser", "no minimum · ready to install")}</p>
-            <p class="mt-4 leading-relaxed text-encre-doux">{t("Pour quelques cartes seulement&nbsp;: le design standard Tapora, bilingue, avec les statistiques incluses.", "For just a few cards: the standard bilingual Tapora design, with stats included.")}</p>
+            <p class="mt-4 leading-relaxed text-encre-doux">{t("Pour quelques cartes seulement&nbsp;: le design standard Tapora, bilingue. Statistiques incluses gratuitement dès 5 cartes.", "For just a few cards: the standard bilingual Tapora design. Stats included free from 5 cards.")}</p>
             <a href="{prix_unite}" class="bouton-fleche group mt-6 inline-flex items-center gap-2 font-semibold text-brique">{t("Voir les cartes à l’unité", "See individual cards")} <span class="fleche" aria-hidden="true">→</span></a>
           </article>
         </div>
@@ -1031,7 +1077,7 @@ def comparaison(l):
         ('Destination', 'Destination', 'Principalement l’avis Google', 'Mainly Google reviews', 'Menus, formulaires, réservations, portails…', 'Menus, forms, bookings, portals…'),
         ('Personnalisation', 'Customization', 'Design standard Tapora', 'Standard Tapora design', 'Complète&nbsp;: logo, couleurs, nom de chaque carte', 'Full: logo, colours, a name on every card'),
         ('Pour qui', 'Who it’s for', 'Les petits commerces', 'Small businesses', 'Hôtels, groupes, restaurants, entreprises', 'Hotels, groups, restaurants, businesses'),
-        ('Quantité', 'Quantity', 'Sans minimum', 'No minimum', 'Minimum 25 cartes', 'Minimum 25 cards'),
+        ('Quantité', 'Quantity', 'Sans minimum', 'No minimum', 'Minimum 25 cartes par design', 'Minimum 25 cards per design'),
         ('Prix', 'Price', '35&nbsp;$ la carte', '$35 per card', '30&nbsp;$ la carte', '$30 per card'),
         ('Évolution', 'What’s next', 'Un produit physique', 'A physical product', 'La carte, plus des services numériques', 'The card, plus digital services'),
     ]

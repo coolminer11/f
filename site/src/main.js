@@ -363,9 +363,12 @@
       const legende = document.getElementById('ep-legende')
       const cartesEl = document.getElementById('ep-repartition-cartes')
       const totalEl = document.getElementById('ep-repartition-total')
+      const noteDesigns = document.getElementById('ep-designs-note')
       const compteurs = { cartes: Number(cartesEl.textContent) || 0 }
       const rendre = (s, glisse) => {
         const total = s.seg.reduce((t, x) => t + x.n, 0)
+        // Le texte vient de la page elle-même (générée), jamais d'une saisie.
+        if (noteDesigns && s.designs) noteDesigns.innerHTML = s.designs
         barre.replaceChildren(
           ...s.seg.map((x) => {
             const b = document.createElement('span')
@@ -422,23 +425,34 @@
       }
     }
 
-    // ---- La calculette : 30 $ la carte, et jamais moins de 25.
+    // ---- La calculette : 30 $ la carte, et 25 cartes minimum PAR DESIGN.
     const champ = document.getElementById('ep-nb')
     if (champ) {
       const detail = document.getElementById('ep-detail')
       const total = document.getElementById('ep-total')
       const resultat = document.getElementById('ep-resultat')
       const minimum = document.getElementById('ep-minimum')
+      const minimumDesigns = document.getElementById('ep-minimum-designs')
+      const champDesigns = document.getElementById('ep-designs')
       const puces = [...document.querySelectorAll('[data-ep-nb]')]
       const maj = (pop) => {
         let n = Math.round(Number(champ.value))
         if (!Number.isFinite(n) || n < 0) n = 0
-        const ok = n >= 25
-        minimum.classList.toggle('hidden', ok)
+        let d = Math.round(Number(champDesigns?.value ?? 1))
+        if (!Number.isFinite(d) || d < 1) d = 1
+        const assez = n >= 25
+        const okDesigns = n >= 25 * d
+        const ok = assez && okDesigns
+        minimum.classList.toggle('hidden', assez)
+        if (minimumDesigns) {
+          minimumDesigns.classList.toggle('hidden', !assez || okDesigns)
+          minimumDesigns.innerHTML = minimumDesigns.dataset.modele.replace('{d}', nombre(d)).replace('{n}', nombre(25 * d))
+        }
         resultat.classList.toggle('hidden', !ok)
         puces.forEach((p) => p.setAttribute('aria-pressed', String(Number(p.dataset.epNb) === n)))
         if (!ok) return
-        detail.textContent = en ? `${nombre(n)} cards × $30` : `${nombre(n)} cartes × 30${NB}$`
+        const designs = ` · ${nombre(d)} design${d > 1 ? 's' : ''}`
+        detail.textContent = (en ? `${nombre(n)} cards × $30` : `${nombre(n)} cartes × 30${NB}$`) + designs
         total.textContent = argent(n * 30)
         if (pop && anime) gsap.fromTo(total, { scale: 1.12 }, { scale: 1, duration: 0.45, ease: 'back.out(3)' })
       }
@@ -447,6 +461,15 @@
         maj(true)
       }
       champ.addEventListener('input', () => maj(true))
+      if (champDesigns) {
+        const fixerDesigns = (d) => {
+          champDesigns.value = String(Math.min(40, Math.max(1, d)))
+          maj(true)
+        }
+        champDesigns.addEventListener('input', () => maj(true))
+        document.querySelector('[data-ep-designs-moins]').addEventListener('click', () => fixerDesigns((Number(champDesigns.value) || 1) - 1))
+        document.querySelector('[data-ep-designs-plus]').addEventListener('click', () => fixerDesigns((Number(champDesigns.value) || 1) + 1))
+      }
       document.querySelector('[data-ep-moins]').addEventListener('click', () => fixer((Number(champ.value) || 0) - 1))
       document.querySelector('[data-ep-plus]').addEventListener('click', () => fixer((Number(champ.value) || 0) + 1))
       puces.forEach((p) => p.addEventListener('click', () => fixer(Number(p.dataset.epNb))))
