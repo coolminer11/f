@@ -27,7 +27,7 @@ l'entreprise, et chacune est mesurée.
 |---|---|
 | Minimum 25 cartes | **Par design.** 100 cartes = jusqu'à 4 designs (4 × 25). La destination, elle, se choisit carte par carte, sans minimum : 100 chambres + 25 cartes d'espaces communs = 2 designs, chaque carte avec sa destination. Le formulaire (`app/api/demande-entreprise`) et la base vérifient aujourd'hui 25 **par commande** : à faire passer à 25 par design (phase 1, zones). |
 | Prix des cartes | 30 $ la carte en Entreprise ; 35 $ à l'unité, sans minimum. |
-| Statistiques | **Toujours incluses gratuitement** : pour toutes les commandes Entreprise, et pour les commandes de plus de 4 cartes à l'unité (5 et plus). |
+| Statistiques | **Toujours incluses gratuitement** : pour toutes les commandes Entreprise et pour **toutes** les cartes à l'unité. |
 | Le reste | Tout ce qui n'est pas dans l'offre, on le construit pour le client ; **le prix dépend de ce qu'il demande** (sur soumission). |
 | Rien de promis qui n'existe pas | Sur le site, chaque fonction porte « Disponible » ou « Bientôt ». On ne vend pas une fonction « Bientôt » (Loi sur la protection du consommateur : pas de représentation fausse). |
 | Avis | Le lien Google est offert à **tous**, quelle que soit la note. Jamais de filtrage des avis (interdit par Google). Un commentaire privé peut être proposé **en plus**, à tout le monde. |
@@ -196,7 +196,8 @@ git push origin claude/tapora-expenses-profits-lsclxr
 - **21 oct. 2026** — Convention : retour au texte d'origine (articles sur le
   logiciel retirés à la demande d'Arthur).
 - **26 oct. 2026** — Page Entreprise : 25 cartes minimum **par design**
-  (calculette avec le nombre de designs), statistiques toujours incluses,
+  (calculette avec le nombre de designs), statistiques toujours incluses
+  (Entreprise et toutes les cartes à l'unité),
   « on le construit pour vous, prix selon la demande », section Sécurité ;
   surclassement et programme de fidélité retirés.
 - **26 oct. 2026** — Plan Entreprise écrit ; page `/entreprise` et
