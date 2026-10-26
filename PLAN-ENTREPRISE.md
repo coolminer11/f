@@ -111,6 +111,14 @@ Publiée et indexée (Google, Bing : elle est dans `site/public/sitemap.xml`,
 annoncée par IndexNow à chaque publication), mais **aucun lien ni bouton**
 du site n'y mène : on y arrive par l'adresse exacte ou par une recherche.
 
+### Le générateur
+Les deux pages viennent d'une seule source : `site/outils/gen-entreprise.py`
+(textes, fonctions, états, en français et en anglais). Pour un changement de
+contenu : modifier ce fichier, puis `python3 site/outils/gen-entreprise.py`.
+Attention : il réécrit les deux pages en entier — une retouche faite à la main
+dans le HTML est perdue. Choisir une méthode : soit le générateur, soit les
+fichiers HTML.
+
 ### Passer une fonction de « Bientôt » à « Disponible »
 Dans les deux fichiers, chaque fonction porte un attribut
 `data-etat="bientot"` ou `data-etat="disponible"`. Changer l'attribut suffit :
