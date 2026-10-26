@@ -219,6 +219,443 @@
     })
   }
 
+  // ------------------------------------------------------ Tapora Entreprise
+  // Catalogue filtré, onglets des secteurs, exemples de commande, calculette,
+  // démo « une carte, plusieurs actions ». Tout fonctionne sans animation
+  // (anime = false : réduire les animations, ou GSAP absent) ; avec, chaque
+  // geste a son mouvement. Rien ne tourne hors de /entreprise et /en/business.
+  const pageEntreprise = (anime, arrivee) => {
+    if (!document.getElementById('scene-entreprise')) return
+    const { gsap, ScrollTrigger } = window
+    const en = document.documentElement.lang.startsWith('en')
+    const NB = ' '
+    const nombre = (v) => new Intl.NumberFormat(en ? 'en-CA' : 'fr-CA').format(v)
+    const argent = (v) => (en ? `$${nombre(v)}` : `${nombre(v)}${NB}$`)
+    const finePointe = window.matchMedia('(pointer: fine)').matches
+
+    // ---- Le catalogue : les totaux suivent les attributs data-etat.
+    const liste = document.getElementById('ep-fonctions')
+    let lotsCatalogue = []
+    if (liste) {
+      const items = [...liste.children]
+      const compte = (etat) => items.filter((i) => etat === 'tous' || i.dataset.etat === etat).length
+      document.getElementById('ep-total-disponible').textContent = String(compte('disponible'))
+      document.getElementById('ep-total-bientot').textContent = String(compte('bientot'))
+      document.querySelectorAll('[data-nombre-etat]').forEach((el) => (el.textContent = String(compte(el.dataset.nombreEtat))))
+      const vide = document.getElementById('ep-vide')
+      const puces = [...document.querySelectorAll('[data-filtre-etat], [data-filtre-cat]')]
+      const filtre = { etat: 'tous', cat: 'tous' }
+      let jeton = 0
+      let touche = false
+      const correspond = (el) => (filtre.etat === 'tous' || el.dataset.etat === filtre.etat) && (filtre.cat === 'tous' || el.dataset.cat === filtre.cat)
+      const appliquer = () => {
+        const n = ++jeton
+        vide.classList.toggle('hidden', items.some(correspond))
+        if (!anime) {
+          items.forEach((el) => (el.hidden = !correspond(el)))
+          return
+        }
+        // La première fois, tout ce qui attendait d'apparaître au défilement est montré.
+        if (!touche) {
+          touche = true
+          lotsCatalogue.forEach((t) => t.kill())
+          gsap.set(items, { opacity: 1, y: 0 })
+        }
+        gsap.killTweensOf(items)
+        const sortants = items.filter((el) => !el.hidden && !correspond(el))
+        const restants = items.filter((el) => !el.hidden && correspond(el))
+        const entrants = items.filter((el) => el.hidden && correspond(el))
+        const fin = () => {
+          if (n !== jeton) return
+          const avant = new Map(restants.map((el) => [el, el.getBoundingClientRect()]))
+          gsap.set(restants, { x: 0, y: 0 })
+          sortants.forEach((el) => {
+            el.hidden = true
+            gsap.set(el, { clearProps: 'opacity,scale,transform' })
+          })
+          entrants.forEach((el) => (el.hidden = false))
+          // FLIP : chaque fonction qui reste glisse de son ancienne place à la nouvelle.
+          restants.forEach((el) => {
+            const a = avant.get(el)
+            const b = el.getBoundingClientRect()
+            gsap.fromTo(el, { x: a.left - b.left, y: a.top - b.top, opacity: 1, scale: 1 }, { x: 0, y: 0, duration: 0.65, ease: 'power3.out' })
+          })
+          gsap.fromTo(entrants, { opacity: 0, scale: 0.92, y: 16 }, { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: 'back.out(1.6)', stagger: Math.min(0.03, 0.6 / Math.max(1, entrants.length)), delay: 0.08 })
+          ScrollTrigger?.refresh()
+        }
+        if (sortants.length) gsap.to(sortants, { opacity: 0, scale: 0.9, duration: 0.2, ease: 'power2.in', onComplete: fin })
+        else fin()
+      }
+      puces.forEach((p) =>
+        p.addEventListener('click', () => {
+          const cle = p.dataset.filtreEtat !== undefined ? 'etat' : 'cat'
+          filtre[cle] = cle === 'etat' ? p.dataset.filtreEtat : p.dataset.filtreCat
+          puces.filter((q) => (cle === 'etat' ? q.dataset.filtreEtat !== undefined : q.dataset.filtreCat !== undefined)).forEach((q) => q.setAttribute('aria-pressed', String(q === p)))
+          appliquer()
+        }),
+      )
+      if (anime) {
+        gsap.set(items, { opacity: 0, y: 18 })
+        lotsCatalogue = ScrollTrigger.batch(items, {
+          start: 'top 92%',
+          once: true,
+          onEnter: (lot) => gsap.to(lot, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', stagger: 0.05, overwrite: true }),
+        })
+      }
+    }
+
+    // ---- Les secteurs : des onglets, une pastille qui glisse sous le choisi.
+    const tablist = document.querySelector('#secteurs [role=tablist]')
+    if (tablist) {
+      const onglets = [...tablist.querySelectorAll('[role=tab]')]
+      const panneaux = onglets.map((o) => document.getElementById(o.getAttribute('aria-controls')))
+      const pastille = document.getElementById('ep-indicateur')
+      tablist.classList.add('ep-avec-indicateur')
+      let courant = Math.max(0, onglets.findIndex((o) => o.getAttribute('aria-selected') === 'true'))
+      const placer = (glisse) => {
+        const o = onglets[courant]
+        const cible = { x: o.offsetLeft - 6, width: o.offsetWidth }
+        if (glisse && anime) gsap.to(pastille, { ...cible, duration: 0.55, ease: 'power3.out' })
+        else if (anime) gsap.set(pastille, cible)
+        else {
+          pastille.style.width = `${cible.width}px`
+          pastille.style.transform = `translateX(${cible.x}px)`
+        }
+      }
+      const choisir = (i, focus) => {
+        if (i === courant && !focus) return
+        const ancien = panneaux[courant]
+        courant = i
+        onglets.forEach((o, k) => {
+          o.setAttribute('aria-selected', String(k === i))
+          o.tabIndex = k === i ? 0 : -1
+        })
+        panneaux.forEach((p, k) => (p.hidden = k !== i))
+        if (focus) onglets[i].focus()
+        onglets[i].scrollIntoView({ block: 'nearest', inline: 'nearest' })
+        placer(true)
+        if (anime && ancien !== panneaux[i]) {
+          const fond = panneaux[i].querySelector('.ep-panneau-fond')
+          gsap.fromTo(fond, { opacity: 0, y: 22, rotateX: -6, transformPerspective: 900 }, { opacity: 1, y: 0, rotateX: 0, duration: 0.6, ease: 'power3.out' })
+          gsap.fromTo(panneaux[i].querySelectorAll('.ep-ligne, .ep-emplacements li'), { opacity: 0, x: -12 }, { opacity: 1, x: 0, duration: 0.45, ease: 'power2.out', stagger: 0.035, delay: 0.1 })
+        }
+      }
+      panneaux.forEach((p, k) => (p.hidden = k !== courant))
+      onglets.forEach((o, i) => o.addEventListener('click', () => choisir(i, false)))
+      tablist.addEventListener('keydown', (e) => {
+        const dernier = onglets.length - 1
+        const i = { ArrowRight: courant + 1, ArrowLeft: courant - 1, Home: 0, End: dernier }[e.key]
+        if (i === undefined) return
+        e.preventDefault()
+        choisir(i < 0 ? dernier : i > dernier ? 0 : i, true)
+      })
+      placer(false)
+      window.addEventListener('resize', () => placer(false))
+      document.fonts?.ready.then(() => placer(false))
+    }
+
+    // ---- Les exemples de commande : une barre empilée par zone.
+    const repartition = document.getElementById('ep-repartition')
+    if (repartition) {
+      const scenarios = JSON.parse(repartition.dataset.scenarios)
+      const boutons = [...repartition.querySelectorAll('[data-scenario]')]
+      const barre = document.getElementById('ep-barre')
+      const legende = document.getElementById('ep-legende')
+      const cartesEl = document.getElementById('ep-repartition-cartes')
+      const totalEl = document.getElementById('ep-repartition-total')
+      const compteurs = { cartes: Number(cartesEl.textContent) || 0 }
+      const rendre = (s, glisse) => {
+        const total = s.seg.reduce((t, x) => t + x.n, 0)
+        barre.replaceChildren(
+          ...s.seg.map((x) => {
+            const b = document.createElement('span')
+            b.className = 'ep-segment'
+            b.style.flexGrow = String(x.n)
+            b.style.background = x.couleur
+            return b
+          }),
+        )
+        legende.replaceChildren(
+          ...s.seg.map((x) => {
+            const li = document.createElement('li')
+            li.className = 'flex items-center justify-between gap-3'
+            const gauche = document.createElement('span')
+            gauche.className = 'flex min-w-0 items-center gap-2.5'
+            const point = document.createElement('span')
+            point.className = 'size-3 shrink-0 rounded-full'
+            point.style.background = x.couleur
+            const nom = document.createElement('span')
+            nom.textContent = `${x.nom} `
+            const dest = document.createElement('span')
+            dest.className = 'text-encre-doux'
+            dest.textContent = `· ${x.dest}`
+            nom.appendChild(dest)
+            gauche.append(point, nom)
+            const n = document.createElement('strong')
+            n.textContent = String(x.n)
+            li.append(gauche, n)
+            return li
+          }),
+        )
+        if (glisse && anime) {
+          gsap.fromTo(barre.children, { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: 'power3.out', stagger: 0.08 })
+          gsap.fromTo(legende.children, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.05 })
+          gsap.to(compteurs, { cartes: total, duration: 0.9, ease: 'power2.out', onUpdate: () => {
+            const v = Math.round(compteurs.cartes)
+            cartesEl.textContent = String(v)
+            totalEl.textContent = argent(v * 30)
+          } })
+        } else {
+          compteurs.cartes = total
+          cartesEl.textContent = String(total)
+          totalEl.textContent = argent(total * 30)
+        }
+      }
+      boutons.forEach((b) =>
+        b.addEventListener('click', () => {
+          boutons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
+          rendre(scenarios.find((s) => s.id === b.dataset.scenario), true)
+        }),
+      )
+      if (anime) {
+        gsap.from(barre.children, { scaleX: 0, duration: 1.1, ease: 'power3.out', stagger: 0.1, scrollTrigger: { trigger: barre, start: 'top 85%', once: true } })
+      }
+    }
+
+    // ---- La calculette : 30 $ la carte, et jamais moins de 25.
+    const champ = document.getElementById('ep-nb')
+    if (champ) {
+      const detail = document.getElementById('ep-detail')
+      const total = document.getElementById('ep-total')
+      const resultat = document.getElementById('ep-resultat')
+      const minimum = document.getElementById('ep-minimum')
+      const puces = [...document.querySelectorAll('[data-ep-nb]')]
+      const maj = (pop) => {
+        let n = Math.round(Number(champ.value))
+        if (!Number.isFinite(n) || n < 0) n = 0
+        const ok = n >= 25
+        minimum.classList.toggle('hidden', ok)
+        resultat.classList.toggle('hidden', !ok)
+        puces.forEach((p) => p.setAttribute('aria-pressed', String(Number(p.dataset.epNb) === n)))
+        if (!ok) return
+        detail.textContent = en ? `${nombre(n)} cards × $30` : `${nombre(n)} cartes × 30${NB}$`
+        total.textContent = argent(n * 30)
+        if (pop && anime) gsap.fromTo(total, { scale: 1.12 }, { scale: 1, duration: 0.45, ease: 'back.out(3)' })
+      }
+      const fixer = (n) => {
+        champ.value = String(Math.min(5000, Math.max(1, n)))
+        maj(true)
+      }
+      champ.addEventListener('input', () => maj(true))
+      document.querySelector('[data-ep-moins]').addEventListener('click', () => fixer((Number(champ.value) || 0) - 1))
+      document.querySelector('[data-ep-plus]').addEventListener('click', () => fixer((Number(champ.value) || 0) + 1))
+      puces.forEach((p) => p.addEventListener('click', () => fixer(Number(p.dataset.epNb))))
+      maj(false)
+    }
+
+    // ---- La démo « une carte, plusieurs actions » : une option, son explication.
+    const options = [...document.querySelectorAll('[data-option]')]
+    if (options.length) {
+      const zone = document.getElementById('ep-option-detail')
+      const panneaux = [...zone.querySelectorAll('[data-option-panneau]')]
+      zone.classList.add('ep-avec-choix')
+      let auto = null
+      const choisir = (cle, glisse) => {
+        options.forEach((o) => o.setAttribute('aria-pressed', String(o.dataset.option === cle)))
+        panneaux.forEach((p) => (p.hidden = p.dataset.optionPanneau !== cle))
+        const p = panneaux.find((x) => x.dataset.optionPanneau === cle)
+        if (glisse && anime) {
+          gsap.fromTo(p, { opacity: 0, y: 14, filter: 'blur(4px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.5, ease: 'power3.out' })
+          const o = options.find((x) => x.dataset.option === cle)
+          gsap.fromTo(o, { scale: 0.96 }, { scale: 1, duration: 0.4, ease: 'back.out(3)' })
+        }
+      }
+      options.forEach((o) =>
+        o.addEventListener('click', () => {
+          clearInterval(auto)
+          auto = 'fini'
+          choisir(o.dataset.option, true)
+        }),
+      )
+      choisir(options[0].dataset.option, false)
+      // Tant que personne n'a touché, la démo se présente toute seule.
+      if (anime) {
+        let i = 0
+        ScrollTrigger.create({
+          trigger: '#demo',
+          start: 'top 70%',
+          end: 'bottom 30%',
+          onToggle: (st) => {
+            if (auto === 'fini') return
+            clearInterval(auto)
+            auto = st.isActive
+              ? setInterval(() => {
+                  i = (i + 1) % options.length
+                  choisir(options[i].dataset.option, true)
+                }, 3200)
+              : null
+          },
+        })
+      }
+    }
+
+    if (!anime) {
+      document.querySelector('.ep-jalon[data-jalon="0"]')?.classList.add('actif')
+      return
+    }
+
+    // ================================================================= animé
+    // ---- Arrivée : la carte de l'hôtel, puis le téléphone.
+    if (arrivee) {
+      arrivee
+        .from('#ep-plan', { scale: 0.92, opacity: 0, duration: 1.1, ease: 'expo.out' }, 0.25)
+        .from('#ep-carte', { y: 70, rotation: -16, opacity: 0, duration: 1.1, ease: 'back.out(1.5)' }, 0.5)
+        .from('#ep-telephone', { x: 70, y: 30, rotation: 18, opacity: 0, duration: 1.1, ease: 'back.out(1.3)' }, 0.7)
+        .from('.ep-destination', { y: -14, opacity: 0, duration: 0.7, ease: 'back.out(1.8)' }, 1)
+        .from('#ep-note', { opacity: 0, y: 10, duration: 0.8 }, 1.3)
+    }
+    const scene = document.getElementById('scene-entreprise')
+    gsap.to('#ep-plan', { y: 30, ease: 'none', scrollTrigger: { trigger: scene, start: 'top 20%', end: 'bottom top', scrub: 0.6 } })
+
+    // ---- Le tap, en boucle : le téléphone touche la carte, les ondes partent,
+    // l'écran change de destination. Hors de l'écran, la scène se repose.
+    const telephone = document.getElementById('ep-telephone')
+    const ecrans = gsap.utils.toArray('#ep-telephone .ep-ecran')
+    const libelle = document.getElementById('ep-destination')
+    gsap.set(ecrans, { opacity: 0 })
+    gsap.set(ecrans[0], { opacity: 1 })
+    gsap.to('#ep-carte', { y: -6, duration: 2.6, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 1.8 })
+    const tap = gsap.timeline({ repeat: -1, delay: 2.4 })
+    ecrans.forEach((ecran, k) => {
+      const suivant = ecrans[(k + 1) % ecrans.length]
+      tap
+        .to(telephone, { x: () => -scene.clientWidth * 0.16, y: () => -scene.clientHeight * 0.16, rotation: -9, duration: 0.9, ease: 'power2.inOut' })
+        .fromTo('.ep-onde', { scale: 0.5, opacity: 0.9 }, { scale: 2.4, opacity: 0, duration: 1.1, ease: 'power2.out', stagger: 0.16 }, '-=0.12')
+        .to('#ep-lueur', { opacity: 1, duration: 0.14, yoyo: true, repeat: 1 }, '<')
+        .to(ecran, { opacity: 0, duration: 0.25 }, '<0.1')
+        .to(suivant, { opacity: 1, duration: 0.35 }, '<')
+        .add(() => {
+          libelle.textContent = suivant.dataset.libelle
+          gsap.fromTo(libelle, { y: 8, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: 'back.out(2)' })
+        }, '<')
+        .to(telephone, { x: 0, y: 0, rotation: 0, duration: 0.95, ease: 'power2.inOut' }, '+=0.15')
+        .to({}, { duration: 1.5 })
+    })
+    ScrollTrigger.create({ trigger: scene, start: 'top bottom', end: 'bottom top', onToggle: (st) => (st.isActive ? tap.play() : tap.pause()) })
+
+    // ---- L'inclinaison 3D avec reflet, et les boutons aimantés.
+    if (finePointe) {
+      document.querySelectorAll('[data-incline]').forEach((el) => {
+        gsap.set(el, { transformPerspective: 1000 })
+        const rx = gsap.quickTo(el, 'rotationX', { duration: 0.6, ease: 'power3.out' })
+        const ry = gsap.quickTo(el, 'rotationY', { duration: 0.6, ease: 'power3.out' })
+        const reflet = el.querySelector(':scope > .ep-reflet')
+        el.addEventListener('pointermove', (e) => {
+          const r = el.getBoundingClientRect()
+          const px = (e.clientX - r.left) / r.width - 0.5
+          const py = (e.clientY - r.top) / r.height - 0.5
+          rx(-py * 9)
+          ry(px * 11)
+          if (reflet) gsap.to(reflet, { opacity: 1, x: px * r.width * 0.7, y: py * r.height * 0.7, duration: 0.4, overwrite: true })
+        })
+        el.addEventListener('pointerleave', () => {
+          rx(0)
+          ry(0)
+          if (reflet) gsap.to(reflet, { opacity: 0, duration: 0.6, overwrite: true })
+        })
+      })
+      document.querySelectorAll('[data-aimant]').forEach((el) => {
+        const x = gsap.quickTo(el, 'x', { duration: 0.5, ease: 'power3.out' })
+        const y = gsap.quickTo(el, 'y', { duration: 0.5, ease: 'power3.out' })
+        el.addEventListener('pointermove', (e) => {
+          const r = el.getBoundingClientRect()
+          x((e.clientX - r.left - r.width / 2) * 0.28)
+          y((e.clientY - r.top - r.height / 2) * 0.35)
+        })
+        el.addEventListener('pointerleave', () => {
+          gsap.to(el, { x: 0, y: 0, duration: 0.9, ease: 'elastic.out(1, 0.35)', overwrite: true })
+        })
+      })
+    }
+
+    // ---- Les trois niveaux se posent comme des cartes lancées sur la table.
+    gsap.from('.ep-niveau', { y: 80, rotation: (i) => [-6, 4, -4][i] ?? 0, opacity: 0, duration: 1.1, ease: 'power3.out', stagger: 0.13, scrollTrigger: { trigger: '#niveaux .ep-niveau', start: 'top 88%', once: true } })
+    gsap.from('#ep-portail', { y: 60, rotation: 4, opacity: 0, duration: 1.1, ease: 'back.out(1.3)', scrollTrigger: { trigger: '#ep-portail', start: 'top 85%', once: true } })
+    gsap.fromTo('#ep-portail .ep-option', { x: 24, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out', stagger: 0.07, scrollTrigger: { trigger: '#ep-portail', start: 'top 80%', once: true } })
+
+    // ---- La plateforme : le tableau se remplit, les fonctions arrivent par lots.
+    gsap.from('.ep-jauge', { scaleX: 0, transformOrigin: 'left center', duration: 1.2, ease: 'power3.out', stagger: 0.1, scrollTrigger: { trigger: '#ep-tableau', start: 'top 80%', once: true } })
+    gsap.set('.ep-plateforme', { opacity: 0, y: 20 })
+    ScrollTrigger.batch('.ep-plateforme', { start: 'top 92%', once: true, onEnter: (lot) => gsap.to(lot, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', stagger: 0.07, overwrite: true }) })
+
+    // ---- La frise : septembre, le menu ; décembre, les fêtes ; janvier, retour.
+    const frise = document.getElementById('ep-frise')
+    if (frise) {
+      frise.classList.add('ep-frise-anime')
+      const jalons = [...frise.querySelectorAll('.ep-jalon')]
+      const etapes = [...frise.querySelectorAll('.ep-etape-frise')]
+      const ecransF = [...frise.querySelectorAll('.ep-frise-ecran')]
+      const cible = document.getElementById('ep-frise-cible')
+      const activer = (i) => {
+        jalons.forEach((j, k) => j.classList.toggle('actif', k === i))
+        etapes.forEach((e, k) => e.classList.toggle('actif', k === i))
+        const ecran = i === 1 ? ecransF[1] : ecransF[0]
+        gsap.to(ecransF, { opacity: (k) => (ecransF[k] === ecran ? 1 : 0), duration: 0.45 })
+        cible.textContent = ecran.dataset.cible
+        gsap.fromTo(cible, { y: 6, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: 'back.out(2)' })
+      }
+      activer(0)
+      const plein = document.getElementById('ep-frise-plein')
+      const boucle = gsap.timeline({ repeat: -1, repeatDelay: 0.8, paused: true })
+      boucle
+        .set(plein, { width: '0%' })
+        .add(() => activer(0))
+        .to({}, { duration: 1.4 })
+        .to(plein, { width: 'calc(50% - 8px)', duration: 1.1, ease: 'power2.inOut' })
+        .add(() => activer(1))
+        .to({}, { duration: 1.8 })
+        .to(plein, { width: 'calc(100% - 16px)', duration: 1.1, ease: 'power2.inOut' })
+        .add(() => activer(2))
+        .to({}, { duration: 1.6 })
+      ScrollTrigger.create({ trigger: frise, start: 'top 85%', end: 'bottom 10%', onToggle: (st) => (st.isActive ? boucle.play() : boucle.pause()) })
+    }
+
+    // ---- La comparaison, ligne par ligne ; la colonne Entreprise se lève.
+    gsap.from('#ep-lignes-comparaison tr', { x: -16, opacity: 0, duration: 0.6, ease: 'power2.out', stagger: 0.07, scrollTrigger: { trigger: '#ep-lignes-comparaison', start: 'top 85%', once: true } })
+
+    // ---- La phrase de la vision s'allume mot à mot, au rythme du défilement.
+    const vision = document.getElementById('ep-vision')
+    if (vision) {
+      const mots = vision.textContent.trim().split(/\s+/)
+      vision.textContent = ''
+      const spans = mots.map((m, i) => {
+        const s = document.createElement('span')
+        s.textContent = m
+        vision.append(s)
+        if (i < mots.length - 1) vision.append(' ')
+        return s
+      })
+      gsap.fromTo(spans, { opacity: 0.14 }, { opacity: 1, stagger: 0.12, ease: 'none', scrollTrigger: { trigger: vision, start: 'top 80%', end: 'bottom 45%', scrub: 0.5 } })
+      gsap.to(spans.slice(-2), { color: '#c2552f', stagger: 0.1, scrollTrigger: { trigger: vision, start: 'bottom 60%', once: true } })
+    }
+
+    // ---- La citation se pose ; la feuille de route se dessine.
+    gsap.from('#ep-citation', { y: 40, rotation: -2, opacity: 0, duration: 1, ease: 'back.out(1.4)', scrollTrigger: { trigger: '#ep-citation', start: 'top 85%', once: true } })
+    gsap.fromTo('#ep-route-ligne', { scaleY: 0 }, { scaleY: 1, ease: 'none', scrollTrigger: { trigger: '#ep-route', start: 'top 75%', end: 'bottom 60%', scrub: 0.5 } })
+    gsap.utils.toArray('.ep-phase').forEach((phase) => {
+      gsap
+        .timeline({ scrollTrigger: { trigger: phase, start: 'top 82%', once: true } })
+        .from(phase.querySelector('.ep-phase-point'), { scale: 0, duration: 0.5, ease: 'back.out(2.4)' })
+        .from(phase.querySelectorAll(':scope > :not(.ep-phase-point)'), { x: -18, opacity: 0, duration: 0.55, ease: 'power3.out', stagger: 0.07 }, '-=0.25')
+    })
+
+    // ---- Le bloc final : la carte se pose, puis ses ondes s'étendent.
+    gsap
+      .timeline({ scrollTrigger: { trigger: '#contact', start: 'top 80%', once: true } })
+      .from('#ep-ondes .ep-carte-cta', { y: 40, rotation: -12, opacity: 0, svgOrigin: '34 46', duration: 1, ease: 'back.out(1.6)' })
+      .from('#ep-ondes .ep-arc', { scale: 0.3, opacity: 0, svgOrigin: '60 41', duration: 0.8, ease: 'power3.out', stagger: 0.14 }, '-=0.45')
+  }
+
   // FAQ : sans animation, le comportement natif de <details> suffit.
   const faq = [...document.querySelectorAll('#faq details')]
 
@@ -226,7 +663,10 @@
   const montrer = () => document.documentElement.classList.remove('attente')
   const demarrer = () => {
     const { gsap, ScrollTrigger, Lenis } = window
-    if (!gsap || !ScrollTrigger || reduit) return montrer()
+    if (!gsap || !ScrollTrigger || reduit) {
+      pageEntreprise(false, null)
+      return montrer()
+    }
     gsap.registerPlugin(ScrollTrigger)
     // Les guides n'ont pas le décor de l'accueil : pas d'avertissement pour les cibles absentes.
     gsap.config({ nullTargetWarn: false })
@@ -601,6 +1041,9 @@
         .from('#ondes-demo .carte-cta', { y: 40, rotation: -12, opacity: 0, svgOrigin: '40 62', duration: 1, ease: 'back.out(1.6)' })
         .from('#ondes-demo .arc-cta', { scale: 0.3, opacity: 0, svgOrigin: '55 39', duration: 0.8, ease: 'power3.out', stagger: 0.14 }, '-=0.45')
     }
+
+    // ---- Tapora Entreprise (seulement sur ses deux pages).
+    pageEntreprise(true, arrivee)
 
     // Les polices peuvent arriver après : on recalcule les positions.
     document.fonts?.ready.then(() => ScrollTrigger.refresh())
