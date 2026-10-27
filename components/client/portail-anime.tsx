@@ -36,7 +36,10 @@ function lireEspace(): Espace | null {
   try {
     const v = JSON.parse(localStorage.getItem('tapora_espace') ?? 'null')
     // Seulement une adresse d'espace client de ce site, jamais autre chose.
-    return v && typeof v.nom === 'string' && typeof v.chemin === 'string' && /^\/stats\/[A-Za-z0-9._-]+$/.test(v.chemin) ? v : null
+    // Oublié après 90 jours : un appareil prêté ou vendu ne garde pas l'accès indéfiniment.
+    const recent = typeof v?.le === 'number' && Date.now() - v.le < 90 * 86_400_000
+    if (!recent) localStorage.removeItem('tapora_espace')
+    return recent && typeof v.nom === 'string' && v.nom.length <= 120 && typeof v.chemin === 'string' && /^\/stats\/[A-Za-z0-9._-]{20,90}$/.test(v.chemin) ? v : null
   } catch {
     return null
   }

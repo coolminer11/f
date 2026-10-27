@@ -115,7 +115,11 @@ export default async function PageNouveauDocument({
 
     let lignes: z.infer<typeof Ligne>[]
     try {
-      lignes = z.array(Ligne).min(1, 'Ajoutez au moins une ligne.').parse(JSON.parse(v.lignes))
+      // Bornes AVANT zod : une liste démesurée ne doit jamais être validée élément par élément.
+      if (v.lignes.length > 200_000) throw new Error('Trop de lignes.')
+      const brutes: unknown = JSON.parse(v.lignes)
+      if (!Array.isArray(brutes) || brutes.length > 300) throw new Error('Trop de lignes.')
+      lignes = z.array(Ligne).min(1, 'Ajoutez au moins une ligne.').max(300).parse(brutes)
     } catch (e) {
       const message =
         e instanceof z.ZodError ? (e.issues[0]?.message ?? 'Lignes invalides.') : 'Lignes illisibles.'

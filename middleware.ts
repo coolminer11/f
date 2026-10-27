@@ -14,6 +14,13 @@ const PUBLIC = ['/connexion', '/securite/', '/bo-manifeste', '/sw-bo.js', '/hors
  */
 export async function middleware(requete: NextRequest) {
   const chemin = requete.nextUrl.pathname
+  // Un code de carte recopié en minuscules : vers le même code en majuscules, tout de suite.
+  const carte = /^\/s\/([A-Za-z0-9]{8})(\/.*)?$/.exec(chemin)
+  if (carte && carte[1] !== carte[1].toUpperCase()) {
+    const destination = requete.nextUrl.clone()
+    destination.pathname = `/s/${carte[1].toUpperCase()}${carte[2] ?? ''}`
+    return NextResponse.redirect(destination, 308)
+  }
   if (PUBLIC.some((p) => chemin.startsWith(p))) return NextResponse.next()
 
   const brut = requete.cookies.get(NOM_COOKIE)?.value

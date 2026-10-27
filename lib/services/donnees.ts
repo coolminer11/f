@@ -1,4 +1,5 @@
 import 'server-only'
+import { cache } from 'react'
 import { requete, requeteUne } from '@/lib/db'
 import { optionsParDefaut, type Annonce, type Emplacement, type Etablissement, type Menu, type Plat, type Rubrique, type Section, type TypeDemande } from '@/lib/services/types'
 
@@ -34,7 +35,8 @@ export async function listerEtablissements(): Promise<(Etablissement & { emplace
 }
 
 /** L'emplacement d'un code (carte NFC ou QR) et son établissement — seulement s'ils sont actifs. */
-export async function parCode(code: string): Promise<{ etab: Etablissement; emplacement: Emplacement } | null> {
+// Une seule lecture par affichage : le gabarit et la page la partagent.
+export const parCode = cache(async function parCode(code: string): Promise<{ etab: Etablissement; emplacement: Emplacement } | null> {
   const c = code.toUpperCase()
   if (!CODE_EMPLACEMENT.test(c)) return null
   const emplacement = await requeteUne<Emplacement>(
@@ -45,7 +47,7 @@ export async function parCode(code: string): Promise<{ etab: Etablissement; empl
   const etab = await lireEtablissement(emplacement.etablissement_id)
   if (!etab?.actif || etab.formule === 'suspendu') return null
   return { etab, emplacement }
-}
+})
 
 export async function emplacements(etabId: string): Promise<Emplacement[]> {
   return requete<Emplacement>(

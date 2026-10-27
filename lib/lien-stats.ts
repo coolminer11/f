@@ -1,4 +1,5 @@
 import 'server-only'
+import { cache } from 'react'
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import { cookies } from 'next/headers'
 import { requete, requeteUne } from '@/lib/db'
@@ -55,8 +56,8 @@ type DossierSigne = {
   langue: 'fr' | 'en'
 }
 
-/** Le dossier si la signature est bonne ET le lien actif — sans regarder le mot de passe. */
-async function dossierSigne(jeton: string): Promise<DossierSigne | null> {
+/** Le dossier si la signature est bonne ET le lien actif — sans regarder le mot de passe. Une seule lecture par affichage. */
+const dossierSigne = cache(async (jeton: string): Promise<DossierSigne | null> => {
   const m = FORME.exec(jeton)
   if (!m) return null
   const [, id, sig] = m
@@ -68,6 +69,11 @@ async function dossierSigne(jeton: string): Promise<DossierSigne | null> {
   const attendue = Buffer.from(signature(id, d.version_lien))
   const recue = Buffer.from(sig)
   return attendue.length === recue.length && timingSafeEqual(attendue, recue) ? d : null
+})
+
+/** Le lien mène-t-il à un dossier (signature, version, lien actif) ? Sans regarder le mot de passe. */
+export async function lienStatsValide(jeton: string): Promise<boolean> {
+  return (await dossierSigne(jeton)) !== null
 }
 
 const nomTemoin = (id: string) => `tapora_page_${id.replace(/-/g, '').slice(0, 16)}`
