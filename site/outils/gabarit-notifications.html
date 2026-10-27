@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<style>
+@font-face { font-family: Inter; src: url('../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2') format('woff2'); font-weight: 100 900; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 820px; height: 735px; background: #f7f1e7; font-family: Inter, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden; }
+.tel { position: absolute; top: 40px; width: 323px; height: 675px; border-radius: 66px; background: #1e1814; padding: 11px; box-shadow: 0 30px 50px -18px rgb(70 40 20 / 0.42), 0 8px 18px -6px rgb(70 40 20 / 0.18); }
+.ecran { position: relative; width: 100%; height: 100%; border-radius: 55px; overflow: hidden; }
+/* iPhone */
+#iphone { left: 46px; }
+#iphone .ecran { background: radial-gradient(120% 70% at 22% 8%, #ea8460 0%, #c8583a 34%, #a8432a 52%, #5a2416 74%, #23120c 88%, #170d09 100%); }
+.ile { position: absolute; top: 11px; left: 50%; width: 90px; height: 25px; margin-left: -45px; border-radius: 20px; background: #050303; }
+.date-i { position: absolute; top: 72px; width: 100%; text-align: center; color: rgb(255 244 236 / 0.92); font-size: 16px; font-weight: 600; letter-spacing: 0.1px; }
+.heure-i { position: absolute; top: 88px; width: 100%; text-align: center; color: #fff; font-size: 80px; font-weight: 800; letter-spacing: -2.5px; line-height: 1.1; }
+.notifs-i { position: absolute; left: 10px; right: 10px; bottom: 90px; display: flex; flex-direction: column; gap: 7px; }
+.n-i { display: flex; gap: 9px; padding: 10px 11px 11px; border-radius: 22px; background: rgb(232 222 216 / 0.86); color: #241a15; }
+.ic-i { flex: none; width: 28px; height: 28px; border-radius: 8px; background: #fbf3ea; display: grid; place-items: center; margin-top: 1px; }
+.ic-i img { width: 23px; height: 23px; }
+.n-i .corps { min-width: 0; flex: 1; }
+.n-i .haut { display: flex; justify-content: space-between; font-size: 11.2px; }
+.n-i .app { font-weight: 600; }
+.n-i .quand { color: #6e625b; }
+.n-i .titre { font-size: 11.6px; font-weight: 700; margin-top: 1px; }
+.n-i .texte { font-size: 11.4px; line-height: 1.3; margin-top: 1px; }
+.lampe, .photo { position: absolute; bottom: 30px; width: 37px; height: 37px; border-radius: 50%; background: rgb(0 0 0 / 0.38); display: grid; place-items: center; font-size: 16px; }
+.lampe { left: 35px; } .photo { right: 35px; }
+.barre-i { position: absolute; bottom: 8px; left: 50%; width: 105px; height: 3px; margin-left: -52px; border-radius: 2px; background: #fff; }
+/* Android */
+#android { left: 451px; }
+#android .ecran { background: #1f1a17; color: #f1e9e3; }
+.etat { position: absolute; top: 46px; left: 26px; right: 26px; display: flex; justify-content: space-between; font-size: 11px; }
+.heure-a { position: absolute; top: 72px; left: 26px; font-size: 43px; font-weight: 400; letter-spacing: -0.5px; }
+.date-a { position: absolute; top: 130px; left: 26px; font-size: 12.5px; color: #e0d6cf; }
+.pastilles { position: absolute; top: 164px; left: 13px; right: 13px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.pastilles span { height: 43px; border-radius: 22px; background: #3a302b; }
+.pastilles span:first-child { background: #f2b8a0; }
+.notifs-a { position: absolute; top: 222px; left: 11px; right: 11px; display: flex; flex-direction: column; gap: 3px; }
+.n-a { display: flex; gap: 11px; padding: 12px 12px 13px; background: #2d2522; }
+.n-a:first-child { border-radius: 18px 18px 6px 6px; } .n-a:last-child { border-radius: 6px 6px 18px 18px; } .n-a:only-child { border-radius: 18px; }
+.n-a:not(:first-child):not(:last-child) { border-radius: 6px; }
+.ic-a { flex: none; width: 29px; height: 29px; border-radius: 50%; background: #fff; display: grid; place-items: center; }
+.ic-a img { width: 25px; height: 25px; }
+.n-a .corps { min-width: 0; flex: 1; }
+.n-a .haut { font-size: 9.8px; color: #b9aea7; white-space: nowrap; }
+.n-a .haut b { color: #f2b8a0; font-weight: 600; }
+.n-a .titre { font-size: 12.3px; font-weight: 600; margin-top: 2px; color: #f6eee8; }
+.n-a .texte { font-size: 11.6px; line-height: 1.3; margin-top: 2px; color: #d8cdc6; }
+</style></head>
+<body>
+<div class="tel" id="iphone"><div class="ecran">
+  <div class="ile"></div>
+  <div class="date-i" id="date-i"></div>
+  <div class="heure-i">12:47</div>
+  <div class="notifs-i" id="notifs-i"></div>
+  <div class="lampe">🔦</div><div class="photo">📷</div>
+  <div class="barre-i"></div>
+</div></div>
+<div class="tel" id="android"><div class="ecran">
+  <div class="etat"><span>12:47</span><span id="batterie"></span></div>
+  <div class="heure-a">12:47</div>
+  <div class="date-a" id="date-a"></div>
+  <div class="pastilles"><span></span><span></span><span></span><span></span></div>
+  <div class="notifs-a" id="notifs-a"></div>
+</div></div>
+<script>
+const LOGO = '../public/favicon.svg'
+const VERSIONS = {
+  'ding-en': {
+    dateI: 'Sunday, October 19', dateA: 'Sun, Oct 19', batterie: '▾◢ 87%', domaine: 'go.taporacards.com',
+    iphone: [
+      ['Tapora', 'now', '🔔 Ding! A customer just tapped', 'Les Trois Corbeaux · 12 taps today'],
+      ['Tapora', '9m ago', '🔔 3 new taps', 'Les Trois Corbeaux · 11 taps today'],
+      ['Tapora', 'Yesterday', '🏆 New record!', '18 taps today: your best day ever.'],
+    ],
+    android: [
+      ['now', '🔔 Ding! A customer just tapped', 'Les Trois Corbeaux · 12 taps today'],
+      ['2h', '🎉 100 taps!', 'Les Trois Corbeaux just passed 100 taps. Congrats!'],
+      ['Yesterday', '🏆 New record!', '18 taps today: your best day ever.'],
+    ],
+  },
+  'equipe-fr': {
+    dateI: 'vendredi 17 octobre', dateA: 'ven. 17 oct.', batterie: '▾◢ 72 %', domaine: 'go.taporacards.com',
+    iphone: [
+      ['Tapora', 'maintenant', '🙋 Table 4 — Appeler le serveur', 'Un client vous attend.'],
+      ['Tapora', 'il y a 2 min', '🧾 Terrasse 2 — L’addition, s’il vous plaît', 'Un client vous attend.'],
+      ['Tapora', 'il y a 5 min', '💧 Table 11 — De l’eau', 'Un client vous attend.'],
+    ],
+    android: [
+      ['maint.', '🍽️ Chambre 204 · Commande · 2 articles · 36 $', '2 × Club sandwich — « Sans oignons »'],
+      ['4 min', '🧺 Chambre 312 — Serviettes propres', 'Nouvelle demande d’un client.'],
+      ['9 min', '⏰ Chambre 118 — Départ tardif', 'Nouvelle demande d’un client.'],
+    ],
+  },
+  'equipe-en': {
+    dateI: 'Friday, October 17', dateA: 'Fri, Oct 17', batterie: '▾◢ 72%', domaine: 'go.taporacards.com',
+    iphone: [
+      ['Tapora', 'now', '🙋 Table 4 — Call the server', 'A guest is waiting for you.'],
+      ['Tapora', '2m ago', '🧾 Patio 2 — The bill, please', 'A guest is waiting for you.'],
+      ['Tapora', '5m ago', '💧 Table 11 — Water', 'A guest is waiting for you.'],
+    ],
+    android: [
+      ['now', '🍽️ Room 204 · Order · 2 items · $36', '2 × Club sandwich — “No onions”'],
+      ['4m', '🧺 Room 312 — Fresh towels', 'New request from a guest.'],
+      ['9m', '⏰ Room 118 — Late check-out', 'New request from a guest.'],
+    ],
+  },
+}
+const v = VERSIONS[new URLSearchParams(location.search).get('v')]
+document.documentElement.lang = location.search.includes('-en') ? 'en' : 'fr'
+document.getElementById('date-i').textContent = v.dateI
+document.getElementById('date-a').textContent = v.dateA
+document.getElementById('batterie').textContent = v.batterie
+const el = (t, c, h) => { const e = document.createElement(t); if (c) e.className = c; if (h != null) e.textContent = h; return e }
+for (const [app, quand, titre, texte] of v.iphone) {
+  const n = el('div', 'n-i'); const ic = el('div', 'ic-i'); const img = el('img'); img.src = LOGO; ic.append(img)
+  const c = el('div', 'corps'); const haut = el('div', 'haut'); haut.append(el('span', 'app', app), el('span', 'quand', quand))
+  c.append(haut, el('div', 'titre', titre), el('div', 'texte', texte)); n.append(ic, c)
+  document.getElementById('notifs-i').append(n)
+}
+for (const [quand, titre, texte] of v.android) {
+  const n = el('div', 'n-a'); const ic = el('div', 'ic-a'); const img = el('img'); img.src = LOGO; ic.append(img)
+  const c = el('div', 'corps'); const haut = el('div', 'haut'); const b = el('b', null, 'Chrome'); haut.append(b, document.createTextNode(` · ${v.domaine} · ${quand}`))
+  c.append(haut, el('div', 'titre', titre), el('div', 'texte', texte)); n.append(ic, c)
+  document.getElementById('notifs-a').append(n)
+}
+</script>
+</body></html>

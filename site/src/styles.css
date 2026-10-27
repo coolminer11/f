@@ -372,15 +372,7 @@ details .reponse { overflow: hidden; }
 [data-etat='bientot'] > .ep-badge::before { content: 'Bientôt'; }
 :lang(en) [data-etat='disponible'] > .ep-badge::before { content: '✓ Available'; }
 :lang(en) [data-etat='bientot'] > .ep-badge::before { content: 'Coming soon'; }
-/* Disponible : un reflet passe. Bientôt : un point qui respire. */
-[data-etat='disponible'] > .ep-badge::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.75) 50%, transparent 65%);
-  transform: translateX(-120%);
-  animation: ep-reflet 3.6s ease-in-out infinite;
-}
+/* Bientôt : un point ambré, immobile. */
 [data-etat='bientot'] > .ep-badge::after {
   content: '';
   position: absolute;
@@ -391,35 +383,25 @@ details .reponse { overflow: hidden; }
   margin-top: -0.21rem;
   border-radius: 9999px;
   background: #e4a53a;
-  animation: ep-pouls 1.9s ease-in-out infinite;
 }
-@keyframes ep-reflet { 55%, 100% { transform: translateX(120%); } }
-@keyframes ep-pouls { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgb(228 165 58 / 0.55); } 50% { transform: scale(0.8); box-shadow: 0 0 0 5px rgb(228 165 58 / 0); } }
 
-/* Les fonctions du catalogue */
-.ep-fonction {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-areas: 'icone badge' 'texte texte';
-  align-items: center;
-  gap: 0.9rem 0.75rem;
-  border-radius: 1.4rem;
-  background: var(--color-creme);
-  padding: 1.15rem 1.2rem 1.3rem;
-  box-shadow: 0 1px 0 rgb(255 255 255 / 0.8) inset, 0 2px 4px rgb(60 40 20 / 0.05), 0 14px 30px -22px rgb(60 40 20 / 0.45);
-  transition: translate 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s;
-}
-/* Le survol passe par « translate » : « transform » appartient aux animations (GSAP). */
-.ep-fonction:hover { translate: 0 -3px; box-shadow: 0 1px 0 rgb(255 255 255 / 0.8) inset, 0 4px 8px rgb(60 40 20 / 0.06), 0 22px 40px -24px rgb(60 40 20 / 0.55); }
-.ep-icone { grid-area: icone; display: grid; width: 2.4rem; height: 2.4rem; place-items: center; border-radius: 0.9rem; }
-.ep-icone svg { width: 1.25rem; height: 1.25rem; }
-.ep-fonction[data-etat='disponible'] .ep-icone { background: #e7f0ea; color: var(--color-sapin); }
-.ep-fonction[data-etat='bientot'] .ep-icone { background: #f6ecd9; color: #b07a1e; }
-.ep-fonction > .ep-badge { grid-area: badge; justify-self: end; }
-.ep-texte { grid-area: texte; font-size: 0.95rem; line-height: 1.45; color: var(--color-encre-doux); }
-.ep-texte strong { display: block; margin-bottom: 0.15rem; font-size: 1.02rem; font-weight: 600; color: var(--color-encre); }
-.ep-cat { display: block; margin-bottom: 0.35rem; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #a08f7d; }
-.ep-ajout { display: block; margin-top: 0.55rem; font-size: 11.5px; font-weight: 600; color: var(--color-brique); }
+/* Les fonctions du catalogue : un panneau par catégorie, une ligne par fonction. */
+.ep-groupe { border-radius: 1.75rem; background: var(--color-creme); padding: 1.4rem 1.5rem 0.6rem; box-shadow: 0 1px 0 rgb(255 255 255 / 0.8) inset, 0 2px 4px rgb(60 40 20 / 0.04), 0 18px 40px -30px rgb(60 40 20 / 0.5); }
+.ep-groupe[hidden] { display: none; }
+.ep-groupe-tete { display: flex; align-items: center; gap: 0.75rem; padding-bottom: 1rem; border-bottom: 1px solid var(--color-ligne); }
+.ep-groupe-tete h3 { flex: 1; min-width: 0; font-family: var(--font-serif); font-size: 1.35rem; font-weight: 500; line-height: 1.2; }
+.ep-groupe-icone { display: grid; flex-shrink: 0; width: 2.4rem; height: 2.4rem; place-items: center; border-radius: 0.85rem; background: var(--color-sable); color: var(--color-brique); }
+.ep-groupe-icone svg { width: 1.25rem; height: 1.25rem; }
+.ep-groupe-compte { flex-shrink: 0; font-size: 12.5px; color: var(--color-encre-doux); font-variant-numeric: tabular-nums; }
+.ep-rangs { margin: 0; padding: 0; list-style: none; }
+.ep-fonction { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding: 0.85rem 0; border-bottom: 1px solid var(--color-ligne); }
+.ep-rangs > .ep-fonction:last-child { border-bottom: 0; }
+.ep-fonction[hidden] { display: none; }
+.ep-fonction > .ep-badge { flex-shrink: 0; margin-top: 0.1rem; }
+.ep-texte { min-width: 0; font-size: 0.92rem; line-height: 1.45; color: var(--color-encre-doux); }
+.ep-texte strong { display: block; margin-bottom: 0.1rem; font-size: 1rem; font-weight: 600; color: var(--color-encre); }
+.ep-texte > span { display: block; }
+.ep-ajout { display: inline-block; margin-left: 0.35rem; border-radius: 0.35rem; padding: 0.05rem 0.35rem; vertical-align: 0.1em; font-size: 10.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-brique); box-shadow: inset 0 0 0 1px rgb(194 85 47 / 0.35); }
 
 /* Les puces de filtre et de choix */
 .ep-puce {
@@ -486,8 +468,11 @@ details .reponse { overflow: hidden; }
 .ep-option > span:nth-child(2) { flex: 1; }
 .ep-option:hover { translate: 3px 0; }
 .ep-option[aria-pressed='true'] { background: var(--color-encre); color: var(--color-creme); box-shadow: 0 14px 26px -16px rgb(40 25 15 / 0.85); }
-.ep-option-icone { display: grid; width: 2.1rem; height: 2.1rem; place-items: center; border-radius: 0.75rem; background: var(--color-sable); font-size: 15px; }
-.ep-option[aria-pressed='true'] .ep-option-icone { background: rgb(255 250 242 / 0.12); }
+.ep-option-icone { display: grid; flex-shrink: 0; width: 2.1rem; height: 2.1rem; place-items: center; border-radius: 0.75rem; background: var(--color-sable); color: var(--color-brique); }
+.ep-option-icone svg { width: 1.15rem; height: 1.15rem; }
+.ep-option-icone-grande { width: 2.75rem; height: 2.75rem; border-radius: 0.95rem; }
+.ep-option-icone-grande svg { width: 1.4rem; height: 1.4rem; }
+.ep-option[aria-pressed='true'] .ep-option-icone { background: rgb(255 250 242 / 0.12); color: var(--color-miel); }
 .ep-option-panneau > .ep-badge { margin-top: 0.6rem; }
 .ep-option-panneau + .ep-option-panneau { margin-top: 1.5rem; }
 .ep-option-panneau[hidden] + .ep-option-panneau, .ep-avec-choix .ep-option-panneau + .ep-option-panneau { margin-top: 0; }
@@ -537,16 +522,28 @@ details .reponse { overflow: hidden; }
 .ep-phase > .ep-badge { margin-top: 0.45rem; }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-etat] > .ep-badge::after { animation: none; }
-  [data-etat='disponible'] > .ep-badge::after { display: none; }
   .ep-tirets { animation: none; }
-  .ep-fonction, .ep-option, .ep-puce, .ep-jalon, .ep-etape-frise { transition: none; }
-  .ep-fonction:hover, .ep-option:hover, .ep-puce:hover { translate: none; }
+  .ep-option, .ep-puce, .ep-jalon, .ep-etape-frise { transition: none; }
+  .ep-option:hover, .ep-puce:hover { translate: none; }
 }
 
 /* Entreprise — la section Sécurité : les cartes reprennent le style de la plateforme. */
 .ep-securite { position: relative; border-radius: 1.4rem; background: var(--color-creme); padding: 1.3rem 1.25rem 1.35rem; box-shadow: 0 1px 0 rgb(255 255 255 / 0.8) inset, 0 2px 4px rgb(60 40 20 / 0.05), 0 14px 30px -22px rgb(60 40 20 / 0.45); }
 .ep-securite > .ep-badge { margin-bottom: 0.75rem; }
-.ep-securite-icone { display: grid; place-items: center; width: 2.6rem; height: 2.6rem; margin-bottom: 0.9rem; border-radius: 0.9rem; background: var(--color-sable); font-size: 1.25rem; }
+.ep-securite-icone { display: grid; place-items: center; width: 2.6rem; height: 2.6rem; margin-bottom: 0.9rem; border-radius: 0.9rem; background: var(--color-sable); color: var(--color-sapin); }
+.ep-securite-icone svg { width: 1.4rem; height: 1.4rem; }
 .ep-securite strong { display: block; font-weight: 600; }
 .ep-securite > span:not(.ep-badge):not(.ep-securite-icone) { display: block; margin-top: 0.3rem; font-size: 0.95rem; line-height: 1.45; color: var(--color-encre-doux); }
+
+/* Entreprise — les téléphones et leurs notifications (images au fond papier, sans cadre). */
+/* « darken » : là où l'image est plus claire que la page (son fond papier,
+   à une nuance près après compression), c'est la page qui se voit, grain
+   compris ; les téléphones, plus foncés, restent tels quels. Aucun contour. */
+.ep-notifs { margin: 0; mix-blend-mode: darken; }
+.ep-notifs-image { display: block; width: 100%; height: auto; }
+.ep-notifs-legende { display: grid; grid-template-columns: 1fr 1fr; margin-top: 0.25rem; text-align: center; font-size: 13.5px; color: var(--color-encre-doux); }
+
+/* Le catalogue en deux colonnes qui s'équilibrent (les panneaux n'ont pas la même hauteur). */
+.ep-colonnes { column-gap: 1.5rem; }
+.ep-colonnes > .ep-groupe { display: inline-block; width: 100%; margin-bottom: 1.5rem; break-inside: avoid; }
+@media (min-width: 1024px) { .ep-colonnes { columns: 2; } }

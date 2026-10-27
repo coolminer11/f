@@ -233,58 +233,50 @@
     const argent = (v) => (en ? `$${nombre(v)}` : `${nombre(v)}${NB}$`)
     const finePointe = window.matchMedia('(pointer: fine)').matches
 
-    // ---- Le catalogue : les totaux suivent les attributs data-etat.
+    // ---- Le catalogue : un panneau par catégorie. Les totaux suivent les
+    // attributs data-etat ; un filtre cache les lignes (et les panneaux vides).
     const liste = document.getElementById('ep-fonctions')
-    let lotsCatalogue = []
     if (liste) {
-      const items = [...liste.children]
+      const items = [...liste.querySelectorAll('.ep-fonction')]
+      const groupes = [...liste.querySelectorAll('.ep-groupe')]
       const compte = (etat) => items.filter((i) => etat === 'tous' || i.dataset.etat === etat).length
       document.getElementById('ep-total-disponible').textContent = String(compte('disponible'))
       document.getElementById('ep-total-bientot').textContent = String(compte('bientot'))
       document.querySelectorAll('[data-nombre-etat]').forEach((el) => (el.textContent = String(compte(el.dataset.nombreEtat))))
+      liste.querySelectorAll('[data-compte-groupe]').forEach((el) => {
+        const rangs = items.filter((i) => i.dataset.cat === el.dataset.compteGroupe)
+        const d = rangs.filter((i) => i.dataset.etat === 'disponible').length
+        const b = rangs.length - d
+        el.textContent = en ? `${d} available · ${b} coming soon` : `${d} disponible${d > 1 ? 's' : ''} · ${b} bientôt`
+      })
       const vide = document.getElementById('ep-vide')
       const puces = [...document.querySelectorAll('[data-filtre-etat], [data-filtre-cat]')]
       const filtre = { etat: 'tous', cat: 'tous' }
       let jeton = 0
-      let touche = false
       const correspond = (el) => (filtre.etat === 'tous' || el.dataset.etat === filtre.etat) && (filtre.cat === 'tous' || el.dataset.cat === filtre.cat)
+      const ranger = () => {
+        items.forEach((el) => (el.hidden = !correspond(el)))
+        groupes.forEach((g) => (g.hidden = !items.some((el) => el.dataset.cat === g.dataset.groupe && !el.hidden)))
+        vide.classList.toggle('hidden', items.some(correspond))
+      }
       const appliquer = () => {
         const n = ++jeton
-        vide.classList.toggle('hidden', items.some(correspond))
-        if (!anime) {
-          items.forEach((el) => (el.hidden = !correspond(el)))
-          return
-        }
-        // La première fois, tout ce qui attendait d'apparaître au défilement est montré.
-        if (!touche) {
-          touche = true
-          lotsCatalogue.forEach((t) => t.kill())
-          gsap.set(items, { opacity: 1, y: 0 })
-        }
-        gsap.killTweensOf(items)
-        const sortants = items.filter((el) => !el.hidden && !correspond(el))
-        const restants = items.filter((el) => !el.hidden && correspond(el))
-        const entrants = items.filter((el) => el.hidden && correspond(el))
-        const fin = () => {
-          if (n !== jeton) return
-          const avant = new Map(restants.map((el) => [el, el.getBoundingClientRect()]))
-          gsap.set(restants, { x: 0, y: 0 })
-          sortants.forEach((el) => {
-            el.hidden = true
-            gsap.set(el, { clearProps: 'opacity,scale,transform' })
-          })
-          entrants.forEach((el) => (el.hidden = false))
-          // FLIP : chaque fonction qui reste glisse de son ancienne place à la nouvelle.
-          restants.forEach((el) => {
-            const a = avant.get(el)
-            const b = el.getBoundingClientRect()
-            gsap.fromTo(el, { x: a.left - b.left, y: a.top - b.top, opacity: 1, scale: 1 }, { x: 0, y: 0, duration: 0.65, ease: 'power3.out' })
-          })
-          gsap.fromTo(entrants, { opacity: 0, scale: 0.92, y: 16 }, { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: 'back.out(1.6)', stagger: Math.min(0.03, 0.6 / Math.max(1, entrants.length)), delay: 0.08 })
-          ScrollTrigger?.refresh()
-        }
-        if (sortants.length) gsap.to(sortants, { opacity: 0, scale: 0.9, duration: 0.2, ease: 'power2.in', onComplete: fin })
-        else fin()
+        if (!anime) return ranger()
+        const visibles = groupes.filter((g) => !g.hidden)
+        gsap.killTweensOf([...groupes, ...items])
+        gsap.to(visibles, {
+          opacity: 0,
+          y: 8,
+          duration: 0.16,
+          ease: 'power1.in',
+          onComplete: () => {
+            if (n !== jeton) return
+            ranger()
+            const montres = groupes.filter((g) => !g.hidden)
+            gsap.fromTo(montres, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.42, ease: 'power2.out', stagger: 0.05 })
+            ScrollTrigger?.refresh()
+          },
+        })
       }
       puces.forEach((p) =>
         p.addEventListener('click', () => {
@@ -295,11 +287,11 @@
         }),
       )
       if (anime) {
-        gsap.set(items, { opacity: 0, y: 18 })
-        lotsCatalogue = ScrollTrigger.batch(items, {
-          start: 'top 92%',
+        gsap.set(groupes, { opacity: 0, y: 18 })
+        ScrollTrigger.batch(groupes, {
+          start: 'top 90%',
           once: true,
-          onEnter: (lot) => gsap.to(lot, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', stagger: 0.05, overwrite: true }),
+          onEnter: (lot) => gsap.to(lot, { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out', stagger: 0.08, overwrite: true }),
         })
       }
     }
@@ -601,8 +593,8 @@
       })
     }
 
-    // ---- Les trois niveaux se posent comme des cartes lancées sur la table.
-    gsap.from('.ep-niveau', { y: 80, rotation: (i) => [-6, 4, -4][i] ?? 0, opacity: 0, duration: 1.1, ease: 'power3.out', stagger: 0.13, scrollTrigger: { trigger: '#niveaux .ep-niveau', start: 'top 88%', once: true } })
+    // ---- Les trois niveaux se posent, doucement.
+    gsap.from('.ep-niveau', { y: 50, rotation: (i) => [-2, 1.5, -1.5][i] ?? 0, opacity: 0, duration: 1, ease: 'power3.out', stagger: 0.12, scrollTrigger: { trigger: '#niveaux .ep-niveau', start: 'top 88%', once: true } })
     gsap.from('#ep-portail', { y: 60, rotation: 4, opacity: 0, duration: 1.1, ease: 'back.out(1.3)', scrollTrigger: { trigger: '#ep-portail', start: 'top 85%', once: true } })
     gsap.fromTo('#ep-portail .ep-option', { x: 24, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out', stagger: 0.07, scrollTrigger: { trigger: '#ep-portail', start: 'top 80%', once: true } })
 
@@ -645,22 +637,6 @@
 
     // ---- La comparaison, ligne par ligne ; la colonne Entreprise se lève.
     gsap.from('#ep-lignes-comparaison tr', { x: -16, opacity: 0, duration: 0.6, ease: 'power2.out', stagger: 0.07, scrollTrigger: { trigger: '#ep-lignes-comparaison', start: 'top 85%', once: true } })
-
-    // ---- La phrase de la vision s'allume mot à mot, au rythme du défilement.
-    const vision = document.getElementById('ep-vision')
-    if (vision) {
-      const mots = vision.textContent.trim().split(/\s+/)
-      vision.textContent = ''
-      const spans = mots.map((m, i) => {
-        const s = document.createElement('span')
-        s.textContent = m
-        vision.append(s)
-        if (i < mots.length - 1) vision.append(' ')
-        return s
-      })
-      gsap.fromTo(spans, { opacity: 0.14 }, { opacity: 1, stagger: 0.12, ease: 'none', scrollTrigger: { trigger: vision, start: 'top 80%', end: 'bottom 45%', scrub: 0.5 } })
-      gsap.to(spans.slice(-2), { color: '#c2552f', stagger: 0.1, scrollTrigger: { trigger: vision, start: 'bottom 60%', once: true } })
-    }
 
     // ---- La citation se pose ; la feuille de route se dessine.
     gsap.from('#ep-citation', { y: 40, rotation: -2, opacity: 0, duration: 1, ease: 'back.out(1.4)', scrollTrigger: { trigger: '#ep-citation', start: 'top 85%', once: true } })

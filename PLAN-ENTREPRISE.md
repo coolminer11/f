@@ -110,9 +110,15 @@ multi-actions sans code ; test de bout en bout + test d'attaque.
 - Français : **https://taporacards.com/entreprise** — fichier `site/src/entreprise.html`
 - Anglais : **https://taporacards.com/en/business** — fichier `site/src/en/business.html`
 
-Publiée et indexée (Google, Bing : elle est dans `site/public/sitemap.xml`,
-annoncée par IndexNow à chaque publication), mais **aucun lien ni bouton**
-du site n'y mène : on y arrive par l'adresse exacte ou par une recherche.
+Publiée, indexée (plan du site + IndexNow) et **reliée au site depuis le
+27 oct.** : menu « Entreprises » / « Businesses », pied de page et bouton
+dans la section Entreprises de l'accueil.
+
+Images : `site/public/images/notifications-{ding,equipe}-{fr,en}[-820].webp`
+(fond #f7f1e7 = couleur de la page). « ding-fr » vient de l'image d'Arthur,
+recadrée ; les autres sont rendues par le gabarit
+`site/outils/gabarit-notifications.html` (mêmes téléphones, vrais textes des
+notifications de l'app).
 
 ### Le générateur
 Les deux pages viennent d'une seule source : `site/outils/gen-entreprise.py`
@@ -128,10 +134,10 @@ Dans les deux fichiers, chaque fonction porte un attribut
 le badge, la couleur et les filtres suivent. Faire le même changement dans la
 version anglaise, puis publier (commandes ci-dessous).
 
-### Ajouter un lien vers la page (le jour venu)
-1. Ajouter un lien dans le menu et le pied de page de `site/src/index.html`
-   (`/entreprise`) et `site/src/en/index.html` (`/en/business`).
-2. Publier.
+### Vérifier avant de publier
+Deux scripts Playwright (dans le dossier de travail de Claude) : la page
+Entreprise (116 vérifications) et tout le site (22 pages, ordinateur et
+téléphone, liens, langue, images, erreurs). Les relancer après un changement.
 
 ### Publier ou mettre à jour le site
 ```bash
@@ -164,7 +170,7 @@ l'équipe Tapora. N'y ajouter une ligne que le jour où elle est vraie.
 - [ ] **Designs par commande** : combien inclus (proposition : 3), au-delà
       sur soumission ? Le site dit « on en discute avec la maquette ».
 - [ ] **Nom** : « Tapora Entreprise » (fr) / « Tapora Business » (en).
-- [ ] **Quand ajouter un lien vers la page** depuis l'accueil.
+- [x] **Lien vers la page** depuis l'accueil : fait le 27 oct. (Julien a vu la page).
 - [ ] **Tapora Services** : reste dans Tapora pour l'instant ; Arthur dira
       quand le sortir dans une entreprise séparée (dépôt, base, hébergement,
       domaine et nom à part, entente écrite, avocat).
@@ -195,6 +201,9 @@ git push origin claude/tapora-expenses-profits-lsclxr
   portail, mode gérant, facturation, rapport mensuel, chevalets) et en ligne.
 - **21 oct. 2026** — Convention : retour au texte d'origine (articles sur le
   logiciel retirés à la demande d'Arthur).
+- **27 oct. 2026** — Page Entreprise nettoyée (textes moins « IA », plus de
+  tirets longs ni d'emojis comme icônes, catalogue en listes), images de
+  notifications (« Ding ! » et équipe, fr/en), page reliée depuis l'accueil.
 - **26 oct. 2026** — Page Entreprise : 25 cartes minimum **par design**
   (calculette avec le nombre de designs), statistiques toujours incluses
   (Entreprise et toutes les cartes à l'unité),

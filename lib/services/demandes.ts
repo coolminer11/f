@@ -49,7 +49,12 @@ export async function creerDemande(code: string, cle: string, note: string | nul
   void noterEvenement(etab.id, emplacement.id, 'demandes', cle, langue)
   void notifierPersonnel(etab.id, emplacement.groupe, {
     titre: `${type.icone ?? '🔔'} ${emplacement.libelle} — ${libelle}`,
-    corps: note?.trim() ? note.trim().slice(0, 140) : etab.type === 'hotel' ? 'Nouvelle demande d’un client.' : 'Un client vous attend.',
+    // Dans la langue de l'établissement : l'équipe d'un hôtel anglophone lit l'anglais.
+    corps: note?.trim()
+      ? note.trim().slice(0, 140)
+      : etab.langue_defaut === 'en'
+        ? etab.type === 'hotel' ? 'New request from a guest.' : 'A guest is waiting for you.'
+        : etab.type === 'hotel' ? 'Nouvelle demande d’un client.' : 'Un client vous attend.',
     url: `/service/${jetonPortail(etab.id, etab.version_lien)}`,
     etiquette: `demande-${ligne.id}`,
   }).catch(() => 0)

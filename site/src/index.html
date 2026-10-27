@@ -83,7 +83,7 @@
           { "@type": "Question", "name": "Quelles statistiques voit-on ?", "acceptedAnswer": { "@type": "Answer", "text": "Chaque tap, en direct : par jour, par heure, par jour de la semaine, iPhone ou Android, et le nombre d’avis Google gagnés à côté. Chaque commerce a sa page privée et reçoit un rapport le 1er du mois." } },
           { "@type": "Question", "name": "Collectez-vous des données sur mes clients ?", "acceptedAnswer": { "@type": "Answer", "text": "Non. Conformément à la Loi 25, nous ne gardons ni adresse IP, ni témoin durable, ni position : seulement l’heure du tap, et le type de téléphone." } },
           { "@type": "Question", "name": "Combien coûte une carte Tapora ?", "acceptedAnswer": { "@type": "Answer", "text": "À l’unité, une carte coûte 35 $, sans minimum (5 cartes : 175 $) : bilingue et conforme à la loi québécoise (le français en vedette au Québec, l’anglais d’abord ailleurs). Dès 25 cartes, l’offre Entreprise est à 30 $ la carte, avec un design sur mesure. Tout est inclus, sans abonnement : statistiques en direct, page privée, notifications, mode comptoir, rapport mensuel." } },
-          { "@type": "Question", "name": "Avez-vous une offre pour les entreprises (hôtels, chaînes…) ?", "acceptedAnswer": { "@type": "Answer", "text": "Oui : l’offre Entreprise, à 30 $ la carte dès 25 cartes. Le design est fait à vos couleurs (logo, texte, nom de chaque carte, par exemple « Chambre 101 »), en version Québec (français d’abord) ou hors Québec (anglais d’abord). Vous suivez vos statistiques carte par carte et par groupe, sur une page qui peut être protégée par un mot de passe. Le délai est plus long qu’une carte standard : maquette à approuver, puis fabrication sur mesure ; la date exacte vous est confirmée avec la maquette." } },
+          { "@type": "Question", "name": "Avez-vous une offre pour les entreprises (hôtels, chaînes…) ?", "acceptedAnswer": { "@type": "Answer", "text": "Oui : l’offre Entreprise, à 30 $ la carte, avec 25 cartes minimum par design. Le design est fait à vos couleurs (logo, texte, nom de chaque carte, par exemple « Chambre 101 »), en version Québec (français d’abord) ou hors Québec (anglais d’abord). Vous suivez vos statistiques carte par carte et par groupe, sur une page qui peut être protégée par un mot de passe. Le délai est plus long qu’une carte standard : maquette à approuver, puis fabrication sur mesure ; la date exacte vous est confirmée avec la maquette." } },
           { "@type": "Question", "name": "Y a-t-il un abonnement ou des frais mensuels ?", "acceptedAnswer": { "@type": "Answer", "text": "Non. Vous payez la carte une fois et tout le reste est inclus, sans frais mensuels : statistiques, page privée, notifications « Ding ! », mode comptoir, suivi des avis et rapport mensuel." } },
           { "@type": "Question", "name": "Tapora, c’est une entreprise d’ici ?", "acceptedAnswer": { "@type": "Answer", "text": "Oui. Tapora S.E.N.C. est une entreprise québécoise (NEQ 3382462367). Vos cartes sont configurées, suivies et soutenues par nous, au Québec, en français comme en anglais." } }
         ]
@@ -107,7 +107,7 @@
         <a href="#fonctionnement" class="lien-nav transition hover:text-encre">Comment ça marche</a>
         <a href="#statistiques" class="lien-nav transition hover:text-encre">Les stats</a>
         <a href="#prix" class="lien-nav transition hover:text-encre">Prix</a>
-        <a href="#entreprise" class="lien-nav transition hover:text-encre">Entreprises</a>
+        <a href="/entreprise" class="lien-nav transition hover:text-encre">Entreprises</a>
         <a href="/guides/" class="lien-nav transition hover:text-encre">Guides</a>
         <a href="#faq" class="lien-nav transition hover:text-encre max-xl:hidden">Questions</a>
       </div>
@@ -139,7 +139,7 @@
           </h1>
           <p class="mt-7 max-w-xl text-lg leading-relaxed text-encre-doux" data-apparait>
             Une petite carte sur le comptoir. Votre client l’effleure avec son téléphone,
-            et la page d’avis Google s’ouvre. Vous, vous voyez chaque tap — et chaque nouvel avis.
+            et la page d’avis Google s’ouvre. Vous, vous voyez chaque tap, et chaque nouvel avis.
           </p>
           <div class="mt-9 flex flex-wrap items-center gap-4" data-apparait>
             <a href="#commander" class="bouton-fleche group inline-flex items-center gap-2 rounded-full bg-brique px-7 py-4 text-[15px] font-semibold text-creme shadow-[0_10px_24px_-10px_rgb(158_65_34_/_0.7)] transition hover:-translate-y-0.5 hover:bg-brique-fonce">Commander mes cartes <span class="fleche" aria-hidden="true">→</span></a>
@@ -330,13 +330,27 @@
         </figure>
 
         <ul class="mt-12 grid gap-x-10 gap-y-4 text-[15px] sm:grid-cols-2 lg:grid-cols-3">
-          <li class="flex gap-3" data-apparait><span class="titre text-xl text-brique">~</span><span><strong class="font-semibold">En direct</strong> — chaque tap apparaît à la seconde.</span></li>
-          <li class="flex gap-3" data-apparait><span class="titre text-xl text-brique">~</span><span><strong class="font-semibold">Vos heures fortes</strong> — pour placer vos cartes au bon endroit.</span></li>
-          <li class="flex gap-3" data-apparait><span class="titre text-xl text-brique">~</span><span><strong class="font-semibold">Les avis gagnés</strong> — le résultat, pas juste l’effort.</span></li>
-          <li class="flex gap-3" data-apparait><span class="titre text-xl text-brique">~</span><span><strong class="font-semibold">Carte par carte</strong> — le comptoir contre la terrasse.</span></li>
-          <li class="flex gap-3" data-apparait><span class="titre text-xl text-brique">~</span><span><strong class="font-semibold">Votre page à vous</strong> — vos chiffres, quand vous voulez.</span></li>
-          <li class="flex gap-3" data-apparait><span class="titre text-xl text-brique">~</span><span><strong class="font-semibold">Un rapport le 1<sup>er</sup></strong> — dans vos courriels, chaque mois.</span></li>
+          <li class="flex gap-3" data-apparait><span class="titre text-xl text-brique">~</span><span><strong class="font-semibold">En direct</strong>&nbsp;: chaque tap apparaît à la seconde.</span></li>
+          <li class="flex gap-3" data-apparait><span class="titre text-xl text-brique">~</span><span><strong class="font-semibold">Vos heures fortes</strong>, pour placer vos cartes au bon endroit.</span></li>
+          <li class="flex gap-3" data-apparait><span class="titre text-xl text-brique">~</span><span><strong class="font-semibold">Les avis gagnés</strong>&nbsp;: le résultat, pas juste l’effort.</span></li>
+          <li class="flex gap-3" data-apparait><span class="titre text-xl text-brique">~</span><span><strong class="font-semibold">Carte par carte</strong>&nbsp;: le comptoir contre la terrasse.</span></li>
+          <li class="flex gap-3" data-apparait><span class="titre text-xl text-brique">~</span><span><strong class="font-semibold">Votre page à vous</strong>, avec vos chiffres, quand vous voulez.</span></li>
+          <li class="flex gap-3" data-apparait><span class="titre text-xl text-brique">~</span><span><strong class="font-semibold">Un rapport le 1<sup>er</sup></strong>, dans vos courriels, chaque mois.</span></li>
         </ul>
+        <div class="mt-24 grid items-center gap-12 lg:grid-cols-[0.85fr_1.15fr]">
+          <div>
+            <p class="text-sm font-semibold uppercase tracking-[0.2em] text-brique" data-apparait>Le «&nbsp;Ding&nbsp;!&nbsp;»</p>
+            <h3 data-mots class="titre mt-3 text-3xl font-medium leading-tight sm:text-4xl">Chaque tap arrive sur votre téléphone.</h3>
+            <p class="mt-5 max-w-md text-lg leading-relaxed text-encre-doux" data-apparait>Un client approche son téléphone de la carte, et le vôtre sonne. Les paliers et les records aussi. Sur Android comme sur iPhone, sans rien télécharger&nbsp;: vous activez le «&nbsp;Ding&nbsp;!&nbsp;» depuis votre page de statistiques (sur iPhone, on l’ajoute d’abord à l’écran d’accueil).</p>
+          </div>
+          <figure class="rounded-[2rem] bg-papier px-3 pt-5 pb-4 shadow-[0_30px_60px_-38px_rgb(60_40_20_/_0.5)] sm:px-6 sm:pt-7" data-apparait>
+            <picture>
+              <source type="image/webp" srcset="/images/notifications-ding-fr-820.webp 820w, /images/notifications-ding-fr.webp 1640w" sizes="(min-width: 1024px) 640px, 100vw">
+              <img src="/images/notifications-ding-fr.webp" width="1640" height="1470" loading="lazy" decoding="async" class="h-auto w-full" alt="Notifications Tapora sur un iPhone verrouillé et sur un Android : « Ding ! Un client vient de taper », « 3 nouveaux taps », « 100 taps ! » et « Nouveau record ! ».">
+            </picture>
+            <figcaption class="mt-2 grid grid-cols-2 text-center text-sm text-encre-doux"><span>iPhone · écran verrouillé</span><span>Android</span></figcaption>
+          </figure>
+        </div>
       </div>
     </section>
 
@@ -346,11 +360,11 @@
       <div class="mt-14 grid gap-x-12 gap-y-12 md:grid-cols-2">
         <div class="flex gap-5" data-apparait>
           <svg viewBox="0 0 48 48" class="size-12 shrink-0 text-brique" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M38 18a15 15 0 0 0-27-4M10 30a15 15 0 0 0 27 4"/><path d="M11 7v7h7M37 41v-7h-7"/></svg>
-          <div><h3 class="text-xl font-semibold">Modifiable en tout temps</h3><p class="mt-2 leading-relaxed text-encre-doux">La puce mène à une adresse Tapora qui ne change jamais. Nouveau lien d’avis, un menu, un concours ? On change la destination — la carte, elle, reste sur votre comptoir.</p></div>
+          <div><h3 class="text-xl font-semibold">Modifiable en tout temps</h3><p class="mt-2 leading-relaxed text-encre-doux">La puce mène à une adresse Tapora qui ne change jamais. Nouveau lien d’avis, un menu, un concours ? On change la destination. La carte, elle, reste sur votre comptoir.</p></div>
         </div>
         <div class="flex gap-5" data-apparait>
           <svg viewBox="0 0 48 48" class="size-12 shrink-0 text-sapin" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><rect x="27" y="9" width="12" height="12" rx="2"/><rect x="9" y="27" width="12" height="12" rx="2"/><path d="M28 28h4v4M36 28v0M28 36h0M36 36h3v3"/></svg>
-          <div><h3 class="text-xl font-semibold">Tout inclus, sans abonnement</h3><p class="mt-2 leading-relaxed text-encre-doux">Vous payez la carte une fois. Les statistiques, la page privée, le «&nbsp;Ding&nbsp;!&nbsp;» et le rapport mensuel viennent avec — sans abonnement.</p></div>
+          <div><h3 class="text-xl font-semibold">Tout inclus, sans abonnement</h3><p class="mt-2 leading-relaxed text-encre-doux">Vous payez la carte une fois. Les statistiques, la page privée, le «&nbsp;Ding&nbsp;!&nbsp;» et le rapport mensuel viennent avec, sans abonnement.</p></div>
         </div>
         <div class="flex gap-5" data-apparait>
           <svg viewBox="0 0 48 48" class="size-12 shrink-0 text-miel" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M24 6c3 6 3 10 0 15-3-5-3-9 0-15ZM24 21c5-4 10-4 14 0-5 3-10 3-14 0ZM24 21c-5-4-10-4-14 0 5 3 10 3 14 0ZM24 21v20M18 34h12"/></svg>
@@ -388,7 +402,7 @@
       <div class="mx-auto max-w-6xl px-5">
         <p class="text-sm font-semibold uppercase tracking-[0.2em] text-brique" data-apparait>Prix</p>
         <h2 data-mots class="titre mt-3 max-w-3xl text-4xl font-medium leading-tight sm:text-5xl">Un prix simple. Tout inclus, sans abonnement.</h2>
-        <p class="mt-5 max-w-2xl text-lg leading-relaxed text-encre-doux" data-apparait>Vous payez la carte une fois. Les statistiques, votre page privée, le «&nbsp;Ding&nbsp;!&nbsp;» et le rapport mensuel viennent avec — sans abonnement, sans frais cachés.</p>
+        <p class="mt-5 max-w-2xl text-lg leading-relaxed text-encre-doux" data-apparait>Vous payez la carte une fois. Les statistiques, votre page privée, le «&nbsp;Ding&nbsp;!&nbsp;» et le rapport mensuel viennent avec. Sans abonnement, sans frais cachés.</p>
         <div class="mt-14 grid gap-5 lg:grid-cols-2">
           <article class="carte-prix relative flex flex-col rounded-3xl p-7 carte-papier sm:p-9" data-apparait>
             <div class="flex flex-wrap items-center justify-between gap-3">
@@ -416,7 +430,7 @@
               <h3 class="titre text-2xl font-medium">Entreprise</h3>
               <span class="rounded-full bg-brique px-3 py-1 text-xs font-semibold text-creme">Design sur mesure</span>
             </div>
-            <p class="relative mt-1 text-sm text-creme/70">Hôtels, restaurants, chaînes · dès 25 cartes</p>
+            <p class="relative mt-1 text-sm text-creme/70">Hôtels, restaurants, chaînes · 25 cartes minimum par design</p>
             <p class="titre relative mt-7 text-7xl font-medium tabular-nums">30&nbsp;<span class="text-2xl">$ / carte</span></p>
             <p class="relative mt-2 text-sm text-creme/70">25 cartes&nbsp;: 750&nbsp;$ · 50 cartes&nbsp;: 1&nbsp;500&nbsp;$ · design inclus</p>
             <ul class="relative mt-6 space-y-3 text-[15px] leading-snug">
@@ -471,7 +485,8 @@
         <div>
           <p class="text-sm font-semibold uppercase tracking-[0.2em] text-brique" data-apparait>Entreprises</p>
           <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">Une carte par chambre, par table, par succursale. <span class="souligne italic text-brique">À vos couleurs<svg viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path class="trait" d="M3 13 C 45 5, 100 4, 140 9 S 182 14, 197 7" fill="none" stroke="#e4a53a" stroke-width="4" stroke-linecap="round"/></svg></span>.</h2>
-          <p class="mt-5 max-w-xl text-lg leading-relaxed text-encre-doux" data-apparait>Pour les hôtels, les restaurants et les chaînes&nbsp;: des cartes conçues pour vous, dès 25 cartes, et un espace client pour suivre chacune d’elles.</p>
+          <p class="mt-5 max-w-xl text-lg leading-relaxed text-encre-doux" data-apparait>Pour les hôtels, les restaurants et les chaînes&nbsp;: des cartes conçues pour vous (25 cartes minimum par design) et un espace client pour suivre chacune d’elles.</p>
+          <a href="/entreprise" class="bouton-fleche group mt-6 inline-flex items-center gap-2 font-semibold text-brique" data-apparait>Tout ce que l’offre Entreprise peut faire <span class="fleche" aria-hidden="true">→</span></a>
           <ul class="mt-10 grid gap-x-8 gap-y-6 sm:grid-cols-2">
             <li class="flex gap-4" data-apparait>
               <span class="grid size-11 shrink-0 place-items-center rounded-2xl bg-creme text-brique shadow-[0_8px_20px_-12px_rgb(60_40_20_/_0.45)]"><svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.8 1.6-1.6 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-4-4-7.4-9-7.4Z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10" cy="7" r="1.2"/><circle cx="15" cy="7.5" r="1.2"/></svg></span>
@@ -656,11 +671,11 @@
         </details>
         <details class="group py-5" data-apparait>
           <summary class="flex items-center justify-between gap-6 text-lg font-medium">Combien coûte une carte Tapora ?<span class="plus titre text-3xl text-brique transition">+</span></summary>
-          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">À l’unité, une carte coûte 35&nbsp;$, sans minimum (5 cartes&nbsp;: 175&nbsp;$)&nbsp;: bilingue et conforme à la loi québécoise — le français en vedette au Québec, l’anglais d’abord ailleurs. Dès 25 cartes, l’<a href="#entreprise" class="text-brique underline underline-offset-4">offre Entreprise</a> est à 30&nbsp;$ la carte, avec un design sur mesure. Tout est inclus, sans abonnement&nbsp;: statistiques en direct, page privée, notifications, mode comptoir, rapport mensuel.</p></div>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">À l’unité, une carte coûte 35&nbsp;$, sans minimum (5 cartes&nbsp;: 175&nbsp;$)&nbsp;: bilingue et conforme à la loi québécoise, avec le français en vedette au Québec et l’anglais d’abord ailleurs. Dès 25 cartes, l’<a href="#entreprise" class="text-brique underline underline-offset-4">offre Entreprise</a> est à 30&nbsp;$ la carte, avec un design sur mesure. Tout est inclus, sans abonnement&nbsp;: statistiques en direct, page privée, notifications, mode comptoir, rapport mensuel.</p></div>
         </details>
         <details class="group py-5" data-apparait>
           <summary class="flex items-center justify-between gap-6 text-lg font-medium">Avez-vous une offre pour les entreprises (hôtels, chaînes…)&nbsp;?<span class="plus titre text-3xl text-brique transition">+</span></summary>
-          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Oui&nbsp;: l’offre Entreprise, à 30&nbsp;$ la carte dès 25 cartes. Le design est fait à vos couleurs (logo, texte, nom de chaque carte, par exemple «&nbsp;Chambre 101&nbsp;»), en version Québec (français d’abord) ou hors Québec (anglais d’abord). Vous suivez vos statistiques carte par carte et par groupe, sur une page qui peut être protégée par un mot de passe. Le délai est plus long qu’une carte standard&nbsp;: maquette à approuver, puis fabrication sur mesure&nbsp;; la date exacte vous est confirmée avec la maquette. <a href="#demande-entreprise" class="text-brique underline underline-offset-4">Faire une demande</a></p></div>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Oui&nbsp;: l’offre Entreprise, à 30&nbsp;$ la carte, avec 25 cartes minimum par design. Le design est fait à vos couleurs (logo, texte, nom de chaque carte, par exemple «&nbsp;Chambre 101&nbsp;»), en version Québec (français d’abord) ou hors Québec (anglais d’abord). Vous suivez vos statistiques carte par carte et par groupe, sur une page qui peut être protégée par un mot de passe. Le délai est plus long qu’une carte standard&nbsp;: maquette à approuver, puis fabrication sur mesure&nbsp;; la date exacte vous est confirmée avec la maquette. <a href="#demande-entreprise" class="text-brique underline underline-offset-4">Faire une demande</a></p></div>
         </details>
         <details class="group py-5" data-apparait>
           <summary class="flex items-center justify-between gap-6 text-lg font-medium">Y a-t-il un abonnement ou des frais mensuels ?<span class="plus titre text-3xl text-brique transition">+</span></summary>
@@ -676,7 +691,7 @@
         </details>
         <details class="group py-5" data-apparait>
           <summary class="flex items-center justify-between gap-6 text-lg font-medium">Quelles statistiques voit-on ?<span class="plus titre text-3xl text-brique transition">+</span></summary>
-          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Chaque tap, en direct : par jour, par heure, par jour de la semaine, iPhone ou Android — et le nombre d’avis Google gagnés à côté. Chaque commerce a sa page privée et reçoit un rapport le 1er du mois.</p></div>
+          <div class="reponse"><p class="pt-3 leading-relaxed text-encre-doux">Chaque tap, en direct : par jour, par heure, par jour de la semaine, iPhone ou Android, avec le nombre d’avis Google gagnés juste à côté. Chaque commerce a sa page privée et reçoit un rapport le 1er du mois.</p></div>
         </details>
         <details class="group py-5" data-apparait>
           <summary class="flex items-center justify-between gap-6 text-lg font-medium">Collectez-vous des données sur mes clients ?<span class="plus titre text-3xl text-brique transition">+</span></summary>
@@ -695,7 +710,7 @@
         <svg id="ondes-cta" viewBox="0 0 100 100" class="pointer-events-none absolute right-12 top-1/2 hidden w-72 -translate-y-1/2 lg:block xl:right-16 xl:w-80" aria-hidden="true"><g class="carte-cta" transform="rotate(-13 40 62)"><rect x="20" y="34" width="40" height="56" rx="8.5" fill="#c2552f"/><rect x="27" y="42" width="14" height="3.6" rx="1.8" fill="#fffaf2" opacity=".45"/><polygon points="40,57.5 42.72,64.26 49.99,64.76 44.39,69.43 46.17,76.49 40,72.62 33.83,76.49 35.61,69.43 30.01,64.76 37.28,64.26" fill="#fffaf2" stroke="#fffaf2" stroke-width="3.2" stroke-linejoin="round"/></g><g fill="none" stroke-width="6.2" stroke-linecap="round"><path class="arc-cta" d="M54.62 28.01A11 11 0 0 1 65.99 38.62" stroke="#f2d3c4"/><path class="arc-cta" d="M54.32 19.51A19.5 19.5 0 0 1 74.49 38.32" stroke="#e4a53a"/><path class="arc-cta" d="M54.02 11.02A28 28 0 0 1 82.98 38.02" stroke="#c2552f"/></g></svg>
         <div class="relative max-w-2xl">
           <h2 data-mots class="titre text-4xl font-medium leading-tight sm:text-6xl">On jase&nbsp;?</h2>
-          <p class="mt-5 text-lg leading-relaxed text-creme/80">Dites-nous le nom de votre commerce et combien de cartes il vous faut. On vous confirme le total — en français, et vite. Un projet sur mesure (25 cartes et plus)&nbsp;? <a href="#demande-entreprise" class="font-semibold text-creme underline decoration-creme/40 underline-offset-4 hover:decoration-creme">Passez par le formulaire Entreprise</a>.</p>
+          <p class="mt-5 text-lg leading-relaxed text-creme/80">Dites-nous le nom de votre commerce et combien de cartes il vous faut. On vous confirme le total, en français, et vite. Un projet sur mesure (25 cartes et plus)&nbsp;? <a href="#demande-entreprise" class="font-semibold text-creme underline decoration-creme/40 underline-offset-4 hover:decoration-creme">Passez par le formulaire Entreprise</a>.</p>
           <div class="mt-9 flex flex-wrap gap-3">
             <a href="mailto:contact@taporacards.com?subject=Commande%20de%20cartes%20Tapora&amp;body=Bonjour%2C%0A%0ANom%20du%20commerce%20%3A%20%0AVille%20%3A%20%0ANombre%20de%20cartes%20%3A%20%0A%0AMerci%20!" class="rounded-full bg-creme px-7 py-4 text-[15px] font-semibold text-sapin transition hover:-translate-y-0.5 hover:bg-white">Écrire pour commander</a>
             <a href="mailto:contact@taporacards.com" class="rounded-full border border-creme/30 px-7 py-4 text-[15px] font-medium transition hover:bg-creme/10">contact@taporacards.com</a>
@@ -712,6 +727,7 @@
         <span><strong class="font-semibold text-encre">Tapora S.E.N.C.</strong> · NEQ 3382462367 · entreprise québécoise</span>
       </div>
       <nav class="flex flex-wrap gap-6" aria-label="Pied de page">
+        <a href="/entreprise" class="hover:text-encre">Entreprises</a>
         <a href="/guides/" class="hover:text-encre">Guides</a>
         <a href="/partenaires" class="hover:text-encre">Partenaires</a>
         <a href="https://go.taporacards.com/portail" class="hover:text-encre">Espace client</a>

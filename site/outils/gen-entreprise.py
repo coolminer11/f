@@ -82,45 +82,46 @@ FONCTIONS = [
   ('cartes', B, 'Destinations programmées', 'Le menu des fêtes du 1<sup>er</sup> au 31' + NB + 'décembre, puis retour automatique.', 'Scheduled destinations', 'The holiday menu from December 1 to 31, then back automatically.', False),
 ]
 
+# L'ordre des panneaux équilibre les deux colonnes du catalogue (13 + 19 lignes, 15 + 15).
 CATS = {
   'client': ('Expérience client', 'Customer experience', 'i-client'),
-  'resto': ('Restaurants, cafés et bars', 'Restaurants, cafés and bars', 'i-resto'),
   'hotel': ('Hôtels et hébergements', 'Hotels and lodging', 'i-hotel'),
+  'resto': ('Restaurants, cafés et bars', 'Restaurants, cafés and bars', 'i-resto'),
   'cartes': ('Cartes et suivi', 'Cards and tracking', 'i-cartes'),
 }
 
 # ---------------------------------------------------------------- plateforme
 PLATEFORME = [
-  (D, 'Gestion des destinations', 'Changer les liens sans remplacer les cartes — par Tapora, sur demande.', 'Destination management', 'Change the links without replacing the cards — by Tapora, on request.'),
+  (D, 'Gestion des destinations', 'Changer les liens sans remplacer les cartes. Tapora s’en charge, sur demande.', 'Destination management', 'Change the links without replacing the cards. Tapora handles it, on request.'),
   (D, 'Tableau de bord', 'Les interactions par carte, par groupe et par période.', 'Dashboard', 'Interactions by card, by group and by period.'),
   (B, 'Formulaires intégrés', 'Créer des sondages, des demandes et des questionnaires.', 'Built-in forms', 'Create surveys, requests and questionnaires.'),
-  (B, 'Pages personnalisées', 'Couleurs, logo et boutons pour chaque entreprise — déjà en place pour les restaurants et les hôtels.', 'Custom pages', 'Colours, logo and buttons for every business — already live for restaurants and hotels.'),
+  (B, 'Pages personnalisées', 'Couleurs, logo et boutons pour chaque entreprise. Déjà en place pour les restaurants et les hôtels.', 'Custom pages', 'Colours, logo and buttons for every business. Already live for restaurants and hotels.'),
   (B, 'Plusieurs succursales', 'Administrer plusieurs établissements dans un même compte.', 'Multiple locations', 'Manage several locations in one account.'),
   (B, 'Rôles et permissions', 'Un accès pour les gestionnaires de chaque succursale.', 'Roles and permissions', 'Access for each location’s managers.'),
   (D, 'Pages multilingues', 'Français et anglais sur les cartes&nbsp;; 10 langues pour les menus et les services.', 'Multilingual pages', 'French and English on the cards; 10 languages for menus and services.'),
   (D, 'Campagnes temporaires', 'Une promotion ou un menu, avec ses dates et ses heures, dans les pages de services.', 'Temporary campaigns', 'A promotion or a menu, with its dates and hours, in the service pages.'),
-  (D, 'Statistiques par redirection', 'Chaque ouverture passe par notre redirection. Honnêtement&nbsp;: on ne prétend pas mesurer chaque lecture NFC indépendamment.', 'Stats through redirection', 'Every opening goes through our redirect. Honestly: we don’t claim to measure each NFC read on its own.'),
+  (D, 'Statistiques par redirection', 'Chaque ouverture passe par notre redirection. On ne prétend pas mesurer chaque lecture NFC à part.', 'Stats through redirection', 'Every opening goes through our redirect. We don’t claim to measure each NFC read separately.'),
   (B, 'Intégrations', 'Relier vos formulaires et vos pages aux logiciels que vous utilisez déjà.', 'Integrations', 'Connect your forms and pages to the software you already use.'),
 ]
 
 # ---------------------------------------------------------------- sécurité
 # Seulement ce qui existe et fonctionne aujourd'hui (vérifié dans le code).
 SECURITE = [
-  ('🔒', 'Pages privées protégées par mot de passe', 'La page de statistiques et le portail de l’équipe se ferment par un mot de passe. Il est chiffré (scrypt)&nbsp;: personne, même chez Tapora, ne peut le lire.',
+  ('i-cadenas', 'Pages privées protégées par mot de passe', 'La page de statistiques et le portail de l’équipe se ferment par un mot de passe. Il est chiffré (scrypt)&nbsp;: personne, même chez Tapora, ne peut le lire.',
    'Password-protected private pages', 'The stats page and the staff portal lock with a password. It is hashed (scrypt): no one, not even Tapora, can read it.'),
-  ('🔗', 'Liens signés, renouvelables', 'Chaque lien privé est signé&nbsp;: impossible à deviner ou à fabriquer. Un nouveau lien rend l’ancien inutilisable sur-le-champ.',
+  ('i-lien', 'Liens signés, renouvelables', 'Chaque lien privé est signé&nbsp;: impossible à deviner ou à fabriquer. Un nouveau lien rend l’ancien inutilisable sur-le-champ.',
    'Signed, renewable links', 'Every private link is signed: impossible to guess or forge. A new link makes the old one stop working instantly.'),
-  ('🛡️', 'Freins contre les intrus', 'Le nombre d’essais de mot de passe est limité, par appareil et par heure, et Tapora est alertée en cas d’essais répétés.',
-   'Brakes against intruders', 'Password attempts are limited, per device and per hour, and Tapora is alerted to repeated attempts.'),
-  ('🔑', 'Un mot de passe à part pour le gérant', 'Modifier le menu, les prix ou les annonces demande le mot de passe du gérant, qui expire après 12&nbsp;heures sur chaque appareil.',
+  ('i-bouclier', 'Essais limités', 'Le nombre d’essais de mot de passe est limité, par appareil et par heure, et Tapora est alertée en cas d’essais répétés.',
+   'Limited attempts', 'Password attempts are limited, per device and per hour, and Tapora is alerted to repeated attempts.'),
+  ('i-cle', 'Un mot de passe à part pour le gérant', 'Modifier le menu, les prix ou les annonces demande le mot de passe du gérant, qui expire après 12&nbsp;heures sur chaque appareil.',
    'A separate password for the manager', 'Changing the menu, prices or announcements takes the manager’s password, which expires after 12 hours on each device.'),
-  ('👤', 'Aucune donnée personnelle dans les statistiques', 'Ni adresse IP ni identifiant&nbsp;: seulement l’heure, le canal (NFC ou code QR) et le type d’appareil.',
+  ('i-oeil', 'Aucune donnée personnelle dans les statistiques', 'Ni adresse IP ni identifiant&nbsp;: seulement l’heure, le canal (NFC ou code QR) et le type d’appareil.',
    'No personal data in the stats', 'No IP address, no identifier: only the time, the channel (NFC or QR code) and the device type.'),
-  ('🧹', 'Effacement automatique', 'Sur les pages de services (menus, demandes, concierge)&nbsp;: la trace anti-abus est effacée après 30&nbsp;jours, les visites après 13&nbsp;mois, les demandes et les avis après 25&nbsp;mois.',
+  ('i-horloge', 'Effacement automatique', 'Sur les pages de services (menus, demandes, concierge)&nbsp;: la trace anti-abus est effacée après 30&nbsp;jours, les visites après 13&nbsp;mois, les demandes et les avis après 25&nbsp;mois.',
    'Automatic deletion', 'On the service pages (menus, requests, concierge): the anti-abuse trace is deleted after 30 days, visits after 13 months, requests and reviews after 25 months.'),
-  ('🇨🇦', 'Hébergé au Canada, chiffré partout', 'Les données sont hébergées au Canada. Tout passe par une connexion chiffrée (HTTPS), et les pages privées ne sont jamais indexées par les moteurs de recherche.',
+  ('i-globe', 'Hébergé au Canada, chiffré partout', 'Les données sont hébergées au Canada. Tout passe par une connexion chiffrée (HTTPS), et les pages privées ne sont jamais indexées par les moteurs de recherche.',
    'Hosted in Canada, encrypted everywhere', 'Data is hosted in Canada. Everything goes over an encrypted connection (HTTPS), and private pages are never indexed by search engines.'),
-  ('🧾', 'À l’abri des abus', 'Les demandes sont plafonnées, les prix d’une commande sont toujours recalculés par nos serveurs, et l’équipe Tapora se connecte avec une double authentification obligatoire.',
+  ('i-bouclier-coche', 'À l’abri des abus', 'Les demandes sont plafonnées, les prix d’une commande sont toujours recalculés par nos serveurs, et l’équipe Tapora se connecte avec une double authentification obligatoire.',
    'Protected from abuse', 'Requests are capped, order prices are always recalculated by our servers, and the Tapora team signs in with mandatory two-factor authentication.'),
 ]
 
@@ -132,13 +133,13 @@ SECTEURS = [
        lieux=[('Chambres', 'Rooms', 100), ('Restaurant', 'Restaurant', 12), ('Réception', 'Front desk', 5), ('Spa', 'Spa', 4), ('Ascenseurs et espaces communs', 'Elevators and common areas', 4)],
        f=[(D, 'Services de chambre et service aux chambres', 'Room services and room service'), (D, 'Entretien ménager, départ tardif, problème', 'Housekeeping, late check-out, problems'), (D, 'Wi-Fi, guide de la chambre, piscine et gym', 'Wi-Fi, room guide, pool and gym'), (D, 'Conciergerie, attractions et transport', 'Concierge, attractions and transportation'), (D, 'Restaurant de l’hôtel et événements', 'Hotel restaurant and events'), (D, 'Évaluation du séjour', 'Stay rating'), (B, 'Enregistrement et départ en ligne', 'Online check-in and check-out'), (B, 'Réservation au spa', 'Spa booking')]),
   dict(id='resto', fr='Restaurants et bars', en='Restaurants and bars', titre_fr='Restaurants, cafés et bars', titre_en='Restaurants, cafés and bars',
-       intro_fr='Le menu dans la langue du client, le serveur appelé au bon moment, l’addition sans attendre — et l’avis juste après.',
-       intro_en='The menu in the guest’s language, the server called at the right time, the bill without waiting — and the review right after.',
+       intro_fr='Le menu dans la langue du client, le serveur appelé au bon moment, l’addition sans attendre, puis l’avis.',
+       intro_en='The menu in the guest’s language, the server called at the right time, the bill without waiting, then the review.',
        lieux=[('Tables de la salle', 'Dining-room tables', 30), ('Terrasse', 'Patio', 8), ('Bar', 'Bar', 2)],
        f=[(D, 'Menu en 10 langues, avec les allergènes', 'Menu in 10 languages, with allergens'), (D, 'Menu du jour et menu des boissons', 'Daily specials and drinks menu'), (D, 'Appeler le serveur et l’addition', 'Call the server and the bill'), (D, 'Commande à table', 'Ordering at the table'), (D, 'Promotions, événements, commentaires', 'Promotions, events, feedback'), (B, 'Réservation et liste d’attente', 'Reservations and waitlist'), (B, 'Paiement et pourboire', 'Payment and tips'), (B, 'Commandes à emporter', 'Takeout')]),
   dict(id='spa', fr='Salons et spas', en='Salons and spas', titre_fr='Salons de coiffure, spas et beauté', titre_en='Hair salons, spas and beauty',
-       intro_fr='Une carte à chaque poste et dans chaque salle de soins&nbsp;: le prochain rendez-vous, les produits, l’avis — pendant que le client est encore là.',
-       intro_en='A card at every station and in every treatment room: the next appointment, the products, the review — while the client is still there.',
+       intro_fr='Une carte à chaque poste et dans chaque salle de soins&nbsp;: le prochain rendez-vous, les produits et l’avis, pendant que le client est encore là.',
+       intro_en='A card at every station and in every treatment room: the next appointment, the products and the review, while the client is still there.',
        lieux=[('Postes de coiffure', 'Styling stations', 10), ('Salles de soins', 'Treatment rooms', 6), ('Salle d’attente', 'Waiting area', 5), ('Réception', 'Front desk', 4)],
        f=[(D, 'Avis Google, offert à tous', 'Google reviews, offered to everyone'), (D, 'Votre outil de rendez-vous actuel, en un tap', 'Your current booking tool, in one tap'), (B, 'Réservation de rendez-vous avec Tapora', 'Appointment booking through Tapora'), (B, 'Catalogue des services et tarifs', 'Service catalogue and prices'), (B, 'Consultation de styles', 'Style lookbook'), (B, 'Produits recommandés', 'Recommended products'), (B, 'Cartes-cadeaux', 'Gift cards'), (B, 'Formulaire de satisfaction', 'Satisfaction form'), (B, 'Conseils après le traitement', 'Aftercare advice')]),
   dict(id='clinique', fr='Cliniques', en='Clinics', titre_fr='Cliniques dentaires et professionnelles', titre_en='Dental and professional clinics',
@@ -188,8 +189,8 @@ SCENARIOS = [
        designs_en='1 design for the 40 tables. 2 designs would need 50 cards (25 + 25).', seg=[
     ('Tables', 'Tables', 'menu et appel du serveur', 'menu and call the server', 40, '#c2552f')]),
   dict(id='resto50', fr='«' + NB + '50 cartes pour nos tables' + NB + '»', en='“50 cards for our tables”',
-       designs_fr='1 design à votre logo — ou 2 designs de 25 cartes chacun.',
-       designs_en='1 design with your logo — or 2 designs of 25 cards each.', seg=[
+       designs_fr='1 design à votre logo, ou 2 designs de 25 cartes chacun.',
+       designs_en='1 design with your logo, or 2 designs of 25 cards each.', seg=[
     ('Tables', 'Tables', 'menu, à votre logo et à vos couleurs', 'menu, with your logo and colours', 50, '#2f5c47')]),
 ]
 
@@ -210,8 +211,8 @@ FAQ = [
    'How do you change where a card leads?', 'You write to us and it’s done, without touching the card: the chip points to a Tapora address and we handle the redirect. Batch changes, scheduled destinations and self-service are coming soon.'),
   ('Que veut dire «&nbsp;Bientôt&nbsp;»&nbsp;?', 'Ces fonctions sont en construction chez Tapora. Elles ne sont pas encore vendues&nbsp;: elles passeront à «&nbsp;Disponible&nbsp;» sur cette page le jour où elles fonctionneront pour de vrai. Seules les fonctions «&nbsp;Disponible&nbsp;» font partie d’une commande.',
    'What does “Coming soon” mean?', 'These features are being built at Tapora. They aren’t sold yet: they’ll switch to “Available” on this page the day they really work. Only “Available” features are part of an order.'),
-  ('NFC ou code QR&nbsp;?', 'Les deux, sur la même carte. Le client approche son téléphone — tous les iPhone depuis le XR et la grande majorité des Android — ou scanne le code avec l’appareil photo. Aucune application à installer.',
-   'NFC or QR code?', 'Both, on the same card. Guests tap their phone — every iPhone since the XR and the vast majority of Android phones — or scan the code with the camera. No app to install.'),
+  ('NFC ou code QR&nbsp;?', 'Les deux, sur la même carte. Le client approche son téléphone (tous les iPhone depuis le XR et la grande majorité des Android) ou scanne le code avec l’appareil photo. Aucune application à installer.',
+   'NFC or QR code?', 'Both, on the same card. Guests tap their phone (every iPhone since the XR and the vast majority of Android phones) or scan the code with the camera. No app to install.'),
   ('Quelles données gardez-vous sur mes clients&nbsp;?', 'Les statistiques sont toujours incluses gratuitement, pour toutes les commandes Entreprise et pour toutes les cartes à l’unité. Elles ne gardent aucune adresse IP et aucun identifiant&nbsp;: seulement l’heure du tap, le canal (NFC ou code QR) et le type d’appareil. Conformément à la Loi&nbsp;25, rien n’est vendu ni partagé.',
    'What data do you keep about my customers?', 'Stats are always included free, for every Business order and for every individual card. They keep no IP address and no identifier: only the time of the tap, the channel (NFC or QR code) and the device type. In line with Québec’s Law 25, nothing is sold or shared.'),
   ('Dans quelles langues&nbsp;?', 'Les cartes&nbsp;: le français d’abord au Québec, l’anglais d’abord ailleurs. Le menu et les pages de services s’affichent dans 10 langues, au choix du client.',
@@ -223,11 +224,11 @@ FAQ = [
 ]
 
 DEMO = [
-  ('services', D, 'Services de l’hôtel', 'Ménage, serviettes, départ tardif&nbsp;: un tap, et la demande arrive à la réception avec le numéro de la chambre.', 'Hotel services', 'Housekeeping, towels, late check-out: one tap, and the request reaches the front desk with the room number.', '🛎️'),
-  ('restaurant', D, 'Restaurant et menus', 'Le menu du restaurant et du service aux chambres, dans la langue du client, avec les allergènes.', 'Restaurant and menus', 'The restaurant and room-service menus, in the guest’s language, with allergens.', '🍽️'),
-  ('soin', B, 'Réserver un soin', 'Le client choisit son soin et son heure au spa, sans appeler la réception.', 'Book a treatment', 'The guest picks a spa treatment and a time, without calling the front desk.', '💆'),
-  ('guide', D, 'Guide touristique', 'Les attractions, les restaurants et le transport du coin, choisis par l’hôtel.', 'Local guide', 'Attractions, restaurants and transportation nearby, picked by the hotel.', '🗺️'),
-  ('experience', D, 'Partager mon expérience', 'La note, puis le lien Google offert à tous — et un mot privé pour l’équipe, si le client le veut.', 'Share my experience', 'The rating, then the Google link offered to everyone — and a private note for the team, if the guest wants.', '★'),
+  ('services', D, 'Services de l’hôtel', 'Ménage, serviettes, départ tardif&nbsp;: un tap, et la demande arrive à la réception avec le numéro de la chambre.', 'Hotel services', 'Housekeeping, towels, late check-out: one tap, and the request reaches the front desk with the room number.', 'i-cloche'),
+  ('restaurant', D, 'Restaurant et menus', 'Le menu du restaurant et du service aux chambres, dans la langue du client, avec les allergènes.', 'Restaurant and menus', 'The restaurant and room-service menus, in the guest’s language, with allergens.', 'i-resto'),
+  ('soin', B, 'Réserver un soin', 'Le client choisit son soin et son heure au spa, sans appeler la réception.', 'Book a treatment', 'The guest picks a spa treatment and a time, without calling the front desk.', 'i-soin'),
+  ('guide', D, 'Guide touristique', 'Les attractions, les restaurants et le transport du coin, choisis par l’hôtel.', 'Local guide', 'Attractions, restaurants and transportation nearby, picked by the hotel.', 'i-lieu'),
+  ('experience', D, 'Partager mon expérience', 'La note, puis le lien Google offert à tous, et un mot privé pour l’équipe si le client le veut.', 'Share my experience', 'The rating, then the Google link offered to everyone, and a private note for the team if the guest wants.', 'i-etoile'),
 ]
 
 def argent(n, l):
@@ -252,15 +253,26 @@ def page(l):
     def ligne(etat, txt):
         return f'<li class="ep-ligne" data-etat="{etat}"><span>{txt}</span>{badge()}</li>'
 
-    # ---- catalogue
-    cat_html = []
-    for cat, etat, tf, df, te, de, extra in FONCTIONS:
-        icone = CATS[cat][2]
-        nom_cat = CATS[cat][0] if fr else CATS[cat][1]
-        ajout = f'<span class="ep-ajout">✦ {t("Ajout Tapora", "Tapora extra")}</span>' if extra else ''
-        cat_html.append(
-            f'<li class="ep-fonction" data-cat="{cat}" data-etat="{etat}"><span class="ep-icone"><svg aria-hidden="true"><use href="#{icone}"/></svg></span>{badge()}'
-            f'<span class="ep-texte"><span class="ep-cat">{nom_cat}</span><strong>{t(tf, te)}</strong>{t(df, de)}{ajout}</span></li>')
+    # ---- catalogue : un panneau par catégorie, une ligne par fonction
+    groupes = []
+    for cat, (nom_fr, nom_en, icone) in CATS.items():
+        lignes_cat = []
+        for c, etat, tf, df, te, de, extra in FONCTIONS:
+            if c != cat:
+                continue
+            ajout = f' <span class="ep-ajout">Tapora</span>' if extra else ''
+            lignes_cat.append(
+                f'<li class="ep-fonction" data-cat="{cat}" data-etat="{etat}"><span class="ep-texte"><strong>{t(tf, te)}{ajout}</strong><span>{t(df, de)}</span></span>{badge()}</li>')
+        groupes.append(f'''
+          <section class="ep-groupe" data-groupe="{cat}" aria-labelledby="groupe-{cat}">
+            <header class="ep-groupe-tete">
+              <span class="ep-groupe-icone" aria-hidden="true"><svg><use href="#{icone}"/></svg></span>
+              <h3 id="groupe-{cat}">{t(nom_fr, nom_en)}</h3>
+              <span class="ep-groupe-compte" data-compte-groupe="{cat}"></span>
+            </header>
+            <ul class="ep-rangs">{"".join(chr(10) + "              " + x for x in lignes_cat)}
+            </ul>
+          </section>''')
     nb_d = sum(1 for f in FONCTIONS if f[1] == D)
     nb_b = sum(1 for f in FONCTIONS if f[1] == B)
 
@@ -300,12 +312,12 @@ def page(l):
     tot0 = sum(x[4] for x in s0['seg'])
 
     # ---- plateforme
-    securite_html = ''.join(f'<li class="ep-securite" data-etat="disponible" data-incline data-apparait><span class="ep-securite-icone" aria-hidden="true">{i}</span>{badge()}<strong>{t(a, c)}</strong><span>{t(b, d)}</span></li>' for i, a, b, c, d in SECURITE)
+    securite_html = ''.join(f'<li class="ep-securite" data-etat="disponible" data-apparait><span class="ep-securite-icone" aria-hidden="true"><svg><use href="#{i}"/></svg></span>{badge()}<strong>{t(a, c)}</strong><span>{t(b, d)}</span></li>' for i, a, b, c, d in SECURITE)
     plat = ''.join(f'<li class="ep-plateforme" data-etat="{e}">{badge()}<strong>{t(a, c)}</strong><span>{t(b, d)}</span></li>' for e, a, b, c, d in PLATEFORME)
 
     # ---- démo
-    demo_boutons = ''.join(f'<button type="button" class="ep-option" data-option="{k}" aria-pressed="{"true" if i == 0 else "false"}"><span class="ep-option-icone" aria-hidden="true">{ic}</span><span>{t(a, c)}</span><span aria-hidden="true">→</span></button>' for i, (k, e, a, b, c, d, ic) in enumerate(DEMO))
-    demo_panneaux = ''.join(f'<div class="ep-option-panneau" data-option-panneau="{k}" data-etat="{e}"><p class="flex items-center gap-2 text-2xl" aria-hidden="true">{ic}</p><h3 class="mt-3 text-xl font-semibold">{t(a, c)}</h3>{badge()}<p class="mt-2 leading-relaxed text-encre-doux">{t(b, d)}</p></div>' for k, e, a, b, c, d, ic in DEMO)
+    demo_boutons = ''.join(f'<button type="button" class="ep-option" data-option="{k}" aria-pressed="{"true" if i == 0 else "false"}"><span class="ep-option-icone" aria-hidden="true"><svg><use href="#{ic}"/></svg></span><span>{t(a, c)}</span><span aria-hidden="true">→</span></button>' for i, (k, e, a, b, c, d, ic) in enumerate(DEMO))
+    demo_panneaux = ''.join(f'<div class="ep-option-panneau" data-option-panneau="{k}" data-etat="{e}"><span class="ep-option-icone ep-option-icone-grande" aria-hidden="true"><svg><use href="#{ic}"/></svg></span><h3 class="mt-4 text-xl font-semibold">{t(a, c)}</h3>{badge()}<p class="mt-2 leading-relaxed text-encre-doux">{t(b, d)}</p></div>' for k, e, a, b, c, d, ic in DEMO)
 
     # ---- feuille de route
     route = ''.join(f'<li class="ep-phase" data-etat="bientot"><span class="ep-phase-point" aria-hidden="true"></span><p class="text-sm font-semibold uppercase tracking-[0.16em] text-brique">{t(a, b)}</p>{badge()}<p class="mt-1.5 leading-relaxed">{t(c, d)}</p></li>' for a, b, c, d in FEUILLE)
@@ -333,10 +345,10 @@ def page(l):
           'provider': {'@type': 'Organization', '@id': f'{base}/#organisation', 'name': 'Tapora Cards', 'legalName': 'Tapora S.E.N.C.', 'url': f'{base}/'},
           'areaServed': [{'@type': 'AdministrativeArea', 'name': 'Québec'}, {'@type': 'Country', 'name': 'Canada'}],
           'audience': {'@type': 'BusinessAudience', 'audienceType': t('Hôtels, restaurants, cafés, bars, spas, salons, cliniques, agences immobilières, concessionnaires, gyms, événements', 'Hotels, restaurants, cafés, bars, spas, salons, clinics, real-estate agencies, car dealerships, gyms, events')},
-          'description': t('Des cartes NFC et QR à vos couleurs, sur chaque table, dans chaque chambre, à chaque comptoir. Chaque carte ouvre la destination de votre choix — menu, services, demandes, avis Google — avec des statistiques par carte et par groupe. Destination modifiable sans remplacer la carte.', 'NFC and QR cards in your colours, on every table, in every room, at every counter. Each card opens the destination you choose — menu, services, requests, Google reviews — with stats per card and per group. The destination can change without replacing the card.'),
+          'description': t('Des cartes NFC et QR à vos couleurs, sur chaque table, dans chaque chambre, à chaque comptoir. Chaque carte ouvre la destination de votre choix (menu, services, demandes, avis Google), avec des statistiques par carte et par groupe. Destination modifiable sans remplacer la carte.', 'NFC and QR cards in your colours, on every table, in every room, at every counter. Each card opens the destination you choose (menu, services, requests, Google reviews), with stats per card and per group. The destination can change without replacing the card.'),
           'offers': {
             '@type': 'Offer',
-            'name': t('Tapora Entreprise — prix par carte, design sur mesure inclus', 'Tapora Business — price per card, custom design included'),
+            'name': t('Tapora Entreprise : prix par carte, design sur mesure inclus', 'Tapora Business: price per card, custom design included'),
             'price': '30.00', 'priceCurrency': 'CAD',
             'eligibleQuantity': {'@type': 'QuantitativeValue', 'minValue': 25, 'unitText': t('cartes', 'cards')},
             'availability': 'https://schema.org/InStock',
@@ -353,10 +365,10 @@ def page(l):
     ld_json = json.dumps(ld, ensure_ascii=False, indent=2)
 
     titre = t('Tapora Entreprise — cartes NFC et QR sur mesure pour hôtels, restaurants et entreprises', 'Tapora Business — custom NFC and QR cards for hotels, restaurants and businesses')
-    desc = t('Des cartes NFC et QR à vos couleurs, sur chaque table et dans chaque chambre : menu, services, demandes, avis Google, réservations. 30 $ la carte, dès 25 cartes. Entreprise québécoise.',
-             'NFC and QR cards in your colours, on every table and in every room: menus, services, requests, Google reviews, bookings. $30 per card, from 25 cards. A Québec business.')
-    og_titre = t('Tapora Entreprise — plus que des avis, plus qu’une carte', 'Tapora Business — connect your customers to more')
-    og_desc = t('Chaque carte ouvre ce que vous voulez y mettre : menu, services de l’hôtel, demandes, avis Google. 30 $ la carte, dès 25.', 'Each card opens whatever you choose: menus, hotel services, requests, Google reviews. $30 per card, from 25.')
+    desc = t('Des cartes NFC et QR à vos couleurs, sur chaque table et dans chaque chambre : menu, services, demandes, avis Google, réservations. 30 $ la carte, 25 cartes minimum par design. Entreprise québécoise.',
+             'NFC and QR cards in your colours, on every table and in every room: menus, services, requests, Google reviews, bookings. $30 per card, 25 cards minimum per design. A Québec business.')
+    og_titre = t('Tapora Entreprise : une carte par table, par chambre, par comptoir', 'Tapora Business: a card for every table, room and counter')
+    og_desc = t('Chaque carte ouvre ce dont le client a besoin à cet endroit : menu, services de l’hôtel, demandes, avis Google. 30 $ la carte.', 'Each card opens what the guest needs right there: menus, hotel services, requests, Google reviews. $30 per card.')
     og_image = f'{base}/og.png' if fr else f'{base}/og-en.png'
 
     return f'''<!doctype html>
@@ -404,11 +416,26 @@ def page(l):
   <!-- {t("Les icônes de la page, dessinées une fois.", "The page’s icons, drawn once.")} -->
   <svg width="0" height="0" class="absolute" aria-hidden="true" focusable="false">
     <defs>
-      <symbol id="i-cartes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><rect x="6" y="9" width="4.2" height="3.4" rx=".8"/><path d="M13.5 15h4"/></symbol>
-      <symbol id="i-client" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5h14a2 2 0 0 1 2 2v8.5a2 2 0 0 1-2 2h-7l-4.2 3.2V17H5a2 2 0 0 1-2-2V6.5a2 2 0 0 1 2-2z"/><path d="M8 9.5h8M8 12.5h5"/></symbol>
-      <symbol id="i-resto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v7.5M5 3v4.5a2 2 0 0 0 4 0V3M7 10.5V21M16.5 3c-1.8 1.6-2.7 4.2-2.7 7.3h2.7V21"/></symbol>
-      <symbol id="i-hotel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5V19M3 15h18v4M21 15v-2.5a3 3 0 0 0-3-3h-7V15"/><circle cx="7" cy="11.7" r="1.9"/></symbol>
-      <symbol id="i-plateforme" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3.5 9 4.8-9 4.8-9-4.8 9-4.8z"/><path d="m3 12.6 9 4.8 9-4.8"/><path d="m3 16.6 9 4.8 9-4.8" opacity=".55"/></symbol>
+      <symbol id="i-cartes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><rect x="6" y="9" width="4.2" height="3.4" rx=".8"/><path d="M13.5 15h4"/></symbol>
+      <symbol id="i-client" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5h14a2 2 0 0 1 2 2v8.5a2 2 0 0 1-2 2h-7l-4.2 3.2V17H5a2 2 0 0 1-2-2V6.5a2 2 0 0 1 2-2z"/><path d="M8 9.5h8M8 12.5h5"/></symbol>
+      <symbol id="i-resto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3v7.5M5 3v4.5a2 2 0 0 0 4 0V3M7 10.5V21M16.5 3c-1.8 1.6-2.7 4.2-2.7 7.3h2.7V21"/></symbol>
+      <symbol id="i-hotel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5V19M3 15h18v4M21 15v-2.5a3 3 0 0 0-3-3h-7V15"/><circle cx="7" cy="11.7" r="1.9"/></symbol>
+      <symbol id="i-plateforme" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3.5 9 4.8-9 4.8-9-4.8 9-4.8z"/><path d="m3 12.6 9 4.8 9-4.8"/><path d="m3 16.6 9 4.8 9-4.8" opacity=".55"/></symbol>
+      <symbol id="i-cloche" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17a7 7 0 0 1 14 0"/><path d="M3.5 17h17M5 20h14M12 10V8M10.3 8h3.4"/></symbol>
+      <symbol id="i-soin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19.5c-4.1 0-7.2-2.6-7.6-6.2 2.6 0 5.2 1 7.6 3.6 2.4-2.6 5-3.6 7.6-3.6-.4 3.6-3.5 6.2-7.6 6.2z"/><path d="M12 16.9c-1.5-1.6-2.3-3.6-2.3-5.6s.9-3.9 2.3-5.2c1.4 1.3 2.3 3.2 2.3 5.2s-.8 4-2.3 5.6z"/></symbol>
+      <symbol id="i-lieu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.4-6.5-11a6.5 6.5 0 0 1 13 0c0 5.6-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></symbol>
+      <symbol id="i-etoile" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3.8 2.5 5.2 5.7.8-4.1 4 1 5.7L12 16.8l-5.1 2.7 1-5.7-4.1-4 5.7-.8z"/></symbol>
+      <symbol id="i-cadenas" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="9.5" rx="2.2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5M12 14.4v2.2"/></symbol>
+      <symbol id="i-lien" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.2 1.2"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.2-1.2"/></symbol>
+      <symbol id="i-bouclier" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l7 2.6v5.4c0 4.4-2.9 8.1-7 9.5-4.1-1.4-7-5.1-7-9.5V6.1z"/><path d="M12 8.5v4"/><path d="M12 15.5h.01"/></symbol>
+      <symbol id="i-bouclier-coche" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l7 2.6v5.4c0 4.4-2.9 8.1-7 9.5-4.1-1.4-7-5.1-7-9.5V6.1z"/><path d="m9 12.2 2.1 2.1 4-4.2"/></symbol>
+      <symbol id="i-cle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="3.8"/><path d="M10.7 12.3 19 4M15.8 7.2l2.6 2.6M13.6 9.4l1.9 1.9"/></symbol>
+      <symbol id="i-oeil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12s3.2-5.7 8.5-5.7c1.6 0 3 .5 4.2 1.2M20.5 12s-3.2 5.7-8.5 5.7c-1.6 0-3-.5-4.2-1.2"/><path d="M10 10a3 3 0 0 0 4 4M4.5 4.5l15 15"/></symbol>
+      <symbol id="i-horloge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="7.5"/><path d="M12 9.2V13l2.6 1.6M9.6 3h4.8"/></symbol>
+      <symbol id="i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.3 2.5 3.5 5.3 3.5 8.5s-1.2 6-3.5 8.5c-2.3-2.5-3.5-5.3-3.5-8.5s1.2-6 3.5-8.5z"/></symbol>
+      <symbol id="i-telecharger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v10.5M7.6 10.2 12 14.6l4.4-4.4M5 19.5h14"/></symbol>
+      <symbol id="i-courriel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.2"/><path d="m4.2 7 7.8 6 7.8-6"/></symbol>
+      <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8h.01"/></symbol>
       <symbol id="i-coche" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4 10.5 4 4 8-9"/></symbol>
       <symbol id="i-nfc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7.5 8.5a5 5 0 0 1 0 7M11 6a8.5 8.5 0 0 1 0 12M14.5 3.5a12 12 0 0 1 0 17"/></symbol>
     </defs>
@@ -444,25 +471,24 @@ def page(l):
         <div class="relative">
           <div class="flex flex-wrap items-center gap-2" data-apparait>
             <p class="inline-flex items-center gap-2 rounded-full bg-sable px-3.5 py-1.5 text-[13px] font-medium text-encre-doux">
-              <span class="text-brique">✦</span> {t("Tapora Entreprise · dès 25 cartes", "Tapora Business · from 25 cards")}
+              {t("Hôtels · restaurants · commerces", "Hotels · restaurants · businesses")}
             </p>
           </div>
           <h1 class="titre mt-6 text-[2.75rem] leading-[1.04] font-medium sm:text-6xl lg:text-[3.7rem]">
-            <span class="titre-ligne block">{t("Plus que des avis.", "More than reviews.")}</span>
-            <span class="titre-ligne block">{t("Plus qu’une", "More than a")}
-              <span class="souligne italic text-brique">{t("carte", "card")}<svg viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path class="trait" d="M3 14 C 40 4, 90 3, 120 9 S 175 16, 197 6" fill="none" stroke="#e4a53a" stroke-width="5" stroke-linecap="round"/></svg></span>.</span>
+            <span class="titre-ligne block">{t("Une carte par table,", "A card for every table,")}</span>
+            <span class="titre-ligne block">{t("par chambre, par", "every room, every")}
+              <span class="souligne italic text-brique">{t("comptoir", "counter")}<svg viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path class="trait" d="M3 14 C 40 4, 90 3, 120 9 S 175 16, 197 6" fill="none" stroke="#e4a53a" stroke-width="5" stroke-linecap="round"/></svg></span>.</span>
           </h1>
-          <p class="titre mt-5 text-2xl italic text-sapin sm:text-[1.7rem]" data-apparait>{t("Reliez vos clients à tout ce que vous offrez.", "Connect your customers to more.")}</p>
-          <p class="mt-5 max-w-xl text-lg leading-relaxed text-encre-doux" data-apparait>
-            {t("Tapora Entreprise transforme vos cartes NFC et QR en points de contact entièrement personnalisables. Sur chaque table, dans chaque chambre, à chaque comptoir&nbsp;: chacune ouvre ce que vous voulez y mettre — votre menu, vos services, vos réservations, votre page d’avis Google — et vous voyez laquelle travaille le plus.",
-               "Tapora Business turns NFC and QR cards into fully customizable digital touchpoints. On every table, in every room, at every counter: each one opens whatever you choose — your menu, your services, your bookings, your Google review page — and you see which one works hardest.")}
+          <p class="mt-6 max-w-xl text-lg leading-relaxed text-encre-doux" data-apparait>
+            {t("Chaque carte ouvre ce dont votre client a besoin à cet endroit&nbsp;: le menu, le service aux chambres, votre lien de réservation ou votre page d’avis Google. Ensuite, vous voyez laquelle sert le plus.",
+               "Each card opens what your guest needs right there: the menu, room service, your booking link or your Google review page. Then you see which one gets used most.")}
           </p>
           <div class="mt-9 flex flex-wrap items-center gap-4" data-apparait>
             <a href="{form}" data-aimant class="bouton-fleche group inline-flex items-center gap-2 rounded-full bg-brique px-7 py-4 text-[15px] font-semibold text-creme shadow-[0_10px_24px_-10px_rgb(158_65_34_/_0.7)] transition-colors hover:bg-brique-fonce">{t("Parler de mon projet", "Talk about my project")} <span class="fleche" aria-hidden="true">→</span></a>
-            <a href="#catalogue" class="group inline-flex items-center gap-2 px-2 py-4 text-[15px] font-medium underline decoration-ligne decoration-2 underline-offset-[6px] transition hover:decoration-brique">{t("Tout ce qu’une carte peut ouvrir", "Everything a card can open")}</a>
+            <a href="#catalogue" class="group inline-flex items-center gap-2 px-2 py-4 text-[15px] font-medium underline decoration-ligne decoration-2 underline-offset-[6px] transition hover:decoration-brique">{t("Voir les fonctions", "See the features")}</a>
           </div>
           <ul class="mt-10 flex flex-wrap gap-x-7 gap-y-2 text-[15px] text-encre-doux" data-apparait>
-            <li class="flex items-center gap-2"><svg class="size-4 text-sapin" aria-hidden="true"><use href="#i-coche"/></svg>{t("30&nbsp;$ la carte, dès 25", "$30 per card, from 25")}</li>
+            <li class="flex items-center gap-2"><svg class="size-4 text-sapin" aria-hidden="true"><use href="#i-coche"/></svg>{t("30&nbsp;$ la carte, 25 minimum par design", "$30 per card, 25 minimum per design")}</li>
             <li class="flex items-center gap-2"><svg class="size-4 text-sapin" aria-hidden="true"><use href="#i-coche"/></svg>{t("Destination modifiable, sans changer la carte", "Change the destination, keep the card")}</li>
             <li class="flex items-center gap-2"><svg class="size-4 text-sapin" aria-hidden="true"><use href="#i-coche"/></svg>{t("Fait au Québec", "Made in Québec")}</li>
           </ul>
@@ -567,7 +593,7 @@ def page(l):
             <span class="shrink-0">{t("Cette carte ouvre&nbsp;:", "This card opens:")}</span> <strong id="ep-destination" class="truncate font-semibold text-miel">{t("Menu du restaurant", "Restaurant menu")}</strong>
           </p>
           <div id="ep-note" class="pointer-events-none absolute bottom-0 left-2 z-20 max-sm:hidden">
-            <p class="titre -rotate-3 text-lg italic text-encre-doux">{t("une carte, la destination de votre choix.", "one card, the destination you choose.")}</p>
+            <p class="titre -rotate-3 text-lg italic text-encre-doux">{t("la même carte, cinq destinations.", "same card, five destinations.")}</p>
           </div>
         </div>
       </div>
@@ -586,8 +612,8 @@ def page(l):
     <section id="niveaux" class="mx-auto max-w-6xl scroll-mt-20 px-5 py-28">
       <div class="max-w-2xl">
         <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brique" data-apparait>{t("Comment ça marche", "How it works")}</p>
-        <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("Tapora ne vend pas seulement des cartes.", "Tapora doesn’t just sell cards.")}</h2>
-        <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>{t("Tapora vend des points de connexion, physiques et numériques, entièrement personnalisables. La puce ne change jamais&nbsp;; ce qu’elle ouvre, oui&nbsp;: un lien aujourd’hui, une page complète demain.", "Tapora sells physical and digital connection points, fully customizable. The chip never changes; what it opens can: a link today, a full page tomorrow.")}</p>
+        <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("Trois façons d’utiliser une carte.", "Three ways to use a card.")}</h2>
+        <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>{t("La puce ne change jamais. Ce qu’elle ouvre, oui&nbsp;: un simple lien aujourd’hui, une page complète demain.", "The chip never changes. What it opens can: a simple link today, a full page tomorrow.")}</p>
       </div>
       <div class="mt-16 grid gap-6 md:grid-cols-3">
         <article data-incline data-etat="disponible" class="ep-niveau carte-papier relative overflow-hidden rounded-[2rem] p-7">
@@ -607,7 +633,7 @@ def page(l):
           {badge()}
           <span class="titre text-5xl text-sapin">2</span>
           <h3 class="mt-4 text-xl font-semibold">{t("Une carte, une page", "One card, one page")}</h3>
-          <p class="mt-2 leading-relaxed text-encre-doux">{t("Une mini-page à votre image, avec plusieurs boutons&nbsp;: le menu, les services, l’avis, le contact. Pour tous les secteurs — c’est déjà le cas pour les restaurants et les hôtels.", "A mini-page in your branding, with several buttons: the menu, services, reviews, contact. For every industry — already live for restaurants and hotels.")}</p>
+          <p class="mt-2 leading-relaxed text-encre-doux">{t("Une mini-page à votre image, avec plusieurs boutons&nbsp;: le menu, les services, l’avis, le contact. Déjà en place pour les restaurants et les hôtels, bientôt pour tous les secteurs.", "A mini-page in your branding, with several buttons: the menu, services, reviews, contact. Already live for restaurants and hotels, coming soon for every industry.")}</p>
           <div class="mx-auto mt-6 w-40 rounded-2xl bg-encre p-1.5" aria-hidden="true">
             <div class="space-y-1 rounded-xl bg-creme p-2 text-[9px] font-semibold">
               <p class="titre text-[12px]">Spa Lumière</p>
@@ -640,8 +666,8 @@ def page(l):
       <div class="mx-auto grid max-w-6xl items-center gap-14 px-5 lg:grid-cols-[0.9fr_1.1fr]">
         <div>
           <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brique" data-apparait>{t("Une carte, plusieurs actions", "One card, several actions")}</p>
-          <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("Bienvenue dans votre espace client.", "Welcome to your guest space.")}</h2>
-          <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>{t("Au lieu d’un seul lien, la carte ouvre une mini-page à l’image de l’établissement. Touchez une option pour voir ce qu’elle fait.", "Instead of a single link, the card opens a mini-page in the venue’s branding. Tap an option to see what it does.")}</p>
+          <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("Une mini-page à l’image de l’hôtel.", "A mini-page in the hotel’s branding.")}</h2>
+          <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>{t("Au lieu d’un seul lien, la carte ouvre une page avec plusieurs boutons. Touchez une option pour voir ce qu’elle fait.", "Instead of a single link, the card opens a page with several buttons. Tap an option to see what it does.")}</p>
           <div id="ep-option-detail" class="mt-8 min-h-[12rem]" aria-live="polite" data-apparait>
             {demo_panneaux}
           </div>
@@ -658,7 +684,7 @@ def page(l):
               <div class="ep-maison rounded-2xl px-5 py-6 text-creme">
                 <p class="text-[10px] font-semibold uppercase tracking-[0.24em] text-miel">{t("Hôtel", "Hotel")}</p>
                 <p class="titre mt-1 text-2xl font-semibold leading-tight">Maison Royale</p>
-                <p class="mt-1 text-[13px] text-creme/75">{t("Bienvenue dans votre espace client", "Welcome to your guest space")}</p>
+                <p class="mt-1 text-[13px] text-creme/75">{t("Bienvenue, chambre 214", "Welcome, room 214")}</p>
               </div>
               <div class="mt-4 grid gap-2" role="group" aria-label="{t("Options de la démonstration", "Demo options")}">
                 {demo_boutons}
@@ -666,8 +692,25 @@ def page(l):
               <p class="mt-5 text-center text-[11px] text-encre-doux">{t("Propulsé par Tapora Cards", "Powered by Tapora Cards")}</p>
             </div>
           </div>
-          <p class="mt-5 text-center text-sm italic text-encre-doux">{t("Maquette illustrative&nbsp;: touchez une option pour voir son utilisation.", "Illustrative mockup: tap an option to see how it’s used.")}</p>
+          <p class="mt-5 text-center text-sm italic text-encre-doux">{t("Maquette&nbsp;: touchez une option.", "Mockup: tap an option.")}</p>
         </div>
+      </div>
+    </section>
+
+    <!-- ============================== L'ÉQUIPE ============================== -->
+    <section id="equipe" class="mx-auto max-w-6xl scroll-mt-20 px-5 py-28">
+      <div class="grid items-center gap-12 lg:grid-cols-[0.85fr_1.15fr]">
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brique" data-apparait>{t("Le portail de l’équipe", "The staff portal")}</p>
+          <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("La demande arrive sur le téléphone de l’équipe.", "The request lands on your team’s phone.")}</h2>
+          <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>{t("Le serveur, l’addition, une commande, des serviettes&nbsp;: chaque demande arrive en notification, avec le numéro de la table ou de la chambre. L’équipe répond «&nbsp;J’arrive&nbsp;», et le client le voit.", "The server, the bill, an order, fresh towels: every request arrives as a notification, with the table or room number. Your team taps “On my way”, and the guest sees it.")}</p>
+          <ul class="mt-7 space-y-2 text-[15px]" data-apparait>
+            {ligne(D, t("Sur iPhone et Android, sans application à télécharger", "On iPhone and Android, with no app to download"))}
+            {ligne(D, t("Chaque appareil peut ne recevoir que sa section", "Each device can get only its own section"))}
+            {ligne(D, t("«&nbsp;J’arrive&nbsp;» et «&nbsp;Fait&nbsp;», vus par le client en direct", "“On my way” and “Done”, seen by the guest live"))}
+          </ul>
+        </div>
+        {figure_notifs("equipe", l)}
       </div>
     </section>
 
@@ -676,9 +719,9 @@ def page(l):
       <div class="mx-auto max-w-6xl px-5">
         <div class="flex flex-wrap items-end justify-between gap-6">
           <div class="max-w-2xl">
-            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brique" data-apparait>{t("Ce qu’une carte peut ouvrir", "What a card can open")}</p>
-            <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("Une carte. Des possibilités infinies.", "One card. Endless possibilities.")}</h2>
-            <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>{t("«&nbsp;Disponible&nbsp;»&nbsp;: ça fonctionne aujourd’hui — la carte ouvre votre page existante, ou un module Tapora déjà en place. «&nbsp;Bientôt&nbsp;»&nbsp;: en construction chez Tapora, pas encore vendu. Et pour tout ce qui n’est pas ici, on le construit pour vous&nbsp;: le prix dépend de ce que vous demandez.", "“Available”: it works today — the card opens your existing page, or a Tapora module that’s already live. “Coming soon”: being built at Tapora, not sold yet. And for anything that isn’t here, we build it for you: the price depends on what you ask for.")}</p>
+            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brique" data-apparait>{t("Les fonctions", "Features")}</p>
+            <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("Ce qu’une carte peut ouvrir.", "What a card can open.")}</h2>
+            <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>{t("«&nbsp;Disponible&nbsp;»&nbsp;: ça fonctionne aujourd’hui, avec votre page existante ou un module Tapora déjà en place. «&nbsp;Bientôt&nbsp;»&nbsp;: en construction, pas encore vendu. Pour tout le reste, on le construit pour vous&nbsp;: le prix dépend de ce que vous demandez.", "“Available”: it works today, with your existing page or a Tapora module that’s already live. “Coming soon”: being built, not sold yet. For everything else, we build it for you: the price depends on what you ask for.")}</p>
           </div>
           <p class="flex gap-5 text-sm text-encre-doux" data-apparait>
             <span><strong id="ep-total-disponible" class="titre inline-block min-w-[2ch] text-3xl text-sapin">{nb_d}</strong> {t("disponibles", "available")}</span>
@@ -701,9 +744,8 @@ def page(l):
           </div>
         </div>
 
-        <ul id="ep-fonctions" class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {"".join(chr(10) + "          " + x for x in cat_html)}
-        </ul>
+        <div id="ep-fonctions" class="ep-colonnes mt-10">{"".join(groupes)}
+        </div>
         <p id="ep-vide" class="mt-8 hidden rounded-2xl bg-creme px-5 py-4 text-center text-encre-doux">{t("Aucune fonction ne correspond à ce filtre pour l’instant.", "No feature matches this filter yet.")}</p>
       </div>
     </section>
@@ -714,7 +756,7 @@ def page(l):
         <div class="max-w-2xl">
           <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brique" data-apparait>{t("Par secteur", "By industry")}</p>
           <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("Où vont les cartes, et ce qu’elles ouvrent.", "Where the cards go, and what they open.")}</h2>
-          <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>{t("Le marché est bien plus vaste que les commerces qui veulent des avis Google. «&nbsp;Disponible&nbsp;»&nbsp;: la carte ouvre votre page, votre vidéo ou votre PDF existants. «&nbsp;Bientôt&nbsp;»&nbsp;: Tapora bâtit l’outil.", "The market is far bigger than businesses that want Google reviews. “Available”: the card opens your existing page, video or PDF. “Coming soon”: Tapora is building the tool.")}</p>
+          <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>{t("Pour chaque secteur, où poser les cartes et ce qu’elles ouvrent. «&nbsp;Disponible&nbsp;»&nbsp;: la carte ouvre votre page, votre vidéo ou votre PDF. «&nbsp;Bientôt&nbsp;»&nbsp;: Tapora construit l’outil.", "For each industry, where the cards go and what they open. “Available”: the card opens your existing page, video or PDF. “Coming soon”: Tapora is building the tool.")}</p>
         </div>
 
         <div class="relative mt-12" data-apparait>
@@ -748,7 +790,7 @@ def page(l):
           </div>
           <div id="ep-barre" class="mt-6 flex h-14 w-full overflow-hidden rounded-2xl bg-sable" aria-hidden="true">{seg0}</div>
           <ul id="ep-legende" class="mt-6 grid gap-x-6 gap-y-3 text-[15px] sm:grid-cols-2">{leg0}</ul>
-          <p class="mt-6 flex gap-3 rounded-2xl bg-sable px-4 py-3 text-[15px] leading-relaxed"><span class="font-semibold text-brique" aria-hidden="true">✦</span><span id="ep-designs-note">{t(SCENARIOS[0]['designs_fr'], SCENARIOS[0]['designs_en'])}</span></p>
+          <p class="mt-6 flex gap-3 rounded-2xl bg-sable px-4 py-3 text-[15px] leading-relaxed"><svg class="mt-0.5 size-5 shrink-0 text-brique" aria-hidden="true"><use href="#i-info"/></svg><span id="ep-designs-note">{t(SCENARIOS[0]['designs_fr'], SCENARIOS[0]['designs_en'])}</span></p>
         </div>
 
         <div id="ep-calcul" class="relative overflow-hidden rounded-[2rem] bg-encre p-7 text-creme sm:p-9" data-apparait>
@@ -777,7 +819,7 @@ def page(l):
               <p class="text-sm text-creme/70" id="ep-detail">{t("25 cartes × 30&nbsp;$", "25 cards × $30")}</p>
               <p id="ep-total" class="titre mt-1 text-5xl font-medium text-miel">{argent(750, l)}</p>
             </div>
-            <p id="ep-minimum" class="hidden rounded-2xl bg-creme/10 px-4 py-3 text-[15px] leading-relaxed">{t("Minimum 25 cartes par design — à l’unité&nbsp;: 35&nbsp;$, sans minimum.", "Minimum 25 cards per design — individual cards: $35, no minimum.")} <a href="{prix_unite}" class="font-semibold text-miel underline underline-offset-4">{t("Voir les cartes à l’unité", "See individual cards")}</a></p>
+            <p id="ep-minimum" class="hidden rounded-2xl bg-creme/10 px-4 py-3 text-[15px] leading-relaxed">{t("Minimum 25 cartes par design. À l’unité&nbsp;: 35&nbsp;$, sans minimum.", "Minimum 25 cards per design. Individual cards: $35, no minimum.")} <a href="{prix_unite}" class="font-semibold text-miel underline underline-offset-4">{t("Voir les cartes à l’unité", "See individual cards")}</a></p>
             <p id="ep-minimum-designs" class="hidden rounded-2xl bg-creme/10 px-4 py-3 text-[15px] leading-relaxed" data-modele="{t("25 cartes minimum par design&nbsp;: pour {d} designs, il faut au moins {n} cartes.", "25 cards minimum per design: {d} designs need at least {n} cards.")}"></p>
           </div>
           <p class="relative mt-4 text-xs text-creme/55">{t("Prix des cartes, design sur mesure inclus. Les modules logiciels se chiffrent selon vos besoins.", "Card pricing, custom design included. Software modules are quoted to your needs.")}</p>
@@ -791,7 +833,7 @@ def page(l):
         <div>
           <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brique" data-apparait>{t("Toujours à jour", "Always up to date")}</p>
           <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("Changez la destination, pas la carte.", "Change the destination, not the card.")}</h2>
-          <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>{t("Une carte peut rester en place pendant des années. Son lien mène à une page modifiable&nbsp;: le menu change, la promotion finit, le site déménage, et la carte suit — sans remplacement physique.", "A card can stay in place for years. Its link leads to an editable page: the menu changes, the promotion ends, the website moves, and the card follows — no physical replacement.")}</p>
+          <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>{t("Une carte peut rester en place pendant des années. Son lien mène à une page modifiable&nbsp;: le menu change, la promotion finit, le site déménage, et la carte suit, sans être remplacée.", "A card can stay in place for years. Its link leads to an editable page: the menu changes, the promotion ends, the website moves, and the card follows, with nothing to replace.")}</p>
           <ul class="mt-8 space-y-2.5 text-[15px]" data-apparait>
             {ligne(D, t("Changement fait par Tapora, sur demande", "Change made by Tapora, on request"))}
             {ligne(B, t("Changement en lot, pour tout un groupe", "Batch change, for a whole group"))}
@@ -826,7 +868,7 @@ def page(l):
                 <ul class="mt-2 space-y-1 text-[9px]"><li class="flex justify-between"><span>{t("Bavette", "Flank steak")}</span><span>{argent(29, l)}</span></li><li class="flex justify-between"><span>Risotto</span><span>{argent(24, l)}</span></li><li class="flex justify-between"><span>{t("Tarte au sucre", "Sugar pie")}</span><span>{argent(9, l)}</span></li></ul>
               </div>
               <div class="ep-frise-ecran absolute inset-0 bg-[#2f5c47] p-3 text-creme opacity-0" data-cible="{t("Le menu des fêtes", "The holiday menu")}">
-                <p class="text-[8px] font-semibold uppercase tracking-[0.16em] text-miel">{t("Table 7", "Table 7")} · ✦</p>
+                <p class="text-[8px] font-semibold uppercase tracking-[0.16em] text-miel">{t("Table 7", "Table 7")} · {t("Fêtes", "Holidays")}</p>
                 <p class="titre mt-1 text-[15px] font-semibold">{t("Menu des fêtes", "Holiday menu")}</p>
                 <ul class="mt-2 space-y-1 text-[9px]"><li class="flex justify-between"><span>{t("Tourtière", "Tourtière")}</span><span>{argent(26, l)}</span></li><li class="flex justify-between"><span>{t("Dinde farcie", "Stuffed turkey")}</span><span>{argent(32, l)}</span></li><li class="flex justify-between"><span>{t("Bûche de Noël", "Yule log")}</span><span>{argent(11, l)}</span></li></ul>
               </div>
@@ -840,8 +882,8 @@ def page(l):
     <section id="plateforme" class="mx-auto max-w-6xl scroll-mt-20 px-5 py-28">
       <div class="max-w-2xl">
         <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brique" data-apparait>{t("La plateforme", "The platform")}</p>
-        <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("Au-delà de la carte&nbsp;: la plateforme Tapora Entreprise.", "Beyond the card: the Tapora Business platform.")}</h2>
-        <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>{t("La carte peut simplement contenir une adresse. Les menus, les formulaires, les statistiques et les réservations demandent des outils logiciels&nbsp;: les voici, et où ils en sont.", "A card can simply hold an address. Menus, forms, stats and bookings need software: here it is, and where each piece stands.")}</p>
+        <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("Vos chiffres, carte par carte.", "Your numbers, card by card.")}</h2>
+        <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>{t("Chaque tap passe par notre redirection&nbsp;: vous voyez quelle carte sert, quand, et dans quel groupe. Les outils qui s’ajoutent sont marqués «&nbsp;Bientôt&nbsp;».", "Every tap goes through our redirect: you see which card gets used, when, and in which group. The tools on the way are marked “Coming soon”.")}</p>
       </div>
       <div class="mt-14 grid items-start gap-10 lg:grid-cols-[1.05fr_0.95fr]">
         <div id="ep-tableau" class="relative overflow-hidden rounded-[2rem] bg-encre p-6 text-creme shadow-[0_40px_70px_-30px_rgb(40_25_15_/_0.7)] sm:p-8" data-apparait aria-hidden="true">
@@ -863,12 +905,19 @@ def page(l):
             <li><div class="flex justify-between"><span>{t("Espaces communs", "Common areas")}</span><span class="text-creme/70">210</span></div><div class="mt-1.5 h-2.5 rounded-full bg-creme/10"><div class="ep-jauge h-full rounded-full bg-creme/60" style="width:9.8%"></div></div></li>
           </ul>
           <div class="mt-7 flex flex-wrap gap-2 text-[11px]">
-            <span class="rounded-full bg-creme/10 px-3 py-1.5">⬇ {t("Export pour Excel", "Excel export")}</span>
-            <span class="rounded-full bg-creme/10 px-3 py-1.5">✉ {t("Rapport du 1<sup>er</sup> du mois", "Report on the 1st")}</span>
-            <span class="rounded-full bg-creme/10 px-3 py-1.5">🔒 {t("Page protégée", "Protected page")}</span>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-creme/10 px-3 py-1.5"><svg class="size-3.5"><use href="#i-telecharger"/></svg>{t("Export pour Excel", "Excel export")}</span>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-creme/10 px-3 py-1.5"><svg class="size-3.5"><use href="#i-courriel"/></svg>{t("Rapport du 1<sup>er</sup> du mois", "Report on the 1st")}</span>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-creme/10 px-3 py-1.5"><svg class="size-3.5"><use href="#i-cadenas"/></svg>{t("Page protégée", "Protected page")}</span>
           </div>
         </div>
         <ul class="grid gap-3 sm:grid-cols-2">{plat}</ul>
+      </div>
+      <div id="ding" class="mt-24 grid items-center gap-12 lg:grid-cols-[1.15fr_0.85fr]">
+        {figure_notifs("ding", l)}
+        <div class="lg:order-first">
+          <h3 data-mots class="titre text-3xl font-medium leading-tight sm:text-4xl">{t("Un «&nbsp;Ding&nbsp;!&nbsp;» à chaque tap.", "A “Ding!” on every tap.")}</h3>
+          <p class="mt-4 text-lg leading-relaxed text-encre-doux" data-apparait>{t("Chaque tap, chaque palier et chaque record arrive en notification sur le téléphone du gérant, iPhone ou Android, sans application à télécharger.", "Every tap, milestone and record arrives as a notification on the manager’s phone, iPhone or Android, with no app to download.")}</p>
+        </div>
       </div>
     </section>
 
@@ -877,7 +926,7 @@ def page(l):
       <div class="mx-auto max-w-5xl px-5">
         <div class="max-w-2xl">
           <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brique" data-apparait>{t("Deux offres", "Two offers")}</p>
-          <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("Les avis comme porte d’entrée. L’Entreprise pour tout le reste.", "Reviews as the way in. Business for everything else.")}</h2>
+          <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("Cartes à l’unité ou Entreprise&nbsp;?", "Individual cards or Business?")}</h2>
         </div>
         <div class="ep-tableau-comparaison carte-papier mt-12 overflow-x-auto rounded-[2rem] p-2 sm:p-4" data-apparait>
           <table class="w-full min-w-[34rem] border-collapse text-left text-[15px]">
@@ -896,21 +945,14 @@ def page(l):
       </div>
     </section>
 
-    <!-- ============================== VISION ============================== -->
-    <section id="vision" class="mx-auto max-w-5xl scroll-mt-20 px-5 py-32 text-center">
-      <p id="ep-vision" class="titre text-[2.4rem] font-medium leading-[1.12] sm:text-6xl">{t("Conçu pour votre entreprise. À votre image. Fait pour connecter.", "Designed for your business. Customized to your brand. Built to connect.")}</p>
-      <p class="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-encre-doux" data-apparait>{t("Tapora ne devrait pas être connue seulement pour les cartes d’avis&nbsp;: c’est la marque qu’on appelle pour relier ses espaces physiques à ses services numériques.", "Tapora shouldn’t be known only for review cards: it’s the brand you call to connect your physical spaces to your digital services.")}</p>
-      <p class="mt-6 font-semibold text-brique" data-apparait>{t("Tapora Cards — Connectez-vous à vos clients.", "Tapora Cards — Connect with your customers.")}</p>
-    </section>
-
     <!-- ============================== TAPORA S'OCCUPE DE TOUT ============================== -->
     <section id="tout" class="scroll-mt-20 bg-sable/70 py-28">
       <div class="mx-auto max-w-6xl px-5">
         <div class="grid items-end gap-10 lg:grid-cols-[1fr_1fr]">
           <div>
             <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brique" data-apparait>{t("Prêt à utiliser", "Ready to use")}</p>
-            <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("Tapora s’occupe de tout.", "Tapora takes care of everything.")}</h2>
-            <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>{t("Pas besoin de savoir quelle puce NFC acheter, comment programmer vos cartes ni comment les dessiner. Vous nous dites ce que vous voulez&nbsp;; on vous livre une solution prête à utiliser.", "No need to know which NFC chip to buy, how to program your cards or how to design them. You tell us what you want; we deliver a ready-to-use solution.")}</p>
+            <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("On s’occupe de tout, du design à la pose.", "We handle everything, from design to installation.")}</h2>
+            <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>{t("Pas besoin de savoir quelle puce NFC acheter, comment programmer vos cartes ni comment les dessiner. Vous nous dites ce que vous voulez, et on vous livre des cartes prêtes à poser.", "No need to know which NFC chip to buy, how to program your cards or how to design them. You tell us what you want, and we deliver cards ready to install.")}</p>
           </div>
           <figure id="ep-citation" class="carte-papier relative rounded-[2rem] p-7 sm:p-9" data-apparait>
             <span class="titre absolute -top-6 left-6 text-7xl leading-none text-brique" aria-hidden="true">«</span>
@@ -954,7 +996,7 @@ def page(l):
     <section id="feuille-de-route" class="mx-auto max-w-4xl scroll-mt-20 px-5 py-28">
       <div class="max-w-2xl">
         <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brique" data-apparait>{t("Ce qui arrive", "What’s coming")}</p>
-        <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("La carte reste. Les services s’ajoutent.", "The card stays. The services keep coming.")}</h2>
+        <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("Ce qu’on construit ensuite.", "What we’re building next.")}</h2>
         <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>{t("Ce que Tapora construit, dans l’ordre. Pas de date promise&nbsp;: chaque fonction passe à «&nbsp;Disponible&nbsp;» le jour où elle marche.", "What Tapora is building, in order. No promised dates: each feature becomes “Available” the day it works.")}</p>
       </div>
       <ol id="ep-route" class="relative mt-14 space-y-10 pl-10">
@@ -978,7 +1020,7 @@ def page(l):
       <div class="mx-auto max-w-6xl px-5">
         <div class="max-w-2xl">
           <p class="text-sm font-semibold uppercase tracking-[0.18em] text-brique" data-apparait>{t("Prix", "Pricing")}</p>
-          <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("Un prix par carte. Les logiciels, selon vos besoins.", "One price per card. Software, to your needs.")}</h2>
+          <h2 data-mots class="titre mt-3 text-4xl font-medium leading-tight sm:text-5xl">{t("Combien ça coûte.", "What it costs.")}</h2>
           <p class="mt-5 text-lg leading-relaxed text-encre-doux" data-apparait>{t("Le prix Entreprise commence à 30&nbsp;$ la carte, avec un minimum de 25 cartes par design. Chaque carte est à votre image et mène à la destination numérique de votre choix. Les statistiques sont toujours incluses, gratuitement&nbsp;: pour toutes les commandes Entreprise, et pour toutes les cartes à l’unité.", "Enterprise pricing starts at $30 per card, with a minimum of 25 cards per design. Every card can be customized to reflect your brand and connect your customers to the digital destination of your choice. Stats are always included, free: for every Business order, and for every individual card.")}</p>
         </div>
         <div class="mt-14 grid gap-6 lg:grid-cols-[1.15fr_1fr_1fr]">
@@ -1000,7 +1042,7 @@ def page(l):
           <article data-incline class="carte-papier relative overflow-hidden rounded-[2rem] p-8" data-apparait>
             <div class="ep-reflet" aria-hidden="true"></div>
             <p class="text-sm font-semibold uppercase tracking-[0.18em] text-sapin">{t("Modules logiciels", "Software modules")}</p>
-            <p class="titre mt-4 text-3xl font-medium leading-tight">{t("Selon vos besoins — sur soumission", "To your needs — on quote")}</p>
+            <p class="titre mt-4 text-3xl font-medium leading-tight">{t("Sur soumission, selon vos besoins", "On quote, to your needs")}</p>
             <p class="mt-3 leading-relaxed text-encre-doux">{t("Menu vivant, demandes, service aux chambres, portail de l’équipe, et les modules qui arrivent&nbsp;: on chiffre ensemble ce dont votre établissement a besoin. Un formulaire simple et une intégration au système d’un hôtel n’ont pas du tout le même coût. Pour tout le reste, on le construit pour vous&nbsp;: le prix dépend de ce que vous demandez.", "Live menu, requests, room service, staff portal, and the modules on the way: we price together what your venue needs. A simple form and a hotel-system integration don’t cost the same at all. For everything else, we build it for you: the price depends on what you ask for.")}</p>
           </article>
           <article data-incline class="carte-papier relative overflow-hidden rounded-[2rem] p-8" data-apparait>
@@ -1031,7 +1073,7 @@ def page(l):
         </svg>
         <div class="relative max-w-2xl">
           <h2 data-mots class="titre text-4xl font-medium leading-tight sm:text-5xl">{t("Dites-nous ce que vos cartes doivent ouvrir.", "Tell us what your cards should open.")}</h2>
-          <p class="mt-5 text-lg leading-relaxed text-creme/80">{t("Le nombre d’emplacements, ce que chacun doit ouvrir, vos couleurs&nbsp;: on vous revient avec une maquette et un prix — en français, et vite.", "How many spots, what each one should open, your colours: we come back with a mockup and a price — fast.")}</p>
+          <p class="mt-5 text-lg leading-relaxed text-creme/80">{t("Le nombre d’emplacements, ce que chacun doit ouvrir, vos couleurs&nbsp;: on vous revient vite avec une maquette et un prix, en français.", "How many spots, what each one should open, your colours: we come back quickly with a mockup and a price.")}</p>
           <div class="mt-9 flex flex-wrap gap-3">
             <a href="{form}" data-aimant class="bouton-fleche group inline-flex items-center gap-2 rounded-full bg-creme px-7 py-4 text-[15px] font-semibold text-sapin transition-colors hover:bg-white">{t("Parler de mon projet", "Talk about my project")} <span class="fleche" aria-hidden="true">→</span></a>
             <a href="{courriel(l)}" class="rounded-full border border-creme/30 px-7 py-4 text-[15px] font-medium transition hover:bg-creme/10">contact@taporacards.com</a>
@@ -1061,6 +1103,25 @@ def page(l):
 </body>
 </html>
 '''
+
+def figure_notifs(quoi, l):
+    """Les deux téléphones (iPhone verrouillé, Android) et leurs notifications : une image, deux légendes sous les téléphones."""
+    fr = l == 'fr'
+    alt = {
+        'ding': ('Deux téléphones, un iPhone à l’écran verrouillé et un Android, qui reçoivent les notifications de Tapora : « Ding ! Un client vient de taper », « 100 taps ! » et « Nouveau record ! ».',
+                 'Two phones, an iPhone on its lock screen and an Android, receiving Tapora notifications: “Ding! A customer just tapped”, “100 taps!” and “New record!”.'),
+        'equipe': ('Deux téléphones de l’équipe qui reçoivent des demandes de clients : sur l’iPhone, appeler le serveur à la table 4, l’addition à la terrasse 2 et de l’eau à la table 11 ; sur l’Android, une commande de la chambre 204, des serviettes pour la chambre 312 et un départ tardif pour la chambre 118.',
+                   'Two staff phones receiving guest requests: on the iPhone, call the server at table 4, the bill on patio 2 and water at table 11; on the Android, an order from room 204, fresh towels for room 312 and a late check-out for room 118.'),
+    }[quoi][0 if fr else 1]
+    nom = f'/images/notifications-{quoi}-{l}'
+    gauche, droite = ('iPhone · écran verrouillé', 'Android') if fr else ('iPhone · lock screen', 'Android')
+    return f'''<figure class="ep-notifs" data-apparait>
+          <picture>
+            <source type="image/webp" srcset="{nom}-820.webp 820w, {nom}.webp 1640w" sizes="(min-width: 1024px) 38rem, 100vw">
+            <img src="{nom}.webp" width="1640" height="1470" loading="lazy" decoding="async" alt="{alt}" class="ep-notifs-image">
+          </picture>
+          <figcaption class="ep-notifs-legende"><span>{gauche}</span><span>{droite}</span></figcaption>
+        </figure>'''
 
 def bandeau(l):
     fr = ['les hôtels', 'les restaurants', 'les cafés', 'les bars', 'les spas', 'les salons', 'les cliniques', 'les agences immobilières', 'les concessionnaires', 'les gyms', 'les congrès', 'les musées', 'les boutiques', 'les coworkings']
