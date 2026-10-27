@@ -119,20 +119,22 @@
           entreprise: 'Indiquez le nom de l’entreprise.',
           courriel: 'Indiquez un courriel valide.',
           quantite: 'L’offre Entreprise commence à 25 cartes.',
+          quantiteDeux: 'Pour les deux versions, il faut au moins 50 cartes : 25 par design.',
           envoi: 'Envoi…',
           patience: 'Encore un instant…',
           erreur: 'Envoi impossible pour le moment.',
-          corps: (d) => `Bonjour,\n\nNom : ${d.nom}\nEntreprise : ${d.entreprise}\nCourriel : ${d.courriel}\nTéléphone : ${d.telephone || '—'}\nNombre de cartes : ${d.quantite}\nLieu : ${d.lieu === 'QC' ? 'Au Québec' : 'Hors Québec'}\n\n${d.message || ''}\n\nMerci !`,
+          corps: (d) => `Bonjour,\n\nNom : ${d.nom}\nEntreprise : ${d.entreprise}\nCourriel : ${d.courriel}\nTéléphone : ${d.telephone || '—'}\nNombre de cartes : ${d.quantite}\nLieu : ${d.lieu === 'QC' ? 'Au Québec' : d.lieu === 'LES_DEUX' ? 'Les deux (une version Québec et une version hors Québec)' : 'Hors Québec'}\n\n${d.message || ''}\n\nMerci !`,
         }
       : {
           nom: 'Please enter your name.',
           entreprise: 'Please enter your business name.',
           courriel: 'Please enter a valid email.',
           quantite: 'Business orders start at 25 cards.',
+          quantiteDeux: 'For both versions, you need at least 50 cards: 25 per design.',
           envoi: 'Sending…',
           patience: 'Almost there…',
           erreur: 'Can’t send right now.',
-          corps: (d) => `Hi,\n\nName: ${d.nom}\nBusiness: ${d.entreprise}\nEmail: ${d.courriel}\nPhone: ${d.telephone || '—'}\nNumber of cards: ${d.quantite}\nLocation: ${d.lieu === 'QC' ? 'In Québec' : 'Outside Québec'}\n\n${d.message || ''}\n\nThanks!`,
+          corps: (d) => `Hi,\n\nName: ${d.nom}\nBusiness: ${d.entreprise}\nEmail: ${d.courriel}\nPhone: ${d.telephone || '—'}\nNumber of cards: ${d.quantite}\nLocation: ${d.lieu === 'QC' ? 'In Québec' : d.lieu === 'LES_DEUX' ? 'Both (a Québec version and an outside-Québec version)' : 'Outside Québec'}\n\n${d.message || ''}\n\nThanks!`,
         }
     const champT = formE.querySelector('[name=t]')
     if (champT) champT.value = String(Date.now())
@@ -144,9 +146,47 @@
     const secoursLien = document.getElementById('secours-lien')
     const merci = document.getElementById('merci-entreprise')
     const aideLieu = document.getElementById('e-lieu-aide')
+    const champQ = formE.querySelector('[name=quantite]')
+    const aideQ = document.getElementById('e-quantite-aide')
+    const estimation = document.getElementById('e-estimation')
+    // 25 cartes minimum par design : « les deux » versions, c'est deux designs.
+    const lieuChoisi = () => formE.querySelector('[name=lieu]:checked')?.value ?? 'QC'
+    const minimum = () => (lieuChoisi() === 'LES_DEUX' ? 50 : 25)
+    const argent = new Intl.NumberFormat(fr ? 'fr-CA' : 'en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 })
+    let dernierTotal = null
+    const majEstimation = () => {
+      if (!estimation) return
+      const n = Number(champQ.value)
+      const min = minimum()
+      const ok = Number.isInteger(n) && n >= min && n <= 5000
+      const detail = estimation.querySelector('[data-detail]')
+      const total = estimation.querySelector('[data-total]')
+      detail.textContent = ok
+        ? min === 50
+          ? fr ? `${n} × 30 $ · 2 designs` : `${n} × $30 · 2 designs`
+          : fr ? `${n} cartes × 30 $` : `${n} cards × $30`
+        : fr ? `${min} cartes au minimum` : `${min} cards minimum`
+      const texte = ok ? argent.format(n * 30) : '—'
+      if (texte !== dernierTotal && ok && !reduit) total.animate([{ transform: 'translateY(-35%)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 320, easing: 'cubic-bezier(.2,.9,.3,1.3)' })
+      total.textContent = texte
+      dernierTotal = texte
+    }
     formE.querySelectorAll('[name=lieu]').forEach((r) =>
-      r.addEventListener('change', () => { if (aideLieu) aideLieu.textContent = r.value === 'QC' ? aideLieu.dataset.qc : aideLieu.dataset.hqc }),
+      r.addEventListener('change', () => {
+        if (aideLieu) aideLieu.textContent = r.value === 'QC' ? aideLieu.dataset.qc : r.value === 'LES_DEUX' ? aideLieu.dataset.deux : aideLieu.dataset.hqc
+        const min = minimum()
+        champQ.min = String(min)
+        if (aideQ) aideQ.textContent = min === 50 ? aideQ.dataset.deux : aideQ.dataset.un
+        // Sous le nouveau minimum : on monte à 50, en le montrant.
+        if (Number(champQ.value) < min) {
+          champQ.value = String(min)
+          if (!reduit) champQ.animate([{ boxShadow: '0 0 0 5px rgb(228 165 58 / 0.55)' }, { boxShadow: '0 0 0 0 rgb(228 165 58 / 0)' }], { duration: 900, easing: 'ease-out' })
+        }
+        majEstimation()
+      }),
     )
+    champQ.addEventListener('input', majEstimation)
+    majEstimation()
     const COURRIEL = /^[^@\s<>]+@[^@\s<>]+\.[a-z]{2,}$/i
     const marquer = (champ, faux) => (faux ? champ.setAttribute('aria-invalid', 'true') : champ.removeAttribute('aria-invalid'))
     formE.querySelectorAll('.champ-site').forEach((c) => c.addEventListener('input', () => marquer(c, false)))
@@ -156,7 +196,7 @@
         ['nom', d.nom.trim().length > 0, T.nom],
         ['entreprise', d.entreprise.trim().length > 0, T.entreprise],
         ['courriel', COURRIEL.test(d.courriel.trim()), T.courriel],
-        ['quantite', /^\d+$/.test(d.quantite.trim()) && Number(d.quantite) >= 25 && Number(d.quantite) <= 5000, T.quantite],
+        ['quantite', /^\d+$/.test(d.quantite.trim()) && Number(d.quantite) >= minimum() && Number(d.quantite) <= 5000, minimum() === 50 ? T.quantiteDeux : T.quantite],
       ]
       let premier = null
       for (const [nom, ok, message] of verifs) {

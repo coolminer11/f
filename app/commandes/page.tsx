@@ -79,7 +79,7 @@ export default async function PageCommandes({ searchParams }: { searchParams: Pr
           <div className="mt-4">
             {demande && (
               <p className="mb-4 rounded-lg bg-[var(--color-accent-doux)] px-4 py-2.5 text-sm">
-                Préremplie depuis la demande de <strong>{demande.entreprise}</strong> ({demande.contact_nom}). Vérifiez le lieu de pose{demande.lieu === 'HORS_QC' ? ' (hors Québec : choisissez la province ou « Hors Canada »)' : ''}.
+                Préremplie depuis la demande de <strong>{demande.entreprise}</strong> ({demande.contact_nom}). Vérifiez le lieu de pose{demande.lieu === 'HORS_QC' ? ' (hors Québec : choisissez la province ou « Hors Canada »)' : demande.lieu === 'LES_DEUX' ? ' : le client veut les deux versions. Créez une commande pour la version Québec et une autre pour la version hors Québec, 25 cartes minimum chacune' : ''}.
               </p>
             )}
             <FormulaireCommande

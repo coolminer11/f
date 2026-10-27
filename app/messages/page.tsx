@@ -77,7 +77,7 @@ export default async function PageMessages({ searchParams }: { searchParams: Pro
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <h3 className="font-semibold">
-                    {d.entreprise} <span className="font-normal text-[var(--color-encre-doux)]">· {d.quantite} cartes · {d.lieu === 'QC' ? 'au Québec' : 'hors Québec'}</span>
+                    {d.entreprise} <span className="font-normal text-[var(--color-encre-doux)]">· {d.quantite} cartes · {d.lieu === 'QC' ? 'au Québec' : d.lieu === 'LES_DEUX' ? 'Québec et hors Québec (2 designs)' : 'hors Québec'}</span>
                   </h3>
                   <p className="mt-0.5 text-sm">
                     {d.contact_nom} ·{' '}

@@ -219,7 +219,7 @@ export type DemandeEntreprise = {
   courriel: string
   telephone: string | null
   quantite: number
-  lieu: 'QC' | 'HORS_QC'
+  lieu: 'QC' | 'HORS_QC' | 'LES_DEUX'
   langue: 'fr' | 'en'
   message: string | null
   cree_le: string
@@ -249,7 +249,7 @@ export async function enregistrerDemandeEntreprise(e: SaisieDemande, ctx: Contex
       ['Courriel', e.courriel],
       ['Téléphone', e.telephone],
       ['Cartes', String(e.quantite)],
-      ['Posées', e.lieu === 'QC' ? 'Au Québec (français d’abord)' : 'Hors Québec (anglais d’abord)'],
+      ['Posées', e.lieu === 'QC' ? 'Au Québec (français d’abord)' : e.lieu === 'LES_DEUX' ? 'Les deux : une version Québec (français d’abord) et une version hors Québec (anglais d’abord), 25 cartes minimum chacune' : 'Hors Québec (anglais d’abord)'],
       ['Langue', e.langue === 'fr' ? 'Français' : 'Anglais'],
     ],
     citation: e.message,

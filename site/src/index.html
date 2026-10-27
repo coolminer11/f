@@ -620,15 +620,17 @@
               <div class="">
                 <label for="e-quantite" class="text-sm font-medium">Nombre de cartes</label>
                 <input id="e-quantite" name="quantite" type="number" required min="25" max="5000" step="1" value="25" inputmode="numeric" aria-describedby="e-quantite-aide" class="champ-site mt-1.5">
-                <p id="e-quantite-aide" class="mt-1.5 text-xs text-encre-doux">25 au minimum</p>
+                <p id="e-quantite-aide" class="mt-1.5 text-xs text-encre-doux" data-un="25 au minimum" data-deux="50 au minimum : 25 par design">25 au minimum</p>
+                <p id="e-estimation" class="mt-2 flex items-baseline justify-between gap-3 rounded-xl bg-sable/70 px-3 py-2 text-sm" aria-live="polite"><span class="text-encre-doux" data-detail>25 cartes × 30&nbsp;$</span><strong class="titre text-lg font-medium tabular-nums" data-total>750&nbsp;$</strong></p>
               </div>
               <fieldset class="min-w-0">
                 <legend class="text-sm font-medium">Où seront-elles posées&nbsp;?</legend>
-                <div class="mt-1.5 grid grid-cols-2 gap-2">
-                  <label class="flex cursor-pointer"><input type="radio" name="lieu" value="QC" checked class="peer sr-only"><span class="choix-lieu flex flex-1 items-center justify-center rounded-[0.9rem] border border-ligne bg-papier px-3 py-3 text-center text-sm font-medium transition peer-checked:border-encre peer-checked:bg-encre peer-checked:text-creme peer-focus-visible:ring-2 peer-focus-visible:ring-brique">Au Québec</span></label>
-                  <label class="flex cursor-pointer"><input type="radio" name="lieu" value="HORS_QC" class="peer sr-only"><span class="choix-lieu flex flex-1 items-center justify-center rounded-[0.9rem] border border-ligne bg-papier px-3 py-3 text-center text-sm font-medium transition peer-checked:border-encre peer-checked:bg-encre peer-checked:text-creme peer-focus-visible:ring-2 peer-focus-visible:ring-brique">Hors Québec</span></label>
+                <div class="mt-1.5 grid grid-cols-3 gap-2">
+                  <label class="flex cursor-pointer"><input type="radio" name="lieu" value="QC" checked class="peer sr-only"><span class="choix-lieu flex flex-1 items-center justify-center rounded-[0.9rem] border border-ligne bg-papier px-1.5 py-3 text-center text-[13px] leading-tight font-medium transition peer-checked:border-encre peer-checked:bg-encre peer-checked:text-creme peer-focus-visible:ring-2 peer-focus-visible:ring-brique sm:text-sm">Au Québec</span></label>
+                  <label class="flex cursor-pointer"><input type="radio" name="lieu" value="HORS_QC" class="peer sr-only"><span class="choix-lieu flex flex-1 items-center justify-center rounded-[0.9rem] border border-ligne bg-papier px-1.5 py-3 text-center text-[13px] leading-tight font-medium transition peer-checked:border-encre peer-checked:bg-encre peer-checked:text-creme peer-focus-visible:ring-2 peer-focus-visible:ring-brique sm:text-sm">Hors Québec</span></label>
+                  <label class="flex cursor-pointer"><input type="radio" name="lieu" value="LES_DEUX" class="peer sr-only"><span class="choix-lieu flex flex-1 items-center justify-center rounded-[0.9rem] border border-ligne bg-papier px-1.5 py-3 text-center text-[13px] leading-tight font-medium transition peer-checked:border-encre peer-checked:bg-encre peer-checked:text-creme peer-focus-visible:ring-2 peer-focus-visible:ring-brique sm:text-sm">Les deux</span></label>
                 </div>
-                <p id="e-lieu-aide" class="mt-1.5 text-xs text-encre-doux" data-qc="Au Québec, le français est en vedette (Charte de la langue française)." data-hqc="Hors Québec, l’anglais passe en premier, le français ensuite.">Au Québec, le français est en vedette (Charte de la langue française).</p>
+                <p id="e-lieu-aide" class="mt-1.5 text-xs text-encre-doux" data-qc="Au Québec, le français est en vedette (Charte de la langue française)." data-hqc="Hors Québec, l’anglais passe en premier, le français ensuite." data-deux="Une version Québec (français en vedette) et une version hors Québec (anglais d’abord) : deux designs, 25 cartes minimum chacun.">Au Québec, le français est en vedette (Charte de la langue française).</p>
               </fieldset>
               <div class="sm:col-span-2">
                 <label for="e-message" class="text-sm font-medium">Votre idée <span class="font-normal text-encre-doux">(facultatif)</span></label>

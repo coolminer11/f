@@ -620,15 +620,17 @@
               <div class="">
                 <label for="e-quantite" class="text-sm font-medium">Number of cards</label>
                 <input id="e-quantite" name="quantite" type="number" required min="25" max="5000" step="1" value="25" inputmode="numeric" aria-describedby="e-quantite-aide" class="champ-site mt-1.5">
-                <p id="e-quantite-aide" class="mt-1.5 text-xs text-encre-doux">25 minimum</p>
+                <p id="e-quantite-aide" class="mt-1.5 text-xs text-encre-doux" data-un="25 minimum" data-deux="50 minimum: 25 per design">25 minimum</p>
+                <p id="e-estimation" class="mt-2 flex items-baseline justify-between gap-3 rounded-xl bg-sable/70 px-3 py-2 text-sm" aria-live="polite"><span class="text-encre-doux" data-detail>25 cards × $30</span><strong class="titre text-lg font-medium tabular-nums" data-total>$750</strong></p>
               </div>
               <fieldset class="min-w-0">
                 <legend class="text-sm font-medium">Where will they be installed?</legend>
-                <div class="mt-1.5 grid grid-cols-2 gap-2">
-                  <label class="flex cursor-pointer"><input type="radio" name="lieu" value="QC" checked class="peer sr-only"><span class="choix-lieu flex flex-1 items-center justify-center rounded-[0.9rem] border border-ligne bg-papier px-3 py-3 text-center text-sm font-medium transition peer-checked:border-encre peer-checked:bg-encre peer-checked:text-creme peer-focus-visible:ring-2 peer-focus-visible:ring-brique">In Québec</span></label>
-                  <label class="flex cursor-pointer"><input type="radio" name="lieu" value="HORS_QC" class="peer sr-only"><span class="choix-lieu flex flex-1 items-center justify-center rounded-[0.9rem] border border-ligne bg-papier px-3 py-3 text-center text-sm font-medium transition peer-checked:border-encre peer-checked:bg-encre peer-checked:text-creme peer-focus-visible:ring-2 peer-focus-visible:ring-brique">Outside Québec</span></label>
+                <div class="mt-1.5 grid grid-cols-3 gap-2">
+                  <label class="flex cursor-pointer"><input type="radio" name="lieu" value="QC" checked class="peer sr-only"><span class="choix-lieu flex flex-1 items-center justify-center rounded-[0.9rem] border border-ligne bg-papier px-1.5 py-3 text-center text-[13px] leading-tight font-medium transition peer-checked:border-encre peer-checked:bg-encre peer-checked:text-creme peer-focus-visible:ring-2 peer-focus-visible:ring-brique sm:text-sm">In Québec</span></label>
+                  <label class="flex cursor-pointer"><input type="radio" name="lieu" value="HORS_QC" class="peer sr-only"><span class="choix-lieu flex flex-1 items-center justify-center rounded-[0.9rem] border border-ligne bg-papier px-1.5 py-3 text-center text-[13px] leading-tight font-medium transition peer-checked:border-encre peer-checked:bg-encre peer-checked:text-creme peer-focus-visible:ring-2 peer-focus-visible:ring-brique sm:text-sm">Outside Québec</span></label>
+                  <label class="flex cursor-pointer"><input type="radio" name="lieu" value="LES_DEUX" class="peer sr-only"><span class="choix-lieu flex flex-1 items-center justify-center rounded-[0.9rem] border border-ligne bg-papier px-1.5 py-3 text-center text-[13px] leading-tight font-medium transition peer-checked:border-encre peer-checked:bg-encre peer-checked:text-creme peer-focus-visible:ring-2 peer-focus-visible:ring-brique sm:text-sm">Both</span></label>
                 </div>
-                <p id="e-lieu-aide" class="mt-1.5 text-xs text-encre-doux" data-qc="In Québec, French is featured first (Charter of the French Language)." data-hqc="Outside Québec, English comes first, then French.">In Québec, French is featured first (Charter of the French Language).</p>
+                <p id="e-lieu-aide" class="mt-1.5 text-xs text-encre-doux" data-qc="In Québec, French is featured first (Charter of the French Language)." data-hqc="Outside Québec, English comes first, then French." data-deux="A Québec version (French featured) and an outside-Québec version (English first): two designs, 25 cards minimum each.">In Québec, French is featured first (Charter of the French Language).</p>
               </fieldset>
               <div class="sm:col-span-2">
                 <label for="e-message" class="text-sm font-medium">Your idea <span class="font-normal text-encre-doux">(optional)</span></label>

@@ -21,11 +21,13 @@ const ERREURS = {
   fr: {
     champs: 'Il manque votre nom, celui de l’entreprise ou un courriel valide.',
     minimum: 'L’offre Entreprise commence à 25 cartes.',
+    minimumDeux: 'Pour les deux versions (Québec et hors Québec), il faut au moins 50 cartes : 25 par design.',
     trop: 'Beaucoup de demandes en peu de temps : réessayez dans une heure, ou écrivez à contact@taporacards.com.',
   },
   en: {
     champs: 'Your name, the business name or a valid email is missing.',
     minimum: 'The Business offer starts at 25 cards.',
+    minimumDeux: 'For both versions (Québec and outside Québec), you need at least 50 cards: 25 per design.',
     trop: 'Too many requests in a short time: try again in an hour, or email contact@taporacards.com.',
   },
 }
@@ -71,8 +73,12 @@ export async function POST(requete: Request) {
   const entreprise = champ('entreprise', 200)
   const courriel = champ('courriel', 254).toLowerCase()
   if (!contact || !entreprise || !COURRIEL.test(courriel)) return repondre({ ok: false, erreur: E.champs }, 400, origine)
+  const brut = champ('lieu', 8)
+  const lieu = brut === 'HORS_QC' || brut === 'LES_DEUX' ? brut : 'QC'
+  // 25 cartes minimum par design : « les deux » versions, c'est deux designs.
+  const minimum = lieu === 'LES_DEUX' ? 50 : 25
   const quantite = Number(champ('quantite', 7))
-  if (!Number.isInteger(quantite) || quantite < 25 || quantite > 100000) return repondre({ ok: false, erreur: E.minimum }, 400, origine)
+  if (!Number.isInteger(quantite) || quantite < minimum || quantite > 100000) return repondre({ ok: false, erreur: lieu === 'LES_DEUX' ? E.minimumDeux : E.minimum }, 400, origine)
 
   const r = await enregistrerDemandeEntreprise(
     {
@@ -81,7 +87,7 @@ export async function POST(requete: Request) {
       courriel,
       telephone: champ('telephone', 40) || null,
       quantite,
-      lieu: champ('lieu', 8) === 'HORS_QC' ? 'HORS_QC' : 'QC',
+      lieu,
       langue,
       message: champ('message', 3000) || null,
     },
