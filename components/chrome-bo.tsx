@@ -4,12 +4,20 @@ import { usePathname } from 'next/navigation'
 
 /**
  * Le menu, la barre de chargement et les pop-ups du back-office ne
- * s'affichent pas sur les pages de Tapora Services destinées aux clients
- * (/s/…) et au personnel (/service/…), même quand le propriétaire est
- * connecté : ces pages ont leur propre cadre.
+ * s'affichent jamais sur les pages destinées aux clients, même quand le
+ * propriétaire est connecté : l'espace client (/portail), la page de
+ * statistiques d'un client (/stats/…), ses documents (/documents/…), et
+ * Tapora Services (/s/… pour les clients, /service/… pour le personnel).
+ * Ces pages ont leur propre cadre.
  */
+// Avec la barre finale : « /service/ » ne touche pas « /services » (le back-office du propriétaire).
+const PREFIXES_CLIENTS = ['/s/', '/service/', '/stats/', '/documents/', '/portail/']
+
+export function pageClient(chemin: string): boolean {
+  return chemin === '/portail' || PREFIXES_CLIENTS.some((p) => chemin.startsWith(p))
+}
+
 export default function ChromeBo({ children }: { children: React.ReactNode }) {
-  const chemin = usePathname()
-  if (chemin.startsWith('/s/') || chemin.startsWith('/service/')) return null
+  if (pageClient(usePathname())) return null
   return <>{children}</>
 }

@@ -398,7 +398,7 @@ export async function envoyerAccesPortail(courriel: string, ctx: Contexte): Prom
           : 'Here is the link to your Tapora area: your stats, your orders and your messages. Keep it to yourself; if the page is protected, you will be asked for your password.',
         fr ? 'Vous n’avez rien demandé ? Ignorez ce courriel : rien n’a changé.' : 'Didn’t ask for this? Just ignore this email: nothing has changed.',
       ],
-      bouton: { texte: fr ? 'Ouvrir mon espace' : 'Open my area', lien: urlStats(d.id, d.version_lien, base) },
+      bouton: { texte: fr ? 'Ouvrir mon espace' : 'Open my area', lien: `${urlStats(d.id, d.version_lien, base)}?bienvenue=1` },
     })
     await envoyerCourriel({ destinataire: adresse, objet: fr ? `Votre espace Tapora — ${d.nom}` : `Your Tapora area — ${d.nom}`, ...c }).catch(() => null)
   }

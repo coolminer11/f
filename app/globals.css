@@ -1146,3 +1146,139 @@ html[data-installable] .bouton-installer { display: grid; }
   .inclinaison { transform: none !important; }
   .compteur-colonne { transition: none !important; }
 }
+
+/* ========================================================================== */
+/* Bienvenue : l'arrivée dans l'espace du client (components/client/bienvenue) */
+/* ========================================================================== */
+.bienvenue { display: none; }
+html[data-bienvenue='1'], html[data-bienvenue='1'] body { overflow: hidden; }
+html[data-bienvenue='1'] .bienvenue {
+  position: fixed; inset: 0; z-index: 95; display: grid; place-items: center; overflow: hidden;
+  background: #1b140f; color: #fffaf2; -webkit-font-smoothing: antialiased;
+}
+.bienvenue-fond {
+  position: absolute; inset: -25%;
+  background:
+    radial-gradient(38% 34% at 30% 32%, rgb(194 85 47 / 0.62), transparent 70%),
+    radial-gradient(34% 30% at 72% 62%, rgb(228 165 58 / 0.38), transparent 72%),
+    radial-gradient(48% 40% at 50% 108%, rgb(47 107 79 / 0.42), transparent 72%);
+  filter: blur(34px);
+  animation: bienvenue-derive 9s ease-in-out infinite alternate;
+}
+@keyframes bienvenue-derive { to { transform: translate3d(3%, -2.5%, 0) rotate(7deg) scale(1.08); } }
+.bienvenue-particules { position: absolute; inset: 0; pointer-events: none; }
+.bienvenue-particules i {
+  position: absolute; bottom: -12px; left: var(--x); width: var(--s); height: var(--s); border-radius: 50%;
+  background: #f2c879; box-shadow: 0 0 14px rgb(228 165 58 / 0.85); opacity: 0;
+  animation: bienvenue-monte var(--t) linear var(--d) infinite;
+}
+@keyframes bienvenue-monte {
+  0% { transform: translate3d(0, 0, 0); opacity: 0; }
+  12% { opacity: 0.9; }
+  100% { transform: translate3d(24px, -112vh, 0); opacity: 0; }
+}
+.bienvenue-centre { position: relative; display: flex; flex-direction: column; align-items: center; padding: 0 1.25rem; text-align: center; }
+.bienvenue-sceau { width: clamp(84px, 14vw, 124px); height: auto; overflow: visible; filter: drop-shadow(0 22px 44px rgb(194 85 47 / 0.6)); }
+.bienvenue-arc, .bienvenue-trait path { stroke-dasharray: 1; stroke-dashoffset: 0; }
+.bienvenue-sur { margin-top: 2.1rem; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.32em; text-transform: uppercase; color: #f2c879; }
+.bienvenue-nom {
+  margin-top: 0.85rem; max-width: 16ch; perspective: 700px;
+  font-family: var(--police-fraunces), Georgia, serif; font-weight: 500; font-size: clamp(2.4rem, 7.2vw, 5.4rem); line-height: 1.04; letter-spacing: -0.01em;
+}
+.bienvenue-mot { display: inline-block; white-space: nowrap; }
+.bienvenue-lettre { display: inline-block; transform-origin: 50% 100%; }
+.bienvenue-trait { width: min(72%, 330px); height: 16px; margin-top: 0.55rem; overflow: visible; }
+.bienvenue-sous { margin-top: 1.1rem; font-size: 1rem; color: rgb(255 250 242 / 0.68); }
+.bienvenue-passer {
+  position: absolute; right: 1.5rem; bottom: max(1.5rem, env(safe-area-inset-bottom));
+  border-radius: 999px; background: rgb(255 250 242 / 0.1); padding: 0.55rem 1.05rem;
+  color: rgb(255 250 242 / 0.75); font-size: 0.8rem; font-weight: 600; transition: background-color 0.2s, color 0.2s;
+}
+.bienvenue-passer:hover { background: rgb(255 250 242 / 0.18); color: #fff; }
+@media (prefers-reduced-motion: reduce) {
+  .bienvenue-fond { animation: none; }
+  .bienvenue-particules { display: none; }
+}
+
+/* ========================================================================== */
+/* Espace client (/portail) : l'entrée animée                                 */
+/* ========================================================================== */
+.theme-client .portail-scene { position: relative; isolation: isolate; overflow: hidden; margin: -1.5rem -1rem; padding: 0 1rem; min-height: 100dvh; }
+.theme-client .portail-aurore { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+.theme-client .portail-aurore span { position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.5; animation: portail-derive 16s ease-in-out infinite alternate; }
+.theme-client .portail-aurore span:nth-child(1) { width: 46vmax; height: 46vmax; left: -14vmax; top: -16vmax; background: radial-gradient(circle, rgb(194 85 47 / 0.32), transparent 65%); }
+.theme-client .portail-aurore span:nth-child(2) { width: 40vmax; height: 40vmax; right: -12vmax; top: 8vmax; background: radial-gradient(circle, rgb(237 161 0 / 0.24), transparent 65%); animation-duration: 19s; animation-delay: -6s; }
+.theme-client .portail-aurore span:nth-child(3) { width: 44vmax; height: 44vmax; left: 20vmax; bottom: -26vmax; background: radial-gradient(circle, rgb(47 107 79 / 0.2), transparent 65%); animation-duration: 22s; animation-delay: -11s; }
+.theme-client[data-mode='sombre'] .portail-aurore span { opacity: 0.75; }
+@keyframes portail-derive { to { transform: translate3d(6vmax, 4vmax, 0) scale(1.12); } }
+
+/* Entrées : tout se pose, dans l'ordre, une seule fois. */
+.theme-client .portail-entre { animation: portail-monte 0.9s cubic-bezier(0.16, 1, 0.3, 1) var(--d, 0s) both; }
+@keyframes portail-monte { from { opacity: 0; transform: translateY(18px); filter: blur(6px); } }
+.theme-client .portail-masque { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.12em; margin-bottom: -0.12em; }
+.theme-client .portail-mot { display: inline-block; animation: portail-mot 1.05s cubic-bezier(0.16, 1, 0.3, 1) var(--d, 0s) both; }
+@keyframes portail-mot { from { transform: translateY(110%) rotate(4deg); opacity: 0; } }
+.theme-client .portail-dernier { color: var(--cl-brique); font-style: italic; background: linear-gradient(100deg, var(--cl-brique) 30%, #e4a53a 50%, var(--cl-brique) 70%) 0 0 / 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: portail-reflet 4.5s ease-in-out 1.6s infinite; }
+@keyframes portail-reflet { 0%, 55% { background-position: 100% 0; } 100% { background-position: -150% 0; } }
+
+/* Le sceau se dessine. */
+.theme-client .portail-sceau { overflow: visible; }
+.theme-client .portail-sceau-disque { transform-origin: 50% 50%; animation: portail-disque 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s both; }
+@keyframes portail-disque { from { transform: scale(0.3) rotate(-40deg); opacity: 0; } }
+.theme-client .portail-arc { stroke-dasharray: 1; animation: portail-trace 0.8s cubic-bezier(0.65, 0, 0.35, 1) calc(0.3s + var(--i) * 0.12s) both; }
+@keyframes portail-trace { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.theme-client .portail-etoile { transform-box: fill-box; transform-origin: 50% 50%; animation: portail-etoile 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.75s both, portail-scintille 5s ease-in-out 2.5s infinite; }
+@keyframes portail-etoile { from { transform: scale(0) rotate(-140deg); } }
+@keyframes portail-scintille { 0%, 88%, 100% { transform: scale(1) rotate(0); } 94% { transform: scale(1.25) rotate(18deg); } }
+
+/* Les coches se tracent. */
+.theme-client .portail-point { animation: portail-monte 0.7s cubic-bezier(0.16, 1, 0.3, 1) var(--d, 0s) both; }
+.theme-client .portail-coche { stroke-dasharray: 1; animation: portail-trace 0.5s ease-out calc(var(--d, 0s) + 0.25s) both; }
+
+/* La carte arrive avec un ressort, et un halo tourne lentement sur son bord. */
+.theme-client .portail-carte { position: relative; isolation: isolate; animation: portail-carte 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both; box-shadow: 0 1px 0 rgb(255 255 255 / 0.6) inset, 0 40px 80px -40px rgb(var(--cl-ombre) / 0.45); }
+@keyframes portail-carte { from { opacity: 0; transform: translateY(46px) scale(0.95) rotate(-1deg); filter: blur(8px); } }
+.theme-client .portail-lueur { position: absolute; inset: -1px; z-index: -1; border-radius: inherit; padding: 1.5px; background: conic-gradient(from var(--a, 0deg), transparent 0 60%, rgb(194 85 47 / 0.55) 75%, rgb(228 165 58 / 0.7) 82%, transparent 92%); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; animation: portail-tour 7s linear infinite; }
+@property --a { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@keyframes portail-tour { to { --a: 360deg; } }
+.theme-client .portail-champ:focus { box-shadow: 0 0 0 4px var(--cl-rose-pale), 0 10px 30px -14px rgb(194 85 47 / 0.6); }
+.theme-client .portail-bouton { position: relative; overflow: hidden; }
+.theme-client .portail-bouton::after { content: ''; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.35) 50%, transparent 70%); transform: translateX(-120%); transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+.theme-client .portail-bouton:hover::after { transform: translateX(120%); }
+.theme-client .portail-bouton:active { transform: scale(0.98); }
+
+/* « Bon retour, <nom> » */
+.theme-client .portail-retour { margin-bottom: 1.25rem; animation: portail-monte 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both; }
+.theme-client .portail-initiale { display: grid; place-items: center; flex: none; width: 3.25rem; height: 3.25rem; border-radius: 1rem; background: linear-gradient(140deg, var(--cl-brique), #e4a53a); color: #fff; font-family: var(--police-fraunces), serif; font-size: 1.6rem; font-weight: 600; box-shadow: 0 14px 30px -14px rgb(194 85 47 / 0.8); animation: portail-disque 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.35s both; }
+.theme-client .portail-retour-lettre { display: inline-block; animation: portail-lettre 0.7s cubic-bezier(0.16, 1, 0.3, 1) calc(0.45s + var(--i) * 0.03s) both; }
+@keyframes portail-lettre { from { opacity: 0; transform: translateY(70%) rotateX(-60deg); filter: blur(6px); } }
+
+/* L'aperçu vivant (décoratif) */
+.theme-client .portail-apercu { position: relative; margin-top: 2.5rem; max-width: 22rem; animation: portail-monte 0.9s cubic-bezier(0.16, 1, 0.3, 1) 1.45s both; }
+.theme-client .portail-apercu-carte { border-radius: 1.5rem; border: 1px solid var(--cl-ligne); background: var(--cl-papier); padding: 1.1rem 1.2rem 1.2rem; box-shadow: 0 30px 60px -36px rgb(var(--cl-ombre) / 0.5); }
+.theme-client .portail-barre { flex: 1; height: var(--h); border-radius: 0.4rem 0.4rem 0.2rem 0.2rem; background: linear-gradient(to top, var(--cl-brique), var(--cl-brique-clair)); transform-origin: 50% 100%; animation: portail-barre 0.9s cubic-bezier(0.16, 1, 0.3, 1) calc(1.7s + var(--i) * 0.07s) both; }
+.theme-client .portail-barre:last-child { background: linear-gradient(to top, #e4a53a, #f2c879); }
+@keyframes portail-barre { from { transform: scaleY(0); } }
+.theme-client .portail-chiffre { display: inline-block; animation: portail-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+@keyframes portail-pop { from { transform: translateY(-40%) scale(1.15); opacity: 0; } }
+.theme-client .portail-ding { position: absolute; z-index: 2; left: 1.5rem; right: -1.5rem; top: -2.1rem; display: flex; align-items: center; gap: 0.65rem; border-radius: 1.1rem; background: rgb(255 250 242 / 0.88); padding: 0.6rem 0.8rem; box-shadow: 0 18px 40px -18px rgb(var(--cl-ombre) / 0.55); backdrop-filter: blur(14px); opacity: 0; transform: translateY(-14px) scale(0.96); transition: opacity 0.45s, transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.theme-client[data-mode='sombre'] .portail-ding { background: rgb(42 33 26 / 0.92); }
+.theme-client .portail-ding-visible { opacity: 1; transform: translateY(0) scale(1); }
+.theme-client .portail-ding-icone { display: grid; place-items: center; flex: none; width: 2rem; height: 2rem; border-radius: 0.6rem; background: var(--cl-papier); }
+
+/* Le lien est parti */
+.theme-client .portail-envoye { display: flex; flex-direction: column; align-items: center; gap: 1rem; border-radius: 1.25rem; background: var(--cl-vert-pale); padding: 1.6rem 1.4rem; text-align: center; animation: portail-monte 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.theme-client .portail-envoye-scene { position: relative; width: 4.5rem; height: 4.5rem; }
+.theme-client .portail-enveloppe, .theme-client .portail-reussi { position: absolute; inset: 0; }
+.theme-client .portail-enveloppe { animation: portail-envol 1.1s cubic-bezier(0.55, 0, 0.45, 1) 0.1s both; }
+@keyframes portail-envol { 0% { transform: translate(0, 0) rotate(0) scale(1); opacity: 1; } 35% { transform: translate(-6px, 4px) rotate(-8deg) scale(0.95); opacity: 1; } 100% { transform: translate(140px, -90px) rotate(18deg) scale(0.4); opacity: 0; } }
+.theme-client .portail-reussi-cercle, .theme-client .portail-reussi-coche { stroke-dasharray: 1; }
+.theme-client .portail-reussi-cercle { animation: portail-trace 0.7s cubic-bezier(0.65, 0, 0.35, 1) 0.95s both; }
+.theme-client .portail-reussi-coche { animation: portail-trace 0.45s ease-out 1.5s both; }
+.theme-client .portail-envoye-texte { animation: portail-monte 0.6s cubic-bezier(0.16, 1, 0.3, 1) 1.55s both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-client .portail-scene *, .theme-client .portail-scene *::before, .theme-client .portail-scene *::after { animation: none !important; transition: none !important; }
+  .theme-client .portail-ding { display: none; }
+  .theme-client .portail-enveloppe { display: none; }
+}

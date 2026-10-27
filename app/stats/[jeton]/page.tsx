@@ -45,6 +45,7 @@ import SectionAvis from '@/components/section-avis'
 import AnimationsClient from '@/components/animations-client'
 import { PERIODES, joursDepuis } from '@/components/selecteur-jours'
 import CadreClient from '@/components/client/cadre-client'
+import Bienvenue from '@/components/client/bienvenue'
 import BasculeMode from '@/components/client/bascule-mode'
 
 export const dynamic = 'force-dynamic'
@@ -252,6 +253,8 @@ export default async function StatsClient({ params, searchParams }: Props) {
   return (
     <CadreClient lang={fr ? 'fr-CA' : 'en-CA'}>
       <script dangerouslySetInnerHTML={{ __html: ANTI_ECLAIR }} />
+      {/* L'arrivée par le lien de l'espace client (ou la toute première visite) : « Bienvenue, <nom> ». */}
+      <Bienvenue nom={d.nom} langue={langue} cle={d.id} />
       {/* Le squelette reste affiché le temps que les animations démarrent : jamais d'écran vide. */}
       <div className="voile-client">
         <SqueletteClient />

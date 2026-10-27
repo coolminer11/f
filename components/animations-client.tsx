@@ -65,6 +65,11 @@ export default function AnimationsClient({ children, langue = 'fr' }: { children
 
       // ---- Les tuiles chiffrées : elles montent, et leurs chiffres comptent.
       intro.from('[data-tuile]', { y: 26, opacity: 0, duration: 0.9, stagger: 0.08 }, 0.35)
+      // L'écran « Bienvenue » joue d'abord : le haut de page attend que son rideau se lève.
+      if (document.documentElement.getAttribute('data-bienvenue') === '1') {
+        intro.pause()
+        window.addEventListener('tapora:bienvenue-fin', () => intro.play(), { once: true })
+      }
       // Les compteurs des sections plus bas comptent quand on les atteint.
       el.querySelectorAll<HTMLElement>('[data-compteur]').forEach((n) => {
         if (!n.closest(BLOCS)) compter(n, intro, 0.45)
